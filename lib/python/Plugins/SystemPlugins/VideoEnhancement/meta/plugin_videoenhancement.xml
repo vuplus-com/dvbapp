@@ -18,8 +18,8 @@
                     <author>Dream Multimedia</author>
                     <name>Erweiterte A/V Einstellungen</name>
                     <packagename>enigma2-plugin-systemplugins-videoenhancement</packagename>
-                    <shortdescription>Erweiterte A/V Einstellungen für Ihre Dreambox.</shortdescription>
-                    <description>Erweiterte A/V Einstellungen für Ihre Dreambox.</description>
+                    <shortdescription>Erweiterte A/V Einstellungen für Ihre STB.</shortdescription>
+                    <description>Erweiterte A/V Einstellungen für Ihre STB.</description>
                     <screenshot src="http://www.dreamboxupdate.com/preview/plugin_videoenhancement_de.jpg" />
           </info>
 

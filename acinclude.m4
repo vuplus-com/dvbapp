@@ -157,6 +157,9 @@ version DVB_API_VERSION
 ])
 fi
 
+ #csh
+AC_DEFINE(BUILD_VUPLUS,1,[Define to 1 for 750])
+
 if test "$DVB_API_VERSION"; then
 	AC_DEFINE(HAVE_DVB,1,[Define to 1 if you have the dvb includes])
 	AC_DEFINE_UNQUOTED(HAVE_DVB_API_VERSION,$DVB_API_VERSION,[Define to the version of the dvb api])

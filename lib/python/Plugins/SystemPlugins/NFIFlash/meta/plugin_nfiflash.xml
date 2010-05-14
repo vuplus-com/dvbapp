@@ -8,9 +8,9 @@
                     <author>Dream Multimedia</author>
                     <name>NFIFlash</name>
                     <packagename>enigma2-plugin-systemplugins-nfiflash</packagename>
-                    <shortdescription>Restore your Dreambox with a USB stick.</shortdescription>
-                    <description>With the NFIFlash extension it is possible to prepare a USB stick with an Dreambox image.\n
-                    It is then possible to flash your Dreambox with the image on that stick.
+                    <shortdescription>Restore your STB with a USB stick.</shortdescription>
+                    <description>With the NFIFlash extension it is possible to prepare a USB stick with an STB image.\n
+                    It is then possible to flash your STB with the image on that stick.
                     </description>
                     <screenshot src="http://www.dreamboxupdate.com/preview/plugin_nfiflash_en.jpg" />
           </info>
@@ -18,9 +18,9 @@
                     <author>Dream Multimedia</author>
                     <name>NFIFlash</name>
                     <packagename>enigma2-plugin-systemplugins-nfiflash</packagename>
-                    <shortdescription>Wiederherstellen Ihrer Dreambox mittels USB-Stick.</shortdescription>
-                    <description>Mit der NFIFlash Erweiterung können Sie ein Dreambox Image auf einen USB-Stick laden.\
-                    Mit diesem USB-Stick ist es dann möglich Ihre Dreambox zu flashen.
+                    <shortdescription>Wiederherstellen Ihrer STB mittels USB-Stick.</shortdescription>
+                    <description>Mit der NFIFlash Erweiterung können Sie ein STB Image auf einen USB-Stick laden.\
+                    Mit diesem USB-Stick ist es dann möglich Ihre STB zu flashen.
                     </description>
                     <screenshot src="http://www.dreamboxupdate.com/preview/plugin_nfiflash_de.jpg" />
           </info>

@@ -490,6 +490,11 @@ void eDVBFrontend::reopenFrontend()
 	openFrontend();
 }
 
+#ifdef BUILD_VUPLUS /* ikseong */
+int frontend0_fd;
+int frontend1_fd;
+#endif
+
 int eDVBFrontend::openFrontend()
 {
 	if (m_state != stateClosed)
@@ -514,6 +519,15 @@ int eDVBFrontend::openFrontend()
 				eWarning("failed! (%s) %m", m_filename);
 				return -1;
 			}
+#ifdef BUILD_VUPLUS /* ikseong */
+			else
+			{				
+				if (m_dvbid==0)
+					frontend0_fd = m_fd;
+				else if (m_dvbid==1)
+					frontend1_fd = m_fd;
+			}
+#endif
 		}
 	}
 	else
@@ -716,6 +730,10 @@ void eDVBFrontend::timeout()
 	m_tuning = 0;
 	if (m_state == stateTuning)
 	{
+#ifdef BUILD_VUPLUS /* ikseong  */
+		eDVBFrontend *sec_fe = this;
+		sec_fe->m_data[CSW] = sec_fe->m_data[UCSW] = sec_fe->m_data[TONEBURST] = -1; // reset diseqc
+#endif
 		m_state = stateFailed;
 		m_stateChanged(this);
 	}

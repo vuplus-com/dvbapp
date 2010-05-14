@@ -175,7 +175,7 @@ class CrashlogAutoSubmitConfiguration(Screen, ConfigListScreen):
 			self.enableVKeyIcon()
 			self.showKeypad()
 		elif current == self.AnonCrashlogEntry:
-			self["status"].setText(_("Adds enigma2 settings and dreambox model informations like SN, rev... if enabled."))
+			self["status"].setText(_("Adds enigma2 settings and STB model informations like SN, rev... if enabled."))
 			self.disableVKeyIcon()
 		elif current == self.NetworkEntry:
 			self["status"].setText(_("Adds network configuration if enabled."))
@@ -332,15 +332,16 @@ def mxServerFound(mxServer,session):
 		if crashlog.startswith("enigma2_crash_") and crashlog.endswith(".log"):
 			print "[CrashlogAutoSubmit] - found crashlog: ",os.path.basename(crashlog)
 			crashLogFilelist.append('/media/hdd/' + crashlog)
-
-	if len(crashLogFilelist):
-		if config.plugins.crashlogautosubmit.sendmail.value == "send":
-			Notifications.AddNotificationWithCallback(handleAnswer, ChoiceBox, title=_("Crashlogs found!\nSend them to Dream Multimedia?"), list = list)
-		elif config.plugins.crashlogautosubmit.sendmail.value == "send_always":
-			send_mail()
-	else:
-		print "[CrashlogAutoSubmit] - no crashlogs found."
-
+#	ikseong
+#	if len(crashLogFilelist):
+#		if config.plugins.crashlogautosubmit.sendmail.value == "send":
+#			session.openWithCallback(handleAnswer, ChoiceBox, title=_("Crashlogs found!\nSend them to Dream Multimedia ?"), list = list)
+#		elif config.plugins.crashlogautosubmit.sendmail.value == "send_always":
+#			send_mail()
+#	else:	
+#		print "[CrashlogAutoSubmit] - no crashlogs found."
+#
+	print "block to handle Crashlogs "
 
 def getMailExchange(host):
 	print "[CrashlogAutoSubmit] - getMailExchange"

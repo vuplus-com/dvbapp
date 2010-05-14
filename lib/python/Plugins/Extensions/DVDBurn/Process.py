@@ -891,7 +891,7 @@ class DVDJob(Job):
 				tool = "genisoimage"
 				isopathfile = getISOfilename(self.project.settings.isopath.getValue(), volName)
 				burnargs = [ "-o", isopathfile ]
-			burnargs += [ "-dvd-video", "-publisher", "Dreambox", "-V", volName, self.workspace + "/dvd" ]
+			burnargs += [ "-dvd-video", "-publisher", "STB", "-V", volName, self.workspace + "/dvd" ]
 			BurnTask(self, burnargs, tool)
 		RemoveDVDFolder(self)
 
@@ -937,7 +937,7 @@ class DVDdataJob(Job):
 			burnargs += ["-iso-level", "4", "-allow-limited-size" ]
 		elif self.project.settings.dataformat.getValue() == "udf":
 			burnargs += ["-udf", "-allow-limited-size" ]
-		burnargs += [ "-publisher", "Dreambox", "-V", volName, "-follow-links", self.workspace ]
+		burnargs += [ "-publisher", "STB", "-V", volName, "-follow-links", self.workspace ]
 		BurnTask(self, burnargs, tool)
 		RemoveDVDFolder(self)
 
@@ -958,6 +958,6 @@ class DVDisoJob(Job):
 			burnargs = [ "-Z", "/dev/" + harddiskmanager.getCD(), "-dvd-compat" ]
 			if getSize(imagepath)/(1024*1024) > self.project.MAX_SL:
 				burnargs += [ "-use-the-force-luke=4gms", "-speed=1", "-R" ]
-			burnargs += [ "-dvd-video", "-publisher", "Dreambox", "-V", volName, imagepath ]
+			burnargs += [ "-dvd-video", "-publisher", "STB", "-V", volName, imagepath ]
 		tool = "growisofs"
 		BurnTask(self, burnargs, tool)

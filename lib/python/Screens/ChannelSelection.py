@@ -1446,6 +1446,10 @@ class ChannelSelectionRadio(ChannelSelectionBase, ChannelSelectionEdit, ChannelS
 		#set previous tv service
 		self.close(None)
 
+	#	ikseong - for add bouquet
+	def cancel(self):
+		self.closeRadio()
+		
 	def __evServiceStart(self):
 		service = self.session.nav.getCurrentService()
 		if service:

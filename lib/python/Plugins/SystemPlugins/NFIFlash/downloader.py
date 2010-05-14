@@ -274,7 +274,7 @@ class NFIDownload(Screen):
 
 	def feed_failed(self, failure_instance):
 		print "[feed_failed] " + str(failure_instance)
-		self["infolabel"].text = _("Could not connect to Dreambox .NFI Image Feed Server:") + "\n" + failure_instance.getErrorMessage() + "\n\n" + _("Please check your network settings!")
+		self["infolabel"].text = _("Could not connect to STB .NFI Image Feed Server:") + "\n" + failure_instance.getErrorMessage() + "\n\n" + _("Please check your network settings!")
 		self.downloading(False)
 
 	def feed_finished(self, feedhtml):
@@ -486,7 +486,7 @@ class NFIDownload(Screen):
 
 	def dmesg_cleared(self, answer):
 		self.container.appClosed.remove(self.dmesg_cleared)
-		self.msgbox = self.session.open(MessageBox, _("Please disconnect all USB devices from your Dreambox and (re-)attach the target USB stick (minimum size is 64 MB) now!"), MessageBox.TYPE_INFO)
+		self.msgbox = self.session.open(MessageBox, _("Please disconnect all USB devices from your STB and (re-)attach the target USB stick (minimum size is 64 MB) now!"), MessageBox.TYPE_INFO)
 		hotplugNotifier.append(self.hotplugCB)
 
 	def hotplugCB(self, dev, action):
@@ -650,7 +650,7 @@ class NFIDownload(Screen):
 				wizardfd.write("image: "+self["feedlist"].getNFIname()+'\n')
 				wizardfd.write("configuration: "+self.backup_file+'\n')
 				wizardfd.close()
-		self.session.open(MessageBox, _("To update your Dreambox firmware, please follow these steps:\n1) Turn off your box with the rear power switch and plug in the bootable USB stick.\n2) Turn mains back on and hold the DOWN button on the front panel pressed for 10 seconds.\n3) Wait for bootup and follow instructions of the wizard."), type = MessageBox.TYPE_INFO)
+		self.session.open(MessageBox, _("To update your STB firmware, please follow these steps:\n1) Turn off your box with the rear power switch and plug in the bootable USB stick.\n2) Turn mains back on and hold the DOWN button on the front panel pressed for 10 seconds.\n3) Wait for bootup and follow instructions of the wizard."), type = MessageBox.TYPE_INFO)
 
 	def closeCB(self):
 		try:

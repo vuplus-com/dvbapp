@@ -36,7 +36,11 @@ void gLCDDC::exec(gOpcode *o)
 	{
 	case gOpcode::flush:
 //		if (update)
+#ifndef BUILD_VUPLUS /* ikseong  */
 			lcd->update();
+#else
+			;
+#endif
 	default:
 		gDC::exec(o);
 		break;

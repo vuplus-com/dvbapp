@@ -137,8 +137,9 @@ class MediaPlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarAudioSelection, InfoB
 
 		self.seek_target = None
 
-		from Plugins.SystemPlugins.Hotplug.plugin import hotplugNotifier
-		hotplugNotifier.append(self.hotplugCB)
+#	ikseong
+#		from Plugins.SystemPlugins.Hotplug.plugin import hotplugNotifier
+#		hotplugNotifier.append(self.hotplugCB)
 
 		class MoviePlayerActionMap(NumberActionMap):
 			def __init__(self, player, contexts = [ ], actions = { }, prio=0):
@@ -168,8 +169,11 @@ class MediaPlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarAudioSelection, InfoB
 				"prevBouquet": (self.switchToPlayList, _("switch to playlist")),
 				"nextBouquet": (self.switchToFileList, _("switch to filelist")),
 				"delete": (self.deletePlaylistEntry, _("delete playlist entry")),
-				"shift_stop": (self.clear_playlist, _("clear playlist")),
-				"shift_record": (self.playlist.PlayListShuffle, _("shuffle playlist")),
+#ikseong				
+#				"shift_stop": (self.clear_playlist, _("clear playlist")),
+#				"shift_record": (self.playlist.PlayListShuffle, _("shuffle playlist")),
+				"shift_stop": self.clear_playlist,
+				"shift_record": self.playlist.PlayListShuffle,
 				"subtitles": (self.subtitleSelection, _("Subtitle selection")),
 			}, -2)
 
@@ -248,8 +252,9 @@ class MediaPlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarAudioSelection, InfoB
 		if config.mediaplayer.saveDirOnExit.getValue():
 			config.mediaplayer.defaultDir.setValue(self.filelist.getCurrentDirectory())
 			config.mediaplayer.defaultDir.save()
-		from Plugins.SystemPlugins.Hotplug.plugin import hotplugNotifier
-		hotplugNotifier.remove(self.hotplugCB)
+#	ikseong			
+#	from Plugins.SystemPlugins.Hotplug.plugin import hotplugNotifier
+#	hotplugNotifier.remove(self.hotplugCB)
 		del self["coverArt"].picload
 		self.close()
 
@@ -277,13 +282,13 @@ class MediaPlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarAudioSelection, InfoB
 		currPlay = self.session.nav.getCurrentService()
 		sTagAudioCodec = currPlay.info().getInfoString(iServiceInformation.sTagAudioCodec)
 		print "[__evAudioDecodeError] audio-codec %s can't be decoded by hardware" % (sTagAudioCodec)
-		self.session.open(MessageBox, _("This Dreambox can't decode %s streams!") % sTagAudioCodec, type = MessageBox.TYPE_INFO,timeout = 20 )
+		self.session.open(MessageBox, _("This STB can't decode %s streams!") % sTagAudioCodec, type = MessageBox.TYPE_INFO,timeout = 20 )
 
 	def __evVideoDecodeError(self):
 		currPlay = self.session.nav.getCurrentService()
 		sTagVideoCodec = currPlay.info().getInfoString(iServiceInformation.sTagVideoCodec)
 		print "[__evVideoDecodeError] video-codec %s can't be decoded by hardware" % (sTagVideoCodec)
-		self.session.open(MessageBox, _("This Dreambox can't decode %s streams!") % sTagVideoCodec, type = MessageBox.TYPE_INFO,timeout = 20 )
+		self.session.open(MessageBox, _("This STB can't decode %s streams!") % sTagVideoCodec, type = MessageBox.TYPE_INFO,timeout = 20 )
 
 	def __evPluginError(self):
 		currPlay = self.session.nav.getCurrentService()

@@ -1,5 +1,7 @@
 from os import system, listdir, statvfs, popen, makedirs, stat, major, minor, path, access
-from Tools.Directories import SCOPE_HDD, resolveFilename
+#	ikseong
+from Tools.Directories import SCOPE_HDD, resolveFilename, fileExists
+
 from Tools.CList import CList
 from SystemInfo import SystemInfo
 import time
@@ -91,7 +93,13 @@ class Harddisk:
 		return ret
 
 	def diskSize(self):
-		line = readFile(self.sysfsPath('size'))
+		#	ikseong
+		try:
+			line = readFile(self.sysfsPath('size'))
+		except:
+			harddiskmanager.removeHotplugPartition(self.device)
+			print "error remove",self.device
+			return -1
 		try:
 			cap = int(line)
 		except:
@@ -105,14 +113,20 @@ class Harddisk:
 		return "%d.%03d GB" % (cap/1000, cap%1000)
 
 	def model(self):
-		if self.device[:2] == "hd":
-			return readFile('/proc/ide/' + self.device + '/model')
-		elif self.device[:2] == "sd":
-			vendor = readFile(self.sysfsPath('device/vendor'))
-			model = readFile(self.sysfsPath('device/model'))
-			return vendor + '(' + model + ')'
-		else:
-			assert False, "no hdX or sdX"
+		#	ikseong
+		try:
+			if self.device[:2] == "hd":
+				return readFile('/proc/ide/' + self.device + '/model')
+			elif self.device[:2] == "sd":
+				vendor = readFile(self.sysfsPath('device/vendor'))
+				model = readFile(self.sysfsPath('device/model'))
+				return vendor + '(' + model + ')'
+			else:
+				assert False, "no hdX or sdX"
+		except:
+			harddiskmanager.removeHotplugPartition(self.device)
+			print "error remove",self.device
+			return -1
 
 	def free(self):
 		try:
@@ -209,7 +223,12 @@ class Harddisk:
 		return (res >> 8)
 
 	def createMovieFolder(self):
+#	ikseong
 		try:
+			if not fileExists("/hdd", 0):
+				print "not found /hdd"
+				system("ln -s /media/hdd /hdd")
+#				
 			makedirs(resolveFilename(SCOPE_HDD))
 		except OSError:
 			return -1
@@ -318,6 +337,10 @@ class Harddisk:
 		idle_time = t - self.last_access
 
 		stats = self.readStats()
+		#	ikseong
+		if stats == -1:
+			self.setIdleTime(0)
+			return
 		print "nr_read", stats[0], "nr_write", stats[1]
 		l = sum(stats)
 		print "sum", l, "prev_sum", self.last_stat
@@ -505,7 +528,8 @@ class HarddiskManager:
 					self.addHotplugPartition(part)
 
 	def getAutofsMountpoint(self, device):
-		return "/autofs/%s/" % (device)
+		return "/media/%s/" % (device)
+
 
 	def addHotplugPartition(self, device, physdev = None):
 		if not physdev:
@@ -554,6 +578,9 @@ class HarddiskManager:
 	def HDDList(self):
 		list = [ ]
 		for hd in self.hdd:
+			#	ikseong
+			if hd.model() == -1:
+				continue
 			hdd = hd.model() + " - " + hd.bus()
 			cap = hd.capacity()
 			if cap != "":

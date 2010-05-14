@@ -15,7 +15,11 @@
 
 /************************************************/
 
+#ifdef BUILD_VUPLUS /* ikseong  */
+#define CRASH_EMAILADDR "crashlog"
+#else
 #define CRASH_EMAILADDR "crashlog@dream-multimedia-tv.de"
+#endif
 #define STDBUFFER_SIZE 512
 #define RINGBUFFER_SIZE 16384
 static char ringbuffer[RINGBUFFER_SIZE];
@@ -379,10 +383,18 @@ void bsodFatal(const char *component)
 		eRect usable_area = eRect(100, 70, my_dc->size().width() - 150, 100);
 		
 		char text[512];
+#ifdef BUILD_VUPLUS /* ikseong  */
+		snprintf(text, 512, "We are really sorry. Your STB encountered "
+#else
 		snprintf(text, 512, "We are really sorry. Your Dreambox encountered "
+#endif
 			"a software problem, and needs to be restarted. "
 			"Please send the logfile created in /hdd/ to %s.\n"
+#ifdef BUILD_VUPLUS /* ikseong  */
+			"Your STB restarts in 10 seconds!\n"
+#else
 			"Your Dreambox restarts in 10 seconds!\n"
+#endif
 			"Component: %s",
 			crash_emailaddr, crash_component);
 	

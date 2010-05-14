@@ -44,7 +44,9 @@ keyDescriptions = [{
 		KEYIDS["KEY_9"]: ("9",),
 		KEYIDS["KEY_EXIT"]: ("EXIT",),
 		KEYIDS["KEY_STOP"]: ("TV", "SHIFT"),
-		KEYIDS["KEY_RECORD"]: ("RECORD",)
+		KEYIDS["KEY_RECORD"]: ("RECORD",),
+#	ikseong for subtitle hotkey
+		KEYIDS["KEY_SUBTITLE"]: ("SUBTITLE",)
 	},
 	{
 		KEYIDS["BTN_0"]: ("UP", "fp"),
@@ -86,7 +88,11 @@ keyDescriptions = [{
 		KEYIDS["KEY_9"]: ("9",),
 		KEYIDS["KEY_EXIT"]: ("EXIT",),
 		KEYIDS["KEY_STOP"]: ("TV", "SHIFT"),
-		KEYIDS["KEY_RECORD"]: ("RADIO", "SHIFT")
+#	ikseong
+#		KEYIDS["KEY_RECORD"]: ("RADIO", "SHIFT"),
+		KEYIDS["KEY_RECORD"]: ("RECORD",),
+#	ikseong for subtitle hotkey
+		KEYIDS["KEY_SUBTITLE"]: ("SUBTITLE",)
 	}
 ]
 

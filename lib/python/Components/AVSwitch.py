@@ -73,8 +73,8 @@ def InitAVSwitch():
 	# when YUV is not enabled, don't let the user select it
 	if config.av.yuvenabled.value:
 		colorformat_choices["yuv"] = _("YPbPr")
-
-	config.av.colorformat = ConfigSelection(choices=colorformat_choices, default="rgb")
+#	ikseong
+	config.av.colorformat = ConfigSelection(choices=colorformat_choices, default="cvbs")
 	config.av.aspectratio = ConfigSelection(choices={
 			"4_3_letterbox": _("4:3 Letterbox"),
 			"4_3_panscan": _("4:3 PanScan"), 

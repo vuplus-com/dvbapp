@@ -15,6 +15,9 @@ from enigma import eTimer
 from xml.sax import make_parser
 from xml.sax.handler import ContentHandler
 
+#	ikseong
+from Plugins.SystemPlugins.FactoryTest.plugin import FactoryTest
+
 class WizardSummary(Screen):
 	skin = """
 	<screen position="0,0" size="132,64">
@@ -193,6 +196,10 @@ class Wizard(Screen):
 		self.timeoutTimer = eTimer()
 		self.timeoutTimer.callback.append(self.timeoutCounterFired)
 
+		#	ikseong - for memory test
+		self.memorytestmode = 0
+		self.testkey = 0
+
 		self["text"] = Label()
 
 		if showConfig:
@@ -243,7 +250,9 @@ class Wizard(Screen):
 			"7": self.keyNumberGlobal,
 			"8": self.keyNumberGlobal,
 			"9": self.keyNumberGlobal,
-			"0": self.keyNumberGlobal
+			"0": self.keyNumberGlobal,
+#	ikseong
+			"test":self.testmode
 		}, -1)
 
 		self["VirtualKB"] = NumberActionMap(["VirtualKeyboardActions"],
@@ -384,7 +393,23 @@ class Wizard(Screen):
 					self.configInstance.run()
 		self.finished()
 
+#	ikseong
+	def testmode(self):
+		print "testmode ",self.memorytestmode
+		if self.memorytestmode == 0:
+			self.memorytestmode = 1
+		else:
+			self.memorytestmode = 0
+
 	def keyNumberGlobal(self, number):
+		if self.memorytestmode == 1:
+			self.testkey = self.testkey * 10 + number
+			if self.testkey > 10000:
+				self.testkey = self.testkey%10000
+			if self.testkey == 4599:
+				self.session.open(FactoryTest)
+			print "testkey", self.testkey
+			return
 		if (self.wizard[self.currStep]["config"]["screen"] != None):
 			self.configInstance.keyNumberGlobal(number)
 

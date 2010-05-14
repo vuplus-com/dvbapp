@@ -10,7 +10,7 @@
                     <packagename>enigma2-plugin-systemplugins-commoninterfaceassignment</packagename>
                     <shortdescription>Assigning providers/services/caids to a dedicated CI module</shortdescription>
                     <description>With the CommonInterfaceAssignment extension it is possible to use different CI modules
-                    in your Dreambox and assign to each of them dedicated providers/services or caids.\n
+                    in your STB and assign to each of them dedicated providers/services or caids.\n
                     So it is then possible to watch a scrambled service while recording another one.
                     </description>
                     <screenshot src="http://www.dreamboxupdate.com/preview/plugin_ciassignment.jpg" />

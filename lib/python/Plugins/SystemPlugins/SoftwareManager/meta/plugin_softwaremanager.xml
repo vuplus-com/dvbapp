@@ -7,8 +7,8 @@
                     <author>Dream Multimedia</author>
                     <name>SoftwareManager</name>
                     <packagename>enigma2-plugin-systemplugins-softwaremanager</packagename>
-                    <shortdescription>SoftwareManager manages your Dreambox software.</shortdescription>
-                    <description>The SoftwareManager manages your Dreambox software.\n
+                    <shortdescription>SoftwareManager manages your STB software.</shortdescription>
+                    <description>The SoftwareManager manages your STB software.\n
                     It's easy to update your receiver's software, install or remove extensions or even backup and restore your system settings.
                     </description>
                     <screenshot src="http://www.dreamboxupdate.com/preview/plugin_softwaremanager_en.jpg" />
@@ -17,9 +17,9 @@
                     <author>Dream Multimedia</author>
                     <name>SoftwareManager</name>
                     <packagename>enigma2-plugin-systemplugins-softwaremanager</packagename>
-                    <shortdescription>Der SoftwareManager verwaltet Ihre Dreambox Software.</shortdescription>
-                    <description>Der SoftwareManager verwaltet Ihre Dreambox Software.\n
-                    Sie können nun einfach Ihre Dreambox-Software aktualisieren, neue Erweiterungen installieren oder entfernen,
+                    <shortdescription>Der SoftwareManager verwaltet Ihre STB Software.</shortdescription>
+                    <description>Der SoftwareManager verwaltet Ihre STB Software.\n
+                    Sie können nun einfach Ihre STB-Software aktualisieren, neue Erweiterungen installieren oder entfernen,
                     oder ihre Einstellungen sichern und wiederherstellen.
                     </description>
                     <screenshot src="http://www.dreamboxupdate.com/preview/plugin_softwaremanager_de.jpg" />

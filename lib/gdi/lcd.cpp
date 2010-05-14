@@ -141,6 +141,9 @@ eDBoxLCD *eDBoxLCD::getInstance()
 
 void eDBoxLCD::update()
 {
+#ifdef BUILD_VUPLUS /* ikseong  */
+	return ;
+#endif
 	if (!is_oled || is_oled == 2)
 	{
 		unsigned char raw[132*8];

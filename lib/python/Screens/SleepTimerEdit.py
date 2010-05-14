@@ -40,7 +40,7 @@ class SleepTimerEdit(Screen):
 		self.status = True
 		self.updateColors()
 		
-		self["pretext"] = Label(_("Shutdown Dreambox after"))
+		self["pretext"] = Label(_("Shutdown STB after"))
 		self["aftertext"] = Label(_("minutes"))
 		
 		self["actions"] = NumberActionMap(["SleepTimerEditorActions", "TextEntryActions", "KeyboardInputActions"], 
@@ -99,18 +99,29 @@ class SleepTimerEdit(Screen):
 
 	def select(self):
 		if self.status:
-			time = int(self["input"].getText())
-			config.SleepTimer.defaulttime.setValue(time)
-			config.SleepTimer.defaulttime.save()
-			config.SleepTimer.action.save()
-			self.session.nav.SleepTimer.setSleepTime(time)
-			self.session.openWithCallback(self.close, MessageBox, _("The sleep timer has been activated."), MessageBox.TYPE_INFO)
+#	ikseong
+			if self["input"].getText()=='':
+				self.session.nav.SleepTimer.clear()
+				self.session.openWithCallback(self.close, MessageBox, _("The sleep timer is invalid."), MessageBox.TYPE_INFO)
+			else:				
+				time = int(self["input"].getText())
+				config.SleepTimer.defaulttime.setValue(time)
+				config.SleepTimer.defaulttime.save()
+				config.SleepTimer.action.save()
+				self.session.nav.SleepTimer.setSleepTime(time)
+				self.session.openWithCallback(self.close, MessageBox, _("The sleep timer has been activated."), MessageBox.TYPE_INFO)
 		else:
 			self.session.nav.SleepTimer.clear()
 			self.session.openWithCallback(self.close, MessageBox, _("The sleep timer has been disabled."), MessageBox.TYPE_INFO)
 
 	def keyNumberGlobal(self, number):
-		self["input"].number(number)
+#	ikseong
+		if self["input"].getText() == '' :
+			inputtime=0
+		else:
+			inputtime= int(self["input"].getText())*10 +number
+		if inputtime < 10000 :
+			self["input"].number(number)
 
 	def selectLeft(self):
 		self["input"].left()
