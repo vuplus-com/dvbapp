@@ -35,10 +35,10 @@ msgstr ""
 #
 msgid ""
 "\n"
-"Backup your Dreambox settings."
+"Backup your STB settings."
 msgstr ""
 "\n"
-"Dreambox ayarlarınızı yedekleyin."
+"STB ayarlarınızı yedekleyin."
 
 #
 msgid ""
@@ -51,18 +51,18 @@ msgstr ""
 #
 msgid ""
 "\n"
-"Manage extensions or plugins for your Dreambox"
+"Manage extensions or plugins for your STB"
 msgstr ""
 "\n"
-"Dreambox eklentilerinizi yönetin"
+"STB eklentilerinizi yönetin"
 
 #
 msgid ""
 "\n"
-"Online update of your Dreambox software."
+"Online update of your STB software."
 msgstr ""
 "\n"
-"Dreambox yazılımını çevrimiçi güncelleyin."
+"STB yazılımını çevrimiçi güncelleyin."
 
 #
 msgid ""
@@ -75,18 +75,18 @@ msgstr ""
 #
 msgid ""
 "\n"
-"Restore your Dreambox settings."
+"Restore your STB settings."
 msgstr ""
 "\n"
-"Dreambox ayarlarınızı geri yükleyin."
+"STB ayarlarınızı geri yükleyin."
 
 #
 msgid ""
 "\n"
-"Restore your Dreambox with a new firmware."
+"Restore your STB with a new firmware."
 msgstr ""
 "\n"
-"Dreambox yeni bellenimini, sistem yedeğinizle birlikte geri yükleyin."
+"STB yeni bellenimini, sistem yedeğinizle birlikte geri yükleyin."
 
 #
 msgid ""
@@ -120,7 +120,7 @@ msgid ""
 "System will restart after the restore!"
 msgstr ""
 "\n"
-"Dreambox geri yüklemeden sonra yeniden başlatılacak!"
+"STB geri yüklemeden sonra yeniden başlatılacak!"
 
 #
 msgid ""
@@ -397,7 +397,7 @@ msgstr "<bilinmiyor>"
 #
 msgid "??"
 msgstr ""
-"Güncelleme tamamlandı. Dreambox'ın yeniden başlatılmasını istiyor musunuz?"
+"Güncelleme tamamlandı. STB'ın yeniden başlatılmasını istiyor musunuz?"
 
 #
 msgid "A"
@@ -418,17 +418,17 @@ msgstr ""
 #
 msgid ""
 "A finished record timer wants to set your\n"
-"Dreambox to standby. Do that now?"
+"STB to standby. Do that now?"
 msgstr ""
-"Bitmiş olan bir kayıt zamanlayıcısı Dreambox'ı\n"
+"Bitmiş olan bir kayıt zamanlayıcısı STB'ı\n"
 "hazırda bekleme kipine almak istiyor. Şimdi alınsın mı?"
 
 #
 msgid ""
 "A finished record timer wants to shut down\n"
-"your Dreambox. Shutdown now?"
+"your STB. Shutdown now?"
 msgstr ""
-"Bitmiş olan bir kayıt zamanlayıcısı Dreambox'ı\n"
+"Bitmiş olan bir kayıt zamanlayıcısı STB'ı\n"
 "kapatmak istiyor. Şimdi kapatılsın mı?"
 
 #
@@ -496,17 +496,17 @@ msgstr ""
 #
 msgid ""
 "A sleep timer wants to set your\n"
-"Dreambox to standby. Do that now?"
+"STB to standby. Do that now?"
 msgstr ""
-"Zamanlanmış bir görev Dreambox'ı\n"
+"Zamanlanmış bir görev STB'ı\n"
 "hazırda bekleme kipine almak istiyor. Şimdi alınsın mı?"
 
 #
 msgid ""
 "A sleep timer wants to shut down\n"
-"your Dreambox. Shutdown now?"
+"your STB. Shutdown now?"
 msgstr ""
-"Zamanlanmış bir görev Dreambox'ı\n"
+"Zamanlanmış bir görev STB'ı\n"
 "kapatmak istiyor. Şimdi kapatılsın mı?"
 
 msgid "A small overview of the available icon states and actions."
@@ -612,8 +612,8 @@ msgid "Add a mark"
 msgstr "İşaret ekle"
 
 #
-msgid "Add a new NFS or CIFS mount point to your Dreambox."
-msgstr "Dreambox'ınıza yeni bir NFS veya CIFS ağ bağlantı noktası ekleyin."
+msgid "Add a new NFS or CIFS mount point to your STB."
+msgstr "STB'ınıza yeni bir NFS veya CIFS ağ bağlantı noktası ekleyin."
 
 #
 msgid "Add a new title"
@@ -661,10 +661,10 @@ msgstr "Eklenme tarihi: "
 
 #
 msgid ""
-"Adds enigma2 settings and dreambox model informations like SN, rev... if "
+"Adds enigma2 settings and STB model informations like SN, rev... if "
 "enabled."
 msgstr ""
-"Evet derseniz, enigma2 ayarlarınız ve dreambox model bilgisi (SN, "
+"Evet derseniz, enigma2 ayarlarınız ve STB model bilgisi (SN, "
 "revizyon..) gönderilecektir."
 
 #
@@ -716,10 +716,10 @@ msgstr "Eylem bittikten sonra"
 #
 msgid ""
 "After the start wizard is completed, you need to protect single services. "
-"Refer to your dreambox's manual on how to do that."
+"Refer to your STB's manual on how to do that."
 msgstr ""
 "Sihirbaz tamamlandıktan sonra, kanal korumasına ihtiyacınız olacak. Nasıl "
-"yapılacağını öğrenmek istiyorsanız Dreambox'ınızın kullanım kılavuzuna "
+"yapılacağını öğrenmek istiyorsanız STB'ınızın kullanım kılavuzuna "
 "başvurun."
 
 #
@@ -1183,8 +1183,8 @@ msgid "Change step size"
 msgstr "Ayar yapılırken atlama boyutu"
 
 #
-msgid "Change the hostname of your Dreambox."
-msgstr "Dreambox'ınızın konak adını değiştirin."
+msgid "Change the hostname of your STB."
+msgstr "STB'ınızın konak adını değiştirin."
 
 #
 msgid "Channel"
@@ -1471,8 +1471,8 @@ msgid "Contrast"
 msgstr "Kontrast"
 
 #
-msgid "Could not connect to Dreambox .NFI Image Feed Server:"
-msgstr "Dreambox .NFI bellenim sunucusuna bağlanamıyor:"
+msgid "Could not connect to STB .NFI Image Feed Server:"
+msgstr "STB .NFI bellenim sunucusuna bağlanamıyor:"
 
 #
 msgid "Could not load Medium! No disc inserted?"
@@ -1931,7 +1931,7 @@ msgid "Do you want to do another manual service scan?"
 msgstr "Başka kanal araması yapacak mısınız?"
 
 #
-msgid "Do you want to enable the parental control feature on your dreambox?"
+msgid "Do you want to enable the parental control feature on your STB?"
 msgstr "Ebeveyn kontrolü özelliğini etkinleştirmek ister misiniz?"
 
 #
@@ -1955,8 +1955,8 @@ msgid "Do you want to preview this DVD before burning?"
 msgstr "DVD'yi yazmadan önce önizleme yapmak istiyor musunuz?"
 
 #
-msgid "Do you want to reboot your Dreambox?"
-msgstr "Dreambox'ı yeniden başlatmak istiyor musunuz?"
+msgid "Do you want to reboot your STB?"
+msgstr "STB'ı yeniden başlatmak istiyor musunuz?"
 
 #
 msgid "Do you want to remove the package:\n"
@@ -1983,15 +1983,15 @@ msgstr ""
 "adınızı giriniz."
 
 #
-msgid "Do you want to update your Dreambox?"
-msgstr "Dreambox'ı güncellemek istiyor musunuz?"
+msgid "Do you want to update your STB?"
+msgstr "STB'ı güncellemek istiyor musunuz?"
 
 #
 msgid ""
-"Do you want to update your Dreambox?\n"
+"Do you want to update your STB?\n"
 "After pressing OK, please wait!"
 msgstr ""
-"Dreambox'ı güncellemek istiyor musunuz?\n"
+"STB'ı güncellemek istiyor musunuz?\n"
 "Lütfen OK'a bastıktan sonra bekleyin!"
 
 #
@@ -2068,12 +2068,12 @@ msgid "Downloading screenshots. Please wait..."
 msgstr "Ekran görüntüsü indiriliyor. Lütfen bekleyin..."
 
 #
-msgid "Dreambox format data DVD (HDTV compatible)"
-msgstr "Dreambox DVD biçimi (HDTV uyumlu)"
+msgid "STB format data DVD (HDTV compatible)"
+msgstr "STB DVD biçimi (HDTV uyumlu)"
 
 #
-msgid "Dreambox software because updates are available."
-msgstr "Dreambox güncellemelerini yükleyin"
+msgid "STB software because updates are available."
+msgstr "STB güncellemelerini yükleyin"
 
 #
 msgid "Duration: "
@@ -2160,12 +2160,12 @@ msgid "Edit settings"
 msgstr "Ayarları düzenle"
 
 #
-msgid "Edit the Nameserver configuration of your Dreambox.\n"
-msgstr "Dreambox'ınızın isim sunucu (DNS) ayarlarını yapılandırın.\n"
+msgid "Edit the Nameserver configuration of your STB.\n"
+msgstr "STB'ınızın isim sunucu (DNS) ayarlarını yapılandırın.\n"
 
 #
-msgid "Edit the network configuration of your Dreambox.\n"
-msgstr "Dreambox'ınızın ağ ayarlarını yapılandırın.\n"
+msgid "Edit the network configuration of your STB.\n"
+msgstr "STB'ınızın ağ ayarlarını yapılandırın.\n"
 
 #
 msgid "Edit title"
@@ -2335,8 +2335,8 @@ msgid "Enter main menu..."
 msgstr "Ana menüyü göster..."
 
 #
-msgid "Enter new hostname for your Dreambox"
-msgstr "Dreambox'ınızın yeni konak adını girin"
+msgid "Enter new hostname for your STB"
+msgstr "STB'ınızın yeni konak adını girin"
 
 #
 msgid "Enter options:"
@@ -2718,10 +2718,10 @@ msgstr "Genel PCM gecikmesi (ms)"
 msgid "Genre"
 msgstr "Tür"
 
-msgid "Genuine Dreambox"
-msgstr "Dreambox'ınız orijinal mi?"
+msgid "Genuine STB"
+msgstr "STB'ınız orijinal mi?"
 
-msgid "Genuine Dreambox validation failed!"
+msgid "Genuine STB validation failed!"
 msgstr ""
 
 #
@@ -4039,8 +4039,8 @@ msgid "No, do nothing."
 msgstr "Hayır, birşey yapma"
 
 #
-msgid "No, just start my dreambox"
-msgstr "Hayır, Dreambox'ımı şimdi başlat"
+msgid "No, just start my STB"
+msgstr "Hayır, STB'ımı şimdi başlat"
 
 #
 msgid "No, not now"
@@ -4401,10 +4401,10 @@ msgstr ""
 
 #
 msgid ""
-"Please disconnect all USB devices from your Dreambox and (re-)attach the "
+"Please disconnect all USB devices from your STB and (re-)attach the "
 "target USB stick (minimum size is 64 MB) now!"
 msgstr ""
-"Lütfen tüm USB aygıtlarını Dreambox'ınızdan çıkarın ve işlem yapmak "
+"Lütfen tüm USB aygıtlarını STB'ınızdan çıkarın ve işlem yapmak "
 "istediğiniz USB belleği (min. 64MB kapasiteli) tekrar takın!"
 
 #
@@ -4938,7 +4938,7 @@ msgstr "Yeniden başlatmak istiyor musunuz?"
 
 #
 msgid "Really shutdown now?"
-msgstr "Dreambox'ı şimdi kapatmak istiyor musunuz?"
+msgstr "STB'ı şimdi kapatmak istiyor musunuz?"
 
 #
 msgid "Reboot"
@@ -5901,7 +5901,7 @@ msgid "Shutdown"
 msgstr "Kapat"
 
 #
-msgid "Shutdown Dreambox after"
+msgid "Shutdown STB after"
 msgstr "Zamanlayıcı süresi: "
 
 #
@@ -6334,8 +6334,8 @@ msgid "Test mode"
 msgstr "Test kipi"
 
 #
-msgid "Test the network configuration of your Dreambox.\n"
-msgstr "Dreambox'ınızın ağ yapılandırmasını test edin.\n"
+msgid "Test the network configuration of your STB.\n"
+msgstr "STB'ınızın ağ yapılandırmasını test edin.\n"
 
 #
 msgid "Test-Messagebox?"
@@ -6352,11 +6352,11 @@ msgstr ""
 #
 msgid ""
 "Thank you for using the wizard. Your box is now ready to use.\n"
-"Please press OK to start using your Dreambox."
+"Please press OK to start using your STB."
 msgstr ""
-"Sihirbazı kullandığınız için teşekkür ederiz. Dreambox'ınız kullanıma "
+"Sihirbazı kullandığınız için teşekkür ederiz. STB'ınız kullanıma "
 "hazır.\n"
-"Dreambox'ınızı kullanmaya başlamak için OK tuşuna basın."
+"STB'ınızı kullanmaya başlamak için OK tuşuna basın."
 
 #
 msgid ""
@@ -6371,11 +6371,11 @@ msgstr ""
 #
 msgid ""
 "The DVD standard doesn't support H.264 (HDTV) video streams. Do you want to "
-"create a Dreambox format data DVD (which will not play in stand-alone DVD "
+"create a STB format data DVD (which will not play in stand-alone DVD "
 "players) instead?"
 msgstr ""
 "Standart DVD biçimi H.264 (HDTV) video biçimini desteklemez. Bunun yerine "
-"Dreambox'ın DVD biçiminde (standart DVD oynatıcılarda oynatamazsınız) "
+"STB'ın DVD biçiminde (standart DVD oynatıcılarda oynatamazsınız) "
 "oluşturmak ister misiniz?"
 
 msgid ""
@@ -6478,10 +6478,10 @@ msgstr "Varsayılan kanal listesi kurulumu tamamlandı."
 #
 msgid ""
 "The installation of the default settings is finished. You can now continue "
-"configuring your Dreambox by pressing the OK button on the remote control."
+"configuring your STB by pressing the OK button on the remote control."
 msgstr ""
 "Varsayılan kanal listesi kurulumu tamamlandı. OK tuşuna bastıktan sonra "
-"Dreambox'ınızı yapılandırmaya devam edebilirsiniz."
+"STB'ınızı yapılandırmaya devam edebilirsiniz."
 
 #
 msgid "The match attribute is mandatory."
@@ -6620,7 +6620,7 @@ msgstr "Hata oluştu. Seçilen:"
 #
 # File: tmp/enigma2_plugins/genuinedreambox/src/plugin.py, line: 130
 msgid ""
-"There's a certificate update available for your dreambox. Would you like to "
+"There's a certificate update available for your STB. Would you like to "
 "apply this update now?"
 msgstr ""
 
@@ -6655,8 +6655,8 @@ msgstr ""
 
 #
 #, python-format
-msgid "This Dreambox can't decode %s streams!"
-msgstr "Dreambox %s streamlarını çözemez!"
+msgid "This STB can't decode %s streams!"
+msgstr "STB %s streamlarını çözemez!"
 
 #
 msgid "This Month"
@@ -6900,16 +6900,16 @@ msgstr "Başlıkseti kipi"
 
 #
 msgid ""
-"To update your Dreambox firmware, please follow these steps:\n"
+"To update your STB firmware, please follow these steps:\n"
 "1) Turn off your box with the rear power switch and plug in the bootable USB "
 "stick.\n"
 "2) Turn mains back on and hold the DOWN button on the front panel pressed "
 "for 10 seconds.\n"
 "3) Wait for bootup and follow instructions of the wizard."
 msgstr ""
-"Lütfen Dreambox bellenimini güncellemek için, aşağıdaki adımları takip "
+"Lütfen STB bellenimini güncellemek için, aşağıdaki adımları takip "
 "edin:\n"
-"1) Dreambox'ınızı, arkasındaki kapama anahtarından kapayın ve önyükleme "
+"1) STB'ınızı, arkasındaki kapama anahtarından kapayın ve önyükleme "
 "yapabilir USB belleği takın.\n"
 "2) Ön panelde yer alan AŞAĞI tuşuna basın ve cihazı tekrar açın. 10 saniye "
 "boyunca AŞAĞI tuşunu bırakmayın.\n"
@@ -7070,10 +7070,10 @@ msgid "USB stick wizard"
 msgstr "USB bellek sihirbazı"
 
 msgid ""
-"USB stick wizard finished. Your dreambox will now restart with your new "
+"USB stick wizard finished. Your STB will now restart with your new "
 "image!"
 msgstr ""
-"USB bellek sihirbazı tamamlandı. Dreambox'ınız şimdi yeni bellenim ile "
+"USB bellek sihirbazı tamamlandı. STB'ınız şimdi yeni bellenim ile "
 "başlatılacak."
 
 #
@@ -7162,7 +7162,7 @@ msgstr "Güncelleme tamamlandı..."
 #
 # File: tmp/enigma2_plugins/genuinedreambox/src/plugin.py, line: 170
 msgid ""
-"Update done... The genuine dreambox test will now be rerun and should not "
+"Update done... The genuine STB test will now be rerun and should not "
 "ask you to update again."
 msgstr ""
 
@@ -7200,8 +7200,8 @@ msgid "Upgrading"
 msgstr "Yazılımı güncelle"
 
 #
-msgid "Upgrading Dreambox... Please wait"
-msgstr "Dreambox güncelleniyor... Lütfen bekleyin"
+msgid "Upgrading STB... Please wait"
+msgstr "STB güncelleniyor... Lütfen bekleyin"
 
 #
 msgid "Upper bound of timespan."
@@ -7315,7 +7315,7 @@ msgid "VMGM (intro trailer)"
 msgstr "VMGM (tanıtım filmi)"
 
 msgid ""
-"Verify your Dreambox authenticity by running the genuine dreambox plugin!"
+"Verify your STB authenticity by running the genuine STB plugin!"
 msgstr ""
 
 #
@@ -7479,9 +7479,9 @@ msgid "View teletext..."
 msgstr "Teleteksi aç..."
 
 #
-msgid "View, edit or delete mountpoints on your Dreambox."
+msgid "View, edit or delete mountpoints on your STB."
 msgstr ""
-"Dreambox'ınızdaki ağ bağlantı noktalarını inceleyin, düzenleyin veya silin."
+"STB'ınızdaki ağ bağlantı noktalarını inceleyin, düzenleyin veya silin."
 
 #
 msgid "View, edit or delete usernames and passwords for your network."
@@ -7597,10 +7597,10 @@ msgstr ""
 #
 msgid ""
 "Welcome to the Image upgrade wizard. The wizard will assist you in upgrading "
-"the firmware of your Dreambox by providing a backup facility for your "
+"the firmware of your STB by providing a backup facility for your "
 "current settings and a short explanation of how to upgrade your firmware."
 msgstr ""
-"Bellenim güncelleme sihirbazına hoş geldiniz. Bu sihirbaz, Dreambox bellenim "
+"Bellenim güncelleme sihirbazına hoş geldiniz. Bu sihirbaz, STB bellenim "
 "güncellemesi esnasında, geçerli ayarlarınızın yedeğini almanıza imkan "
 "sağlayacak ve kısa açıklamalarla bellenimi nasıl güncelleyeceğinizi "
 "anlatacaktır."
@@ -7659,14 +7659,14 @@ msgid ""
 "Welcome to the cleanup wizard.\n"
 "\n"
 "We have detected that your available internal memory has dropped below 2MB.\n"
-"To ensure stable operation of your Dreambox, the internal memory should be "
+"To ensure stable operation of your STB, the internal memory should be "
 "cleaned up.\n"
 "You can use this wizard to remove some extensions.\n"
 msgstr ""
 "Temizlik sihirbazına hoşgeldiniz.\n"
 "\n"
 "Cihazınızın kullanılabilir dahili belleği 2MB'ın altına düşmüş durumda.\n"
-"Dreambox'ınızın sağlıklı çalışabilmesi için, kullanılabilir dahili bellek "
+"STB'ınızın sağlıklı çalışabilmesi için, kullanılabilir dahili bellek "
 "alanının artırılması gerekmektedir.\n"
 "Bu sihirbazı kullanarak ihtiyaç duymadığınız eklentileri kaldırabilirsiniz.\n"
 
@@ -7674,14 +7674,14 @@ msgstr ""
 msgid ""
 "Welcome.\n"
 "\n"
-"If you want to connect your Dreambox to the Internet, this wizard will guide "
-"you through the basic network setup of your Dreambox.\n"
+"If you want to connect your STB to the Internet, this wizard will guide "
+"you through the basic network setup of your STB.\n"
 "\n"
 "Press OK to start configuring your network"
 msgstr ""
 "Hoşgeldiniz.\n"
 "\n"
-"Dreambox'ınızı internete bağlamak istiyorsanız, bu sihirbaz size ağ "
+"STB'ınızı internete bağlamak istiyorsanız, bu sihirbaz size ağ "
 "yapılandırmanızı yapabilmeniz için rehberlik yapacaktır.\n"
 "\n"
 "Ağ yapılandırmasına başlamak için OK tuşuna basın"
@@ -7702,12 +7702,12 @@ msgstr ""
 msgid ""
 "Welcome.\n"
 "\n"
-"This start wizard will guide you through the basic setup of your Dreambox.\n"
+"This start wizard will guide you through the basic setup of your STB.\n"
 "Press the OK button on your remote control to move to the next step."
 msgstr ""
 "Hoşgeldiniz.\n"
 "\n"
-"Bu sihirbaz Dreambox'ınızı yapılandırmanız için yardımcı olacaktır.\n"
+"Bu sihirbaz STB'ınızı yapılandırmanız için yardımcı olacaktır.\n"
 "Kumandanızın OK tuşuna basarak sonraki adıma geçebilirsiniz."
 
 #
@@ -7894,8 +7894,8 @@ msgid "You can install this plugin."
 msgstr "Bu eklentiyi yükleyebilirsiniz."
 
 #
-msgid "You can only burn Dreambox recordings!"
-msgstr "Yalnızca Dreambox'ta kaydettiğiniz videoları yazabilirsiniz!"
+msgid "You can only burn STB recordings!"
+msgstr "Yalnızca STB'ta kaydettiğiniz videoları yazabilirsiniz!"
 
 #
 msgid "You can remove this plugin."
@@ -7987,16 +7987,16 @@ msgstr "Bekleme süresi : %s!"
 
 #
 msgid ""
-"You need a PC connected to your dreambox. If you need further instructions, "
+"You need a PC connected to your STB. If you need further instructions, "
 "please visit the website http://www.dm7025.de.\n"
-"Your dreambox will now be halted. After you have performed the update "
+"Your STB will now be halted. After you have performed the update "
 "instructions from the website, your new firmware will ask you to restore "
 "your settings."
 msgstr ""
-"Dreambox'ınızın PC bağlantısına ihtiyacı var. Daha fazla açıklamaya "
+"STB'ınızın PC bağlantısına ihtiyacı var. Daha fazla açıklamaya "
 "ihtiyacınız varsa, lütfen http://www.dream-multimedia-tv.de adresini ziyaret "
 "edin.\n"
-"Dreambox'ınız şimdi kapatılıyor. Web sitesinde belirtilen güncelleme "
+"STB'ınız şimdi kapatılıyor. Web sitesinde belirtilen güncelleme "
 "talimatlarını yerine getirdikten sonra yeni bellenim, ayarlarınızı geri "
 "yüklemek isteyip istemediğiniz sorusunu soracaktır."
 
@@ -8032,7 +8032,7 @@ msgstr ""
 
 #
 msgid ""
-"Your Dreambox is now ready to use.\n"
+"Your STB is now ready to use.\n"
 "\n"
 "Your internet connection is working now.\n"
 "\n"
@@ -8044,7 +8044,7 @@ msgstr ""
 
 #
 msgid ""
-"Your Dreambox is now ready to use.\n"
+"Your STB is now ready to use.\n"
 "\n"
 "Your internet connection is working now.\n"
 "\n"
@@ -8057,9 +8057,9 @@ msgstr ""
 "Devam etmek için lütfen OK tuşuna basın."
 
 #
-msgid "Your Dreambox will restart after pressing OK on your remote control."
+msgid "Your STB will restart after pressing OK on your remote control."
 msgstr ""
-"Kumandanızda OK tuşuna bastıktan sonra Dreambox'ınız yeniden başlatılacak."
+"Kumandanızda OK tuşuna bastıktan sonra STB'ınız yeniden başlatılacak."
 
 #
 msgid ""
@@ -8089,15 +8089,15 @@ msgid "Your current collection will get lost!"
 msgstr ""
 
 #
-msgid "Your dreambox is shutting down. Please stand by..."
-msgstr "Dreambox'ınız kapatılıyor. Lütfen bekleyin..."
+msgid "Your STB is shutting down. Please stand by..."
+msgstr "STB'ınız kapatılıyor. Lütfen bekleyin..."
 
 #
 msgid ""
-"Your dreambox isn't connected to the internet properly. Please check it and "
+"Your STB isn't connected to the internet properly. Please check it and "
 "try again."
 msgstr ""
-"Dreambox'ınız internete bağlı değil. Kontrol ettikten sonra tekrar deneyin."
+"STB'ınız internete bağlı değil. Kontrol ettikten sonra tekrar deneyin."
 
 #
 msgid "Your email address:"
@@ -9393,10 +9393,10 @@ msgstr "evet (beslemeleri tut)"
 
 #
 msgid ""
-"your dreambox might be unusable now. Please consult the manual for further "
-"assistance before rebooting your dreambox."
+"your STB might be unusable now. Please consult the manual for further "
+"assistance before rebooting your STB."
 msgstr ""
-"Dreambox'ınız şu an kullanılamaz durumda. Lütfen Dreambox'ınızı yeniden "
+"STB'ınız şu an kullanılamaz durumda. Lütfen STB'ınızı yeniden "
 "açmadan önce kullanım kılavuzundan yardım alın."
 
 #
@@ -9500,11 +9500,11 @@ msgstr "kanal değiştirildi"
 #
 #~ msgid ""
 #~ "Are you sure you want to enable WLAN support?\n"
-#~ "Connect your Wlan USB Stick to your Dreambox and press OK.\n"
+#~ "Connect your Wlan USB Stick to your STB and press OK.\n"
 #~ "\n"
 #~ msgstr ""
 #~ "WLAN desteğini açmak istediğinizden emin misiniz?\n"
-#~ "WLAN USB donanımını Dreambox'unuza takın ve OK'e basın.\n"
+#~ "WLAN USB donanımını STB'unuza takın ve OK'e basın.\n"
 #~ "\n"
 
 #
@@ -9780,10 +9780,10 @@ msgstr "kanal değiştirildi"
 
 #
 #~ msgid ""
-#~ "Enable the local network of your Dreambox.\n"
+#~ "Enable the local network of your STB.\n"
 #~ "\n"
 #~ msgstr ""
-#~ "Dreambox'un yerel ağ bağlantısını aç.\n"
+#~ "STB'un yerel ağ bağlantısını aç.\n"
 #~ "\n"
 
 #~ msgid "Encrypted: %s"
@@ -9918,8 +9918,8 @@ msgstr "kanal değiştirildi"
 #~ msgstr "Dil ayarları"
 
 #
-#~ msgid "Lets you view/edit files in your Dreambox"
-#~ msgstr "Dreambox'ınızdaki dosyaları görün/düzenleyin"
+#~ msgid "Lets you view/edit files in your STB"
+#~ msgstr "STB'ınızdaki dosyaları görün/düzenleyin"
 
 #
 #~ msgid "Max. Bitrate: %s"
@@ -10053,11 +10053,11 @@ msgstr "kanal değiştirildi"
 #
 #~ msgid ""
 #~ "Please attach your Zydas ZD1211B chipset compatibe WLAN USB Stick to your "
-#~ "Dreambox and press the OK button on your remote control to enable the "
+#~ "STB and press the OK button on your remote control to enable the "
 #~ "built in wireless network support"
 #~ msgstr ""
 #~ "Lütfen dahili kablosuz ağ desteğini etkinleştirmek için, Zydas ZD1211B "
-#~ "çipset uyumlu WLAN USB donanımını Dreambox'ınıza takın ve kumandanızdan "
+#~ "çipset uyumlu WLAN USB donanımını STB'ınıza takın ve kumandanızdan "
 #~ "OK tuşuna basın..."
 
 #
@@ -10104,17 +10104,17 @@ msgstr "kanal değiştirildi"
 
 #
 #~ msgid ""
-#~ "Pressing OK enables the built in wireless LAN support of your Dreambox.\n"
+#~ "Pressing OK enables the built in wireless LAN support of your STB.\n"
 #~ "Wlan USB Sticks with Zydas ZD1211B and RAlink RT73 Chipset are "
 #~ "supported.\n"
-#~ "Connect your Wlan USB Stick to your Dreambox before pressing OK.\n"
+#~ "Connect your Wlan USB Stick to your STB before pressing OK.\n"
 #~ "\n"
 #~ msgstr ""
-#~ "Dreambox'ınızda kablosuz ağ desteğini aktif hale getirmek için OK'a "
+#~ "STB'ınızda kablosuz ağ desteğini aktif hale getirmek için OK'a "
 #~ "basın.\n"
 #~ "WLAN USB donanımlarında, Zydas ZD1211B ve RAlink RT73 çipsetleri "
 #~ "desteklenmektedir.\n"
-#~ "OK'a basmadan önce WLAN USB donanımınızı Dreambox'ınıza takın.\n"
+#~ "OK'a basmadan önce WLAN USB donanımınızı STB'ınıza takın.\n"
 
 #
 #~ msgid "RSS Feed URI"
@@ -10338,13 +10338,13 @@ msgstr "kanal değiştirildi"
 
 #
 #~ msgid ""
-#~ "Thank you for using the wizard. Your Dreambox is now ready to use.\n"
+#~ "Thank you for using the wizard. Your STB is now ready to use.\n"
 #~ "\n"
 #~ "Your local LAN internet connection is working now.\n"
 #~ "\n"
 #~ "Please press OK to continue."
 #~ msgstr ""
-#~ "Sihirbazı kullandığınız için teşekkür ederiz. Dreambox'ınız kullanıma "
+#~ "Sihirbazı kullandığınız için teşekkür ederiz. STB'ınız kullanıma "
 #~ "hazır.\n"
 #~ "\n"
 #~ "Yerel ağ bağlantınız çalışıyor.\n"
@@ -10353,13 +10353,13 @@ msgstr "kanal değiştirildi"
 
 #
 #~ msgid ""
-#~ "Thank you for using the wizard. Your Dreambox is now ready to use.\n"
+#~ "Thank you for using the wizard. Your STB is now ready to use.\n"
 #~ "\n"
 #~ "Your wireless internet connection is working now.\n"
 #~ "\n"
 #~ "Please press OK to continue."
 #~ msgstr ""
-#~ "Sihirbazı kullandığınız için teşekkür ederiz. Dreambox'ınız kullanıma "
+#~ "Sihirbazı kullandığınız için teşekkür ederiz. STB'ınız kullanıma "
 #~ "hazır.\n"
 #~ "\n"
 #~ "Kablosuz ağ bağlantınız çalışıyor.\n"
@@ -10368,21 +10368,21 @@ msgstr "kanal değiştirildi"
 
 #
 #~ msgid ""
-#~ "Thank you for using the wizard. Your Dreambox is now ready to use.\n"
-#~ "Please press OK to start using your Dreambox."
+#~ "Thank you for using the wizard. Your STB is now ready to use.\n"
+#~ "Please press OK to start using your STB."
 #~ msgstr ""
-#~ "Sihirbazı kullandığınız için teşekkür ederiz. Dreambox'ınız kullanıma "
+#~ "Sihirbazı kullandığınız için teşekkür ederiz. STB'ınız kullanıma "
 #~ "hazır.\n"
-#~ "Dreambox'ınızı kullanmak için hazırsanız OK tuşuna basın."
+#~ "STB'ınızı kullanmak için hazırsanız OK tuşuna basın."
 
 #
 #~ msgid ""
 #~ "Thank you for using the wizard. Your box is now ready to use.\n"
-#~ "Please press OK to start using you Dreambox."
+#~ "Please press OK to start using you STB."
 #~ msgstr ""
-#~ "Sihirbazı kullandığınız için teşekkür ederiz. Dreambox'ınız kullanıma "
+#~ "Sihirbazı kullandığınız için teşekkür ederiz. STB'ınız kullanıma "
 #~ "hazır.\n"
-#~ "Dreambox'ınızı kullanmak için OK tuşuna basın."
+#~ "STB'ınızı kullanmak için OK tuşuna basın."
 
 #
 #~ msgid ""
@@ -10397,8 +10397,8 @@ msgstr "kanal değiştirildi"
 #~ "'Down' tuşuna basılı tutun!"
 
 #
-#~ msgid "This Dreambox can't decode %s video streams!"
-#~ msgstr "Dreambox %s video dosyalarını gösteremez!"
+#~ msgid "This STB can't decode %s video streams!"
+#~ msgstr "STB %s video dosyalarını gösteremez!"
 
 #
 #~ msgid "This is unsupported at the moment."
@@ -10451,9 +10451,9 @@ msgstr "kanal değiştirildi"
 #~ msgstr "Uydu Alıcınızın yazılımını güncelleyin"
 
 #
-#~ msgid "Upgrade finished. Do you want to reboot your Dreambox?"
+#~ msgid "Upgrade finished. Do you want to reboot your STB?"
 #~ msgstr ""
-#~ "Güncelleme tamamlandı. Dreambox'ınızı yeniden başlatmak istiyor musunuz?"
+#~ "Güncelleme tamamlandı. STB'ınızı yeniden başlatmak istiyor musunuz?"
 
 #
 #
@@ -10511,14 +10511,14 @@ msgstr "kanal değiştirildi"
 #~ msgid ""
 #~ "Welcome.\n"
 #~ "\n"
-#~ "If you want to connect your Dreambox to the Internet, this wizard will "
-#~ "guide you through the basic network setup of your Dreambox.\n"
+#~ "If you want to connect your STB to the Internet, this wizard will "
+#~ "guide you through the basic network setup of your STB.\n"
 #~ "\n"
 #~ "Press the OK button on your remote control to move to the next step."
 #~ msgstr ""
 #~ "Hoşgeldiniz.\n"
 #~ "\n"
-#~ "Bu sihirbaz Dreambox'ınızın ağ ayarlarını yapabilmeniz için yardımcı "
+#~ "Bu sihirbaz STB'ınızın ağ ayarlarını yapabilmeniz için yardımcı "
 #~ "olacaktır.\n"
 #~ "\n"
 #~ "Kumandanızın OK tuşuna basarak sonraki adıma geçebilirsiniz."
@@ -10537,10 +10537,10 @@ msgstr "kanal değiştirildi"
 
 #
 #~ msgid ""
-#~ "You do not seem to have a harddisk in your Dreambox. So backing up to a "
+#~ "You do not seem to have a harddisk in your STB. So backing up to a "
 #~ "harddisk is not an option for you."
 #~ msgstr ""
-#~ "Dreambox'a bağlı bir sabit disk görünmüyor. Bu işlem için sabit diski "
+#~ "STB'a bağlı bir sabit disk görünmüyor. Bu işlem için sabit diski "
 #~ "kullanma opsiyonunuz bulunmamaktadır."
 
 #
@@ -10617,19 +10617,19 @@ msgstr "kanal değiştirildi"
 #
 #~ msgid ""
 #~ "Your wired LAN Adapter could not be started.\n"
-#~ "Do you want to reboot your Dreambox to apply the new configuration?\n"
+#~ "Do you want to reboot your STB to apply the new configuration?\n"
 #~ msgstr ""
 #~ "Kablolu Ağ donanımınız başlatılamadı.\n"
-#~ "Yeni ayarların geçerli olabilmesi için Dreambox'u yeniden başlatmak ister "
+#~ "Yeni ayarların geçerli olabilmesi için STB'u yeniden başlatmak ister "
 #~ "misiniz?\n"
 
 #
 #~ msgid ""
 #~ "Your wireless LAN Adapter could not be started.\n"
-#~ "Do you want to reboot your Dreambox to apply the new configuration?\n"
+#~ "Do you want to reboot your STB to apply the new configuration?\n"
 #~ msgstr ""
 #~ "Kablosuz Ağ donanımınız başlatılamadı.\n"
-#~ "Yeni ayarların geçerli olabilmesi için Dreambox'u yeniden başlatmak ister "
+#~ "Yeni ayarların geçerli olabilmesi için STB'u yeniden başlatmak ister "
 #~ "misiniz?\n"
 
 #

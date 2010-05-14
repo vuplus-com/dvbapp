@@ -27,7 +27,7 @@ msgstr ""
 #
 msgid ""
 "\n"
-"Backup your Dreambox settings."
+"Backup your STB settings."
 msgstr ""
 
 #
@@ -39,13 +39,13 @@ msgstr ""
 #
 msgid ""
 "\n"
-"Manage extensions or plugins for your Dreambox"
+"Manage extensions or plugins for your STB"
 msgstr ""
 
 #
 msgid ""
 "\n"
-"Online update of your Dreambox software."
+"Online update of your STB software."
 msgstr ""
 
 #
@@ -57,13 +57,13 @@ msgstr ""
 #
 msgid ""
 "\n"
-"Restore your Dreambox settings."
+"Restore your STB settings."
 msgstr ""
 
 #
 msgid ""
 "\n"
-"Restore your Dreambox with a new firmware."
+"Restore your STB with a new firmware."
 msgstr ""
 
 #
@@ -383,18 +383,18 @@ msgstr ""
 #
 msgid ""
 "A finished record timer wants to set your\n"
-"Dreambox to standby. Do that now?"
+"STB to standby. Do that now?"
 msgstr ""
 "Tajmer snimanja je završio i želi postaviti\n"
-"Dreambox u stanje pripravnosti. Učiniti sada?"
+"STB u stanje pripravnosti. Učiniti sada?"
 
 #
 msgid ""
 "A finished record timer wants to shut down\n"
-"your Dreambox. Shutdown now?"
+"your STB. Shutdown now?"
 msgstr ""
 "Tajmer snimanja je završio i želi isključiti vaš\n"
-"Dreambox sada. Isključiti sada?"
+"STB sada. Isključiti sada?"
 
 #
 msgid "A graphical EPG for all services of an specific bouquet"
@@ -458,18 +458,18 @@ msgstr ""
 #
 msgid ""
 "A sleep timer wants to set your\n"
-"Dreambox to standby. Do that now?"
+"STB to standby. Do that now?"
 msgstr ""
 "Tajmer spavanja želi postaviti vaš\n"
-"Dreambox u stanje pripravnosti. Učiniti sada?"
+"STB u stanje pripravnosti. Učiniti sada?"
 
 #
 msgid ""
 "A sleep timer wants to shut down\n"
-"your Dreambox. Shutdown now?"
+"your STB. Shutdown now?"
 msgstr ""
 "Tajmer spavanja želi isključiti vaš\n"
-"Dreambox. Isključiti sada?"
+"STB. Isključiti sada?"
 
 #
 msgid "A small overview of the available icon states and actions."
@@ -574,7 +574,7 @@ msgid "Add a mark"
 msgstr "Dodaj oznaku"
 
 #
-msgid "Add a new NFS or CIFS mount point to your Dreambox."
+msgid "Add a new NFS or CIFS mount point to your STB."
 msgstr ""
 
 #
@@ -623,7 +623,7 @@ msgstr ""
 
 #
 msgid ""
-"Adds enigma2 settings and dreambox model informations like SN, rev... if "
+"Adds enigma2 settings and STB model informations like SN, rev... if "
 "enabled."
 msgstr ""
 
@@ -674,7 +674,7 @@ msgstr "Nakon događaja"
 #
 msgid ""
 "After the start wizard is completed, you need to protect single services. "
-"Refer to your dreambox's manual on how to do that."
+"Refer to your STB's manual on how to do that."
 msgstr ""
 "Nakon što Čarobnjak završi, vi trebate zaštititi pojedine usluge. Pogledajte "
 "u korisničke upute kako to učiniti."
@@ -1139,7 +1139,7 @@ msgid "Change step size"
 msgstr ""
 
 #
-msgid "Change the hostname of your Dreambox."
+msgid "Change the hostname of your STB."
 msgstr ""
 
 #
@@ -1427,7 +1427,7 @@ msgid "Contrast"
 msgstr "Kontrast"
 
 #
-msgid "Could not connect to Dreambox .NFI Image Feed Server:"
+msgid "Could not connect to STB .NFI Image Feed Server:"
 msgstr ""
 
 #
@@ -1626,7 +1626,7 @@ msgstr ""
 
 #
 msgid "Deep Standby"
-msgstr "Isključi Dreambox"
+msgstr "Isključi STB"
 
 #
 msgid "Default"
@@ -1881,8 +1881,8 @@ msgid "Do you want to do another manual service scan?"
 msgstr "Želite li započeti drugu ručnu pretragu usluga sada?"
 
 #
-msgid "Do you want to enable the parental control feature on your dreambox?"
-msgstr "Želite li uključiti roditeljsku kontrolu na vašem dreambox-u?"
+msgid "Do you want to enable the parental control feature on your STB?"
+msgstr "Želite li uključiti roditeljsku kontrolu na vašem STB-u?"
 
 #
 msgid "Do you want to enter a username and password for this host?\n"
@@ -1905,7 +1905,7 @@ msgid "Do you want to preview this DVD before burning?"
 msgstr ""
 
 #
-msgid "Do you want to reboot your Dreambox?"
+msgid "Do you want to reboot your STB?"
 msgstr ""
 
 #
@@ -1931,15 +1931,15 @@ msgid ""
 msgstr ""
 
 #
-msgid "Do you want to update your Dreambox?"
+msgid "Do you want to update your STB?"
 msgstr ""
 
 #
 msgid ""
-"Do you want to update your Dreambox?\n"
+"Do you want to update your STB?\n"
 "After pressing OK, please wait!"
 msgstr ""
-"Želite li nadograditi vaš Dreambox?\n"
+"Želite li nadograditi vaš STB?\n"
 "Nakon pritiska tipke OK, molim pričekajte!"
 
 #
@@ -2013,11 +2013,11 @@ msgid "Downloading screenshots. Please wait..."
 msgstr ""
 
 #
-msgid "Dreambox format data DVD (HDTV compatible)"
+msgid "STB format data DVD (HDTV compatible)"
 msgstr ""
 
 #
-msgid "Dreambox software because updates are available."
+msgid "STB software because updates are available."
 msgstr ""
 
 #
@@ -2106,11 +2106,11 @@ msgid "Edit settings"
 msgstr ""
 
 #
-msgid "Edit the Nameserver configuration of your Dreambox.\n"
+msgid "Edit the Nameserver configuration of your STB.\n"
 msgstr ""
 
 #
-msgid "Edit the network configuration of your Dreambox.\n"
+msgid "Edit the network configuration of your STB.\n"
 msgstr ""
 
 #
@@ -2280,7 +2280,7 @@ msgid "Enter main menu..."
 msgstr "Uđi u Glavni Izbornik"
 
 #
-msgid "Enter new hostname for your Dreambox"
+msgid "Enter new hostname for your STB"
 msgstr ""
 
 #
@@ -2651,10 +2651,10 @@ msgid "Genre"
 msgstr "Žanrovi"
 
 #
-msgid "Genuine Dreambox"
+msgid "Genuine STB"
 msgstr ""
 
-msgid "Genuine Dreambox validation failed!"
+msgid "Genuine STB validation failed!"
 msgstr ""
 
 #
@@ -3964,8 +3964,8 @@ msgid "No, do nothing."
 msgstr "Ne, ništa ne čini "
 
 #
-msgid "No, just start my dreambox"
-msgstr "Ne, samo pokreni moj dreambox"
+msgid "No, just start my STB"
+msgstr "Ne, samo pokreni moj STB"
 
 #
 msgid "No, not now"
@@ -4317,7 +4317,7 @@ msgstr ""
 
 #
 msgid ""
-"Please disconnect all USB devices from your Dreambox and (re-)attach the "
+"Please disconnect all USB devices from your STB and (re-)attach the "
 "target USB stick (minimum size is 64 MB) now!"
 msgstr ""
 
@@ -5810,8 +5810,8 @@ msgid "Shutdown"
 msgstr ""
 
 #
-msgid "Shutdown Dreambox after"
-msgstr "Isključi Dreambox nakon"
+msgid "Shutdown STB after"
+msgstr "Isključi STB nakon"
 
 #
 msgid "Signal Strength:"
@@ -6240,7 +6240,7 @@ msgid "Test mode"
 msgstr "Test mod"
 
 #
-msgid "Test the network configuration of your Dreambox.\n"
+msgid "Test the network configuration of your STB.\n"
 msgstr ""
 
 #
@@ -6256,11 +6256,11 @@ msgstr ""
 #
 msgid ""
 "Thank you for using the wizard. Your box is now ready to use.\n"
-"Please press OK to start using your Dreambox."
+"Please press OK to start using your STB."
 msgstr ""
 "Hvala vam na korištenju čarobnjaka. Vaš prijemnik je sada spreman za "
 "korištenje.\n"
-"Molim pritisnite tipku OK za start vašeg Dreambox-a."
+"Molim pritisnite tipku OK za start vašeg STB-a."
 
 #
 msgid ""
@@ -6272,7 +6272,7 @@ msgstr ""
 #
 msgid ""
 "The DVD standard doesn't support H.264 (HDTV) video streams. Do you want to "
-"create a Dreambox format data DVD (which will not play in stand-alone DVD "
+"create a STB format data DVD (which will not play in stand-alone DVD "
 "players) instead?"
 msgstr ""
 
@@ -6357,7 +6357,7 @@ msgstr ""
 #
 msgid ""
 "The installation of the default settings is finished. You can now continue "
-"configuring your Dreambox by pressing the OK button on the remote control."
+"configuring your STB by pressing the OK button on the remote control."
 msgstr ""
 
 #
@@ -6487,7 +6487,7 @@ msgstr ""
 #
 # File: tmp/enigma2_plugins/genuinedreambox/src/plugin.py, line: 130
 msgid ""
-"There's a certificate update available for your dreambox. Would you like to "
+"There's a certificate update available for your STB. Would you like to "
 "apply this update now?"
 msgstr ""
 
@@ -6516,7 +6516,7 @@ msgstr ""
 
 #
 #, python-format
-msgid "This Dreambox can't decode %s streams!"
+msgid "This STB can't decode %s streams!"
 msgstr ""
 
 #
@@ -6738,7 +6738,7 @@ msgstr ""
 
 #
 msgid ""
-"To update your Dreambox firmware, please follow these steps:\n"
+"To update your STB firmware, please follow these steps:\n"
 "1) Turn off your box with the rear power switch and plug in the bootable USB "
 "stick.\n"
 "2) Turn mains back on and hold the DOWN button on the front panel pressed "
@@ -6904,7 +6904,7 @@ msgstr ""
 
 #
 msgid ""
-"USB stick wizard finished. Your dreambox will now restart with your new "
+"USB stick wizard finished. Your STB will now restart with your new "
 "image!"
 msgstr ""
 
@@ -6994,7 +6994,7 @@ msgstr ""
 #
 # File: tmp/enigma2_plugins/genuinedreambox/src/plugin.py, line: 170
 msgid ""
-"Update done... The genuine dreambox test will now be rerun and should not "
+"Update done... The genuine STB test will now be rerun and should not "
 "ask you to update again."
 msgstr ""
 
@@ -7035,8 +7035,8 @@ msgid "Upgrading"
 msgstr "Nadograđujem"
 
 #
-msgid "Upgrading Dreambox... Please wait"
-msgstr "Nadograđujem Dreambox... Molim pričekajte"
+msgid "Upgrading STB... Please wait"
+msgstr "Nadograđujem STB... Molim pričekajte"
 
 #
 msgid "Upper bound of timespan."
@@ -7151,7 +7151,7 @@ msgid "VMGM (intro trailer)"
 msgstr ""
 
 msgid ""
-"Verify your Dreambox authenticity by running the genuine dreambox plugin!"
+"Verify your STB authenticity by running the genuine STB plugin!"
 msgstr ""
 
 #
@@ -7309,7 +7309,7 @@ msgid "View teletext..."
 msgstr "Pregled teleteksta..."
 
 #
-msgid "View, edit or delete mountpoints on your Dreambox."
+msgid "View, edit or delete mountpoints on your STB."
 msgstr ""
 
 #
@@ -7419,11 +7419,11 @@ msgstr ""
 #
 msgid ""
 "Welcome to the Image upgrade wizard. The wizard will assist you in upgrading "
-"the firmware of your Dreambox by providing a backup facility for your "
+"the firmware of your STB by providing a backup facility for your "
 "current settings and a short explanation of how to upgrade your firmware."
 msgstr ""
 "Dobro došli u čarobnjaka za nadogradnju softvera. Čarobnjak će vam pomoći "
-"tokom nadogradnje Softvera na vašem Dreambox-u s pružanjem sigurnosne kopije "
+"tokom nadogradnje Softvera na vašem STB-u s pružanjem sigurnosne kopije "
 "vaših trenutnih postavki te kratkim objašnjenjem kako nadograditi vaš "
 "Softver."
 
@@ -7461,7 +7461,7 @@ msgid ""
 "Welcome to the cleanup wizard.\n"
 "\n"
 "We have detected that your available internal memory has dropped below 2MB.\n"
-"To ensure stable operation of your Dreambox, the internal memory should be "
+"To ensure stable operation of your STB, the internal memory should be "
 "cleaned up.\n"
 "You can use this wizard to remove some extensions.\n"
 msgstr ""
@@ -7470,8 +7470,8 @@ msgstr ""
 msgid ""
 "Welcome.\n"
 "\n"
-"If you want to connect your Dreambox to the Internet, this wizard will guide "
-"you through the basic network setup of your Dreambox.\n"
+"If you want to connect your STB to the Internet, this wizard will guide "
+"you through the basic network setup of your STB.\n"
 "\n"
 "Press OK to start configuring your network"
 msgstr ""
@@ -7488,12 +7488,12 @@ msgstr ""
 msgid ""
 "Welcome.\n"
 "\n"
-"This start wizard will guide you through the basic setup of your Dreambox.\n"
+"This start wizard will guide you through the basic setup of your STB.\n"
 "Press the OK button on your remote control to move to the next step."
 msgstr ""
 "Dobro došli.\n"
 "\n"
-"Ovaj početni čarobnjak će vas voditi kroz osnovne postavke vašeg Dreambox-"
+"Ovaj početni čarobnjak će vas voditi kroz osnovne postavke vašeg STB-"
 "a.\n"
 "Pritisnite OK tipku na vašem bežičnom upravljaču za prelazak u sljedeći "
 "korak."
@@ -7673,7 +7673,7 @@ msgid "You can install this plugin."
 msgstr ""
 
 #
-msgid "You can only burn Dreambox recordings!"
+msgid "You can only burn STB recordings!"
 msgstr ""
 
 #
@@ -7745,15 +7745,15 @@ msgstr "Morate pričekati %s!"
 
 #
 msgid ""
-"You need a PC connected to your dreambox. If you need further instructions, "
+"You need a PC connected to your STB. If you need further instructions, "
 "please visit the website http://www.dm7025.de.\n"
-"Your dreambox will now be halted. After you have performed the update "
+"Your STB will now be halted. After you have performed the update "
 "instructions from the website, your new firmware will ask you to restore "
 "your settings."
 msgstr ""
 "Vi trebate PC spojen s vašim Dreamboxom. Ukoliko trebate dodatne "
 "instrukcije, molim posjetite ovu stranicu http://www.dm7025.de.\n"
-"Vaš dreambox će sada stati. Nakon što ste izvršili proceduru nadogradnje "
+"Vaš STB će sada stati. Nakon što ste izvršili proceduru nadogradnje "
 "prema uputama s Web stranice, vaš novi softver će vas pitati želite li "
 "vratiti sigurnosnu kopiju vaših postavki."
 
@@ -7783,7 +7783,7 @@ msgstr ""
 
 #
 msgid ""
-"Your Dreambox is now ready to use.\n"
+"Your STB is now ready to use.\n"
 "\n"
 "Your internet connection is working now.\n"
 "\n"
@@ -7791,7 +7791,7 @@ msgstr ""
 
 #
 msgid ""
-"Your Dreambox is now ready to use.\n"
+"Your STB is now ready to use.\n"
 "\n"
 "Your internet connection is working now.\n"
 "\n"
@@ -7799,7 +7799,7 @@ msgid ""
 msgstr ""
 
 #
-msgid "Your Dreambox will restart after pressing OK on your remote control."
+msgid "Your STB will restart after pressing OK on your remote control."
 msgstr ""
 
 #
@@ -7828,15 +7828,15 @@ msgid "Your current collection will get lost!"
 msgstr ""
 
 #
-msgid "Your dreambox is shutting down. Please stand by..."
-msgstr "Vaš dreambox se gasi sada."
+msgid "Your STB is shutting down. Please stand by..."
+msgstr "Vaš STB se gasi sada."
 
 #
 msgid ""
-"Your dreambox isn't connected to the internet properly. Please check it and "
+"Your STB isn't connected to the internet properly. Please check it and "
 "try again."
 msgstr ""
-"Vaš dreambox nije ispravno spojen na internet. Molim provjerite postavke i "
+"Vaš STB nije ispravno spojen na internet. Molim provjerite postavke i "
 "pokušajte ponovno."
 
 #
@@ -9130,11 +9130,11 @@ msgstr "Da ( zadrži feedove)"
 
 #
 msgid ""
-"your dreambox might be unusable now. Please consult the manual for further "
-"assistance before rebooting your dreambox."
+"your STB might be unusable now. Please consult the manual for further "
+"assistance before rebooting your STB."
 msgstr ""
-"vaš dreambox može biti sada nemoguće za koristiti. Molim konzultirajte se s "
-"korisničkim uputama za daljnju pomoć prije rebootanja vašeg dreambox-a."
+"vaš STB može biti sada nemoguće za koristiti. Molim konzultirajte se s "
+"korisničkim uputama za daljnju pomoć prije rebootanja vašeg STB-a."
 
 #
 msgid "zap"
@@ -9191,18 +9191,18 @@ msgstr "prebačen"
 #
 #~ msgid ""
 #~ "A sleep timer want's to set your\n"
-#~ "Dreambox to standby. Do that now?"
+#~ "STB to standby. Do that now?"
 #~ msgstr ""
 #~ "Tajmer spavanja želi postaviti vaš\n"
-#~ "Dreambox u stanj.pripav. Učiniti sada?"
+#~ "STB u stanj.pripav. Učiniti sada?"
 
 #
 #~ msgid ""
 #~ "A sleep timer want's to shut down\n"
-#~ "your Dreambox. Shutdown now?"
+#~ "your STB. Shutdown now?"
 #~ msgstr ""
 #~ "Tajmer spavanja želi isključiti\n"
-#~ "vaš Dreambox. Isključiti sada?"
+#~ "vaš STB. Isključiti sada?"
 
 #
 #~ msgid "AGC"
@@ -9699,8 +9699,8 @@ msgstr "prebačen"
 #~ msgstr "Nadograđuje softver vašeg prijemnika"
 
 #
-#~ msgid "Upgrade finished. Do you want to reboot your Dreambox?"
-#~ msgstr "Nadogradnja uspješna. Želite li sada restartati Dreambox?"
+#~ msgid "Upgrade finished. Do you want to reboot your STB?"
+#~ msgstr "Nadogradnja uspješna. Želite li sada restartati STB?"
 
 #
 #~ msgid "Usage Settings"
@@ -9720,10 +9720,10 @@ msgstr "prebačen"
 
 #
 #~ msgid ""
-#~ "You do not seem to have a harddisk in your Dreambox. So backing up to a "
+#~ "You do not seem to have a harddisk in your STB. So backing up to a "
 #~ "harddisk is not an option for you."
 #~ msgstr ""
-#~ "Izgleda da vi nemate instalirani Tvrdi disk u vašem Dreambox-u. Stoga "
+#~ "Izgleda da vi nemate instalirani Tvrdi disk u vašem STB-u. Stoga "
 #~ "izrada sigurnosne kopije nije opcija za vas."
 
 #

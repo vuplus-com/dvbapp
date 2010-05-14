@@ -37,10 +37,10 @@ msgstr ""
 #
 msgid ""
 "\n"
-"Backup your Dreambox settings."
+"Backup your STB settings."
 msgstr ""
 "\n"
-"Jūsų Dreambox nustatymų atsarginė kopija."
+"Jūsų STB nustatymų atsarginė kopija."
 
 #
 msgid ""
@@ -53,18 +53,18 @@ msgstr ""
 #
 msgid ""
 "\n"
-"Manage extensions or plugins for your Dreambox"
+"Manage extensions or plugins for your STB"
 msgstr ""
 "\n"
-"Išplėtimų arba papildomų programų valdymas jūsų Dreambox'e"
+"Išplėtimų arba papildomų programų valdymas jūsų STB'e"
 
 #
 msgid ""
 "\n"
-"Online update of your Dreambox software."
+"Online update of your STB software."
 msgstr ""
 "\n"
-"Internetinis jūsų Dreambox programinės įrangos atnaujinimas."
+"Internetinis jūsų STB programinės įrangos atnaujinimas."
 
 #
 msgid ""
@@ -77,18 +77,18 @@ msgstr ""
 #
 msgid ""
 "\n"
-"Restore your Dreambox settings."
+"Restore your STB settings."
 msgstr ""
 "\n"
-"Atkurti jūsų Dreambox nustatymus."
+"Atkurti jūsų STB nustatymus."
 
 #
 msgid ""
 "\n"
-"Restore your Dreambox with a new firmware."
+"Restore your STB with a new firmware."
 msgstr ""
 "\n"
-"Atkurti jūsų Dreambox su nauja programine įranga."
+"Atkurti jūsų STB su nauja programine įranga."
 
 #
 msgid ""
@@ -412,7 +412,7 @@ msgstr ""
 #
 msgid ""
 "A finished record timer wants to set your\n"
-"Dreambox to standby. Do that now?"
+"STB to standby. Do that now?"
 msgstr ""
 "Baigtas įrašymas pagal laikmatį nori nustatyti Jūsų\n"
 "imtuvą išjungimui. Padaryti tai dabar?"
@@ -420,7 +420,7 @@ msgstr ""
 #
 msgid ""
 "A finished record timer wants to shut down\n"
-"your Dreambox. Shutdown now?"
+"your STB. Shutdown now?"
 msgstr ""
 "Baigtas įrašymas pagal laikmatį nori išjungti Jūsų\n"
 "imtuvą. Išjungti dabar?"
@@ -491,7 +491,7 @@ msgstr ""
 #
 msgid ""
 "A sleep timer wants to set your\n"
-"Dreambox to standby. Do that now?"
+"STB to standby. Do that now?"
 msgstr ""
 "Budėjimo laikmatis nori nustatyti Jūsų\n"
 "imtuvą išjungimui. Padaryti tai dabar?"
@@ -499,7 +499,7 @@ msgstr ""
 #
 msgid ""
 "A sleep timer wants to shut down\n"
-"your Dreambox. Shutdown now?"
+"your STB. Shutdown now?"
 msgstr ""
 "Budėjimo laikmatis nori išjungti Jūsų\n"
 "imtuvą. Išjungti dabar?"
@@ -609,8 +609,8 @@ msgid "Add a mark"
 msgstr "Pridėti žymeklį"
 
 #
-msgid "Add a new NFS or CIFS mount point to your Dreambox."
-msgstr "Pridėti naują NFS arba CIFS pajungimo tašką jūsų Dreambox'ui."
+msgid "Add a new NFS or CIFS mount point to your STB."
+msgstr "Pridėti naują NFS arba CIFS pajungimo tašką jūsų STB'ui."
 
 #
 msgid "Add a new title"
@@ -658,10 +658,10 @@ msgstr "Pridėta:"
 
 #
 msgid ""
-"Adds enigma2 settings and dreambox model informations like SN, rev... if "
+"Adds enigma2 settings and STB model informations like SN, rev... if "
 "enabled."
 msgstr ""
-"Pridėti enigma2 nustatymus ir dreambox modelio informacijas kaip SN, jei "
+"Pridėti enigma2 nustatymus ir STB modelio informacijas kaip SN, jei "
 "įjungta."
 
 #
@@ -716,7 +716,7 @@ msgstr "Po įvykio"
 #
 msgid ""
 "After the start wizard is completed, you need to protect single services. "
-"Refer to your dreambox's manual on how to do that."
+"Refer to your STB's manual on how to do that."
 msgstr ""
 "Po nustatymų vedlio darbo baigimo Jūs galite nustatyti kai kurių kanalų "
 "apribojimus. Paskaitykite imtuvo instrukciją kaip tai padaryti."
@@ -1185,8 +1185,8 @@ msgid "Change step size"
 msgstr "Keisti žingsnio dydį"
 
 #
-msgid "Change the hostname of your Dreambox."
-msgstr "Keisti savo Dreambox'o pagrindinio kompiuterio vardą."
+msgid "Change the hostname of your STB."
+msgstr "Keisti savo STB'o pagrindinio kompiuterio vardą."
 
 #
 msgid "Channel"
@@ -1473,8 +1473,8 @@ msgid "Contrast"
 msgstr "Kontrastas"
 
 #
-msgid "Could not connect to Dreambox .NFI Image Feed Server:"
-msgstr "Negalima prisijungti prie Dreambox .NFI atvaizdo perdavimo serverio:"
+msgid "Could not connect to STB .NFI Image Feed Server:"
+msgstr "Negalima prisijungti prie STB .NFI atvaizdo perdavimo serverio:"
 
 #
 msgid "Could not load Medium! No disc inserted?"
@@ -1923,7 +1923,7 @@ msgid "Do you want to do another manual service scan?"
 msgstr "Jūs norite atlikti rankinį kanalų skanavimą?"
 
 #
-msgid "Do you want to enable the parental control feature on your dreambox?"
+msgid "Do you want to enable the parental control feature on your STB?"
 msgstr "Jūs norite įdiegti tėvų kontrolę Jūsų imtuvui?"
 
 #
@@ -1947,8 +1947,8 @@ msgid "Do you want to preview this DVD before burning?"
 msgstr "Jūs norite peržiūrėti šį DVD prieš įrašymą?"
 
 #
-msgid "Do you want to reboot your Dreambox?"
-msgstr "Jūs norite perjungti savo Dreambox?"
+msgid "Do you want to reboot your STB?"
+msgstr "Jūs norite perjungti savo STB?"
 
 #
 msgid "Do you want to remove the package:\n"
@@ -1975,12 +1975,12 @@ msgstr ""
 "galėtume susisiekti su jumis jei reikia?"
 
 #
-msgid "Do you want to update your Dreambox?"
-msgstr "Jūs norite atnaujinti savo Dreambox?"
+msgid "Do you want to update your STB?"
+msgstr "Jūs norite atnaujinti savo STB?"
 
 #
 msgid ""
-"Do you want to update your Dreambox?\n"
+"Do you want to update your STB?\n"
 "After pressing OK, please wait!"
 msgstr ""
 "Jūs tikrai norite atnaujinti Jūsų imtuvą?\n"
@@ -2058,12 +2058,12 @@ msgid "Downloading screenshots. Please wait..."
 msgstr "Momentinių ekrano kopijų parsisiuntimas. Prašome laukti..."
 
 #
-msgid "Dreambox format data DVD (HDTV compatible)"
-msgstr "Dreambox formatuoja DVD duomenis (suderinama su HDTV)"
+msgid "STB format data DVD (HDTV compatible)"
+msgstr "STB formatuoja DVD duomenis (suderinama su HDTV)"
 
 #
-msgid "Dreambox software because updates are available."
-msgstr "Dreambox programinės įrangos atnaujinimas, nes yra pasiekiamas."
+msgid "STB software because updates are available."
+msgstr "STB programinės įrangos atnaujinimas, nes yra pasiekiamas."
 
 #
 msgid "Duration: "
@@ -2151,11 +2151,11 @@ msgid "Edit settings"
 msgstr "Redaguoti nustatymus"
 
 #
-msgid "Edit the Nameserver configuration of your Dreambox.\n"
+msgid "Edit the Nameserver configuration of your STB.\n"
 msgstr "Redaguokite serverio pavadinimo konfigūraciją savo imtuve.\n"
 
 #
-msgid "Edit the network configuration of your Dreambox.\n"
+msgid "Edit the network configuration of your STB.\n"
 msgstr "Redaguokite tinklo konfigūraciją savo imtuve.\n"
 
 #
@@ -2294,7 +2294,7 @@ msgstr ""
 msgid "Enter main menu..."
 msgstr ""
 
-msgid "Enter new hostname for your Dreambox"
+msgid "Enter new hostname for your STB"
 msgstr ""
 
 msgid "Enter options:"
@@ -2578,10 +2578,10 @@ msgstr ""
 msgid "Genre"
 msgstr ""
 
-msgid "Genuine Dreambox"
+msgid "Genuine STB"
 msgstr ""
 
-msgid "Genuine Dreambox validation failed!"
+msgid "Genuine STB validation failed!"
 msgstr ""
 
 msgid "German"
@@ -3566,7 +3566,7 @@ msgstr ""
 msgid "No, do nothing."
 msgstr ""
 
-msgid "No, just start my dreambox"
+msgid "No, just start my STB"
 msgstr ""
 
 msgid "No, not now"
@@ -3834,7 +3834,7 @@ msgid ""
 msgstr ""
 
 msgid ""
-"Please disconnect all USB devices from your Dreambox and (re-)attach the "
+"Please disconnect all USB devices from your STB and (re-)attach the "
 "target USB stick (minimum size is 64 MB) now!"
 msgstr ""
 
@@ -4959,7 +4959,7 @@ msgstr ""
 msgid "Shutdown"
 msgstr ""
 
-msgid "Shutdown Dreambox after"
+msgid "Shutdown STB after"
 msgstr ""
 
 msgid "Signal Strength:"
@@ -5284,7 +5284,7 @@ msgstr ""
 msgid "Test mode"
 msgstr ""
 
-msgid "Test the network configuration of your Dreambox.\n"
+msgid "Test the network configuration of your STB.\n"
 msgstr ""
 
 msgid "Test-Messagebox?"
@@ -5297,7 +5297,7 @@ msgstr ""
 
 msgid ""
 "Thank you for using the wizard. Your box is now ready to use.\n"
-"Please press OK to start using your Dreambox."
+"Please press OK to start using your STB."
 msgstr ""
 
 msgid ""
@@ -5308,7 +5308,7 @@ msgstr ""
 
 msgid ""
 "The DVD standard doesn't support H.264 (HDTV) video streams. Do you want to "
-"create a Dreambox format data DVD (which will not play in stand-alone DVD "
+"create a STB format data DVD (which will not play in stand-alone DVD "
 "players) instead?"
 msgstr ""
 
@@ -5379,7 +5379,7 @@ msgstr ""
 
 msgid ""
 "The installation of the default settings is finished. You can now continue "
-"configuring your Dreambox by pressing the OK button on the remote control."
+"configuring your STB by pressing the OK button on the remote control."
 msgstr ""
 
 msgid "The match attribute is mandatory."
@@ -5478,7 +5478,7 @@ msgid "There was an error. The package:"
 msgstr ""
 
 msgid ""
-"There's a certificate update available for your dreambox. Would you like to "
+"There's a certificate update available for your STB. Would you like to "
 "apply this update now?"
 msgstr ""
 
@@ -5502,7 +5502,7 @@ msgid ""
 msgstr ""
 
 #, python-format
-msgid "This Dreambox can't decode %s streams!"
+msgid "This STB can't decode %s streams!"
 msgstr ""
 
 msgid "This Month"
@@ -5677,7 +5677,7 @@ msgid "Titleset mode"
 msgstr ""
 
 msgid ""
-"To update your Dreambox firmware, please follow these steps:\n"
+"To update your STB firmware, please follow these steps:\n"
 "1) Turn off your box with the rear power switch and plug in the bootable USB "
 "stick.\n"
 "2) Turn mains back on and hold the DOWN button on the front panel pressed "
@@ -5800,7 +5800,7 @@ msgid "USB stick wizard"
 msgstr ""
 
 msgid ""
-"USB stick wizard finished. Your dreambox will now restart with your new "
+"USB stick wizard finished. Your STB will now restart with your new "
 "image!"
 msgstr ""
 
@@ -5869,7 +5869,7 @@ msgid "Update done..."
 msgstr ""
 
 msgid ""
-"Update done... The genuine dreambox test will now be rerun and should not "
+"Update done... The genuine STB test will now be rerun and should not "
 "ask you to update again."
 msgstr ""
 
@@ -5898,7 +5898,7 @@ msgstr ""
 msgid "Upgrading"
 msgstr ""
 
-msgid "Upgrading Dreambox... Please wait"
+msgid "Upgrading STB... Please wait"
 msgstr ""
 
 msgid "Upper bound of timespan."
@@ -5984,7 +5984,7 @@ msgid "VMGM (intro trailer)"
 msgstr ""
 
 msgid ""
-"Verify your Dreambox authenticity by running the genuine dreambox plugin!"
+"Verify your STB authenticity by running the genuine STB plugin!"
 msgstr ""
 
 msgid "Vertical"
@@ -6104,7 +6104,7 @@ msgstr ""
 msgid "View teletext..."
 msgstr ""
 
-msgid "View, edit or delete mountpoints on your Dreambox."
+msgid "View, edit or delete mountpoints on your STB."
 msgstr ""
 
 msgid "View, edit or delete usernames and passwords for your network."
@@ -6190,7 +6190,7 @@ msgstr ""
 
 msgid ""
 "Welcome to the Image upgrade wizard. The wizard will assist you in upgrading "
-"the firmware of your Dreambox by providing a backup facility for your "
+"the firmware of your STB by providing a backup facility for your "
 "current settings and a short explanation of how to upgrade your firmware."
 msgstr ""
 
@@ -6225,7 +6225,7 @@ msgid ""
 "Welcome to the cleanup wizard.\n"
 "\n"
 "We have detected that your available internal memory has dropped below 2MB.\n"
-"To ensure stable operation of your Dreambox, the internal memory should be "
+"To ensure stable operation of your STB, the internal memory should be "
 "cleaned up.\n"
 "You can use this wizard to remove some extensions.\n"
 msgstr ""
@@ -6233,8 +6233,8 @@ msgstr ""
 msgid ""
 "Welcome.\n"
 "\n"
-"If you want to connect your Dreambox to the Internet, this wizard will guide "
-"you through the basic network setup of your Dreambox.\n"
+"If you want to connect your STB to the Internet, this wizard will guide "
+"you through the basic network setup of your STB.\n"
 "\n"
 "Press OK to start configuring your network"
 msgstr ""
@@ -6249,7 +6249,7 @@ msgstr ""
 msgid ""
 "Welcome.\n"
 "\n"
-"This start wizard will guide you through the basic setup of your Dreambox.\n"
+"This start wizard will guide you through the basic setup of your STB.\n"
 "Press the OK button on your remote control to move to the next step."
 msgstr ""
 
@@ -6387,7 +6387,7 @@ msgstr ""
 msgid "You can install this plugin."
 msgstr ""
 
-msgid "You can only burn Dreambox recordings!"
+msgid "You can only burn STB recordings!"
 msgstr ""
 
 msgid "You can remove this plugin."
@@ -6446,9 +6446,9 @@ msgid "You have to wait %s!"
 msgstr ""
 
 msgid ""
-"You need a PC connected to your dreambox. If you need further instructions, "
+"You need a PC connected to your STB. If you need further instructions, "
 "please visit the website http://www.dm7025.de.\n"
-"Your dreambox will now be halted. After you have performed the update "
+"Your STB will now be halted. After you have performed the update "
 "instructions from the website, your new firmware will ask you to restore "
 "your settings."
 msgstr ""
@@ -6472,21 +6472,21 @@ msgid ""
 msgstr ""
 
 msgid ""
-"Your Dreambox is now ready to use.\n"
+"Your STB is now ready to use.\n"
 "\n"
 "Your internet connection is working now.\n"
 "\n"
 msgstr ""
 
 msgid ""
-"Your Dreambox is now ready to use.\n"
+"Your STB is now ready to use.\n"
 "\n"
 "Your internet connection is working now.\n"
 "\n"
 "Please press OK to continue."
 msgstr ""
 
-msgid "Your Dreambox will restart after pressing OK on your remote control."
+msgid "Your STB will restart after pressing OK on your remote control."
 msgstr ""
 
 msgid ""
@@ -6508,11 +6508,11 @@ msgstr ""
 msgid "Your current collection will get lost!"
 msgstr ""
 
-msgid "Your dreambox is shutting down. Please stand by..."
+msgid "Your STB is shutting down. Please stand by..."
 msgstr ""
 
 msgid ""
-"Your dreambox isn't connected to the internet properly. Please check it and "
+"Your STB isn't connected to the internet properly. Please check it and "
 "try again."
 msgstr ""
 
@@ -7486,8 +7486,8 @@ msgid "yes (keep feeds)"
 msgstr ""
 
 msgid ""
-"your dreambox might be unusable now. Please consult the manual for further "
-"assistance before rebooting your dreambox."
+"your STB might be unusable now. Please consult the manual for further "
+"assistance before rebooting your STB."
 msgstr ""
 
 msgid "zap"
@@ -7685,8 +7685,8 @@ msgstr ""
 #~ msgid ""
 #~ "Welcome.\n"
 #~ "\n"
-#~ "If you want to connect your Dreambox to the Internet, this wizard will "
-#~ "guide you through the basic network setup of your Dreambox.\n"
+#~ "If you want to connect your STB to the Internet, this wizard will "
+#~ "guide you through the basic network setup of your STB.\n"
 #~ "\n"
 #~ "Press the OK button on your remote control to move to the next step."
 #~ msgstr ""
@@ -7751,7 +7751,7 @@ msgstr ""
 #
 #~ msgid ""
 #~ "Your wired LAN Adapter could not be started.\n"
-#~ "Do you want to reboot your Dreambox to apply the new configuration?\n"
+#~ "Do you want to reboot your STB to apply the new configuration?\n"
 #~ msgstr ""
 #~ "Jūsų belaidžio tinklo adapteris nestartavo.\n"
 #~ "Jūs norite paleisti iš naujo savo imtuvą, kad pavtirtinti naują "
@@ -7760,7 +7760,7 @@ msgstr ""
 #
 #~ msgid ""
 #~ "Your wireless LAN Adapter could not be started.\n"
-#~ "Do you want to reboot your Dreambox to apply the new configuration?\n"
+#~ "Do you want to reboot your STB to apply the new configuration?\n"
 #~ msgstr ""
 #~ "Jūsų belaidžio tinklo adapteris nestartavo.\n"
 #~ "Jūs norite perjungti savo imtuvą, kad patvirtinti naują konfigūraciją?\n"

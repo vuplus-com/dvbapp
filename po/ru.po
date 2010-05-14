@@ -37,10 +37,10 @@ msgstr ""
 #
 msgid ""
 "\n"
-"Backup your Dreambox settings."
+"Backup your STB settings."
 msgstr ""
 "\n"
-"Резервная копия настроек Dreambox."
+"Резервная копия настроек STB."
 
 #
 msgid ""
@@ -52,18 +52,18 @@ msgstr ""
 
 msgid ""
 "\n"
-"Manage extensions or plugins for your Dreambox"
+"Manage extensions or plugins for your STB"
 msgstr ""
 "\n"
-"Управление расширениями и плагинами для Dreambox"
+"Управление расширениями и плагинами для STB"
 
 #
 msgid ""
 "\n"
-"Online update of your Dreambox software."
+"Online update of your STB software."
 msgstr ""
 "\n"
-"Онлайн обновление Dreambox."
+"Онлайн обновление STB."
 
 #
 msgid ""
@@ -76,18 +76,18 @@ msgstr ""
 #
 msgid ""
 "\n"
-"Restore your Dreambox settings."
+"Restore your STB settings."
 msgstr ""
 "\n"
-"Восстановить настройки Dreambox."
+"Восстановить настройки STB."
 
 #
 msgid ""
 "\n"
-"Restore your Dreambox with a new firmware."
+"Restore your STB with a new firmware."
 msgstr ""
 "\n"
-"Восстановить Dreambox с новой микропрограммой."
+"Восстановить STB с новой микропрограммой."
 
 #
 msgid ""
@@ -416,17 +416,17 @@ msgstr ""
 #
 msgid ""
 "A finished record timer wants to set your\n"
-"Dreambox to standby. Do that now?"
+"STB to standby. Do that now?"
 msgstr ""
-"Запись по таймеру завершена, Dreambox будет переведен\n"
+"Запись по таймеру завершена, STB будет переведен\n"
 "\"в ждущий режим. Сделать это сейчас?\""
 
 #
 msgid ""
 "A finished record timer wants to shut down\n"
-"your Dreambox. Shutdown now?"
+"your STB. Shutdown now?"
 msgstr ""
-"Запись по таймеру закончена, Dreambox\n"
+"Запись по таймеру закончена, STB\n"
 "\"будет выключен. Сделать это сейчас?\""
 
 #
@@ -489,17 +489,17 @@ msgstr ""
 #
 msgid ""
 "A sleep timer wants to set your\n"
-"Dreambox to standby. Do that now?"
+"STB to standby. Do that now?"
 msgstr ""
-"Таймер сна хочет перевести Dreambox\n"
+"Таймер сна хочет перевести STB\n"
 "в ждущий режим. Сделать это сейчас?"
 
 #
 msgid ""
 "A sleep timer wants to shut down\n"
-"your Dreambox. Shutdown now?"
+"your STB. Shutdown now?"
 msgstr ""
-"Таймер сна хочет выключить Dreambox.\n"
+"Таймер сна хочет выключить STB.\n"
 "Сделать это сейчас?\""
 
 #
@@ -605,7 +605,7 @@ msgid "Add a mark"
 msgstr "Добавить метку"
 
 #
-msgid "Add a new NFS or CIFS mount point to your Dreambox."
+msgid "Add a new NFS or CIFS mount point to your STB."
 msgstr ""
 
 #
@@ -654,7 +654,7 @@ msgstr ""
 
 #
 msgid ""
-"Adds enigma2 settings and dreambox model informations like SN, rev... if "
+"Adds enigma2 settings and STB model informations like SN, rev... if "
 "enabled."
 msgstr ""
 
@@ -709,7 +709,7 @@ msgstr "После события"
 #
 msgid ""
 "After the start wizard is completed, you need to protect single services. "
-"Refer to your dreambox's manual on how to do that."
+"Refer to your STB's manual on how to do that."
 msgstr ""
 "По окончанию работы мастера Вы можете установить ограничение на некоторые "
 "сервисы.Прочитайте в инструкции к тюнеру как это сделать."
@@ -1181,7 +1181,7 @@ msgid "Change step size"
 msgstr ""
 
 #
-msgid "Change the hostname of your Dreambox."
+msgid "Change the hostname of your STB."
 msgstr ""
 
 #
@@ -1469,8 +1469,8 @@ msgid "Contrast"
 msgstr "Контрастность"
 
 #
-msgid "Could not connect to Dreambox .NFI Image Feed Server:"
-msgstr "Не удалось подключиться к Dreambox. NFI Feed Image серверу:"
+msgid "Could not connect to STB .NFI Image Feed Server:"
+msgstr "Не удалось подключиться к STB. NFI Feed Image серверу:"
 
 #
 msgid "Could not load Medium! No disc inserted?"
@@ -1931,8 +1931,8 @@ msgid "Do you want to do another manual service scan?"
 msgstr "Искать еще вручную?"
 
 #
-msgid "Do you want to enable the parental control feature on your dreambox?"
-msgstr "Вы желаете установить родительский контроль на Вашем dreambox?"
+msgid "Do you want to enable the parental control feature on your STB?"
+msgstr "Вы желаете установить родительский контроль на Вашем STB?"
 
 #
 msgid "Do you want to enter a username and password for this host?\n"
@@ -1955,8 +1955,8 @@ msgid "Do you want to preview this DVD before burning?"
 msgstr "Вы хотите просмотреть DVD перед прожигом?"
 
 #
-msgid "Do you want to reboot your Dreambox?"
-msgstr "Вы хотите перезагрузить Dreambox?"
+msgid "Do you want to reboot your STB?"
+msgstr "Вы хотите перезагрузить STB?"
 
 #
 msgid "Do you want to remove the package:\n"
@@ -1981,15 +1981,15 @@ msgid ""
 msgstr ""
 
 #
-msgid "Do you want to update your Dreambox?"
-msgstr "Вы хотите обновить Dreambox?"
+msgid "Do you want to update your STB?"
+msgstr "Вы хотите обновить STB?"
 
 #
 msgid ""
-"Do you want to update your Dreambox?\n"
+"Do you want to update your STB?\n"
 "After pressing OK, please wait!"
 msgstr ""
-"Вы хотите обновить ПО Dreambox?\n"
+"Вы хотите обновить ПО STB?\n"
 "После нажатия OK, пожалуйста, ждите!"
 
 #
@@ -2063,11 +2063,11 @@ msgid "Downloading screenshots. Please wait..."
 msgstr ""
 
 #
-msgid "Dreambox format data DVD (HDTV compatible)"
-msgstr "Dreambox формат данных DVD (HDTV-совместимый"
+msgid "STB format data DVD (HDTV compatible)"
+msgstr "STB формат данных DVD (HDTV-совместимый"
 
 #
-msgid "Dreambox software because updates are available."
+msgid "STB software because updates are available."
 msgstr ""
 
 #
@@ -2156,12 +2156,12 @@ msgid "Edit settings"
 msgstr "Изменить настройки"
 
 #
-msgid "Edit the Nameserver configuration of your Dreambox.\n"
-msgstr "Изменить сервер DNS вашего Dreambox.\n"
+msgid "Edit the Nameserver configuration of your STB.\n"
+msgstr "Изменить сервер DNS вашего STB.\n"
 
 #
-msgid "Edit the network configuration of your Dreambox.\n"
-msgstr "Изменить конфигурацию сети  вашего Dreambox.\n"
+msgid "Edit the network configuration of your STB.\n"
+msgstr "Изменить конфигурацию сети  вашего STB.\n"
 
 #
 msgid "Edit title"
@@ -2330,7 +2330,7 @@ msgid "Enter main menu..."
 msgstr "Войти в главное меню..."
 
 #
-msgid "Enter new hostname for your Dreambox"
+msgid "Enter new hostname for your STB"
 msgstr ""
 
 #
@@ -2704,10 +2704,10 @@ msgid "Genre"
 msgstr "Жанр"
 
 #
-msgid "Genuine Dreambox"
+msgid "Genuine STB"
 msgstr ""
 
-msgid "Genuine Dreambox validation failed!"
+msgid "Genuine STB validation failed!"
 msgstr ""
 
 #
@@ -4035,7 +4035,7 @@ msgid "No, do nothing."
 msgstr "Нет, не делать"
 
 #
-msgid "No, just start my dreambox"
+msgid "No, just start my STB"
 msgstr "Нет, включить мой dreamdox"
 
 #
@@ -4400,7 +4400,7 @@ msgstr ""
 
 #
 msgid ""
-"Please disconnect all USB devices from your Dreambox and (re-)attach the "
+"Please disconnect all USB devices from your STB and (re-)attach the "
 "target USB stick (minimum size is 64 MB) now!"
 msgstr ""
 "Пожалуйста, отключите все USB устройства от ресивера и (пере-)подключите USB-"
@@ -5906,7 +5906,7 @@ msgid "Shutdown"
 msgstr ""
 
 #
-msgid "Shutdown Dreambox after"
+msgid "Shutdown STB after"
 msgstr "Выключить через :  "
 
 #
@@ -6340,8 +6340,8 @@ msgid "Test mode"
 msgstr "Режим теста"
 
 #
-msgid "Test the network configuration of your Dreambox.\n"
-msgstr "Тест сетевой конфигурации вашего Dreambox.\n"
+msgid "Test the network configuration of your STB.\n"
+msgstr "Тест сетевой конфигурации вашего STB.\n"
 
 #
 msgid "Test-Messagebox?"
@@ -6358,10 +6358,10 @@ msgstr ""
 #
 msgid ""
 "Thank you for using the wizard. Your box is now ready to use.\n"
-"Please press OK to start using your Dreambox."
+"Please press OK to start using your STB."
 msgstr ""
 "Спасибо Вам за использование мастера. Ваш ресивер готов к работе.\n"
-"Пожалуйста, нажмите OK для начала работы Вашего Dreambox."
+"Пожалуйста, нажмите OK для начала работы Вашего STB."
 
 #
 msgid ""
@@ -6373,11 +6373,11 @@ msgstr ""
 #
 msgid ""
 "The DVD standard doesn't support H.264 (HDTV) video streams. Do you want to "
-"create a Dreambox format data DVD (which will not play in stand-alone DVD "
+"create a STB format data DVD (which will not play in stand-alone DVD "
 "players) instead?"
 msgstr ""
 "DVD стандарт не поддерживает H.264 (HDTV) видео потоков. Вы хотите создать "
-"Dreambox DVD  (который не будет проигрываться в стационарных DVD "
+"STB DVD  (который не будет проигрываться в стационарных DVD "
 "проигрывателях)?"
 
 #
@@ -6471,10 +6471,10 @@ msgstr "Установка списков сервисов по умолчани
 #
 msgid ""
 "The installation of the default settings is finished. You can now continue "
-"configuring your Dreambox by pressing the OK button on the remote control."
+"configuring your STB by pressing the OK button on the remote control."
 msgstr ""
 "Установка по умолчанию закончена. Теперь Вы можете продолжить настройку "
-"Dreambox, нажав на кнопку ОК на пульте ДУ."
+"STB, нажав на кнопку ОК на пульте ДУ."
 
 #
 msgid "The match attribute is mandatory."
@@ -6613,7 +6613,7 @@ msgstr ""
 #
 # File: tmp/enigma2_plugins/genuinedreambox/src/plugin.py, line: 130
 msgid ""
-"There's a certificate update available for your dreambox. Would you like to "
+"There's a certificate update available for your STB. Would you like to "
 "apply this update now?"
 msgstr ""
 
@@ -6648,8 +6648,8 @@ msgstr ""
 
 #
 #, python-format
-msgid "This Dreambox can't decode %s streams!"
-msgstr "Этот Dreambox не может декодировать %s потоки!"
+msgid "This STB can't decode %s streams!"
+msgstr "Этот STB не может декодировать %s потоки!"
 
 #
 msgid "This Month"
@@ -6895,15 +6895,15 @@ msgstr "Режим установки заголовка"
 
 #
 msgid ""
-"To update your Dreambox firmware, please follow these steps:\n"
+"To update your STB firmware, please follow these steps:\n"
 "1) Turn off your box with the rear power switch and plug in the bootable USB "
 "stick.\n"
 "2) Turn mains back on and hold the DOWN button on the front panel pressed "
 "for 10 seconds.\n"
 "3) Wait for bootup and follow instructions of the wizard."
 msgstr ""
-"Для обновления микропрограммы Dreambox, выполните следующие действия:\n"
-"1) Выключите Dreambox кнопкой на задней панели и вставьте загрузочный USB "
+"Для обновления микропрограммы STB, выполните следующие действия:\n"
+"1) Выключите STB кнопкой на задней панели и вставьте загрузочный USB "
 "стик.\n"
 "2) Включите ресивер и удерживайте кнопку ВНИЗ на передней панели около 10 "
 "секунд.\n"
@@ -7067,7 +7067,7 @@ msgstr "Мастер USB"
 
 #
 msgid ""
-"USB stick wizard finished. Your dreambox will now restart with your new "
+"USB stick wizard finished. Your STB will now restart with your new "
 "image!"
 msgstr ""
 
@@ -7161,7 +7161,7 @@ msgstr "Обновление"
 #
 # File: tmp/enigma2_plugins/genuinedreambox/src/plugin.py, line: 170
 msgid ""
-"Update done... The genuine dreambox test will now be rerun and should not "
+"Update done... The genuine STB test will now be rerun and should not "
 "ask you to update again."
 msgstr ""
 
@@ -7201,8 +7201,8 @@ msgid "Upgrading"
 msgstr "Обновление"
 
 #
-msgid "Upgrading Dreambox... Please wait"
-msgstr "Обновление Dreambox... Пожалуйста, подождите."
+msgid "Upgrading STB... Please wait"
+msgstr "Обновление STB... Пожалуйста, подождите."
 
 #
 msgid "Upper bound of timespan."
@@ -7317,7 +7317,7 @@ msgid "VMGM (intro trailer)"
 msgstr "VMGM (трейлер)"
 
 msgid ""
-"Verify your Dreambox authenticity by running the genuine dreambox plugin!"
+"Verify your STB authenticity by running the genuine STB plugin!"
 msgstr ""
 
 #
@@ -7481,7 +7481,7 @@ msgid "View teletext..."
 msgstr "Смотреть телетекст"
 
 #
-msgid "View, edit or delete mountpoints on your Dreambox."
+msgid "View, edit or delete mountpoints on your STB."
 msgstr ""
 
 #
@@ -7598,11 +7598,11 @@ msgstr ""
 #
 msgid ""
 "Welcome to the Image upgrade wizard. The wizard will assist you in upgrading "
-"the firmware of your Dreambox by providing a backup facility for your "
+"the firmware of your STB by providing a backup facility for your "
 "current settings and a short explanation of how to upgrade your firmware."
 msgstr ""
 "Добро пожаловать в мастер обновления имиджа. Мастер поможет Вам в обновлении "
-"программного обеспечения Вашего Dreambox путем сохранения Ваших текущих "
+"программного обеспечения Вашего STB путем сохранения Ваших текущих "
 "настроек и коротких подсказок по процессу обновления."
 
 #
@@ -7639,7 +7639,7 @@ msgid ""
 "Welcome to the cleanup wizard.\n"
 "\n"
 "We have detected that your available internal memory has dropped below 2MB.\n"
-"To ensure stable operation of your Dreambox, the internal memory should be "
+"To ensure stable operation of your STB, the internal memory should be "
 "cleaned up.\n"
 "You can use this wizard to remove some extensions.\n"
 msgstr ""
@@ -7648,15 +7648,15 @@ msgstr ""
 msgid ""
 "Welcome.\n"
 "\n"
-"If you want to connect your Dreambox to the Internet, this wizard will guide "
-"you through the basic network setup of your Dreambox.\n"
+"If you want to connect your STB to the Internet, this wizard will guide "
+"you through the basic network setup of your STB.\n"
 "\n"
 "Press OK to start configuring your network"
 msgstr ""
 "Добро пожаловать.\n"
 "\n"
-"Если вы хотите подключить Dreambox к сети интернет, этот мастер проведет вас "
-"через основные настройки сети Вашего Dreambox.\n"
+"Если вы хотите подключить STB к сети интернет, этот мастер проведет вас "
+"через основные настройки сети Вашего STB.\n"
 "\n"
 "Нажмите ОК для начала настройки сети."
 
@@ -7672,12 +7672,12 @@ msgstr ""
 msgid ""
 "Welcome.\n"
 "\n"
-"This start wizard will guide you through the basic setup of your Dreambox.\n"
+"This start wizard will guide you through the basic setup of your STB.\n"
 "Press the OK button on your remote control to move to the next step."
 msgstr ""
 "Добро пожаловать.\n"
 "\n"
-"Этот мастер поможет Вам настроить основные параметры Вашего Dreambox.\n"
+"Этот мастер поможет Вам настроить основные параметры Вашего STB.\n"
 "Нажмите OK на пульте управления для перехода к следующему шагу."
 
 #
@@ -7862,7 +7862,7 @@ msgid "You can install this plugin."
 msgstr ""
 
 #
-msgid "You can only burn Dreambox recordings!"
+msgid "You can only burn STB recordings!"
 msgstr ""
 
 #
@@ -7942,16 +7942,16 @@ msgstr "Необходимо подождать %s!"
 
 #
 msgid ""
-"You need a PC connected to your dreambox. If you need further instructions, "
+"You need a PC connected to your STB. If you need further instructions, "
 "please visit the website http://www.dm7025.de.\n"
-"Your dreambox will now be halted. After you have performed the update "
+"Your STB will now be halted. After you have performed the update "
 "instructions from the website, your new firmware will ask you to restore "
 "your settings."
 msgstr ""
-"Вам потребуется компьютер подсоединенный а Вашему Dreambox. Если вам "
+"Вам потребуется компьютер подсоединенный а Вашему STB. Если вам "
 "необходимы дополнительные инструкции, пожалуйста, посетите сайт http://www."
 "dm7025.de.\n"
-"Ваш Dreambox должен быть остановлен. После выполнения Вами инструкций по "
+"Ваш STB должен быть остановлен. После выполнения Вами инструкций по "
 "обновлению с сайта, новое ПО запросит восстановление Ваших установок. "
 
 #
@@ -7980,7 +7980,7 @@ msgstr ""
 
 #
 msgid ""
-"Your Dreambox is now ready to use.\n"
+"Your STB is now ready to use.\n"
 "\n"
 "Your internet connection is working now.\n"
 "\n"
@@ -7988,21 +7988,21 @@ msgstr ""
 
 #
 msgid ""
-"Your Dreambox is now ready to use.\n"
+"Your STB is now ready to use.\n"
 "\n"
 "Your internet connection is working now.\n"
 "\n"
 "Please press OK to continue."
 msgstr ""
-"Dreambox готов к работе.\n"
+"STB готов к работе.\n"
 "\n"
 "Интернет соединение уже работает.\n"
 "\n"
 "Нажмите ОК для продолжения."
 
 #
-msgid "Your Dreambox will restart after pressing OK on your remote control."
-msgstr "Ваш Dreambox будет перезагружен после нажатия кнопки OK на пульте."
+msgid "Your STB will restart after pressing OK on your remote control."
+msgstr "Ваш STB будет перезагружен после нажатия кнопки OK на пульте."
 
 #
 msgid ""
@@ -8030,12 +8030,12 @@ msgid "Your current collection will get lost!"
 msgstr ""
 
 #
-msgid "Your dreambox is shutting down. Please stand by..."
-msgstr "Ваш Dreambox выключается. Пожалуйста, ожидайте..."
+msgid "Your STB is shutting down. Please stand by..."
+msgstr "Ваш STB выключается. Пожалуйста, ожидайте..."
 
 #
 msgid ""
-"Your dreambox isn't connected to the internet properly. Please check it and "
+"Your STB isn't connected to the internet properly. Please check it and "
 "try again."
 msgstr ""
 "Ваш ресивер не подключен к интернету. Пожалуйста, проверьте и попробуйте "
@@ -9338,8 +9338,8 @@ msgstr "да (keep feeds)"
 
 #
 msgid ""
-"your dreambox might be unusable now. Please consult the manual for further "
-"assistance before rebooting your dreambox."
+"your STB might be unusable now. Please consult the manual for further "
+"assistance before rebooting your STB."
 msgstr ""
 "Сейчас ваш ресивер может быть непригодным для использования. Обратитесь к "
 "руководству для получения дополнительной помощи до его перезагрузки."
@@ -9577,8 +9577,8 @@ msgstr "переключено"
 #~ msgstr "Язык..."
 
 #
-#~ msgid "Lets you view/edit files in your Dreambox"
-#~ msgstr "Позволяет просматривать и редактировать файлы на Dreambox"
+#~ msgid "Lets you view/edit files in your STB"
+#~ msgstr "Позволяет просматривать и редактировать файлы на STB"
 
 #
 #~ msgid "Movie Menu"
@@ -9690,8 +9690,8 @@ msgstr "переключено"
 #~ msgstr "Шаг "
 
 #
-#~ msgid "This Dreambox can't decode %s video streams!"
-#~ msgstr "Этот Dreambox не может декодировать %s видео потоки!"
+#~ msgid "This STB can't decode %s video streams!"
+#~ msgstr "Этот STB не может декодировать %s видео потоки!"
 
 #
 #~ msgid "This is unsupported at the moment."
@@ -9720,8 +9720,8 @@ msgstr "переключено"
 #~ msgstr "Обновление программы вашего ресивера"
 
 #
-#~ msgid "Upgrade finished. Do you want to reboot your Dreambox?"
-#~ msgstr "Обновление завершено. Вы хотите перезагрузить Dreambox?"
+#~ msgid "Upgrade finished. Do you want to reboot your STB?"
+#~ msgstr "Обновление завершено. Вы хотите перезагрузить STB?"
 
 #
 #~ msgid "VCR Switch"
@@ -9740,7 +9740,7 @@ msgstr "переключено"
 
 #
 #~ msgid ""
-#~ "You do not seem to have a harddisk in your Dreambox. So backing up to a "
+#~ "You do not seem to have a harddisk in your STB. So backing up to a "
 #~ "harddisk is not an option for you."
 #~ msgstr ""
 #~ "Возможно не установлен жесткий диск. Поэтому вы не можете выбрать "
