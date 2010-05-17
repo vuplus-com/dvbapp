@@ -49,7 +49,7 @@ class FactoryTest(Screen):
 		</screen>"""
 	def __init__(self, session):
 
-		self["actions"] = NumberActionMap(["OkCancelActions","WizardActions","NumberActions",],
+		self["actions"] = NumberActionMap(["OkCancelActions","WizardActions","NumberActions","ColorActions"],
 		{
 			"left": self.nothing,
 			"right":self.nothing,
@@ -67,7 +67,8 @@ class FactoryTest(Screen):
 			"6": self.numberaction,			
 			"7": self.numberaction,			
 			"8": self.numberaction,			
-			"9": self.numberaction,			
+			"9": self.numberaction,
+			"red": self.shutdownaction,		
 		}, -2)
 
 		Screen.__init__(self, session)
@@ -128,8 +129,8 @@ class FactoryTest(Screen):
 #		tlist.append(("13. DRAM+Flash test",13))
 			self.fdefaultIndex=11
 			tlist.append(("11. Factory default",self.fdefaultIndex))
-			self.shotdownIndex=12
-			tlist.append(("12. Shutdown",self.shotdownIndex))
+			self.shutdownIndex=12
+			tlist.append(("12. Shutdown",self.shutdownIndex))
 		elif self.model == 1:
 #			tlist.append((" 0. Sata & extend hdd test",self.satetestIndex=0))
 			self.satetestIndex = -1
@@ -160,8 +161,8 @@ class FactoryTest(Screen):
 #		tlist.append(("13. DRAM+Flash test",13))
 			self.fdefaultIndex=7
 			tlist.append((" 7. Factory default",self.fdefaultIndex))
-			self.shotdownIndex=8
-			tlist.append((" 8. Shutdown",self.shotdownIndex))
+			self.shutdownIndex=8
+			tlist.append((" 8. Shutdown",self.shutdownIndex))
 		self.menulength= len(tlist)-1
 		self["testlist"] = MenuList(tlist)
 		self.rlist = []
@@ -315,7 +316,7 @@ class FactoryTest(Screen):
 #		tlist.append(("12. Flash test",12))
 #		tlist.append(("13. DRAM+Flash test",13))
 #			tlist.append(("11. Factory default",self.fdefaultIndex=11))
-#			tlist.append(("12. Shutdown",self.shotdownIndex=12))
+#			tlist.append(("12. Shutdown",self.shutdownIndex=12))
 #
 		if self.testing==1:
 			return
@@ -346,7 +347,11 @@ class FactoryTest(Screen):
 #			self.Test13()
 		elif index==self.fdefaultIndex:
 			self.Test14()
-		elif index==self.shotdownIndex:
+#		elif index==self.shutdownIndex:
+#			self.Test15()
+
+	def shutdownaction(self):
+		if self["testlist"].getCurrent()[1] == self.shutdownIndex:
 			self.Test15()
 
 
