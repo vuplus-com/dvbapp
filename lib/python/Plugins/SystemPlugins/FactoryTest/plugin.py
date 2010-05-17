@@ -28,8 +28,6 @@ class TestResultList(HTMLComponent, GUIComponent):
 		self.l = eListboxPythonStringContent()
 		self.list = source
 		self.l.setList(self.list)
-		self.l.setFont( gFont("Regular", 23))
-		self.l.setItemHeight(25)
 
 	GUI_WIDGET = eListbox
 
