@@ -72,7 +72,7 @@ class FactoryTest(Screen):
 		}, -2)
 
 		Screen.__init__(self, session)
-		TESTPROGRAM_DATE = "2010-03-22"
+		TESTPROGRAM_DATE = "2010-06-09"
 		TESTPROGRAM_VERSION = "Version 00.01"
 
 		self.model = 0
@@ -446,12 +446,14 @@ class FactoryTest(Screen):
 			if displayerror==1:
 				self.session.open( MessageBox, _("one hdd test error"), MessageBox.TYPE_ERROR)
 				self.rlist[self["testlist"].getCurrent()[1]]="fail"
-			self.satatimer.start(1100,True)
+			else:
+				self.satatimer.start(1100,True)
 		else:
 			if displayerror==1:
 				self.session.open( MessageBox, _("Sata & extend hdd test error"), MessageBox.TYPE_ERROR)
 				self.rlist[self["testlist"].getCurrent()[1]]="fail"
-			self.satatimer.start(1100,True)
+			else:
+				self.satatimer.start(1100,True)
 
 	def Test1(self):
 		if self.model== 0:
@@ -551,7 +553,7 @@ class FactoryTest(Screen):
 				self.camtimer.start(100,True)
 			else:
 				self.session.nav.stopService()
-				self.session.open( MessageBox, _("NO_CAM1_NOT_INSERTED"), MessageBox.TYPE_ERROR)
+				self.session.open( MessageBox, _("CAM1_NOT_INSERTED\nPress exit!"), MessageBox.TYPE_ERROR)
 				self.rlist[self["testlist"].getCurrent()[1]]="fail"
 				self.tunemsgtimer.stop()
 #				self.rlist[index]="fail"
@@ -562,7 +564,7 @@ class FactoryTest(Screen):
 			print 'appname',appname
 			if appname is None:
 				self.session.nav.stopService()
-				self.session.open( MessageBox, _("NO_GET_APPNAME"), MessageBox.TYPE_ERROR)
+				self.session.open( MessageBox, _("NO_GET_APPNAME\nPress exit!"), MessageBox.TYPE_ERROR)
 				self.rlist[self["testlist"].getCurrent()[1]]="fail"
 				self.tunemsgtimer.stop()				
 			else:
@@ -577,7 +579,7 @@ class FactoryTest(Screen):
 				self.camtimer.start(100,True)
 			else:
 				self.session.nav.stopService()
-				self.session.open( MessageBox, _("NO_CAM2_NOT_INSERTED"), MessageBox.TYPE_ERROR)
+				self.session.open( MessageBox, _("CAM2_NOT_INSERTED\nPress exit!"), MessageBox.TYPE_ERROR)
 				self.rlist[self["testlist"].getCurrent()[1]]="fail"
 				self.tunemsgtimer.stop()				
 #				self.rlist[index]="fail"
@@ -588,7 +590,7 @@ class FactoryTest(Screen):
 			print 'appname',appname
 			if appname is None:
 				self.session.nav.stopService()
-				self.session.open( MessageBox, _("NO_GET_APPNAME"), MessageBox.TYPE_ERROR)
+				self.session.open( MessageBox, _("NO_GET_APPNAME\nPress exit!"), MessageBox.TYPE_ERROR)
 				self.rlist[self["testlist"].getCurrent()[1]]="fail"
 				self.tunemsgtimer.stop()				
 			else:
@@ -694,9 +696,9 @@ class FactoryTest(Screen):
 	def checkaging(self):
 		global Agingresult
 		if(Agingresult ==1):
-			self["testlist"].moveToIndex(11)
+			self["testlist"].moveToIndex(self.fdefaultIndex)
 			self.Test14()
-			self["testlist"].moveToIndex(12)
+			self["testlist"].moveToIndex(self.shotdownIndex)
 		self.agingmode = 0
 #			self["testlist"].instance.moveSelection(self["testlist"].instance.moveDown)
 			
@@ -721,19 +723,19 @@ class FactoryTest(Screen):
 				if result < 0 :
 					result = 0
 				if result == 3:
-					self.session.open( MessageBox, _("USB test pass %d devices"%result), MessageBox.TYPE_INFO)			
+					self.session.open( MessageBox, _("USB test pass %d devices\nPress OK!"%result), MessageBox.TYPE_INFO)			
 					self.rlist[self["testlist"].getCurrent()[1]]="pass"
 				else:
-					self.session.open( MessageBox, _("USB test error : Success-%d"%result+" Fail-%d"%(3-result)), MessageBox.TYPE_ERROR)
+					self.session.open( MessageBox, _("USB test error : Success-%d"%result+" Fail-%d\nPress EXIT!"%(3-result)), MessageBox.TYPE_ERROR)
 					self.rlist[self["testlist"].getCurrent()[1]]="fail"
 			except:
 				if result < 0 :
 					result = 0
 				if result == 3:
-					self.session.open( MessageBox, _("USB test pass %d devices"%result), MessageBox.TYPE_INFO)			
+					self.session.open( MessageBox, _("USB test pass %d devices\nPress OK!"%result), MessageBox.TYPE_INFO)			
 					self.rlist[self["testlist"].getCurrent()[1]]="pass"
 				else:
-					self.session.open( MessageBox, _("USB test error : Success-%d"%result+" Fail-%d"%(3-result)), MessageBox.TYPE_ERROR)
+					self.session.open( MessageBox, _("USB test error : Success-%d"%result+" Fail-%d\nPress EXIT!"%(3-result)), MessageBox.TYPE_ERROR)
 					self.rlist[self["testlist"].getCurrent()[1]]="fail"
 		elif self.model==1:
 			try:
@@ -749,19 +751,19 @@ class FactoryTest(Screen):
 				if result < 0 :
 					result = 0
 				if result == 2:
-					self.session.open( MessageBox, _("USB test pass %d devices"%result), MessageBox.TYPE_INFO)			
+					self.session.open( MessageBox, _("USB test pass %d devices\nPress OK!"%result), MessageBox.TYPE_INFO)			
 					self.rlist[self["testlist"].getCurrent()[1]]="pass"
 				else:
-					self.session.open( MessageBox, _("USB test error : Success-%d"%result+" Fail-%d"%(2-result)), MessageBox.TYPE_ERROR)
+					self.session.open( MessageBox, _("USB test error : Success-%d"%result+" Fail-%d\nPress EXIT!"%(2-result)), MessageBox.TYPE_ERROR)
 					self.rlist[self["testlist"].getCurrent()[1]]="fail"
 			except:
 				if result < 0 :
 					result = 0
 				if result == 2:
-					self.session.open( MessageBox, _("USB test pass %d devices"%result), MessageBox.TYPE_INFO)			
+					self.session.open( MessageBox, _("USB test pass %d devices\nPress OK!"%result), MessageBox.TYPE_INFO)			
 					self.rlist[self["testlist"].getCurrent()[1]]="pass"
 				else:
-					self.session.open( MessageBox, _("USB test error : Success-%d"%result+" Fail-%d"%(2-result)), MessageBox.TYPE_ERROR)
+					self.session.open( MessageBox, _("USB test error : Success-%d"%result+" Fail-%d\nPress EXIT!"%(2-result)), MessageBox.TYPE_ERROR)
 					self.rlist[self["testlist"].getCurrent()[1]]="fail"
 		
 
@@ -802,7 +804,7 @@ class FactoryTest(Screen):
 		else:
 			ethtest = 0
 			print "fail"
-			self.session.open( MessageBox, _("Ping test fail"), MessageBox.TYPE_ERROR)
+			self.session.open( MessageBox, _("Ping test fail\nPress exit"), MessageBox.TYPE_ERROR)
 			self.macresult()
 
 	def Test9(self):
@@ -941,8 +943,8 @@ class MacConfig(Screen):
 					break
 				if disk[1].startswith('/media/sd') or disk[1].startswith('/media/hdd'):
 					print 'try..',disk[1]
-					if  fileExists(disk[1]+"/Vuplus_mac.txt"):
-						self.macfd = open(disk[1]+"/Vuplus_mac.txt","r+")
+					if  fileExists(disk[1]+"/macinfo.txt"):
+						self.macfd = open(disk[1]+"/macinfo.txt","r+")
 						break
 			if self.macfd == 0:
 				self["text"].setText(("cannot read usb!!"))
@@ -1010,8 +1012,6 @@ class MacConfig(Screen):
 			system("/etc/init.d/networking stop")
 			system("ifconfig eth0 down")
 			macaddr = self.macaddr
-			macaddrcmd="ifconfig eth0 hw ether %02x:%02x:%02x:%02x:%02x:%02x"%(int(macaddr[0:2],16),int(macaddr[2:4],16),int(macaddr[4:6],16),int(macaddr[6:8],16),int(macaddr[8:10],16),int(macaddr[10:12],16))
-			system(macaddrcmd)
 #make_mac_sector 00-99-99-99-00-00 > /tmp/mac.sector
 #flash_eraseall /dev/mtd4
 #nandwrite /dev/mtd4 /tmp/mac.sector -p			
@@ -1019,6 +1019,8 @@ class MacConfig(Screen):
 			system(cmd)
 			system("flash_eraseall /dev/mtd4")
 			system("nandwrite /dev/mtd4 /tmp/mac.sector -p")
+			macaddrcmd="ifconfig eth0 hw ether %02x:%02x:%02x:%02x:%02x:%02x"%(int(macaddr[0:2],16),int(macaddr[2:4],16),int(macaddr[4:6],16),int(macaddr[6:8],16),int(macaddr[8:10],16),int(macaddr[10:12],16))
+			system(macaddrcmd)
 			macaddress = long(macaddr,16)+1
 			if macaddress > 0xffffffffffff:
 				macaddress = 0
@@ -1355,6 +1357,8 @@ class SmartCardTest(Screen):
 		self.smartcardtimer = eTimer()
 		self.smartcardtimer.callback.append(self.check_smart_card)
 		self.smartcardtimer.start(100,True)
+		self.closetimer = eTimer()
+		self.closetimer.callback.append(self.close)
 		self.smartcard=0
 		global smartcardtest
 		smartcardtest = 0
@@ -1408,21 +1412,23 @@ class SmartCardTest(Screen):
 #				self.session.open( MessageBox, _("Smart Card OK!!"), MessageBox.TYPE_INFO,2)
 				self.step = 1
 				self["text"].setText(_("Smart Card OK!!"))
+				self.closetimer.start(2000,True)
 				self.smartcardtimer.stop()
 #			self.session.openWithCallback(self.check6, MessageBox, _("Scart loop ok?"), MessageBox.TYPE_INFO)
 		else:
-			if result ==-1:
-				self.session.open( MessageBox, _("%d:NO_DEV_FOUND"%(index+1)), MessageBox.TYPE_ERROR)
-			elif result == -2:
-				self.session.open( MessageBox, _("%d:SC_NOT_INSERTED"%(index+1)), MessageBox.TYPE_ERROR)
-			elif result == -3:
-				self.session.open( MessageBox, _("%d:SC_NOT_VALID_ATR"%(index+1)), MessageBox.TYPE_ERROR)
-			elif result == -5:
-				self.session.open( MessageBox, _("%d:SC_READ_TIMEOUT"%(index+1)), MessageBox.TYPE_ERROR)
+#			if result ==-1:
+#				self.session.open( MessageBox, _("%d:NO_DEV_FOUND"%(index+1)), MessageBox.TYPE_ERROR)
+#			elif result == -2:
+#				self.session.open( MessageBox, _("%d:SC_NOT_INSERTED"%(index+1)), MessageBox.TYPE_ERROR)
+#			elif result == -3:
+#				self.session.open( MessageBox, _("%d:SC_NOT_VALID_ATR"%(index+1)), MessageBox.TYPE_ERROR)
+#			elif result == -5:
+#				self.session.open( MessageBox, _("%d:SC_READ_TIMEOUT"%(index+1)), MessageBox.TYPE_ERROR)
 			if(index==0):
-				self["text"].setText(_("Smart Card 1 Error!"))
+				self["text"].setText(_("Smart Card 1 Error!\nerrorcode=%d"%result))
 			elif (index==1):
-				self["text"].setText(_("Smart Card 2 Error!"))
+				self["text"].setText(_("Smart Card 2 Error!\nerrorcode=%d"%result))
+			self.closetimer.start(2000,True)
 			self.smartcardtimer.stop()
 
 				
@@ -1501,7 +1507,7 @@ class FrontTest(Screen):
 			self.keytimeout.stop()
 			self.step =4
 			self.fronttimer.start(1000,True)
-			self["text"].setText(("Front Test OK! Press Exit Key"))
+			self["text"].setText(("Front Test OK!\nPress Exit Key"))
 #		elif self.step==4:
 #			global fronttest
 #			self.fronttimer.stop()
@@ -1551,15 +1557,15 @@ class FrontTest_solo(Screen):
 
 	def KeyTimeOut(self):
 		if self.step == 1:
-			self["text"].setText(("Front STANDBY ERROR"))
+			self["text"].setText(("Front STANDBY ERROR\nPress exit!"))
 		elif self.step == 2 :
-			self["text"].setText(("Front CH+ ERROR"))
+			self["text"].setText(("Front CH - ERROR\nPress exit!"))
 		elif self.step == 3:
-			self["text"].setText(("Front CH- ERROR"))
+			self["text"].setText(("Front CH + ERROR\nPress exit!"))
 		elif self.step == 4 :
-			self["text"].setText(("Front VOL + ERROR"))
+			self["text"].setText(("Front VOL - ERROR\nPress exit!"))
 		elif self.step == 5:
-			self["text"].setText(("Front VOL - ERROR"))
+			self["text"].setText(("Front VOL + ERROR\nPress exit!"))
 			
 		self.step = 0
 #		self.keyCancel()
@@ -1569,51 +1575,58 @@ class FrontTest_solo(Screen):
 			self.keytimeout.stop()
 			self.keytimeout.start(5000,True)
 			self.step = 2
-			self["text"].setText(_("Press Front CH+"))
+			self["text"].setText(_("Press Front CH -"))
 			
 	def keyright(self):
 		if self.step== 3:
 			self.keytimeout.stop()
 			self.keytimeout.start(5000,True)
 			self.step = 4
-			self["text"].setText(_("Press Front VOL +"))
+			self["text"].setText(_("Press Front VOL -"))
 			
 	def keyleft(self):
 		if self.step== 2:
 			self.keytimeout.stop()
 			self.keytimeout.start(5000,True)
 			self.step = 3
-			self["text"].setText(_("Press Front CH -"))
+			self["text"].setText(_("Press Front CH +"))
 
 	def keyvolup(self):
+		if self.step== 5:
+			self.keytimeout.stop()
+			self.step = 6
+			self.fronttimer.start(1000,True)
+			self["text"].setText(_("Front LED OK?\n\nyes-ok\nno-exit"))			
+#			self["text"].setText(("Front Test OK!\nPress Exit Key"))
+		
+	def keyvoldown(self):
 		if self.step== 4:
 			self.keytimeout.stop()
 			self.keytimeout.start(5000,True)
 			self.step = 5
-			self["text"].setText(_("Press Front VOL -"))
-		
-	def keyvoldown(self):
-		if self.step== 5:
-			self.keytimeout.stop()
-			self.step = 6
-			self["text"].setText(("Front Test OK! Press Exit Key"))
+			self["text"].setText(_("Press Front VOL +"))
+
+	def checkled(self, yesno):
+		if yesno :
+			self.step=6
+		else:
+			self.step=0
+		self.keyCancel()
 			
 	def keyCancel(self):
 		global fronttest
 		self.fronttimer.stop()
 		eSctest.getInstance().VFD_Close()
-		if self.step==6:
-			fronttest = 1
-		else:
-			fronttest = 0
+		fronttest = 0
 		self.close()
 
 	def keyOk(self):
-		if self.step == 3:
-			self.keytimeout.stop()
-			self.step =4
-			self.fronttimer.start(1000,True)
-			self["text"].setText(("Front Test OK! Press Exit Key"))
+		global fronttest
+		self.fronttimer.stop()
+		eSctest.getInstance().VFD_Close()
+		if self.step == 6:
+			fronttest = 1
+		self.close()
 
 	def FrontAnimate(self):
 		if (self.frontturnonoff==0):
