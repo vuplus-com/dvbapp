@@ -67,12 +67,12 @@ class FactoryTest(Screen):
 			"6": self.numberaction,			
 			"7": self.numberaction,			
 			"8": self.numberaction,			
-			"9": self.numberaction,
-			"red": self.shutdownaction,		
+			"9": self.numberaction,			
+			"red": self.shutdownaction,
 		}, -2)
 
 		Screen.__init__(self, session)
-		TESTPROGRAM_DATE = "2010-06-09"
+		TESTPROGRAM_DATE = "2010-06-11"
 		TESTPROGRAM_VERSION = "Version 00.01"
 
 		self.model = 0
@@ -287,15 +287,16 @@ class FactoryTest(Screen):
 		if self.macConsole is not None:
 			if retval == 0:
 				self.macConsole = None
-				content =result.split()
-				self["mactext"].setText(("MAC : "+content[10]))
+				content =result.splitlines()
+				macline = content[3].split()
+				mac = macline[5]+":"+macline[6]+":"+macline[7]+":"+macline[8]+":"+macline[9]+":"+macline[10]
+				self["mactext"].setText(("MAC : "+mac))
  	
 	def getmacaddr(self):
 		try:
-			cmd = "ip -o addr"
+			cmd = "nanddump -b -o -l 64 -p /dev/mtd4"
 			self.macConsole = Console()	
 			self.macConsole.ePopen(cmd, self.readmac)	
-#			self["stattext"].setText((macaddr))
 		except:
 			return
 		
@@ -698,7 +699,7 @@ class FactoryTest(Screen):
 		if(Agingresult ==1):
 			self["testlist"].moveToIndex(self.fdefaultIndex)
 			self.Test14()
-			self["testlist"].moveToIndex(self.shotdownIndex)
+			self["testlist"].moveToIndex(self.shutdownIndex)
 		self.agingmode = 0
 #			self["testlist"].instance.moveSelection(self["testlist"].instance.moveDown)
 			
@@ -928,7 +929,6 @@ class MacConfig(Screen):
 		self.loadmacaddr()
 		self.getmacaddr()
 		self.pingok=1
-#		self.pingtest()
 		global ethtest
 		ethtest = 1
 
@@ -969,17 +969,18 @@ class MacConfig(Screen):
 		if self.macConsole is not None:
 			if retval == 0:
 				self.macConsole = None
-				content =result.split()
-				self["stattext"].setText(("now : "+content[10]))
+				content =result.splitlines()
+				macline = content[3].split()
+				mac = macline[5]+":"+macline[6]+":"+macline[7]+":"+macline[8]+":"+macline[9]+":"+macline[10]
+				self["stattext"].setText(("now : "+mac))
  	
 	def getmacaddr(self):
 		if self.NetworkState==0:
 			return
 		try:
-			cmd = "ip -o addr"
+			cmd = "nanddump -b -o -l 64 -p /dev/mtd4"
 			self.macConsole = Console()	
 			self.macConsole.ePopen(cmd, self.readmac)	
-#			self["stattext"].setText((macaddr))
 		except:
 			return
 			
@@ -1009,8 +1010,6 @@ class MacConfig(Screen):
 		if self.NetworkState==0 or self.pingok<1:
 			return
 		try:
-			system("/etc/init.d/networking stop")
-			system("ifconfig eth0 down")
 			macaddr = self.macaddr
 #make_mac_sector 00-99-99-99-00-00 > /tmp/mac.sector
 #flash_eraseall /dev/mtd4
@@ -1019,8 +1018,6 @@ class MacConfig(Screen):
 			system(cmd)
 			system("flash_eraseall /dev/mtd4")
 			system("nandwrite /dev/mtd4 /tmp/mac.sector -p")
-			macaddrcmd="ifconfig eth0 hw ether %02x:%02x:%02x:%02x:%02x:%02x"%(int(macaddr[0:2],16),int(macaddr[2:4],16),int(macaddr[4:6],16),int(macaddr[6:8],16),int(macaddr[8:10],16),int(macaddr[10:12],16))
-			system(macaddrcmd)
 			macaddress = long(macaddr,16)+1
 			if macaddress > 0xffffffffffff:
 				macaddress = 0
@@ -1029,60 +1026,12 @@ class MacConfig(Screen):
 			self.macfd.seek(0)
 			self.macfd.write(macwritetext)
 			self.macaddr = macaddr
-			system("ifconfig eth0 up")
-			self.loadmacaddr()
-			system("ifconfig eth0 192.168.0.10")
-			system("/etc/init.d/networking start")
 			self.close()
 		except:
 			self.session.open( MessageBox, _("Mac address fail"), MessageBox.TYPE_ERROR)
 			global ethtest
 			ethtest = 0
-			self.close()
-		
-	def pingtest(self):
-		self["stattext"].setText(("now : wait to finish ping test..."))
-#		system("/etc/init.d/networking stop")
-		system("ifconfig eth0 192.168.0.10")
-#		system("/etc/init.d/networking start")
-		cmd1 = "ping -c 1 192.168.0.100"
-		self.PingConsole = Console()
-		self.PingConsole.ePopen(cmd1, self.checkNetworkStateFinished,self.NetworkStatedataAvail)
-		
-	def checkNetworkStateFinished(self, result, retval,extra_args):
-		(statecallback) = extra_args
-		if self.PingConsole is not None:
-			if retval == 0:
-				self.PingConsole = None
-				content = result.splitlines()
-#				print 'content',content
-				x = content[4].split()
-#				print 'x',x
-				if x[0]==x[3]:
-					statecallback(1)
-				else:
-					statecallback(0)					
-			else:
-				statecallback(0)
-
-
-	def NetworkStatedataAvail(self,data):
-		global ethtest
-		if data == 1:
-			ethtest = 1
-			print "success"
-			self.pingok=1
-			self.loadmacaddr()
-			self.getmacaddr()			
-			self.session.open( MessageBox, _("Ping test pass"), MessageBox.TYPE_INFO,2)
-		else:
-			ethtest = 0
-			print "fail"
-			self.pingok=0
-			self["stattext"].setText(("ping test fail..    press Exit Key"))
-			self.session.open( MessageBox, _("Ping test fail"), MessageBox.TYPE_ERROR,2)
-		self.getmacaddr()
-		
+			self.close()		
 
 	def keyCancel(self):
 		if self.pingok == -1:
@@ -1092,7 +1041,6 @@ class MacConfig(Screen):
 		global ethtest
 		ethtest = 0
 		self.close()
-
 
 
 sccitest = 0
