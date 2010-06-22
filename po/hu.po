@@ -32,7 +32,7 @@ msgstr ""
 #
 msgid ""
 "\n"
-"Backup your STB settings."
+"Backup your Dreambox settings."
 msgstr ""
 
 #
@@ -44,13 +44,13 @@ msgstr ""
 #
 msgid ""
 "\n"
-"Manage extensions or plugins for your STB"
+"Manage extensions or plugins for your Dreambox"
 msgstr ""
 
 #
 msgid ""
 "\n"
-"Online update of your STB software."
+"Online update of your Dreambox software."
 msgstr ""
 
 #
@@ -62,13 +62,13 @@ msgstr ""
 #
 msgid ""
 "\n"
-"Restore your STB settings."
+"Restore your Dreambox settings."
 msgstr ""
 
 #
 msgid ""
 "\n"
-"Restore your STB with a new firmware."
+"Restore your Dreambox with a new firmware."
 msgstr ""
 
 #
@@ -390,18 +390,18 @@ msgstr ""
 #
 msgid ""
 "A finished record timer wants to set your\n"
-"STB to standby. Do that now?"
+"Dreambox to standby. Do that now?"
 msgstr ""
 "Egy befejezett időzítés le akarja kapcsolni\n"
-"a STB-ot készenléti módba. Engedélyezi?"
+"a Dreambox-ot készenléti módba. Engedélyezi?"
 
 #
 msgid ""
 "A finished record timer wants to shut down\n"
-"your STB. Shutdown now?"
+"your Dreambox. Shutdown now?"
 msgstr ""
 "Egy befejezett időzítés ki akarja kapcsolni\n"
-"a STB-ot. Engedélyezi?"
+"a Dreambox-ot. Engedélyezi?"
 
 #
 msgid "A graphical EPG for all services of an specific bouquet"
@@ -465,18 +465,18 @@ msgstr ""
 #
 msgid ""
 "A sleep timer wants to set your\n"
-"STB to standby. Do that now?"
+"Dreambox to standby. Do that now?"
 msgstr ""
 "Az elalvásidőzítő le akarja kapcsolni\n"
-"a STB-ot készenléti módba. Engedélyezi?"
+"a Dreambox-ot készenléti módba. Engedélyezi?"
 
 #
 msgid ""
 "A sleep timer wants to shut down\n"
-"your STB. Shutdown now?"
+"your Dreambox. Shutdown now?"
 msgstr ""
 "Az elalvásidőzítő ki akarja kapcsolni\n"
-"a STB-ot. Engedélyezi?"
+"a Dreambox-ot. Engedélyezi?"
 
 #
 msgid "A small overview of the available icon states and actions."
@@ -581,7 +581,7 @@ msgid "Add a mark"
 msgstr "Jelző hozzáadása"
 
 #
-msgid "Add a new NFS or CIFS mount point to your STB."
+msgid "Add a new NFS or CIFS mount point to your Dreambox."
 msgstr ""
 
 #
@@ -630,7 +630,7 @@ msgstr ""
 
 #
 msgid ""
-"Adds enigma2 settings and STB model informations like SN, rev... if "
+"Adds enigma2 settings and dreambox model informations like SN, rev... if "
 "enabled."
 msgstr ""
 
@@ -685,10 +685,10 @@ msgstr "Esemény után"
 #
 msgid ""
 "After the start wizard is completed, you need to protect single services. "
-"Refer to your STB's manual on how to do that."
+"Refer to your dreambox's manual on how to do that."
 msgstr ""
 "Miután elvégezte az indítási varázsló, le kell védenie a szimpla "
-"szolgáltatásokat. Olvassa el a STB kezelési útmutatóját, hogyan kell "
+"szolgáltatásokat. Olvassa el a DreamBox kezelési útmutatóját, hogyan kell "
 "ezt elvégeznie."
 
 #
@@ -1152,7 +1152,7 @@ msgid "Change step size"
 msgstr ""
 
 #
-msgid "Change the hostname of your STB."
+msgid "Change the hostname of your Dreambox."
 msgstr ""
 
 #
@@ -1440,8 +1440,8 @@ msgid "Contrast"
 msgstr "Kontraszt"
 
 #
-msgid "Could not connect to STB .NFI Image Feed Server:"
-msgstr "Nem lehet csatlakozni a STB .NFI Image feed szerveréhez:"
+msgid "Could not connect to Dreambox .NFI Image Feed Server:"
+msgstr "Nem lehet csatlakozni a Dreambox .NFI Image feed szerveréhez:"
 
 #
 msgid "Could not load Medium! No disc inserted?"
@@ -1902,8 +1902,8 @@ msgid "Do you want to do another manual service scan?"
 msgstr "Akar most egy másik kézi keresést csinálni?"
 
 #
-msgid "Do you want to enable the parental control feature on your STB?"
-msgstr "Szeretné bekapcsolni a STB gyermekzárját?"
+msgid "Do you want to enable the parental control feature on your dreambox?"
+msgstr "Szeretné bekapcsolni a DreamBox gyermekzárját?"
 
 #
 msgid "Do you want to enter a username and password for this host?\n"
@@ -1926,7 +1926,7 @@ msgid "Do you want to preview this DVD before burning?"
 msgstr "Kiírás előtt meg akarja nézni a DVD tartalmat?"
 
 #
-msgid "Do you want to reboot your STB?"
+msgid "Do you want to reboot your Dreambox?"
 msgstr ""
 
 #
@@ -1952,15 +1952,15 @@ msgid ""
 msgstr ""
 
 #
-msgid "Do you want to update your STB?"
+msgid "Do you want to update your Dreambox?"
 msgstr ""
 
 #
 msgid ""
-"Do you want to update your STB?\n"
+"Do you want to update your Dreambox?\n"
 "After pressing OK, please wait!"
 msgstr ""
-"Szeretné frissíteni a STB-ot?\n"
+"Szeretné frissíteni a DreamBox-ot?\n"
 "Az OK gomb megnyomásával indul, kérem várjon!"
 
 #
@@ -2034,11 +2034,11 @@ msgid "Downloading screenshots. Please wait..."
 msgstr ""
 
 #
-msgid "STB format data DVD (HDTV compatible)"
-msgstr "STB formátumú adat DVD (HDTV kompatibilis)"
+msgid "Dreambox format data DVD (HDTV compatible)"
+msgstr "Dreambox formátumú adat DVD (HDTV kompatibilis)"
 
 #
-msgid "STB software because updates are available."
+msgid "Dreambox software because updates are available."
 msgstr ""
 
 #
@@ -2127,12 +2127,12 @@ msgid "Edit settings"
 msgstr "Beállítások módosítása"
 
 #
-msgid "Edit the Nameserver configuration of your STB.\n"
-msgstr "A STB névszerver beállítások módosítása.\n"
+msgid "Edit the Nameserver configuration of your Dreambox.\n"
+msgstr "A Dreambox névszerver beállítások módosítása.\n"
 
 #
-msgid "Edit the network configuration of your STB.\n"
-msgstr "A STB hálózati beállítások módosítása.\n"
+msgid "Edit the network configuration of your Dreambox.\n"
+msgstr "A Dreambox hálózati beállítások módosítása.\n"
 
 #
 msgid "Edit title"
@@ -2301,7 +2301,7 @@ msgid "Enter main menu..."
 msgstr "Belépés a főmenübe..."
 
 #
-msgid "Enter new hostname for your STB"
+msgid "Enter new hostname for your Dreambox"
 msgstr ""
 
 #
@@ -2676,10 +2676,10 @@ msgid "Genre"
 msgstr ""
 
 #
-msgid "Genuine STB"
+msgid "Genuine Dreambox"
 msgstr ""
 
-msgid "Genuine STB validation failed!"
+msgid "Genuine Dreambox validation failed!"
 msgstr ""
 
 #
@@ -3999,8 +3999,8 @@ msgid "No, do nothing."
 msgstr "Nem, ne csináljon semmit."
 
 #
-msgid "No, just start my STB"
-msgstr "Nem, csak indítsa el a STB-ot."
+msgid "No, just start my dreambox"
+msgstr "Nem, csak indítsa el a DreamBox-ot."
 
 #
 msgid "No, not now"
@@ -4360,7 +4360,7 @@ msgstr ""
 
 #
 msgid ""
-"Please disconnect all USB devices from your STB and (re-)attach the "
+"Please disconnect all USB devices from your Dreambox and (re-)attach the "
 "target USB stick (minimum size is 64 MB) now!"
 msgstr ""
 
@@ -5859,8 +5859,8 @@ msgid "Shutdown"
 msgstr ""
 
 #
-msgid "Shutdown STB after"
-msgstr "Kapcsolja le a STB-ot miután"
+msgid "Shutdown Dreambox after"
+msgstr "Kapcsolja le a DreamBox-ot miután"
 
 #
 msgid "Signal Strength:"
@@ -6295,8 +6295,8 @@ msgid "Test mode"
 msgstr "Teszt mód"
 
 #
-msgid "Test the network configuration of your STB.\n"
-msgstr "A STB hálózati beállításánal ellenőrzése.\n"
+msgid "Test the network configuration of your Dreambox.\n"
+msgstr "A Dreambox hálózati beállításánal ellenőrzése.\n"
 
 #
 msgid "Test-Messagebox?"
@@ -6311,7 +6311,7 @@ msgstr ""
 #
 msgid ""
 "Thank you for using the wizard. Your box is now ready to use.\n"
-"Please press OK to start using your STB."
+"Please press OK to start using your Dreambox."
 msgstr ""
 "Köszönöm hogy használta a varázslót. A készüléke most már be van állítva.\n"
 "Az OK gomb megnyomása után máris használatba veheti a beltérijét."
@@ -6326,11 +6326,11 @@ msgstr ""
 #
 msgid ""
 "The DVD standard doesn't support H.264 (HDTV) video streams. Do you want to "
-"create a STB format data DVD (which will not play in stand-alone DVD "
+"create a Dreambox format data DVD (which will not play in stand-alone DVD "
 "players) instead?"
 msgstr ""
 "A DVD szabvány nem támogatja a H.264 (HDTV) videó streamet. Szeretne "
-"ehelyett létrehozni egy STB formátumó adat DVD-t (mely azonban nem "
+"ehelyett létrehozni egy Dreambox formátumó adat DVD-t (mely azonban nem "
 "játszható le a hagyományos lejátszókban)?"
 
 #
@@ -6421,7 +6421,7 @@ msgstr "A csatornalisták telepítése elkészült."
 #
 msgid ""
 "The installation of the default settings is finished. You can now continue "
-"configuring your STB by pressing the OK button on the remote control."
+"configuring your Dreambox by pressing the OK button on the remote control."
 msgstr ""
 "A beállítások telepítése elkészült. Az OK gomb megnyomásával folytathatja a  "
 "készülék további beállítását."
@@ -6561,7 +6561,7 @@ msgstr ""
 #
 # File: tmp/enigma2_plugins/genuinedreambox/src/plugin.py, line: 130
 msgid ""
-"There's a certificate update available for your STB. Would you like to "
+"There's a certificate update available for your dreambox. Would you like to "
 "apply this update now?"
 msgstr ""
 
@@ -6596,7 +6596,7 @@ msgstr ""
 
 #
 #, python-format
-msgid "This STB can't decode %s streams!"
+msgid "This Dreambox can't decode %s streams!"
 msgstr ""
 
 #
@@ -6842,7 +6842,7 @@ msgstr ""
 
 #
 msgid ""
-"To update your STB firmware, please follow these steps:\n"
+"To update your Dreambox firmware, please follow these steps:\n"
 "1) Turn off your box with the rear power switch and plug in the bootable USB "
 "stick.\n"
 "2) Turn mains back on and hold the DOWN button on the front panel pressed "
@@ -7006,7 +7006,7 @@ msgstr ""
 
 #
 msgid ""
-"USB stick wizard finished. Your STB will now restart with your new "
+"USB stick wizard finished. Your dreambox will now restart with your new "
 "image!"
 msgstr ""
 
@@ -7099,7 +7099,7 @@ msgstr "Frissítés"
 #
 # File: tmp/enigma2_plugins/genuinedreambox/src/plugin.py, line: 170
 msgid ""
-"Update done... The genuine STB test will now be rerun and should not "
+"Update done... The genuine dreambox test will now be rerun and should not "
 "ask you to update again."
 msgstr ""
 
@@ -7139,8 +7139,8 @@ msgid "Upgrading"
 msgstr "Frissítés"
 
 #
-msgid "Upgrading STB... Please wait"
-msgstr "STB frissítése... Kérem várjon"
+msgid "Upgrading Dreambox... Please wait"
+msgstr "Dreambox frissítése... Kérem várjon"
 
 #
 msgid "Upper bound of timespan."
@@ -7254,7 +7254,7 @@ msgid "VMGM (intro trailer)"
 msgstr "VMGM (Intro trailer)"
 
 msgid ""
-"Verify your STB authenticity by running the genuine STB plugin!"
+"Verify your Dreambox authenticity by running the genuine dreambox plugin!"
 msgstr ""
 
 #
@@ -7417,7 +7417,7 @@ msgid "View teletext..."
 msgstr "Teletext megtekintése..."
 
 #
-msgid "View, edit or delete mountpoints on your STB."
+msgid "View, edit or delete mountpoints on your Dreambox."
 msgstr ""
 
 #
@@ -7534,10 +7534,10 @@ msgstr ""
 #
 msgid ""
 "Welcome to the Image upgrade wizard. The wizard will assist you in upgrading "
-"the firmware of your STB by providing a backup facility for your "
+"the firmware of your Dreambox by providing a backup facility for your "
 "current settings and a short explanation of how to upgrade your firmware."
 msgstr ""
-"Üdvözlöm az Image frissítés varázslójában. A varázsló segít Önnek a STB "
+"Üdvözlöm az Image frissítés varázslójában. A varázsló segít Önnek a DreamBox "
 "készülékének firmware frissítésében. Ismerteti a mentési tulajdonságokat, "
 "így beállításai sem vesznek el, továbbá elmagyarázza hogyan frissítse "
 "készülékét az új firmware-el."
@@ -7576,7 +7576,7 @@ msgid ""
 "Welcome to the cleanup wizard.\n"
 "\n"
 "We have detected that your available internal memory has dropped below 2MB.\n"
-"To ensure stable operation of your STB, the internal memory should be "
+"To ensure stable operation of your Dreambox, the internal memory should be "
 "cleaned up.\n"
 "You can use this wizard to remove some extensions.\n"
 msgstr ""
@@ -7585,8 +7585,8 @@ msgstr ""
 msgid ""
 "Welcome.\n"
 "\n"
-"If you want to connect your STB to the Internet, this wizard will guide "
-"you through the basic network setup of your STB.\n"
+"If you want to connect your Dreambox to the Internet, this wizard will guide "
+"you through the basic network setup of your Dreambox.\n"
 "\n"
 "Press OK to start configuring your network"
 msgstr ""
@@ -7603,12 +7603,12 @@ msgstr ""
 msgid ""
 "Welcome.\n"
 "\n"
-"This start wizard will guide you through the basic setup of your STB.\n"
+"This start wizard will guide you through the basic setup of your Dreambox.\n"
 "Press the OK button on your remote control to move to the next step."
 msgstr ""
 "Üdvözlöm.\n"
 "\n"
-"Ez az indítási varázsló végig fogja Önt vezetni a STB "
+"Ez az indítási varázsló végig fogja Önt vezetni a DreamBox "
 "alapbeállításain.\n"
 "Nyomja meg az OK gombot a távirányítón a következő lépéshez."
 
@@ -7789,7 +7789,7 @@ msgid "You can install this plugin."
 msgstr ""
 
 #
-msgid "You can only burn STB recordings!"
+msgid "You can only burn Dreambox recordings!"
 msgstr ""
 
 #
@@ -7868,15 +7868,15 @@ msgstr "Várnia kell (%s)!"
 
 #
 msgid ""
-"You need a PC connected to your STB. If you need further instructions, "
+"You need a PC connected to your dreambox. If you need further instructions, "
 "please visit the website http://www.dm7025.de.\n"
-"Your STB will now be halted. After you have performed the update "
+"Your dreambox will now be halted. After you have performed the update "
 "instructions from the website, your new firmware will ask you to restore "
 "your settings."
 msgstr ""
-"Szüksége lesz egy PC kapcsolatra a STB-hoz. Amennyiben segítségre van "
+"Szüksége lesz egy PC kapcsolatra a DreamBox-hoz. Amennyiben segítségre van "
 "szüksége, kérem látogasson el a http://www.dm7025.de weboldalra.\n"
-"A STB most meg fog állni. Miután végrehajtotta a weboldalon olvasható "
+"A DreamBox most meg fog állni. Miután végrehajtotta a weboldalon olvasható "
 "utasításokat, az új firmware fel fogja Önt kérni a saját beállításainak "
 "visszatöltésére."
 
@@ -7906,7 +7906,7 @@ msgstr ""
 
 #
 msgid ""
-"Your STB is now ready to use.\n"
+"Your Dreambox is now ready to use.\n"
 "\n"
 "Your internet connection is working now.\n"
 "\n"
@@ -7914,7 +7914,7 @@ msgstr ""
 
 #
 msgid ""
-"Your STB is now ready to use.\n"
+"Your Dreambox is now ready to use.\n"
 "\n"
 "Your internet connection is working now.\n"
 "\n"
@@ -7922,8 +7922,8 @@ msgid ""
 msgstr ""
 
 #
-msgid "Your STB will restart after pressing OK on your remote control."
-msgstr "Az OK gomb megnyomása után a STB újra fog indulni."
+msgid "Your Dreambox will restart after pressing OK on your remote control."
+msgstr "Az OK gomb megnyomása után a Dreambox újra fog indulni."
 
 #
 msgid ""
@@ -7951,12 +7951,12 @@ msgid "Your current collection will get lost!"
 msgstr ""
 
 #
-msgid "Your STB is shutting down. Please stand by..."
-msgstr "A STB most kikapcsol. Kérem várjon..."
+msgid "Your dreambox is shutting down. Please stand by..."
+msgstr "A DreamBox most kikapcsol. Kérem várjon..."
 
 #
 msgid ""
-"Your STB isn't connected to the internet properly. Please check it and "
+"Your dreambox isn't connected to the internet properly. Please check it and "
 "try again."
 msgstr ""
 "A beltéri nem csatlakozik rendesen az internetre. Kérem nézze át a "
@@ -9253,8 +9253,8 @@ msgstr "igen (feed-ek megtartása)"
 
 #
 msgid ""
-"your STB might be unusable now. Please consult the manual for further "
-"assistance before rebooting your STB."
+"your dreambox might be unusable now. Please consult the manual for further "
+"assistance before rebooting your dreambox."
 msgstr ""
 "a Dreamboxa most lehet hogy használhatatlan. Kérem vegye fel a kapcsolatot a "
 "szervízzel, vagy szakemberrel a folytatás elött."
@@ -9314,18 +9314,18 @@ msgstr "zap-elt"
 #
 #~ msgid ""
 #~ "A sleep timer want's to set your\n"
-#~ "STB to standby. Do that now?"
+#~ "Dreambox to standby. Do that now?"
 #~ msgstr ""
 #~ "Az elalvás kapcsoló ki akarja\n"
-#~ "kapcsolni a STB-ot. Mehet?"
+#~ "kapcsolni a DreamBox-ot. Mehet?"
 
 #
 #~ msgid ""
 #~ "A sleep timer want's to shut down\n"
-#~ "your STB. Shutdown now?"
+#~ "your Dreambox. Shutdown now?"
 #~ msgstr ""
 #~ "Az elalvás kapcsoló le akarja\n"
-#~ "kapcsolni a STB-ot. Mehet?"
+#~ "kapcsolni a DreamBox-ot. Mehet?"
 
 #
 #~ msgid "AGC"
@@ -9378,7 +9378,7 @@ msgstr "zap-elt"
 #
 #~ msgid ""
 #~ "Are you sure you want to enable WLAN support?\n"
-#~ "Connect your Wlan USB Stick to your STB and press OK.\n"
+#~ "Connect your Wlan USB Stick to your Dreambox and press OK.\n"
 #~ "\n"
 #~ msgstr ""
 #~ "Biztos hogy engedélyezni akarja a WLAN támogatást?\n"
@@ -9599,10 +9599,10 @@ msgstr "zap-elt"
 
 #
 #~ msgid ""
-#~ "Enable the local network of your STB.\n"
+#~ "Enable the local network of your Dreambox.\n"
 #~ "\n"
 #~ msgstr ""
-#~ "A STB helyi hálózatának engedélyezése.\n"
+#~ "A Dreambox helyi hálózatának engedélyezése.\n"
 #~ "\n"
 
 #
@@ -9786,7 +9786,7 @@ msgstr "zap-elt"
 #
 #~ msgid ""
 #~ "Please attach your Zydas ZD1211B chipset compatibe WLAN USB Stick to your "
-#~ "STB and press the OK button on your remote control to enable the "
+#~ "Dreambox and press the OK button on your remote control to enable the "
 #~ "built in wireless network support"
 #~ msgstr ""
 #~ "Kérem csatlakoztassa a Zydas ZD1211B chipset kompatibilis WLAN USB "
@@ -9828,10 +9828,10 @@ msgstr "zap-elt"
 
 #
 #~ msgid ""
-#~ "Pressing OK enables the built in wireless LAN support of your STB.\n"
+#~ "Pressing OK enables the built in wireless LAN support of your Dreambox.\n"
 #~ "Wlan USB Sticks with Zydas ZD1211B and RAlink RT73 Chipset are "
 #~ "supported.\n"
-#~ "Connect your Wlan USB Stick to your STB before pressing OK.\n"
+#~ "Connect your Wlan USB Stick to your Dreambox before pressing OK.\n"
 #~ "\n"
 #~ msgstr ""
 #~ "Az OK gomb megnyomásával engedélyezheti a wireless LAN támogatást a "
@@ -9983,7 +9983,7 @@ msgstr "zap-elt"
 
 #
 #~ msgid ""
-#~ "Thank you for using the wizard. Your STB is now ready to use.\n"
+#~ "Thank you for using the wizard. Your Dreambox is now ready to use.\n"
 #~ "\n"
 #~ "Your local LAN internet connection is working now.\n"
 #~ "\n"
@@ -9998,7 +9998,7 @@ msgstr "zap-elt"
 
 #
 #~ msgid ""
-#~ "Thank you for using the wizard. Your STB is now ready to use.\n"
+#~ "Thank you for using the wizard. Your Dreambox is now ready to use.\n"
 #~ "\n"
 #~ "Your wireless internet connection is working now.\n"
 #~ "\n"
@@ -10013,8 +10013,8 @@ msgstr "zap-elt"
 
 #
 #~ msgid ""
-#~ "Thank you for using the wizard. Your STB is now ready to use.\n"
-#~ "Please press OK to start using your STB."
+#~ "Thank you for using the wizard. Your Dreambox is now ready to use.\n"
+#~ "Please press OK to start using your Dreambox."
 #~ msgstr ""
 #~ "Köszönöm hogy használta a Varázslót. A készüléket most már használatba "
 #~ "veheti.\n"
@@ -10033,8 +10033,8 @@ msgstr "zap-elt"
 #~ "'Lefelé' gombot hogy a sticken lévő .NFI flasher induljon el!"
 
 #
-#~ msgid "This STB can't decode %s video streams!"
-#~ msgstr "Ez a STB nem tudja dekódolni a %s videó streamet!"
+#~ msgid "This Dreambox can't decode %s video streams!"
+#~ msgstr "Ez a Dreambox nem tudja dekódolni a %s videó streamet!"
 
 #
 #~ msgid "This is unsupported at the moment."
@@ -10072,8 +10072,8 @@ msgstr "zap-elt"
 #~ msgstr "A beltéri szoftverét frissíti fel"
 
 #
-#~ msgid "Upgrade finished. Do you want to reboot your STB?"
-#~ msgstr "Frissiítés sikeres. Újraindítsam most a STB-ot?"
+#~ msgid "Upgrade finished. Do you want to reboot your Dreambox?"
+#~ msgstr "Frissiítés sikeres. Újraindítsam most a DreamBox-ot?"
 
 #
 #~ msgid "VCR Switch"
@@ -10102,8 +10102,8 @@ msgstr "zap-elt"
 #~ msgid ""
 #~ "Welcome.\n"
 #~ "\n"
-#~ "If you want to connect your STB to the Internet, this wizard will "
-#~ "guide you through the basic network setup of your STB.\n"
+#~ "If you want to connect your Dreambox to the Internet, this wizard will "
+#~ "guide you through the basic network setup of your Dreambox.\n"
 #~ "\n"
 #~ "Press the OK button on your remote control to move to the next step."
 #~ msgstr ""
@@ -10123,7 +10123,7 @@ msgstr "zap-elt"
 
 #
 #~ msgid ""
-#~ "You do not seem to have a harddisk in your STB. So backing up to a "
+#~ "You do not seem to have a harddisk in your Dreambox. So backing up to a "
 #~ "harddisk is not an option for you."
 #~ msgstr ""
 #~ "Úgy látom a készülékben nincs merevlemez. Így a merevlemezre való mentés "
@@ -10197,18 +10197,18 @@ msgstr "zap-elt"
 #
 #~ msgid ""
 #~ "Your wired LAN Adapter could not be started.\n"
-#~ "Do you want to reboot your STB to apply the new configuration?\n"
+#~ "Do you want to reboot your Dreambox to apply the new configuration?\n"
 #~ msgstr ""
 #~ "A kábeles LAn adaptert nem lehetett elindítani.\n"
-#~ "Újraindítsam a STB-ot az új konfiguráció élesítéséhez?\n"
+#~ "Újraindítsam a DreamBox-ot az új konfiguráció élesítéséhez?\n"
 
 #
 #~ msgid ""
 #~ "Your wireless LAN Adapter could not be started.\n"
-#~ "Do you want to reboot your STB to apply the new configuration?\n"
+#~ "Do you want to reboot your Dreambox to apply the new configuration?\n"
 #~ msgstr ""
 #~ "A wireless LAn adaptert nem lehetett elindítani.\n"
-#~ "Újraindítsam a STB-ot az új konfiguráció élesítéséhez?\n"
+#~ "Újraindítsam a DreamBox-ot az új konfiguráció élesítéséhez?\n"
 
 #
 #~ msgid ""

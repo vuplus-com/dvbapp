@@ -26,7 +26,7 @@ msgstr ""
 #
 msgid ""
 "\n"
-"Backup your STB settings."
+"Backup your Dreambox settings."
 msgstr ""
 
 #
@@ -38,13 +38,13 @@ msgstr ""
 #
 msgid ""
 "\n"
-"Manage extensions or plugins for your STB"
+"Manage extensions or plugins for your Dreambox"
 msgstr ""
 
 #
 msgid ""
 "\n"
-"Online update of your STB software."
+"Online update of your Dreambox software."
 msgstr ""
 
 #
@@ -56,13 +56,13 @@ msgstr ""
 #
 msgid ""
 "\n"
-"Restore your STB settings."
+"Restore your Dreambox settings."
 msgstr ""
 
 #
 msgid ""
 "\n"
-"Restore your STB with a new firmware."
+"Restore your Dreambox with a new firmware."
 msgstr ""
 
 #
@@ -382,17 +382,17 @@ msgstr ""
 #
 msgid ""
 "A finished record timer wants to set your\n"
-"STB to standby. Do that now?"
+"Dreambox to standby. Do that now?"
 msgstr ""
-"Μια τελειωμένη εγγραφή θέλει να θέση την STB σε αναμονή.\n"
+"Μια τελειωμένη εγγραφή θέλει να θέση την Dreambox σε αναμονή.\n"
 "θέλετε να γίνει;"
 
 #
 msgid ""
 "A finished record timer wants to shut down\n"
-"your STB. Shutdown now?"
+"your Dreambox. Shutdown now?"
 msgstr ""
-"Μια τελειωμένη εγγραφή θέλει να κλείσει την STB.\n"
+"Μια τελειωμένη εγγραφή θέλει να κλείσει την Dreambox.\n"
 "Να κλείσει τώρα;"
 
 #
@@ -457,17 +457,17 @@ msgstr ""
 #
 msgid ""
 "A sleep timer wants to set your\n"
-"STB to standby. Do that now?"
+"Dreambox to standby. Do that now?"
 msgstr ""
-"Sleep timer θέλει να θέση την STB σε standby.\n"
+"Sleep timer θέλει να θέση την Dreambox σε standby.\n"
 "Τι θέλετε να γίνει;"
 
 #
 msgid ""
 "A sleep timer wants to shut down\n"
-"your STB. Shutdown now?"
+"your Dreambox. Shutdown now?"
 msgstr ""
-"Sleep timer θέλει να κάνει κλείσει την STB.\n"
+"Sleep timer θέλει να κάνει κλείσει την Dreambox.\n"
 "Να κλείσει τώρα;"
 
 #
@@ -573,7 +573,7 @@ msgid "Add a mark"
 msgstr "Πρόσθεσε ενα mark"
 
 #
-msgid "Add a new NFS or CIFS mount point to your STB."
+msgid "Add a new NFS or CIFS mount point to your Dreambox."
 msgstr ""
 
 #
@@ -622,7 +622,7 @@ msgstr ""
 
 #
 msgid ""
-"Adds enigma2 settings and STB model informations like SN, rev... if "
+"Adds enigma2 settings and dreambox model informations like SN, rev... if "
 "enabled."
 msgstr ""
 
@@ -676,7 +676,7 @@ msgstr "Μετά event"
 #
 msgid ""
 "After the start wizard is completed, you need to protect single services. "
-"Refer to your STB's manual on how to do that."
+"Refer to your dreambox's manual on how to do that."
 msgstr ""
 "Μετά το τέλος του wizard πρέπει να προστατευτούν τα «single services». "
 "Διάβαστε στο user manual για το πώς γίνεται."
@@ -1141,7 +1141,7 @@ msgid "Change step size"
 msgstr ""
 
 #
-msgid "Change the hostname of your STB."
+msgid "Change the hostname of your Dreambox."
 msgstr ""
 
 #
@@ -1429,7 +1429,7 @@ msgid "Contrast"
 msgstr "Αντίθεση"
 
 #
-msgid "Could not connect to STB .NFI Image Feed Server:"
+msgid "Could not connect to Dreambox .NFI Image Feed Server:"
 msgstr ""
 
 #
@@ -1885,7 +1885,7 @@ msgid "Do you want to do another manual service scan?"
 msgstr "Θέλετε να πραγματοποιηθεί ένα ακόμα χειροκίνητη ανεύρεση;"
 
 #
-msgid "Do you want to enable the parental control feature on your STB?"
+msgid "Do you want to enable the parental control feature on your dreambox?"
 msgstr "Θέλετε να ενεργοποιηθεί η γονική προστασία;"
 
 #
@@ -1909,7 +1909,7 @@ msgid "Do you want to preview this DVD before burning?"
 msgstr ""
 
 #
-msgid "Do you want to reboot your STB?"
+msgid "Do you want to reboot your Dreambox?"
 msgstr ""
 
 #
@@ -1935,15 +1935,15 @@ msgid ""
 msgstr ""
 
 #
-msgid "Do you want to update your STB?"
+msgid "Do you want to update your Dreambox?"
 msgstr ""
 
 #
 msgid ""
-"Do you want to update your STB?\n"
+"Do you want to update your Dreambox?\n"
 "After pressing OK, please wait!"
 msgstr ""
-"Θέλετε να αναβαθμίσετε την STB;\n"
+"Θέλετε να αναβαθμίσετε την Dreambox;\n"
 "Μετά το ΟΚ περίμενετε!"
 
 #
@@ -2019,11 +2019,11 @@ msgid "Downloading screenshots. Please wait..."
 msgstr ""
 
 #
-msgid "STB format data DVD (HDTV compatible)"
+msgid "Dreambox format data DVD (HDTV compatible)"
 msgstr ""
 
 #
-msgid "STB software because updates are available."
+msgid "Dreambox software because updates are available."
 msgstr ""
 
 #
@@ -2112,12 +2112,12 @@ msgid "Edit settings"
 msgstr "Επεξεργασία settings"
 
 #
-msgid "Edit the Nameserver configuration of your STB.\n"
-msgstr "Παραμετροποιήσετε το Nameserver της STB.\n"
+msgid "Edit the Nameserver configuration of your Dreambox.\n"
+msgstr "Παραμετροποιήσετε το Nameserver της Dreambox.\n"
 
 #
-msgid "Edit the network configuration of your STB.\n"
-msgstr "Παραμετροποιήσετε το δικτυο της STB.\n"
+msgid "Edit the network configuration of your Dreambox.\n"
+msgstr "Παραμετροποιήσετε το δικτυο της Dreambox.\n"
 
 #
 msgid "Edit title"
@@ -2286,7 +2286,7 @@ msgid "Enter main menu..."
 msgstr "Είσοδος στο κεντρικό μενού..."
 
 #
-msgid "Enter new hostname for your STB"
+msgid "Enter new hostname for your Dreambox"
 msgstr ""
 
 #
@@ -2657,10 +2657,10 @@ msgid "Genre"
 msgstr "Genre"
 
 #
-msgid "Genuine STB"
+msgid "Genuine Dreambox"
 msgstr ""
 
-msgid "Genuine STB validation failed!"
+msgid "Genuine Dreambox validation failed!"
 msgstr ""
 
 #
@@ -3981,8 +3981,8 @@ msgid "No, do nothing."
 msgstr "Όχι. Μην κάνεις τίποτα."
 
 #
-msgid "No, just start my STB"
-msgstr "Όχι, απλώς ξεκινά το STB"
+msgid "No, just start my dreambox"
+msgstr "Όχι, απλώς ξεκινά το dreambox"
 
 #
 msgid "No, not now"
@@ -4338,7 +4338,7 @@ msgstr ""
 
 #
 msgid ""
-"Please disconnect all USB devices from your STB and (re-)attach the "
+"Please disconnect all USB devices from your Dreambox and (re-)attach the "
 "target USB stick (minimum size is 64 MB) now!"
 msgstr ""
 
@@ -5833,7 +5833,7 @@ msgid "Shutdown"
 msgstr ""
 
 #
-msgid "Shutdown STB after"
+msgid "Shutdown Dreambox after"
 msgstr "Κλείσε το dream μετά από"
 
 #
@@ -6263,8 +6263,8 @@ msgid "Test mode"
 msgstr "Test mode"
 
 #
-msgid "Test the network configuration of your STB.\n"
-msgstr "Δοκιμάστε της παραμετροποιήσης του δικτύου της  STB.\n"
+msgid "Test the network configuration of your Dreambox.\n"
+msgstr "Δοκιμάστε της παραμετροποιήσης του δικτύου της  Dreambox.\n"
 
 #
 msgid "Test-Messagebox?"
@@ -6279,7 +6279,7 @@ msgstr ""
 #
 msgid ""
 "Thank you for using the wizard. Your box is now ready to use.\n"
-"Please press OK to start using your STB."
+"Please press OK to start using your Dreambox."
 msgstr ""
 "Σε ευχαριστούμε που χρησιμοποίησατε τον wizard. Το dream είναι έτοιμο τώρα.\n"
 "Πιέστε Οκ για να ξεκινήσετε."
@@ -6293,7 +6293,7 @@ msgstr ""
 
 msgid ""
 "The DVD standard doesn't support H.264 (HDTV) video streams. Do you want to "
-"create a STB format data DVD (which will not play in stand-alone DVD "
+"create a Dreambox format data DVD (which will not play in stand-alone DVD "
 "players) instead?"
 msgstr ""
 
@@ -6381,10 +6381,10 @@ msgstr "Οι προρυθμιζμένες λίστες καναλιών έχου
 #
 msgid ""
 "The installation of the default settings is finished. You can now continue "
-"configuring your STB by pressing the OK button on the remote control."
+"configuring your Dreambox by pressing the OK button on the remote control."
 msgstr ""
 "Τα προρυθμιζμένα settings έχουν εγκατασταθεί πλήρης. Μπορειτε να συνεχύσετε "
-"την εγκατάσταση της STB πιέζοντας το ΟΚ."
+"την εγκατάσταση της Dreambox πιέζοντας το ΟΚ."
 
 #
 msgid "The match attribute is mandatory."
@@ -6514,7 +6514,7 @@ msgstr ""
 #
 # File: tmp/enigma2_plugins/genuinedreambox/src/plugin.py, line: 130
 msgid ""
-"There's a certificate update available for your STB. Would you like to "
+"There's a certificate update available for your dreambox. Would you like to "
 "apply this update now?"
 msgstr ""
 
@@ -6543,7 +6543,7 @@ msgstr ""
 
 #
 #, python-format
-msgid "This STB can't decode %s streams!"
+msgid "This Dreambox can't decode %s streams!"
 msgstr ""
 
 #
@@ -6785,7 +6785,7 @@ msgstr ""
 
 #
 msgid ""
-"To update your STB firmware, please follow these steps:\n"
+"To update your Dreambox firmware, please follow these steps:\n"
 "1) Turn off your box with the rear power switch and plug in the bootable USB "
 "stick.\n"
 "2) Turn mains back on and hold the DOWN button on the front panel pressed "
@@ -6951,7 +6951,7 @@ msgstr ""
 
 #
 msgid ""
-"USB stick wizard finished. Your STB will now restart with your new "
+"USB stick wizard finished. Your dreambox will now restart with your new "
 "image!"
 msgstr ""
 
@@ -7045,7 +7045,7 @@ msgstr ""
 #
 # File: tmp/enigma2_plugins/genuinedreambox/src/plugin.py, line: 170
 msgid ""
-"Update done... The genuine STB test will now be rerun and should not "
+"Update done... The genuine dreambox test will now be rerun and should not "
 "ask you to update again."
 msgstr ""
 
@@ -7085,7 +7085,7 @@ msgid "Upgrading"
 msgstr "Η αναβάθμιση γίνεται…"
 
 #
-msgid "Upgrading STB... Please wait"
+msgid "Upgrading Dreambox... Please wait"
 msgstr "Η αναβάθμιση γίνεται… Περίμενε"
 
 #
@@ -7200,7 +7200,7 @@ msgid "VMGM (intro trailer)"
 msgstr ""
 
 msgid ""
-"Verify your STB authenticity by running the genuine STB plugin!"
+"Verify your Dreambox authenticity by running the genuine dreambox plugin!"
 msgstr ""
 
 #
@@ -7364,7 +7364,7 @@ msgid "View teletext..."
 msgstr "Εμφάνηση teletext..."
 
 #
-msgid "View, edit or delete mountpoints on your STB."
+msgid "View, edit or delete mountpoints on your Dreambox."
 msgstr ""
 
 #
@@ -7474,11 +7474,11 @@ msgstr ""
 #
 msgid ""
 "Welcome to the Image upgrade wizard. The wizard will assist you in upgrading "
-"the firmware of your STB by providing a backup facility for your "
+"the firmware of your Dreambox by providing a backup facility for your "
 "current settings and a short explanation of how to upgrade your firmware."
 msgstr ""
 "Καλώς ορίσατε στο wizard αναβάθμισεις του Image. Ο wizard θα σας οδηγίσει "
-"στο να αναβαθμίσετε το firmware της STB με δυνοτότητα για backup και "
+"στο να αναβαθμίσετε το firmware της Dreambox με δυνοτότητα για backup και "
 "μια γρύγρορη εξήγηση για το πώς θα γινει η αναβάθμιση."
 
 #
@@ -7515,7 +7515,7 @@ msgid ""
 "Welcome to the cleanup wizard.\n"
 "\n"
 "We have detected that your available internal memory has dropped below 2MB.\n"
-"To ensure stable operation of your STB, the internal memory should be "
+"To ensure stable operation of your Dreambox, the internal memory should be "
 "cleaned up.\n"
 "You can use this wizard to remove some extensions.\n"
 msgstr ""
@@ -7524,8 +7524,8 @@ msgstr ""
 msgid ""
 "Welcome.\n"
 "\n"
-"If you want to connect your STB to the Internet, this wizard will guide "
-"you through the basic network setup of your STB.\n"
+"If you want to connect your Dreambox to the Internet, this wizard will guide "
+"you through the basic network setup of your Dreambox.\n"
 "\n"
 "Press OK to start configuring your network"
 msgstr ""
@@ -7542,7 +7542,7 @@ msgstr ""
 msgid ""
 "Welcome.\n"
 "\n"
-"This start wizard will guide you through the basic setup of your STB.\n"
+"This start wizard will guide you through the basic setup of your Dreambox.\n"
 "Press the OK button on your remote control to move to the next step."
 msgstr ""
 "Καλώς ορίσατε.\n"
@@ -7688,7 +7688,7 @@ msgstr ""
 
 #
 msgid "Yes, perform a shutdown now."
-msgstr "Ναι, ξεκίνα το κλείσιμο του STB, τώρα"
+msgstr "Ναι, ξεκίνα το κλείσιμο του dreambox, τώρα"
 
 #
 msgid "Yes, restore the settings now"
@@ -7727,7 +7727,7 @@ msgid "You can install this plugin."
 msgstr ""
 
 #
-msgid "You can only burn STB recordings!"
+msgid "You can only burn Dreambox recordings!"
 msgstr ""
 
 #
@@ -7802,15 +7802,15 @@ msgstr "Περιμένετε για %s!"
 
 #
 msgid ""
-"You need a PC connected to your STB. If you need further instructions, "
+"You need a PC connected to your dreambox. If you need further instructions, "
 "please visit the website http://www.dm7025.de.\n"
-"Your STB will now be halted. After you have performed the update "
+"Your dreambox will now be halted. After you have performed the update "
 "instructions from the website, your new firmware will ask you to restore "
 "your settings."
 msgstr ""
-"Χρειοζόσαστε ενα PC συνδεμένο στην STB. Εαν χρειαυόσαστε περισσότερες "
+"Χρειοζόσαστε ενα PC συνδεμένο στην dreambox. Εαν χρειαυόσαστε περισσότερες "
 "πληροφορίες επισκευτείτε την website http://www.dm7025.de.\n"
-"Η STB θα διακοπή.Όταν διαβάσατε της ορμηνείες αναβάθμισεις στην website "
+"Η dreambox θα διακοπή.Όταν διαβάσατε της ορμηνείες αναβάθμισεις στην website "
 "θα ρωτειυήτε για επαναφορά settings."
 
 #
@@ -7839,7 +7839,7 @@ msgstr ""
 
 #
 msgid ""
-"Your STB is now ready to use.\n"
+"Your Dreambox is now ready to use.\n"
 "\n"
 "Your internet connection is working now.\n"
 "\n"
@@ -7847,7 +7847,7 @@ msgstr ""
 
 #
 msgid ""
-"Your STB is now ready to use.\n"
+"Your Dreambox is now ready to use.\n"
 "\n"
 "Your internet connection is working now.\n"
 "\n"
@@ -7855,8 +7855,8 @@ msgid ""
 msgstr ""
 
 #
-msgid "Your STB will restart after pressing OK on your remote control."
-msgstr "Η STB 8α επανςκκινήσει πιέζοντας ΟΚ."
+msgid "Your Dreambox will restart after pressing OK on your remote control."
+msgstr "Η Dreambox 8α επανςκκινήσει πιέζοντας ΟΚ."
 
 #
 msgid ""
@@ -7883,12 +7883,12 @@ msgid "Your current collection will get lost!"
 msgstr ""
 
 #
-msgid "Your STB is shutting down. Please stand by..."
-msgstr "Το STB κλείνει. Περίμενε..."
+msgid "Your dreambox is shutting down. Please stand by..."
+msgstr "Το dreambox κλείνει. Περίμενε..."
 
 #
 msgid ""
-"Your STB isn't connected to the internet properly. Please check it and "
+"Your dreambox isn't connected to the internet properly. Please check it and "
 "try again."
 msgstr ""
 "Το dream δεν είναι συνδεμένο στο internet. Έλεγξτε το και προσπάθηστε ξανά."
@@ -9183,11 +9183,11 @@ msgstr "Ναι (σώσε feeds)"
 
 #
 msgid ""
-"your STB might be unusable now. Please consult the manual for further "
-"assistance before rebooting your STB."
+"your dreambox might be unusable now. Please consult the manual for further "
+"assistance before rebooting your dreambox."
 msgstr ""
-"Ενδέχετε η STB να μην λειτοθργεί. Παρακαλώ διαβάστε στον βιβλιό χρήσεως "
-"πρώτοθ επανεκκίνηθει η STB."
+"Ενδέχετε η dreambox να μην λειτοθργεί. Παρακαλώ διαβάστε στον βιβλιό χρήσεως "
+"πρώτοθ επανεκκίνηθει η dreambox."
 
 #
 msgid "zap"
@@ -9248,11 +9248,11 @@ msgstr "zapped"
 #
 #~ msgid ""
 #~ "Are you sure you want to enable WLAN support?\n"
-#~ "Connect your Wlan USB Stick to your STB and press OK.\n"
+#~ "Connect your Wlan USB Stick to your Dreambox and press OK.\n"
 #~ "\n"
 #~ msgstr ""
 #~ "Είστε σίγουρος οτι θέλετε να ενεργοποιήσετε το WLAN;\n"
-#~ "Σύνδεστε το Wlan USB Stick στην STB  και πατήστε ΟΚ.\n"
+#~ "Σύνδεστε το Wlan USB Stick στην Dreambox  και πατήστε ΟΚ.\n"
 #~ "\n"
 
 #
@@ -9406,10 +9406,10 @@ msgstr "zapped"
 
 #
 #~ msgid ""
-#~ "Enable the local network of your STB.\n"
+#~ "Enable the local network of your Dreambox.\n"
 #~ "\n"
 #~ msgstr ""
-#~ "Ενεργοποίηστε το δικτυο της STB.\n"
+#~ "Ενεργοποίηστε το δικτυο της Dreambox.\n"
 #~ "\n"
 
 #
@@ -9534,10 +9534,10 @@ msgstr "zapped"
 #
 #~ msgid ""
 #~ "Please attach your Zydas ZD1211B chipset compatibe WLAN USB Stick to your "
-#~ "STB and press the OK button on your remote control to enable the "
+#~ "Dreambox and press the OK button on your remote control to enable the "
 #~ "built in wireless network support"
 #~ msgstr ""
-#~ "Συνδέσετε το WLAN USB Stick εύθετο σε Zydas ZD1211B chipset στο STB "
+#~ "Συνδέσετε το WLAN USB Stick εύθετο σε Zydas ZD1211B chipset στο Dreambox "
 #~ "και πατήστε ΟΚ να ενεργοποιηθεί το ενσωματωμένο wireless network support"
 
 #
@@ -9570,14 +9570,14 @@ msgstr "zapped"
 
 #
 #~ msgid ""
-#~ "Pressing OK enables the built in wireless LAN support of your STB.\n"
+#~ "Pressing OK enables the built in wireless LAN support of your Dreambox.\n"
 #~ "Wlan USB Sticks with Zydas ZD1211B and RAlink RT73 Chipset are "
 #~ "supported.\n"
-#~ "Connect your Wlan USB Stick to your STB before pressing OK.\n"
+#~ "Connect your Wlan USB Stick to your Dreambox before pressing OK.\n"
 #~ "\n"
 #~ msgstr ""
 #~ "Πιέζοντας ΟΚ ενεργοποιεί το ενσωματομένο wireless LAN support της  "
-#~ "STB.\n"
+#~ "Dreambox.\n"
 #~ "Υποστιρίζοντε Wlan USB Sticks με Zydas ZD1211B και RAlink RT73 Chipset.\n"
 #~ "Πιέστε ΟΚ αφου συνδέσατε το Wlan USB Stick .\n"
 #~ "\n"
@@ -9662,13 +9662,13 @@ msgstr "zapped"
 
 #
 #~ msgid ""
-#~ "Thank you for using the wizard. Your STB is now ready to use.\n"
+#~ "Thank you for using the wizard. Your Dreambox is now ready to use.\n"
 #~ "\n"
 #~ "Your local LAN internet connection is working now.\n"
 #~ "\n"
 #~ "Please press OK to continue."
 #~ msgstr ""
-#~ "Ευχαριστώ που χρεισημοποιήσατε τον wizard. Η STB εινα έτοιμη για "
+#~ "Ευχαριστώ που χρεισημοποιήσατε τον wizard. Η Dreambox εινα έτοιμη για "
 #~ "χρήση.\n"
 #~ "\n"
 #~ "Η σύνδεση LAN internet εχει πλήρης εγκατασταθεί.\n"
@@ -9677,13 +9677,13 @@ msgstr "zapped"
 
 #
 #~ msgid ""
-#~ "Thank you for using the wizard. Your STB is now ready to use.\n"
+#~ "Thank you for using the wizard. Your Dreambox is now ready to use.\n"
 #~ "\n"
 #~ "Your wireless internet connection is working now.\n"
 #~ "\n"
 #~ "Please press OK to continue."
 #~ msgstr ""
-#~ "Ευχαριστώ που χρεισημοποιήσατε τον wizard. Η STB εινα έτοιμη για "
+#~ "Ευχαριστώ που χρεισημοποιήσατε τον wizard. Η Dreambox εινα έτοιμη για "
 #~ "χρήση.\n"
 #~ "\n"
 #~ "Η σύνδεση wireless internet εχει πλήρης εγκατασταθεί.\n"
@@ -9692,10 +9692,10 @@ msgstr "zapped"
 
 #
 #~ msgid ""
-#~ "Thank you for using the wizard. Your STB is now ready to use.\n"
-#~ "Please press OK to start using your STB."
+#~ "Thank you for using the wizard. Your Dreambox is now ready to use.\n"
+#~ "Please press OK to start using your Dreambox."
 #~ msgstr ""
-#~ "Ευχαριστώ που χρεισημοποιήσατε τον wizard. Η STB εινα έτοιμη για "
+#~ "Ευχαριστώ που χρεισημοποιήσατε τον wizard. Η Dreambox εινα έτοιμη για "
 #~ "χρήση.\n"
 #~ "Πιέστε ΟΚ."
 
@@ -9722,7 +9722,7 @@ msgstr "zapped"
 #~ msgstr "Αναβάθμιση software του δέκτη"
 
 #
-#~ msgid "Upgrade finished. Do you want to reboot your STB?"
+#~ msgid "Upgrade finished. Do you want to reboot your Dreambox?"
 #~ msgstr "Η αναβάθμιση τελείωσε . Να γίνει επανεκκίνηση του dream;"
 
 #
@@ -9744,24 +9744,24 @@ msgstr "zapped"
 #~ msgid ""
 #~ "Welcome.\n"
 #~ "\n"
-#~ "If you want to connect your STB to the Internet, this wizard will "
-#~ "guide you through the basic network setup of your STB.\n"
+#~ "If you want to connect your Dreambox to the Internet, this wizard will "
+#~ "guide you through the basic network setup of your Dreambox.\n"
 #~ "\n"
 #~ "Press the OK button on your remote control to move to the next step."
 #~ msgstr ""
 #~ "Καλώς ορίσατε.\n"
 #~ "\n"
-#~ "Εαν θέλετε να συνδέσετε την STB με το Internet, το wizard θα σας "
-#~ "οδηγίσει στο setup τοθ δικτύου της STB.\n"
+#~ "Εαν θέλετε να συνδέσετε την Dreambox με το Internet, το wizard θα σας "
+#~ "οδηγίσει στο setup τοθ δικτύου της Dreambox.\n"
 #~ "\n"
 #~ "Πιέστε ΟΚ για να πάτε στο επόμενο βήμα."
 
 #
 #~ msgid ""
-#~ "You do not seem to have a harddisk in your STB. So backing up to a "
+#~ "You do not seem to have a harddisk in your Dreambox. So backing up to a "
 #~ "harddisk is not an option for you."
 #~ msgstr ""
-#~ "Δεν φαίνετε να έχετε σκληρό δισκο στο STB. Δεν μπορεί να γίνει "
+#~ "Δεν φαίνετε να έχετε σκληρό δισκο στο Dreambox. Δεν μπορεί να γίνει "
 #~ "backing στο  σκληρό δισκο."
 
 #
@@ -9831,19 +9831,19 @@ msgstr "zapped"
 #
 #~ msgid ""
 #~ "Your wired LAN Adapter could not be started.\n"
-#~ "Do you want to reboot your STB to apply the new configuration?\n"
+#~ "Do you want to reboot your Dreambox to apply the new configuration?\n"
 #~ msgstr ""
 #~ "Η προσαρμογή LAN δεν μπορούσε να εκκινηθεί.\n"
-#~ "θέλετε να γίνει επανεκκίνηση της STB για να εφαρμοστούν οι νέες "
+#~ "θέλετε να γίνει επανεκκίνηση της Dreambox για να εφαρμοστούν οι νέες "
 #~ "παραμετροποιήσης;\n"
 
 #
 #~ msgid ""
 #~ "Your wireless LAN Adapter could not be started.\n"
-#~ "Do you want to reboot your STB to apply the new configuration?\n"
+#~ "Do you want to reboot your Dreambox to apply the new configuration?\n"
 #~ msgstr ""
 #~ "Η προσαρμογή wireless LAN δεν μπορούσε να εκκινηθεί.\n"
-#~ "θέλετε να γίνει επανεκκίνηση της STB για να εφαρμοστούν οι νέες "
+#~ "θέλετε να γίνει επανεκκίνηση της Dreambox για να εφαρμοστούν οι νέες "
 #~ "παραμετροποιήσης;\n"
 
 #

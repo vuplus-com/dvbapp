@@ -32,10 +32,10 @@ msgstr ""
 #
 msgid ""
 "\n"
-"Backup your STB settings."
+"Backup your Dreambox settings."
 msgstr ""
 "\n"
-"Veidot STB iestatījumu dublējumkopiju."
+"Veidot Dreambox iestatījumu dublējumkopiju."
 
 #
 msgid ""
@@ -48,16 +48,16 @@ msgstr ""
 #
 msgid ""
 "\n"
-"Manage extensions or plugins for your STB"
+"Manage extensions or plugins for your Dreambox"
 msgstr ""
 
 #
 msgid ""
 "\n"
-"Online update of your STB software."
+"Online update of your Dreambox software."
 msgstr ""
 "\n"
-"STB programmatūras atjaunināšana tiešsaistē."
+"Dreambox programmatūras atjaunināšana tiešsaistē."
 
 #
 msgid ""
@@ -70,18 +70,18 @@ msgstr ""
 #
 msgid ""
 "\n"
-"Restore your STB settings."
+"Restore your Dreambox settings."
 msgstr ""
 "\n"
-"Atjaunot STB iestatījumus."
+"Atjaunot Dreambox iestatījumus."
 
 #
 msgid ""
 "\n"
-"Restore your STB with a new firmware."
+"Restore your Dreambox with a new firmware."
 msgstr ""
 "\n"
-"Atjaunot STB ar jaunu programmatūru."
+"Atjaunot Dreambox ar jaunu programmatūru."
 
 #
 msgid ""
@@ -412,18 +412,18 @@ msgstr ""
 #
 msgid ""
 "A finished record timer wants to set your\n"
-"STB to standby. Do that now?"
+"Dreambox to standby. Do that now?"
 msgstr ""
 "Taimeris ir beidzis ierakstu un vēlas pārslēgt\n"
-"STB gaidstāves režīmā. Vai darīt to tagad?"
+"Dreambox gaidstāves režīmā. Vai darīt to tagad?"
 
 #
 msgid ""
 "A finished record timer wants to shut down\n"
-"your STB. Shutdown now?"
+"your Dreambox. Shutdown now?"
 msgstr ""
 "Taimeris ir beidzis ierakstu un vēlas izslēgt\n"
-"STB. Vai darīt to tagad?"
+"Dreambox. Vai darīt to tagad?"
 
 #
 # ???
@@ -488,18 +488,18 @@ msgstr ""
 #
 msgid ""
 "A sleep timer wants to set your\n"
-"STB to standby. Do that now?"
+"Dreambox to standby. Do that now?"
 msgstr ""
 "Miega taimeris vēlas pārslēgt\n"
-"STB gaidstāves režīmā. Vai darīt to tagad?"
+"Dreambox gaidstāves režīmā. Vai darīt to tagad?"
 
 #
 msgid ""
 "A sleep timer wants to shut down\n"
-"your STB. Shutdown now?"
+"your Dreambox. Shutdown now?"
 msgstr ""
 "Miega taimeris vēlas izslēgt\n"
-"STB. Vai darīt to tagad?"
+"Dreambox. Vai darīt to tagad?"
 
 #
 msgid "A small overview of the available icon states and actions."
@@ -606,7 +606,7 @@ msgid "Add a mark"
 msgstr "Pievienot iezīmi"
 
 #
-msgid "Add a new NFS or CIFS mount point to your STB."
+msgid "Add a new NFS or CIFS mount point to your Dreambox."
 msgstr ""
 
 #
@@ -655,7 +655,7 @@ msgstr ""
 
 #
 msgid ""
-"Adds enigma2 settings and STB model informations like SN, rev... if "
+"Adds enigma2 settings and dreambox model informations like SN, rev... if "
 "enabled."
 msgstr ""
 
@@ -711,10 +711,10 @@ msgstr "Pēc notikuma"
 # ???
 msgid ""
 "After the start wizard is completed, you need to protect single services. "
-"Refer to your STB's manual on how to do that."
+"Refer to your dreambox's manual on how to do that."
 msgstr ""
 "Pēc starta vednis ir pabeigts, jums ir jāaizsargā atsevišķi kanāli. "
-"Meklējiet STB rokasgrāmatā kā to izdarīt."
+"Meklējiet dreambox rokasgrāmatā kā to izdarīt."
 
 #
 msgid "Album"
@@ -1189,7 +1189,7 @@ msgid "Change step size"
 msgstr ""
 
 #
-msgid "Change the hostname of your STB."
+msgid "Change the hostname of your Dreambox."
 msgstr ""
 
 #
@@ -1478,8 +1478,8 @@ msgid "Contrast"
 msgstr "Kontrasts"
 
 #
-msgid "Could not connect to STB .NFI Image Feed Server:"
-msgstr "Nevar savienoties ar STB .NFI imidža barotnes serveris:"
+msgid "Could not connect to Dreambox .NFI Image Feed Server:"
+msgstr "Nevar savienoties ar Dreambox .NFI imidža barotnes serveris:"
 
 #
 msgid "Could not load Medium! No disc inserted?"
@@ -1945,7 +1945,7 @@ msgid "Do you want to do another manual service scan?"
 msgstr "Vai vēleties manuāli meklēt citus kanālus?"
 
 #
-msgid "Do you want to enable the parental control feature on your STB?"
+msgid "Do you want to enable the parental control feature on your dreambox?"
 msgstr "Vai vēlaties aktivizēt vecāku kontroles iespēju?"
 
 #
@@ -1969,8 +1969,8 @@ msgid "Do you want to preview this DVD before burning?"
 msgstr "Vai vēleties skatīt šo DVD pirms rakstīšanas?"
 
 #
-msgid "Do you want to reboot your STB?"
-msgstr "Vai vēlaties atsāknēt STB?"
+msgid "Do you want to reboot your Dreambox?"
+msgstr "Vai vēlaties atsāknēt Dreambox?"
 
 #
 msgid "Do you want to remove the package:\n"
@@ -1995,15 +1995,15 @@ msgid ""
 msgstr ""
 
 #
-msgid "Do you want to update your STB?"
-msgstr "Vai vēlaties atjaunināt STB?"
+msgid "Do you want to update your Dreambox?"
+msgstr "Vai vēlaties atjaunināt Dreambox?"
 
 #
 msgid ""
-"Do you want to update your STB?\n"
+"Do you want to update your Dreambox?\n"
 "After pressing OK, please wait!"
 msgstr ""
-"Vai vēlaties atjaunināt STB?\n"
+"Vai vēlaties atjaunināt Dreambox?\n"
 "Nospiediet OK un gaidiet!"
 
 #
@@ -2079,11 +2079,11 @@ msgid "Downloading screenshots. Please wait..."
 msgstr ""
 
 #
-msgid "STB format data DVD (HDTV compatible)"
-msgstr "STB formāta datu DVD (savietojams ar HDTV)"
+msgid "Dreambox format data DVD (HDTV compatible)"
+msgstr "Dreambox formāta datu DVD (savietojams ar HDTV)"
 
 #
-msgid "STB software because updates are available."
+msgid "Dreambox software because updates are available."
 msgstr ""
 
 #
@@ -2173,12 +2173,12 @@ msgid "Edit settings"
 msgstr "Rediģēt iestatījumus"
 
 #
-msgid "Edit the Nameserver configuration of your STB.\n"
-msgstr "Rediģēt STB domēna vārdu servera konfigurāciju.\n"
+msgid "Edit the Nameserver configuration of your Dreambox.\n"
+msgstr "Rediģēt Dreambox domēna vārdu servera konfigurāciju.\n"
 
 #
-msgid "Edit the network configuration of your STB.\n"
-msgstr "Rediģēt STB tīkla konfigurāciju.\n"
+msgid "Edit the network configuration of your Dreambox.\n"
+msgstr "Rediģēt Dreambox tīkla konfigurāciju.\n"
 
 #
 msgid "Edit title"
@@ -2347,7 +2347,7 @@ msgid "Enter main menu..."
 msgstr "Atvērt galveno izvēlni..."
 
 #
-msgid "Enter new hostname for your STB"
+msgid "Enter new hostname for your Dreambox"
 msgstr ""
 
 #
@@ -2723,10 +2723,10 @@ msgid "Genre"
 msgstr "Žanrs"
 
 #
-msgid "Genuine STB"
+msgid "Genuine Dreambox"
 msgstr ""
 
-msgid "Genuine STB validation failed!"
+msgid "Genuine Dreambox validation failed!"
 msgstr ""
 
 #
@@ -4051,8 +4051,8 @@ msgid "No, do nothing."
 msgstr "Nē, nedarīt neko"
 
 #
-msgid "No, just start my STB"
-msgstr "Nē, vienkārši startēt STB"
+msgid "No, just start my dreambox"
+msgstr "Nē, vienkārši startēt dreambox"
 
 #
 msgid "No, not now"
@@ -4410,10 +4410,10 @@ msgstr ""
 
 #
 msgid ""
-"Please disconnect all USB devices from your STB and (re-)attach the "
+"Please disconnect all USB devices from your Dreambox and (re-)attach the "
 "target USB stick (minimum size is 64 MB) now!"
 msgstr ""
-"Tagad lūdzu atvienojiet visas USB ierīces no STB, un pievienojiet "
+"Tagad lūdzu atvienojiet visas USB ierīces no Dreambox, un pievienojiet "
 "atpakaļ USB atmiņu (minimālais izmērs 64 MB)!"
 
 #
@@ -5916,8 +5916,8 @@ msgid "Shutdown"
 msgstr ""
 
 #
-msgid "Shutdown STB after"
-msgstr "Izslēgt STB pēc"
+msgid "Shutdown Dreambox after"
+msgstr "Izslēgt Dreambox pēc"
 
 #
 msgid "Signal Strength:"
@@ -6351,8 +6351,8 @@ msgid "Test mode"
 msgstr "Testa režīms"
 
 #
-msgid "Test the network configuration of your STB.\n"
-msgstr "Pārbaudīt tīkla STB konfigurāciju.\n"
+msgid "Test the network configuration of your Dreambox.\n"
+msgstr "Pārbaudīt tīkla Dreambox konfigurāciju.\n"
 
 #
 msgid "Test-Messagebox?"
@@ -6367,10 +6367,10 @@ msgstr ""
 #
 msgid ""
 "Thank you for using the wizard. Your box is now ready to use.\n"
-"Please press OK to start using your STB."
+"Please press OK to start using your Dreambox."
 msgstr ""
 "Pateicamies par vedņa izmantošanu. Ierīce ir gatava lietošanai.\n"
-"Lūdzu spiediet OK, lai sāktu lietot STB."
+"Lūdzu spiediet OK, lai sāktu lietot Dreambox."
 
 #
 msgid ""
@@ -6382,11 +6382,11 @@ msgstr ""
 #
 msgid ""
 "The DVD standard doesn't support H.264 (HDTV) video streams. Do you want to "
-"create a STB format data DVD (which will not play in stand-alone DVD "
+"create a Dreambox format data DVD (which will not play in stand-alone DVD "
 "players) instead?"
 msgstr ""
 "DVD standarts neatbalsta H.264 (HDTV) attēla plūsmas. Vai jūs tā vietā "
-"vēlaties izveidot STB formāta datu DVD (kuru nevarēs izmantot standarta "
+"vēlaties izveidot Dreambox formāta datu DVD (kuru nevarēs izmantot standarta "
 "DVD atskaņotājos)?"
 
 #
@@ -6482,9 +6482,9 @@ msgstr "Noklusēto kanālu sarakstu uzstādīšana ir pabeigta."
 #
 msgid ""
 "The installation of the default settings is finished. You can now continue "
-"configuring your STB by pressing the OK button on the remote control."
+"configuring your Dreambox by pressing the OK button on the remote control."
 msgstr ""
-"Noklusēto iestatījumu uzstādīšana ir pabeigta. Tagad varat turpināt STB "
+"Noklusēto iestatījumu uzstādīšana ir pabeigta. Tagad varat turpināt Dreambox "
 "konfigurēšanu, spiežot OK taustiņu uz tālvadības pults."
 
 #
@@ -6622,7 +6622,7 @@ msgstr ""
 #
 # File: tmp/enigma2_plugins/genuinedreambox/src/plugin.py, line: 130
 msgid ""
-"There's a certificate update available for your STB. Would you like to "
+"There's a certificate update available for your dreambox. Would you like to "
 "apply this update now?"
 msgstr ""
 
@@ -6657,7 +6657,7 @@ msgstr ""
 
 #
 #, python-format
-msgid "This STB can't decode %s streams!"
+msgid "This Dreambox can't decode %s streams!"
 msgstr ""
 
 #
@@ -6902,14 +6902,14 @@ msgstr "Nosaukuma iestatīšanas režīms"
 
 #
 msgid ""
-"To update your STB firmware, please follow these steps:\n"
+"To update your Dreambox firmware, please follow these steps:\n"
 "1) Turn off your box with the rear power switch and plug in the bootable USB "
 "stick.\n"
 "2) Turn mains back on and hold the DOWN button on the front panel pressed "
 "for 10 seconds.\n"
 "3) Wait for bootup and follow instructions of the wizard."
 msgstr ""
-"Lūdzu veiciet šādus soļus, lai atjauninātu STB programmatūru:\n"
+"Lūdzu veiciet šādus soļus, lai atjauninātu Dreambox programmatūru:\n"
 "1) Izslēdziet ierīci ar aizmugures barošanas slēdzi un iespraudiet sāknējamu "
 "USB atmiņu.\n"
 "2) Ieslēdziet ierīci un 10 sekundes turiet nospiestu DOWN pogu uz priekšējā "
@@ -7071,7 +7071,7 @@ msgstr "USB atmiņas vednis"
 
 #
 msgid ""
-"USB stick wizard finished. Your STB will now restart with your new "
+"USB stick wizard finished. Your dreambox will now restart with your new "
 "image!"
 msgstr ""
 
@@ -7164,7 +7164,7 @@ msgstr "Atjaunināt"
 #
 # File: tmp/enigma2_plugins/genuinedreambox/src/plugin.py, line: 170
 msgid ""
-"Update done... The genuine STB test will now be rerun and should not "
+"Update done... The genuine dreambox test will now be rerun and should not "
 "ask you to update again."
 msgstr ""
 
@@ -7204,8 +7204,8 @@ msgid "Upgrading"
 msgstr "Atjaunošana"
 
 #
-msgid "Upgrading STB... Please wait"
-msgstr "Atjauno STB... Lūdzu gaidiet"
+msgid "Upgrading Dreambox... Please wait"
+msgstr "Atjauno Dreambox... Lūdzu gaidiet"
 
 #
 msgid "Upper bound of timespan."
@@ -7321,7 +7321,7 @@ msgid "VMGM (intro trailer)"
 msgstr "VMGM (ievada treileris)"
 
 msgid ""
-"Verify your STB authenticity by running the genuine STB plugin!"
+"Verify your Dreambox authenticity by running the genuine dreambox plugin!"
 msgstr ""
 
 #
@@ -7485,7 +7485,7 @@ msgid "View teletext..."
 msgstr "Skatīt teletekstu..."
 
 #
-msgid "View, edit or delete mountpoints on your STB."
+msgid "View, edit or delete mountpoints on your Dreambox."
 msgstr ""
 
 #
@@ -7603,11 +7603,11 @@ msgstr ""
 #
 msgid ""
 "Welcome to the Image upgrade wizard. The wizard will assist you in upgrading "
-"the firmware of your STB by providing a backup facility for your "
+"the firmware of your Dreambox by providing a backup facility for your "
 "current settings and a short explanation of how to upgrade your firmware."
 msgstr ""
 "Sveicināti imidža atjaunināšanas vednī. Vednis palīdzēs Jums atjaunot "
-"STB programmatūru, sniedzot pašreizējo iestatījumu dublējumkopēšanas "
+"Dreambox programmatūru, sniedzot pašreizējo iestatījumu dublējumkopēšanas "
 "iespējas, kā arī īsumā izskaidros, kā veikt programmatūras atjaunināšanu."
 
 #
@@ -7644,7 +7644,7 @@ msgid ""
 "Welcome to the cleanup wizard.\n"
 "\n"
 "We have detected that your available internal memory has dropped below 2MB.\n"
-"To ensure stable operation of your STB, the internal memory should be "
+"To ensure stable operation of your Dreambox, the internal memory should be "
 "cleaned up.\n"
 "You can use this wizard to remove some extensions.\n"
 msgstr ""
@@ -7653,8 +7653,8 @@ msgstr ""
 msgid ""
 "Welcome.\n"
 "\n"
-"If you want to connect your STB to the Internet, this wizard will guide "
-"you through the basic network setup of your STB.\n"
+"If you want to connect your Dreambox to the Internet, this wizard will guide "
+"you through the basic network setup of your Dreambox.\n"
 "\n"
 "Press OK to start configuring your network"
 msgstr ""
@@ -7671,12 +7671,12 @@ msgstr ""
 msgid ""
 "Welcome.\n"
 "\n"
-"This start wizard will guide you through the basic setup of your STB.\n"
+"This start wizard will guide you through the basic setup of your Dreambox.\n"
 "Press the OK button on your remote control to move to the next step."
 msgstr ""
 "Sveicināti.\n"
 "\n"
-"Šis sākuma vednis būs Jūsu ceļvedis STB pamata iestatnē.\n"
+"Šis sākuma vednis būs Jūsu ceļvedis Dreambox pamata iestatnē.\n"
 "Spiediet OK taustiņu uz tālvadības pults, lai pārietu uz nākamo soli."
 
 #
@@ -7861,7 +7861,7 @@ msgid "You can install this plugin."
 msgstr ""
 
 #
-msgid "You can only burn STB recordings!"
+msgid "You can only burn Dreambox recordings!"
 msgstr ""
 
 #
@@ -7943,15 +7943,15 @@ msgstr "Jums jāuzgaida %s!"
 
 #
 msgid ""
-"You need a PC connected to your STB. If you need further instructions, "
+"You need a PC connected to your dreambox. If you need further instructions, "
 "please visit the website http://www.dm7025.de.\n"
-"Your STB will now be halted. After you have performed the update "
+"Your dreambox will now be halted. After you have performed the update "
 "instructions from the website, your new firmware will ask you to restore "
 "your settings."
 msgstr ""
-"Personālajam datoram jābūt savienotam ar STB. Ja Jums ir nepieciešamas "
+"Personālajam datoram jābūt savienotam ar Dreambox. Ja Jums ir nepieciešamas "
 "turpmākas instrukcijas, lūdzu apmeklējiet vietni http://www.dm7025.de.\n"
-"STB tagad tiks apturēts. Pēc tam, kad būs izpildītas atjaunināšanas "
+"Dreambox tagad tiks apturēts. Pēc tam, kad būs izpildītas atjaunināšanas "
 "instrukcijas no tīkla vietnes, jaunā programmatūra piedāvās Jums atjaunot "
 "iestatījumus."
 
@@ -7981,7 +7981,7 @@ msgstr ""
 
 #
 msgid ""
-"Your STB is now ready to use.\n"
+"Your Dreambox is now ready to use.\n"
 "\n"
 "Your internet connection is working now.\n"
 "\n"
@@ -7989,7 +7989,7 @@ msgstr ""
 
 #
 msgid ""
-"Your STB is now ready to use.\n"
+"Your Dreambox is now ready to use.\n"
 "\n"
 "Your internet connection is working now.\n"
 "\n"
@@ -7997,8 +7997,8 @@ msgid ""
 msgstr ""
 
 #
-msgid "Your STB will restart after pressing OK on your remote control."
-msgstr "STB restartēsies pēc OK taustiņa nospiešanas uz tālvadības pults."
+msgid "Your Dreambox will restart after pressing OK on your remote control."
+msgstr "Dreambox restartēsies pēc OK taustiņa nospiešanas uz tālvadības pults."
 
 #
 msgid ""
@@ -8026,15 +8026,15 @@ msgid "Your current collection will get lost!"
 msgstr ""
 
 #
-msgid "Your STB is shutting down. Please stand by..."
-msgstr "STB izslēdzas. Lūdzu gaidiet..."
+msgid "Your dreambox is shutting down. Please stand by..."
+msgstr "Dreambox izslēdzas. Lūdzu gaidiet..."
 
 #
 msgid ""
-"Your STB isn't connected to the internet properly. Please check it and "
+"Your dreambox isn't connected to the internet properly. Please check it and "
 "try again."
 msgstr ""
-"STB nav pievienots internetam kā nākas. Lūdzu pārbaudiet un mēģiniet "
+"Dreambox nav pievienots internetam kā nākas. Lūdzu pārbaudiet un mēģiniet "
 "vēl."
 
 #
@@ -9331,11 +9331,11 @@ msgstr "jā (paturēt barotnes)"
 
 #
 msgid ""
-"your STB might be unusable now. Please consult the manual for further "
-"assistance before rebooting your STB."
+"your dreambox might be unusable now. Please consult the manual for further "
+"assistance before rebooting your dreambox."
 msgstr ""
-"STB tagad var būt nelietojams. Lūdzu skatīt lietošanas instrukciju "
-"tālākai palīdzībai, pirms atsāknējat STB."
+"Dreambox tagad var būt nelietojams. Lūdzu skatīt lietošanas instrukciju "
+"tālākai palīdzībai, pirms atsāknējat Dreambox."
 
 #
 msgid "zap"
@@ -9703,8 +9703,8 @@ msgstr "pārslēgts"
 #~ "Lūdzu izvēlieties citu."
 
 #
-#~ msgid "This STB can't decode %s video streams!"
-#~ msgstr "Šis STB modelis nevar atkodēt %s attēla plūsmas!"
+#~ msgid "This Dreambox can't decode %s video streams!"
+#~ msgstr "Šis Dreambox modelis nevar atkodēt %s attēla plūsmas!"
 
 #
 #~ msgid "This is unsupported at the moment."
@@ -9723,8 +9723,8 @@ msgstr "pārslēgts"
 #~ msgstr "Atjaunina ierīces programmatūru"
 
 #
-#~ msgid "Upgrade finished. Do you want to reboot your STB?"
-#~ msgstr "Atjaunināšana pabeigta. Vai vēlaties atsāknēt STB?"
+#~ msgid "Upgrade finished. Do you want to reboot your Dreambox?"
+#~ msgstr "Atjaunināšana pabeigta. Vai vēlaties atsāknēt Dreambox?"
 
 #
 #~ msgid ""
@@ -9739,10 +9739,10 @@ msgstr "pārslēgts"
 
 #
 #~ msgid ""
-#~ "You do not seem to have a harddisk in your STB. So backing up to a "
+#~ "You do not seem to have a harddisk in your Dreambox. So backing up to a "
 #~ "harddisk is not an option for you."
 #~ msgstr ""
-#~ "Izskatās, ka šajā STB nav uzstādīts cietais disks. Tādēļ "
+#~ "Izskatās, ka šajā Dreambox nav uzstādīts cietais disks. Tādēļ "
 #~ "dublējumkopijas veidošana uz cietā diska jums nav pieejama."
 
 #

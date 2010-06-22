@@ -29,7 +29,7 @@ msgstr ""
 #
 msgid ""
 "\n"
-"Backup your STB settings."
+"Backup your Dreambox settings."
 msgstr ""
 
 #
@@ -41,13 +41,13 @@ msgstr ""
 #
 msgid ""
 "\n"
-"Manage extensions or plugins for your STB"
+"Manage extensions or plugins for your Dreambox"
 msgstr ""
 
 #
 msgid ""
 "\n"
-"Online update of your STB software."
+"Online update of your Dreambox software."
 msgstr ""
 
 #
@@ -59,13 +59,13 @@ msgstr ""
 #
 msgid ""
 "\n"
-"Restore your STB settings."
+"Restore your Dreambox settings."
 msgstr ""
 
 #
 msgid ""
 "\n"
-"Restore your STB with a new firmware."
+"Restore your Dreambox with a new firmware."
 msgstr ""
 
 #
@@ -385,17 +385,17 @@ msgstr ""
 #
 msgid ""
 "A finished record timer wants to set your\n"
-"STB to standby. Do that now?"
+"Dreambox to standby. Do that now?"
 msgstr ""
-"En avluttet timer ønsker å sett din STB\n"
+"En avluttet timer ønsker å sett din Dreambox\n"
 "i standby. Skal det gjøres nå ?"
 
 #
 msgid ""
 "A finished record timer wants to shut down\n"
-"your STB. Shutdown now?"
+"your Dreambox. Shutdown now?"
 msgstr ""
-"En avluttet timer ønsker å slå av din STB.\n"
+"En avluttet timer ønsker å slå av din Dreambox.\n"
 "Skal den slås av nå ?"
 
 #
@@ -460,18 +460,18 @@ msgstr ""
 #
 msgid ""
 "A sleep timer wants to set your\n"
-"STB to standby. Do that now?"
+"Dreambox to standby. Do that now?"
 msgstr ""
 "En sleeptimer ønsker å sette din\n"
-"STB i standby. Skal det gjøres nå?"
+"Dreambox i standby. Skal det gjøres nå?"
 
 #
 msgid ""
 "A sleep timer wants to shut down\n"
-"your STB. Shutdown now?"
+"your Dreambox. Shutdown now?"
 msgstr ""
 "En sleeptimer ønsker å slå av din\n"
-"STB. Slå av nå?"
+"Dreambox. Slå av nå?"
 
 #
 msgid "A small overview of the available icon states and actions."
@@ -575,7 +575,7 @@ msgid "Add a mark"
 msgstr "Legge til markør"
 
 #
-msgid "Add a new NFS or CIFS mount point to your STB."
+msgid "Add a new NFS or CIFS mount point to your Dreambox."
 msgstr ""
 
 #
@@ -624,7 +624,7 @@ msgstr ""
 
 #
 msgid ""
-"Adds enigma2 settings and STB model informations like SN, rev... if "
+"Adds enigma2 settings and dreambox model informations like SN, rev... if "
 "enabled."
 msgstr ""
 
@@ -679,10 +679,10 @@ msgstr "Etter program"
 #
 msgid ""
 "After the start wizard is completed, you need to protect single services. "
-"Refer to your STB's manual on how to do that."
+"Refer to your dreambox's manual on how to do that."
 msgstr ""
 "Etter oppstartsguiden er ferdig, trenger du beskytte enkelte kanaler. Les i "
-"manualen for din STB hvordan det gjøres."
+"manualen for din Dreambox hvordan det gjøres."
 
 #
 msgid "Album"
@@ -1144,7 +1144,7 @@ msgid "Change step size"
 msgstr ""
 
 #
-msgid "Change the hostname of your STB."
+msgid "Change the hostname of your Dreambox."
 msgstr ""
 
 #
@@ -1432,7 +1432,7 @@ msgid "Contrast"
 msgstr "Kontrast"
 
 #
-msgid "Could not connect to STB .NFI Image Feed Server:"
+msgid "Could not connect to Dreambox .NFI Image Feed Server:"
 msgstr ""
 
 #
@@ -1887,7 +1887,7 @@ msgid "Do you want to do another manual service scan?"
 msgstr "Vil du gjøre enda et manuelt kanalsøk?"
 
 #
-msgid "Do you want to enable the parental control feature on your STB?"
+msgid "Do you want to enable the parental control feature on your dreambox?"
 msgstr "Vil du aktivere foreldrekontroll på dreamboxen din?"
 
 #
@@ -1911,7 +1911,7 @@ msgid "Do you want to preview this DVD before burning?"
 msgstr ""
 
 #
-msgid "Do you want to reboot your STB?"
+msgid "Do you want to reboot your Dreambox?"
 msgstr ""
 
 #
@@ -1937,15 +1937,15 @@ msgid ""
 msgstr ""
 
 #
-msgid "Do you want to update your STB?"
+msgid "Do you want to update your Dreambox?"
 msgstr ""
 
 #
 msgid ""
-"Do you want to update your STB?\n"
+"Do you want to update your Dreambox?\n"
 "After pressing OK, please wait!"
 msgstr ""
-"Vil du oppdatere din STB?\n"
+"Vil du oppdatere din Dreambox?\n"
 "Etter å ha trykt OK, vennligst vent!"
 
 #
@@ -2019,11 +2019,11 @@ msgid "Downloading screenshots. Please wait..."
 msgstr ""
 
 #
-msgid "STB format data DVD (HDTV compatible)"
+msgid "Dreambox format data DVD (HDTV compatible)"
 msgstr ""
 
 #
-msgid "STB software because updates are available."
+msgid "Dreambox software because updates are available."
 msgstr ""
 
 #
@@ -2112,12 +2112,12 @@ msgid "Edit settings"
 msgstr "Endre instillinger"
 
 #
-msgid "Edit the Nameserver configuration of your STB.\n"
-msgstr "Endre navneserver konfigurasjon for din STB.\n"
+msgid "Edit the Nameserver configuration of your Dreambox.\n"
+msgstr "Endre navneserver konfigurasjon for din Dreambox.\n"
 
 #
-msgid "Edit the network configuration of your STB.\n"
-msgstr "Endre nettverk konfigurasjon for din STB.\n"
+msgid "Edit the network configuration of your Dreambox.\n"
+msgstr "Endre nettverk konfigurasjon for din Dreambox.\n"
 
 #
 msgid "Edit title"
@@ -2286,7 +2286,7 @@ msgid "Enter main menu..."
 msgstr "Åpne hovedmenyen"
 
 #
-msgid "Enter new hostname for your STB"
+msgid "Enter new hostname for your Dreambox"
 msgstr ""
 
 #
@@ -2656,10 +2656,10 @@ msgid "Genre"
 msgstr "Genre"
 
 #
-msgid "Genuine STB"
+msgid "Genuine Dreambox"
 msgstr ""
 
-msgid "Genuine STB validation failed!"
+msgid "Genuine Dreambox validation failed!"
 msgstr ""
 
 #
@@ -3977,8 +3977,8 @@ msgid "No, do nothing."
 msgstr "Nei, gjør ingenting"
 
 #
-msgid "No, just start my STB"
-msgstr "Nei, bare start min STB"
+msgid "No, just start my dreambox"
+msgstr "Nei, bare start min dreambox"
 
 #
 msgid "No, not now"
@@ -4332,7 +4332,7 @@ msgstr ""
 
 #
 msgid ""
-"Please disconnect all USB devices from your STB and (re-)attach the "
+"Please disconnect all USB devices from your Dreambox and (re-)attach the "
 "target USB stick (minimum size is 64 MB) now!"
 msgstr ""
 
@@ -5825,7 +5825,7 @@ msgid "Shutdown"
 msgstr ""
 
 #
-msgid "Shutdown STB after"
+msgid "Shutdown Dreambox after"
 msgstr "Slå av Dreamboxen etter"
 
 #
@@ -6259,8 +6259,8 @@ msgid "Test mode"
 msgstr "Testmodus"
 
 #
-msgid "Test the network configuration of your STB.\n"
-msgstr "Test nettverkskonfigurasjonen for din STB.\n"
+msgid "Test the network configuration of your Dreambox.\n"
+msgstr "Test nettverkskonfigurasjonen for din Dreambox.\n"
 
 #
 msgid "Test-Messagebox?"
@@ -6275,9 +6275,9 @@ msgstr ""
 #
 msgid ""
 "Thank you for using the wizard. Your box is now ready to use.\n"
-"Please press OK to start using your STB."
+"Please press OK to start using your Dreambox."
 msgstr ""
-"Takk for at du brukte guiden. Din STB er nå klar til bruk .\n"
+"Takk for at du brukte guiden. Din Dreambox er nå klar til bruk .\n"
 "Vennligst trykk OK å begynne å bruke den."
 
 msgid ""
@@ -6289,7 +6289,7 @@ msgstr ""
 #
 msgid ""
 "The DVD standard doesn't support H.264 (HDTV) video streams. Do you want to "
-"create a STB format data DVD (which will not play in stand-alone DVD "
+"create a Dreambox format data DVD (which will not play in stand-alone DVD "
 "players) instead?"
 msgstr ""
 
@@ -6375,10 +6375,10 @@ msgstr "Installasjonen av standard tjenesteliste er ferdig."
 #
 msgid ""
 "The installation of the default settings is finished. You can now continue "
-"configuring your STB by pressing the OK button on the remote control."
+"configuring your Dreambox by pressing the OK button on the remote control."
 msgstr ""
 "Installasjonen av standard innstillinger er ferdig. Du kan nå fortsette å "
-"konfigurere din STB, ved å trykke OK knappen."
+"konfigurere din Dreambox, ved å trykke OK knappen."
 
 #
 msgid "The match attribute is mandatory."
@@ -6508,7 +6508,7 @@ msgstr ""
 #
 # File: tmp/enigma2_plugins/genuinedreambox/src/plugin.py, line: 130
 msgid ""
-"There's a certificate update available for your STB. Would you like to "
+"There's a certificate update available for your dreambox. Would you like to "
 "apply this update now?"
 msgstr ""
 
@@ -6537,7 +6537,7 @@ msgstr ""
 
 #
 #, python-format
-msgid "This STB can't decode %s streams!"
+msgid "This Dreambox can't decode %s streams!"
 msgstr ""
 
 #
@@ -6781,7 +6781,7 @@ msgstr ""
 
 #
 msgid ""
-"To update your STB firmware, please follow these steps:\n"
+"To update your Dreambox firmware, please follow these steps:\n"
 "1) Turn off your box with the rear power switch and plug in the bootable USB "
 "stick.\n"
 "2) Turn mains back on and hold the DOWN button on the front panel pressed "
@@ -6943,7 +6943,7 @@ msgstr ""
 
 #
 msgid ""
-"USB stick wizard finished. Your STB will now restart with your new "
+"USB stick wizard finished. Your dreambox will now restart with your new "
 "image!"
 msgstr ""
 
@@ -7037,7 +7037,7 @@ msgstr ""
 #
 # File: tmp/enigma2_plugins/genuinedreambox/src/plugin.py, line: 170
 msgid ""
-"Update done... The genuine STB test will now be rerun and should not "
+"Update done... The genuine dreambox test will now be rerun and should not "
 "ask you to update again."
 msgstr ""
 
@@ -7077,8 +7077,8 @@ msgid "Upgrading"
 msgstr "Oppgraderer"
 
 #
-msgid "Upgrading STB... Please wait"
-msgstr "Oppgraderer STB... Vennligst vent"
+msgid "Upgrading Dreambox... Please wait"
+msgstr "Oppgraderer Dreambox... Vennligst vent"
 
 #
 msgid "Upper bound of timespan."
@@ -7191,7 +7191,7 @@ msgid "VMGM (intro trailer)"
 msgstr ""
 
 msgid ""
-"Verify your STB authenticity by running the genuine STB plugin!"
+"Verify your Dreambox authenticity by running the genuine dreambox plugin!"
 msgstr ""
 
 #
@@ -7355,7 +7355,7 @@ msgid "View teletext..."
 msgstr "Vis teletext..."
 
 #
-msgid "View, edit or delete mountpoints on your STB."
+msgid "View, edit or delete mountpoints on your Dreambox."
 msgstr ""
 
 #
@@ -7465,7 +7465,7 @@ msgstr ""
 #
 msgid ""
 "Welcome to the Image upgrade wizard. The wizard will assist you in upgrading "
-"the firmware of your STB by providing a backup facility for your "
+"the firmware of your Dreambox by providing a backup facility for your "
 "current settings and a short explanation of how to upgrade your firmware."
 msgstr ""
 "Velkommen til Image-Oppgraderings-Guiden. Guiden vil assistere deg i "
@@ -7507,7 +7507,7 @@ msgid ""
 "Welcome to the cleanup wizard.\n"
 "\n"
 "We have detected that your available internal memory has dropped below 2MB.\n"
-"To ensure stable operation of your STB, the internal memory should be "
+"To ensure stable operation of your Dreambox, the internal memory should be "
 "cleaned up.\n"
 "You can use this wizard to remove some extensions.\n"
 msgstr ""
@@ -7516,8 +7516,8 @@ msgstr ""
 msgid ""
 "Welcome.\n"
 "\n"
-"If you want to connect your STB to the Internet, this wizard will guide "
-"you through the basic network setup of your STB.\n"
+"If you want to connect your Dreambox to the Internet, this wizard will guide "
+"you through the basic network setup of your Dreambox.\n"
 "\n"
 "Press OK to start configuring your network"
 msgstr ""
@@ -7533,12 +7533,12 @@ msgstr ""
 msgid ""
 "Welcome.\n"
 "\n"
-"This start wizard will guide you through the basic setup of your STB.\n"
+"This start wizard will guide you through the basic setup of your Dreambox.\n"
 "Press the OK button on your remote control to move to the next step."
 msgstr ""
 "Velkommen.\n"
 "\n"
-"Denne Guiden vil hjelpe deg gjennom basis setup av din STB.\n"
+"Denne Guiden vil hjelpe deg gjennom basis setup av din Dreambox.\n"
 "Vennligst trykk OK på din fjernkontroll for å gå til neste steg."
 
 #
@@ -7716,7 +7716,7 @@ msgid "You can install this plugin."
 msgstr ""
 
 #
-msgid "You can only burn STB recordings!"
+msgid "You can only burn Dreambox recordings!"
 msgstr ""
 
 #
@@ -7790,15 +7790,15 @@ msgstr "Du må vente %s!"
 
 #
 msgid ""
-"You need a PC connected to your STB. If you need further instructions, "
+"You need a PC connected to your dreambox. If you need further instructions, "
 "please visit the website http://www.dm7025.de.\n"
-"Your STB will now be halted. After you have performed the update "
+"Your dreambox will now be halted. After you have performed the update "
 "instructions from the website, your new firmware will ask you to restore "
 "your settings."
 msgstr ""
 "Du trenger en PC koblet til din DB. Trenger du videre informasjonvennligst "
 "gå til Websiden http://www.dm7025.de.\n"
-"Din STB vil nå bli stoppet. Etter du har gjennomførtoppdaterings- "
+"Din Dreambox vil nå bli stoppet. Etter du har gjennomførtoppdaterings- "
 "instruksjonene fra websiden, vil din nye firmware spørre deg om å legg inn "
 "igjen innstillingene."
 
@@ -7826,7 +7826,7 @@ msgstr ""
 
 #
 msgid ""
-"Your STB is now ready to use.\n"
+"Your Dreambox is now ready to use.\n"
 "\n"
 "Your internet connection is working now.\n"
 "\n"
@@ -7834,7 +7834,7 @@ msgstr ""
 
 #
 msgid ""
-"Your STB is now ready to use.\n"
+"Your Dreambox is now ready to use.\n"
 "\n"
 "Your internet connection is working now.\n"
 "\n"
@@ -7842,8 +7842,8 @@ msgid ""
 msgstr ""
 
 #
-msgid "Your STB will restart after pressing OK on your remote control."
-msgstr "Din STB vil restarte etter at du har trykket OK."
+msgid "Your Dreambox will restart after pressing OK on your remote control."
+msgstr "Din Dreambox vil restarte etter at du har trykket OK."
 
 #
 msgid ""
@@ -7871,15 +7871,15 @@ msgid "Your current collection will get lost!"
 msgstr ""
 
 #
-msgid "Your STB is shutting down. Please stand by..."
-msgstr "Din STB slår seg av. Vennligst vent..."
+msgid "Your dreambox is shutting down. Please stand by..."
+msgstr "Din dreambox slår seg av. Vennligst vent..."
 
 #
 msgid ""
-"Your STB isn't connected to the internet properly. Please check it and "
+"Your dreambox isn't connected to the internet properly. Please check it and "
 "try again."
 msgstr ""
-"Din STB er ikke koblet til internet skikkelig. Vennligst sjekk dette og "
+"Din dreambox er ikke koblet til internet skikkelig. Vennligst sjekk dette og "
 "prøv igjen"
 
 #
@@ -9173,11 +9173,11 @@ msgstr "ja (behold feeds)"
 
 #
 msgid ""
-"your STB might be unusable now. Please consult the manual for further "
-"assistance before rebooting your STB."
+"your dreambox might be unusable now. Please consult the manual for further "
+"assistance before rebooting your dreambox."
 msgstr ""
-"din STB fungerer kanskje ikke nå. Vennligst les manualen for hvordan du "
-"får hjelp før du starter om din STB."
+"din dreambox fungerer kanskje ikke nå. Vennligst les manualen for hvordan du "
+"får hjelp før du starter om din dreambox."
 
 #
 msgid "zap"
@@ -9246,7 +9246,7 @@ msgstr "zapped"
 #
 #~ msgid ""
 #~ "Are you sure you want to enable WLAN support?\n"
-#~ "Connect your Wlan USB Stick to your STB and press OK.\n"
+#~ "Connect your Wlan USB Stick to your Dreambox and press OK.\n"
 #~ "\n"
 #~ msgstr ""
 #~ "Er du sikker på at du vil aktivere WLAN støtte?\n"
@@ -9434,10 +9434,10 @@ msgstr "zapped"
 
 #
 #~ msgid ""
-#~ "Enable the local network of your STB.\n"
+#~ "Enable the local network of your Dreambox.\n"
 #~ "\n"
 #~ msgstr ""
-#~ "Aktiver det lokale nettverket på din STB.\n"
+#~ "Aktiver det lokale nettverket på din Dreambox.\n"
 #~ "\n"
 
 #
@@ -9609,7 +9609,7 @@ msgstr "zapped"
 #
 #~ msgid ""
 #~ "Please attach your Zydas ZD1211B chipset compatibe WLAN USB Stick to your "
-#~ "STB and press the OK button on your remote control to enable the "
+#~ "Dreambox and press the OK button on your remote control to enable the "
 #~ "built in wireless network support"
 #~ msgstr ""
 #~ "Vennligst koble til din Zydas ZD1211B kompatible WLAN USB adapter til "
@@ -9649,14 +9649,14 @@ msgstr "zapped"
 
 #
 #~ msgid ""
-#~ "Pressing OK enables the built in wireless LAN support of your STB.\n"
+#~ "Pressing OK enables the built in wireless LAN support of your Dreambox.\n"
 #~ "Wlan USB Sticks with Zydas ZD1211B and RAlink RT73 Chipset are "
 #~ "supported.\n"
-#~ "Connect your Wlan USB Stick to your STB before pressing OK.\n"
+#~ "Connect your Wlan USB Stick to your Dreambox before pressing OK.\n"
 #~ "\n"
 #~ msgstr ""
 #~ "Ved å trykke OK aktiveres the innebygde tråløse nettverket på din "
-#~ "STB.\n"
+#~ "Dreambox.\n"
 #~ "WLAN USB adapter basert på Zydas ZD1211B og RAlink RT73 Chipset er "
 #~ "støttet.\n"
 #~ "Koble ditt WLAN USB adapter til Dreamboxen før du trykker OK.\n"
@@ -9778,13 +9778,13 @@ msgstr "zapped"
 
 #
 #~ msgid ""
-#~ "Thank you for using the wizard. Your STB is now ready to use.\n"
+#~ "Thank you for using the wizard. Your Dreambox is now ready to use.\n"
 #~ "\n"
 #~ "Your local LAN internet connection is working now.\n"
 #~ "\n"
 #~ "Please press OK to continue."
 #~ msgstr ""
-#~ "Takk for at du brukte guiden. Din STB er nå klar til bruk.\n"
+#~ "Takk for at du brukte guiden. Din Dreambox er nå klar til bruk.\n"
 #~ "\n"
 #~ "Din lokale nettverksforbindelse fungerer nå.\n"
 #~ "\n"
@@ -9792,13 +9792,13 @@ msgstr "zapped"
 
 #
 #~ msgid ""
-#~ "Thank you for using the wizard. Your STB is now ready to use.\n"
+#~ "Thank you for using the wizard. Your Dreambox is now ready to use.\n"
 #~ "\n"
 #~ "Your wireless internet connection is working now.\n"
 #~ "\n"
 #~ "Please press OK to continue."
 #~ msgstr ""
-#~ "Takk for at du brukte guiden. Din STB er nå klar til bruk.\n"
+#~ "Takk for at du brukte guiden. Din Dreambox er nå klar til bruk.\n"
 #~ "\n"
 #~ "Din trådløse nettverksforbindelse fungerer nå.\n"
 #~ "\n"
@@ -9806,11 +9806,11 @@ msgstr "zapped"
 
 #
 #~ msgid ""
-#~ "Thank you for using the wizard. Your STB is now ready to use.\n"
-#~ "Please press OK to start using your STB."
+#~ "Thank you for using the wizard. Your Dreambox is now ready to use.\n"
+#~ "Please press OK to start using your Dreambox."
 #~ msgstr ""
-#~ "Takk for at du brukte guiden. Din STB er nå klar til bruk.\n"
-#~ "Vennligst trykk OK for å begynne å bruke din STB."
+#~ "Takk for at du brukte guiden. Din Dreambox er nå klar til bruk.\n"
+#~ "Vennligst trykk OK for å begynne å bruke din Dreambox."
 
 #
 #~ msgid "Thanks for using the wizard. Your box is now ready to use."
@@ -9819,10 +9819,10 @@ msgstr "zapped"
 #
 #~ msgid ""
 #~ "Thanks for using the wizard. Your box is now ready to use.\n"
-#~ "Please press OK to start using your STB."
+#~ "Please press OK to start using your Dreambox."
 #~ msgstr ""
-#~ "Takk for at du brukte denne guiden. Din STB er klar til bruk.Trykk "
-#~ "OK for å begynne å bruke din STB."
+#~ "Takk for at du brukte denne guiden. Din Dreambox er klar til bruk.Trykk "
+#~ "OK for å begynne å bruke din Dreambox."
 
 #
 #~ msgid "This is unsupported at the moment."
@@ -9851,8 +9851,8 @@ msgstr "zapped"
 #~ msgstr "Oppdaterer software på din mottager"
 
 #
-#~ msgid "Upgrade finished. Do you want to reboot your STB?"
-#~ msgstr "Oppgradering er ferdig. Vil du restarte din STB?"
+#~ msgid "Upgrade finished. Do you want to reboot your Dreambox?"
+#~ msgstr "Oppgradering er ferdig. Vil du restarte din Dreambox?"
 
 #
 #~ msgid "Usage"
@@ -9896,14 +9896,14 @@ msgstr "zapped"
 #~ msgid ""
 #~ "Welcome.\n"
 #~ "\n"
-#~ "If you want to connect your STB to the Internet, this wizard will "
-#~ "guide you through the basic network setup of your STB.\n"
+#~ "If you want to connect your Dreambox to the Internet, this wizard will "
+#~ "guide you through the basic network setup of your Dreambox.\n"
 #~ "\n"
 #~ "Press the OK button on your remote control to move to the next step."
 #~ msgstr ""
 #~ "Velkommen.\n"
 #~ "\n"
-#~ "Hvis du vil koble din STB til Internet, vil denne guide hjelpe deg "
+#~ "Hvis du vil koble din Dreambox til Internet, vil denne guide hjelpe deg "
 #~ "gjennom nettverksoppsettet.\n"
 #~ "\n"
 #~ "Trykk OK for å fortsette til neste steg."
@@ -9914,7 +9914,7 @@ msgstr "zapped"
 
 #
 #~ msgid ""
-#~ "You do not seem to have a harddisk in your STB. So backing up to a "
+#~ "You do not seem to have a harddisk in your Dreambox. So backing up to a "
 #~ "harddisk is not an option for you."
 #~ msgstr ""
 #~ "Det ser ikke ut til at du har en harddisk in din DB. Så backup til HDD er "
@@ -9982,18 +9982,18 @@ msgstr "zapped"
 #
 #~ msgid ""
 #~ "Your wired LAN Adapter could not be started.\n"
-#~ "Do you want to reboot your STB to apply the new configuration?\n"
+#~ "Do you want to reboot your Dreambox to apply the new configuration?\n"
 #~ msgstr ""
 #~ "Ditt LAN-adapter kunne ikke startes.\n"
-#~ "Vil du restarte din STB for å aktivere den nye konfigurasjonen?\n"
+#~ "Vil du restarte din Dreambox for å aktivere den nye konfigurasjonen?\n"
 
 #
 #~ msgid ""
 #~ "Your wireless LAN Adapter could not be started.\n"
-#~ "Do you want to reboot your STB to apply the new configuration?\n"
+#~ "Do you want to reboot your Dreambox to apply the new configuration?\n"
 #~ msgstr ""
 #~ "Ditt trådløse adapter kunne ikke startes.\n"
-#~ "Vil du restarte din STB for å aktivere den nye konfigurasjonen?\n"
+#~ "Vil du restarte din Dreambox for å aktivere den nye konfigurasjonen?\n"
 
 #
 #~ msgid ""

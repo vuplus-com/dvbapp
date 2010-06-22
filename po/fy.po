@@ -37,7 +37,7 @@ msgstr ""
 #
 msgid ""
 "\n"
-"Backup your STB settings."
+"Backup your Dreambox settings."
 msgstr ""
 
 #
@@ -49,13 +49,13 @@ msgstr ""
 #
 msgid ""
 "\n"
-"Manage extensions or plugins for your STB"
+"Manage extensions or plugins for your Dreambox"
 msgstr ""
 
 #
 msgid ""
 "\n"
-"Online update of your STB software."
+"Online update of your Dreambox software."
 msgstr ""
 
 #
@@ -67,13 +67,13 @@ msgstr ""
 #
 msgid ""
 "\n"
-"Restore your STB settings."
+"Restore your Dreambox settings."
 msgstr ""
 
 #
 msgid ""
 "\n"
-"Restore your STB with a new firmware."
+"Restore your Dreambox with a new firmware."
 msgstr ""
 
 #
@@ -395,17 +395,17 @@ msgstr ""
 #
 msgid ""
 "A finished record timer wants to set your\n"
-"STB to standby. Do that now?"
+"Dreambox to standby. Do that now?"
 msgstr ""
-"In tiidsbarren wol de STB yn sliipstand\n"
+"In tiidsbarren wol de Dreambox yn sliipstand\n"
 "skeakelje... No nei de sliipstand ?"
 
 #
 msgid ""
 "A finished record timer wants to shut down\n"
-"your STB. Shutdown now?"
+"your Dreambox. Shutdown now?"
 msgstr ""
-"In tiidsbarren wol de STB\n"
+"In tiidsbarren wol de Dreambox\n"
 "útskeakelje... No útskeakelje ?"
 
 #
@@ -469,17 +469,17 @@ msgstr ""
 #
 msgid ""
 "A sleep timer wants to set your\n"
-"STB to standby. Do that now?"
+"Dreambox to standby. Do that now?"
 msgstr ""
-"In sliiptiidsbarren wol de STB yn paraatstand sette\n"
+"In sliiptiidsbarren wol de Dreambox yn paraatstand sette\n"
 "Dit no dwaan ?"
 
 #
 msgid ""
 "A sleep timer wants to shut down\n"
-"your STB. Shutdown now?"
+"your Dreambox. Shutdown now?"
 msgstr ""
-"In sliiptiidsbarren wol de STB útskeakelje\n"
+"In sliiptiidsbarren wol de Dreambox útskeakelje\n"
 "No útskeakelje ?"
 
 #
@@ -585,7 +585,7 @@ msgid "Add a mark"
 msgstr "In merker tafoegje"
 
 #
-msgid "Add a new NFS or CIFS mount point to your STB."
+msgid "Add a new NFS or CIFS mount point to your Dreambox."
 msgstr ""
 
 #
@@ -634,7 +634,7 @@ msgstr ""
 
 #
 msgid ""
-"Adds enigma2 settings and STB model informations like SN, rev... if "
+"Adds enigma2 settings and dreambox model informations like SN, rev... if "
 "enabled."
 msgstr ""
 
@@ -689,7 +689,7 @@ msgstr "Nei it barren"
 #
 msgid ""
 "After the start wizard is completed, you need to protect single services. "
-"Refer to your STB's manual on how to do that."
+"Refer to your dreambox's manual on how to do that."
 msgstr ""
 "Ot de startgucheler klear is, kinne jo in service befeilichje. Sjoch yn 'e "
 "hânlieding foar ynformaasje."
@@ -1157,7 +1157,7 @@ msgid "Change step size"
 msgstr ""
 
 #
-msgid "Change the hostname of your STB."
+msgid "Change the hostname of your Dreambox."
 msgstr ""
 
 #
@@ -1445,8 +1445,8 @@ msgid "Contrast"
 msgstr "Kontrast"
 
 #
-msgid "Could not connect to STB .NFI Image Feed Server:"
-msgstr "Kin net ferbine mei STB .NFI Image feed server:"
+msgid "Could not connect to Dreambox .NFI Image Feed Server:"
+msgstr "Kin net ferbine mei Dreambox .NFI Image feed server:"
 
 #
 msgid "Could not load Medium! No disc inserted?"
@@ -1901,7 +1901,7 @@ msgid "Do you want to do another manual service scan?"
 msgstr "Wolle jo opnei mei de hân sykje ?"
 
 #
-msgid "Do you want to enable the parental control feature on your STB?"
+msgid "Do you want to enable the parental control feature on your dreambox?"
 msgstr "Wolle jo it berne slot ynskeakelje ?"
 
 #
@@ -1925,7 +1925,7 @@ msgid "Do you want to preview this DVD before burning?"
 msgstr "Wolle jo de DVD besjen foar it brânen ?"
 
 #
-msgid "Do you want to reboot your STB?"
+msgid "Do you want to reboot your Dreambox?"
 msgstr ""
 
 #
@@ -1951,15 +1951,15 @@ msgid ""
 msgstr ""
 
 #
-msgid "Do you want to update your STB?"
+msgid "Do you want to update your Dreambox?"
 msgstr ""
 
 #
 msgid ""
-"Do you want to update your STB?\n"
+"Do you want to update your Dreambox?\n"
 "After pressing OK, please wait!"
 msgstr ""
-"Wolle jo jo STB bywurkje ?\n"
+"Wolle jo jo dreambox bywurkje ?\n"
 "Nei Ok, eefkes geduld !"
 
 #
@@ -2033,11 +2033,11 @@ msgid "Downloading screenshots. Please wait..."
 msgstr ""
 
 #
-msgid "STB format data DVD (HDTV compatible)"
-msgstr "STB yndieling data DVD (HDTV geskikt)"
+msgid "Dreambox format data DVD (HDTV compatible)"
+msgstr "Dreambox yndieling data DVD (HDTV geskikt)"
 
 #
-msgid "STB software because updates are available."
+msgid "Dreambox software because updates are available."
 msgstr ""
 
 #
@@ -2126,12 +2126,12 @@ msgid "Edit settings"
 msgstr "Wyzigje ynstellingen"
 
 #
-msgid "Edit the Nameserver configuration of your STB.\n"
-msgstr "Bewrukje de nammeserver ynstellingen fan de STB.\n"
+msgid "Edit the Nameserver configuration of your Dreambox.\n"
+msgstr "Bewrukje de nammeserver ynstellingen fan de Dreambox.\n"
 
 #
-msgid "Edit the network configuration of your STB.\n"
-msgstr "Bewurkje de netwurk ynstellingen fan de STB.\n"
+msgid "Edit the network configuration of your Dreambox.\n"
+msgstr "Bewurkje de netwurk ynstellingen fan de Dreambox.\n"
 
 #
 msgid "Edit title"
@@ -2300,7 +2300,7 @@ msgid "Enter main menu..."
 msgstr "Nei it haadmenu..."
 
 #
-msgid "Enter new hostname for your STB"
+msgid "Enter new hostname for your Dreambox"
 msgstr ""
 
 #
@@ -2682,10 +2682,10 @@ msgid "Genre"
 msgstr "Sjenre"
 
 #
-msgid "Genuine STB"
+msgid "Genuine Dreambox"
 msgstr ""
 
-msgid "Genuine STB validation failed!"
+msgid "Genuine Dreambox validation failed!"
 msgstr ""
 
 #
@@ -4011,7 +4011,7 @@ msgid "No, do nothing."
 msgstr "Nee, doch neat.."
 
 #
-msgid "No, just start my STB"
+msgid "No, just start my dreambox"
 msgstr "Nee, allinne myn box starte"
 
 #
@@ -4319,7 +4319,7 @@ msgstr ""
 
 #
 msgid "Please Reboot"
-msgstr "Start STB opnei"
+msgstr "Start Dreambox opnei"
 
 #
 msgid "Please Select Medium to be Scanned"
@@ -4369,10 +4369,10 @@ msgstr ""
 
 #
 msgid ""
-"Please disconnect all USB devices from your STB and (re-)attach the "
+"Please disconnect all USB devices from your Dreambox and (re-)attach the "
 "target USB stick (minimum size is 64 MB) now!"
 msgstr ""
-"Helje alle USB apparaten út de STB en doch de doel USB stick dan lyk "
+"Helje alle USB apparaten út de Dreambox en doch de doel USB stick dan lyk "
 "deryn. minimum grutte is 64 MB."
 
 #
@@ -5864,8 +5864,8 @@ msgid "Shutdown"
 msgstr ""
 
 #
-msgid "Shutdown STB after"
-msgstr "STB útskeakelje nei"
+msgid "Shutdown Dreambox after"
+msgstr "Dreambox útskeakelje nei"
 
 #
 msgid "Signal Strength:"
@@ -6294,8 +6294,8 @@ msgid "Test mode"
 msgstr "Test moadus"
 
 #
-msgid "Test the network configuration of your STB.\n"
-msgstr "Test de netwurk konfiguraasje fan de STB.\n"
+msgid "Test the network configuration of your Dreambox.\n"
+msgstr "Test de netwurk konfiguraasje fan de Dreambox.\n"
 
 #
 msgid "Test-Messagebox?"
@@ -6310,10 +6310,10 @@ msgstr ""
 #
 msgid ""
 "Thank you for using the wizard. Your box is now ready to use.\n"
-"Please press OK to start using your STB."
+"Please press OK to start using your Dreambox."
 msgstr ""
 "Bedankt foar it brûken fan de gucheler. Jo box is no klear om te brûken.\n"
-"Druk OK om mei de STB te begjinnen."
+"Druk OK om mei de Dreambox te begjinnen."
 
 #
 msgid ""
@@ -6328,11 +6328,11 @@ msgstr ""
 #
 msgid ""
 "The DVD standard doesn't support H.264 (HDTV) video streams. Do you want to "
-"create a STB format data DVD (which will not play in stand-alone DVD "
+"create a Dreambox format data DVD (which will not play in stand-alone DVD "
 "players) instead?"
 msgstr ""
 "De DVD standert kin gjin H.264 (HDTV) fideo streams an. Wolle jo dan in "
-"STB formaat data DVD meitsje ? Tink der om, dizze kin net in gewoane "
+"Dreambox formaat data DVD meitsje ? Tink der om, dizze kin net in gewoane "
 "DVD spielers ôfspiele wurde !"
 
 #
@@ -6430,10 +6430,10 @@ msgstr "Ynstalaasje fan standert ynstellingen is klear."
 #
 msgid ""
 "The installation of the default settings is finished. You can now continue "
-"configuring your STB by pressing the OK button on the remote control."
+"configuring your Dreambox by pressing the OK button on the remote control."
 msgstr ""
 "Standert ynstellingen binne werom set. Jo kinne fierder gean mei it "
-"ynstellen fan de STB troch OK te drukken op de ôfstandsbetsjinning"
+"ynstellen fan de Dreambox troch OK te drukken op de ôfstandsbetsjinning"
 
 #
 msgid "The match attribute is mandatory."
@@ -6533,7 +6533,7 @@ msgstr ""
 
 #
 msgid "There are no default services lists in your image."
-msgstr "Der binne gjin standert lysts yn de STB"
+msgstr "Der binne gjin standert lysts yn de Dreambox"
 
 #
 msgid "There are no default settings in your image."
@@ -6570,7 +6570,7 @@ msgstr ""
 #
 # File: tmp/enigma2_plugins/genuinedreambox/src/plugin.py, line: 130
 msgid ""
-"There's a certificate update available for your STB. Would you like to "
+"There's a certificate update available for your dreambox. Would you like to "
 "apply this update now?"
 msgstr ""
 
@@ -6605,7 +6605,7 @@ msgstr ""
 
 #
 #, python-format
-msgid "This STB can't decode %s streams!"
+msgid "This Dreambox can't decode %s streams!"
 msgstr ""
 
 #
@@ -6849,15 +6849,15 @@ msgstr "Titelset moadus"
 
 #
 msgid ""
-"To update your STB firmware, please follow these steps:\n"
+"To update your Dreambox firmware, please follow these steps:\n"
 "1) Turn off your box with the rear power switch and plug in the bootable USB "
 "stick.\n"
 "2) Turn mains back on and hold the DOWN button on the front panel pressed "
 "for 10 seconds.\n"
 "3) Wait for bootup and follow instructions of the wizard."
 msgstr ""
-"Om de software fan de STB by te wurken, folgje de folgende stappen :\n"
-"1) STB útskeakelje mei de skeakeler op de efterside en doch de USB "
+"Om de software fan de Dreambox by te wurken, folgje de folgende stappen :\n"
+"1) Dreambox útskeakelje mei de skeakeler op de efterside en doch de USB "
 "stick der yn.\n"
 "2) Skeakelje de Dreamobx wer yn en hald de 'nei beneden' taste op 'e "
 "foarkant fan de box yndrukt foar 10 seconden.\n"
@@ -7017,7 +7017,7 @@ msgstr "USB stick gûcheler"
 
 #
 msgid ""
-"USB stick wizard finished. Your STB will now restart with your new "
+"USB stick wizard finished. Your dreambox will now restart with your new "
 "image!"
 msgstr ""
 
@@ -7111,7 +7111,7 @@ msgstr "Bywurkje"
 #
 # File: tmp/enigma2_plugins/genuinedreambox/src/plugin.py, line: 170
 msgid ""
-"Update done... The genuine STB test will now be rerun and should not "
+"Update done... The genuine dreambox test will now be rerun and should not "
 "ask you to update again."
 msgstr ""
 
@@ -7151,8 +7151,8 @@ msgid "Upgrading"
 msgstr "An it bywurkjen"
 
 #
-msgid "Upgrading STB... Please wait"
-msgstr "STB an it bywurkjen..."
+msgid "Upgrading Dreambox... Please wait"
+msgstr "Dreambox an it bywurkjen..."
 
 #
 msgid "Upper bound of timespan."
@@ -7265,7 +7265,7 @@ msgid "VMGM (intro trailer)"
 msgstr "VMGM (yntro fan film)"
 
 msgid ""
-"Verify your STB authenticity by running the genuine STB plugin!"
+"Verify your Dreambox authenticity by running the genuine dreambox plugin!"
 msgstr ""
 
 #
@@ -7428,7 +7428,7 @@ msgid "View teletext..."
 msgstr "tiletekst toane..."
 
 #
-msgid "View, edit or delete mountpoints on your STB."
+msgid "View, edit or delete mountpoints on your Dreambox."
 msgstr ""
 
 #
@@ -7543,11 +7543,11 @@ msgstr ""
 #
 msgid ""
 "Welcome to the Image upgrade wizard. The wizard will assist you in upgrading "
-"the firmware of your STB by providing a backup facility for your "
+"the firmware of your Dreambox by providing a backup facility for your "
 "current settings and a short explanation of how to upgrade your firmware."
 msgstr ""
 "Wolkom by de byld bywurkje gucheler. De gucheler helpt jo by it bywurkjen "
-"fan de software yn jo STB, in backup mochelikhiid foar jo ynstellingen "
+"fan de software yn jo Dreambox, in backup mochelikhiid foar jo ynstellingen "
 "en in koarte útlis fan hoe de software by te wurkjen."
 
 #
@@ -7584,7 +7584,7 @@ msgid ""
 "Welcome to the cleanup wizard.\n"
 "\n"
 "We have detected that your available internal memory has dropped below 2MB.\n"
-"To ensure stable operation of your STB, the internal memory should be "
+"To ensure stable operation of your Dreambox, the internal memory should be "
 "cleaned up.\n"
 "You can use this wizard to remove some extensions.\n"
 msgstr ""
@@ -7593,8 +7593,8 @@ msgstr ""
 msgid ""
 "Welcome.\n"
 "\n"
-"If you want to connect your STB to the Internet, this wizard will guide "
-"you through the basic network setup of your STB.\n"
+"If you want to connect your Dreambox to the Internet, this wizard will guide "
+"you through the basic network setup of your Dreambox.\n"
 "\n"
 "Press OK to start configuring your network"
 msgstr ""
@@ -7615,12 +7615,12 @@ msgstr ""
 msgid ""
 "Welcome.\n"
 "\n"
-"This start wizard will guide you through the basic setup of your STB.\n"
+"This start wizard will guide you through the basic setup of your Dreambox.\n"
 "Press the OK button on your remote control to move to the next step."
 msgstr ""
 "Wolkom.\n"
 "\n"
-"Dizze gucheler helpt jo troch de basis ynstellingen fan jo STB.\n"
+"Dizze gucheler helpt jo troch de basis ynstellingen fan jo Dreambox.\n"
 "Druk Ok op jo ôfstandsbetsjinning om nei de folgende stap te gean."
 
 #
@@ -7800,7 +7800,7 @@ msgid "You can install this plugin."
 msgstr ""
 
 #
-msgid "You can only burn STB recordings!"
+msgid "You can only burn Dreambox recordings!"
 msgstr ""
 
 #
@@ -7885,15 +7885,15 @@ msgstr "Jo moatte %s wachtsje!"
 
 #
 msgid ""
-"You need a PC connected to your STB. If you need further instructions, "
+"You need a PC connected to your dreambox. If you need further instructions, "
 "please visit the website http://www.dm7025.de.\n"
-"Your STB will now be halted. After you have performed the update "
+"Your dreambox will now be halted. After you have performed the update "
 "instructions from the website, your new firmware will ask you to restore "
 "your settings."
 msgstr ""
-"De moat in PC oan de STB ansluten weze. Foar mear ynstruktiessjoch op "
+"De moat in PC oan de dreambox ansluten weze. Foar mear ynstruktiessjoch op "
 "de webside http://www.dm7025.de.\n"
-"Jo STB sil no stopje. Nei it bywurkjen neffens de webside, de neie "
+"Jo dreambox sil no stopje. Nei it bywurkjen neffens de webside, de neie "
 "software sil jo freegje om de oarspronkelike ynstellingen werom te setten."
 
 #
@@ -7928,7 +7928,7 @@ msgstr ""
 
 #
 msgid ""
-"Your STB is now ready to use.\n"
+"Your Dreambox is now ready to use.\n"
 "\n"
 "Your internet connection is working now.\n"
 "\n"
@@ -7936,7 +7936,7 @@ msgstr ""
 
 #
 msgid ""
-"Your STB is now ready to use.\n"
+"Your Dreambox is now ready to use.\n"
 "\n"
 "Your internet connection is working now.\n"
 "\n"
@@ -7944,7 +7944,7 @@ msgid ""
 msgstr ""
 
 #
-msgid "Your STB will restart after pressing OK on your remote control."
+msgid "Your Dreambox will restart after pressing OK on your remote control."
 msgstr "Jo D"
 
 #
@@ -7975,15 +7975,15 @@ msgid "Your current collection will get lost!"
 msgstr ""
 
 #
-msgid "Your STB is shutting down. Please stand by..."
-msgstr "Jo STB wurd no ôfsluten. Eefkes wachtsje..."
+msgid "Your dreambox is shutting down. Please stand by..."
+msgstr "Jo Dreambox wurd no ôfsluten. Eefkes wachtsje..."
 
 #
 msgid ""
-"Your STB isn't connected to the internet properly. Please check it and "
+"Your dreambox isn't connected to the internet properly. Please check it and "
 "try again."
 msgstr ""
-"Jo STB is net goed ferbun mei it internet. Kontrolearje en besykje "
+"Jo Dreambox is net goed ferbun mei it internet. Kontrolearje en besykje "
 "opnij."
 
 #
@@ -9277,11 +9277,11 @@ msgstr "ja (feeds hâlde)"
 
 #
 msgid ""
-"your STB might be unusable now. Please consult the manual for further "
-"assistance before rebooting your STB."
+"your dreambox might be unusable now. Please consult the manual for further "
+"assistance before rebooting your dreambox."
 msgstr ""
-"jo STB is miskien no net brûkber. sjoch yn de hanlieding foar jo jo "
-"STB opnij starte."
+"jo Dreambox is miskien no net brûkber. sjoch yn de hanlieding foar jo jo "
+"Dreambox opnij starte."
 
 #
 msgid "zap"
@@ -9549,8 +9549,8 @@ msgstr "knipt"
 #~ "Kies in oar plak aub..."
 
 #
-#~ msgid "This STB can't decode %s video streams!"
-#~ msgstr "De STB kin %s fideo streams net oan !"
+#~ msgid "This Dreambox can't decode %s video streams!"
+#~ msgstr "De Dreambox kin %s fideo streams net oan !"
 
 #
 #~ msgid "This is unsupported at the moment."
@@ -9569,8 +9569,8 @@ msgstr "knipt"
 #~ msgstr "UntfangerSoftware bywurkje"
 
 #
-#~ msgid "Upgrade finished. Do you want to reboot your STB?"
-#~ msgstr "Klear mei bywurkjen. Wolle jo de STB opnij starte?"
+#~ msgid "Upgrade finished. Do you want to reboot your Dreambox?"
+#~ msgstr "Klear mei bywurkjen. Wolle jo de Dreambox opnij starte?"
 
 #
 #~ msgid ""
@@ -9592,10 +9592,10 @@ msgstr "knipt"
 
 #
 #~ msgid ""
-#~ "You do not seem to have a harddisk in your STB. So backing up to a "
+#~ "You do not seem to have a harddisk in your Dreambox. So backing up to a "
 #~ "harddisk is not an option for you."
 #~ msgstr ""
-#~ "Jo hawwe blykber gjin hurde skiif yn jo STB. Extra bewarje fan "
+#~ "Jo hawwe blykber gjin hurde skiif yn jo Dreambox. Extra bewarje fan "
 #~ "ynstellingen nei in hurde skiif kin net by jo."
 
 #

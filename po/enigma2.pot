@@ -42,7 +42,7 @@ msgstr ""
 #: ../enigma2_master/lib/python/Plugins/SystemPlugins/SoftwareManager/plugin.py:118
 msgid ""
 "\n"
-"Backup your STB settings."
+"Backup your Dreambox settings."
 msgstr ""
 
 #: ../enigma2_experimental/lib/python/Plugins/SystemPlugins/SoftwareManager/plugin.py:142
@@ -56,14 +56,14 @@ msgstr ""
 #: ../enigma2_master/lib/python/Plugins/SystemPlugins/SoftwareManager/plugin.py:115
 msgid ""
 "\n"
-"Manage extensions or plugins for your STB"
+"Manage extensions or plugins for your Dreambox"
 msgstr ""
 
 #: ../enigma2_experimental/lib/python/Plugins/SystemPlugins/SoftwareManager/plugin.py:116
 #: ../enigma2_master/lib/python/Plugins/SystemPlugins/SoftwareManager/plugin.py:116
 msgid ""
 "\n"
-"Online update of your STB software."
+"Online update of your Dreambox software."
 msgstr ""
 
 #: ../enigma2_experimental/lib/python/Plugins/SystemPlugins/SoftwareManager/plugin.py:111
@@ -77,14 +77,14 @@ msgstr ""
 #: ../enigma2_master/lib/python/Plugins/SystemPlugins/SoftwareManager/plugin.py:119
 msgid ""
 "\n"
-"Restore your STB settings."
+"Restore your Dreambox settings."
 msgstr ""
 
 #: ../enigma2_experimental/lib/python/Plugins/SystemPlugins/SoftwareManager/plugin.py:117
 #: ../enigma2_master/lib/python/Plugins/SystemPlugins/SoftwareManager/plugin.py:117
 msgid ""
 "\n"
-"Restore your STB with a new firmware."
+"Restore your Dreambox with a new firmware."
 msgstr ""
 
 #: ../enigma2_experimental/lib/python/Plugins/SystemPlugins/SoftwareManager/plugin.py:137
@@ -421,14 +421,14 @@ msgstr ""
 #: ../enigma2_master/RecordTimer.py:288
 msgid ""
 "A finished record timer wants to set your\n"
-"STB to standby. Do that now?"
+"Dreambox to standby. Do that now?"
 msgstr ""
 
 #: ../enigma2_experimental/RecordTimer.py:294
 #: ../enigma2_master/RecordTimer.py:294
 msgid ""
 "A finished record timer wants to shut down\n"
-"your STB. Shutdown now?"
+"your Dreambox. Shutdown now?"
 msgstr ""
 
 #: ../enigma2_experimental/lib/python/Plugins/Extensions/GraphMultiEPG/plugin.py:96
@@ -496,7 +496,7 @@ msgstr ""
 #: ../enigma2_master/SleepTimer.py:34
 msgid ""
 "A sleep timer wants to set your\n"
-"STB to standby. Do that now?"
+"Dreambox to standby. Do that now?"
 msgstr ""
 
 #: ../enigma2_experimental/lib/python/Screens/TaskView.py:121
@@ -505,7 +505,7 @@ msgstr ""
 #: ../enigma2_master/SleepTimer.py:29
 msgid ""
 "A sleep timer wants to shut down\n"
-"your STB. Shutdown now?"
+"your Dreambox. Shutdown now?"
 msgstr ""
 
 #: ../enigma2_experimental/lib/python/Plugins/SystemPlugins/SoftwareManager/plugin.py:852
@@ -626,7 +626,7 @@ msgid "Add a mark"
 msgstr ""
 
 #: ../enigma2_plugins/networkbrowser/src/MountManager.py:73
-msgid "Add a new NFS or CIFS mount point to your STB."
+msgid "Add a new NFS or CIFS mount point to your Dreambox."
 msgstr ""
 
 #: ../enigma2_experimental/lib/python/Plugins/Extensions/DVDBurn/TitleList.py:62
@@ -707,7 +707,7 @@ msgstr ""
 #: ../enigma2_experimental/lib/python/Plugins/SystemPlugins/CrashlogAutoSubmit/plugin.py:178
 #: ../enigma2_master/lib/python/Plugins/SystemPlugins/CrashlogAutoSubmit/plugin.py:178
 msgid ""
-"Adds enigma2 settings and STB model informations like SN, rev... if "
+"Adds enigma2 settings and dreambox model informations like SN, rev... if "
 "enabled."
 msgstr ""
 
@@ -1454,7 +1454,7 @@ msgid "Change step size"
 msgstr ""
 
 #: ../enigma2_plugins/networkbrowser/src/MountManager.py:76
-msgid "Change the hostname of your STB."
+msgid "Change the hostname of your Dreambox."
 msgstr ""
 
 #: ../enigma2_experimental/lib/python/Screens/Satconfig.py:260
@@ -1862,7 +1862,7 @@ msgstr ""
 
 #: ../enigma2_experimental/lib/python/Plugins/SystemPlugins/NFIFlash/downloader.py:277
 #: ../enigma2_master/lib/python/Plugins/SystemPlugins/NFIFlash/downloader.py:277
-msgid "Could not connect to STB .NFI Image Feed Server:"
+msgid "Could not connect to Dreambox .NFI Image Feed Server:"
 msgstr ""
 
 #: ../enigma2_experimental/lib/python/Plugins/Extensions/DVDBurn/Process.py:283
@@ -2454,7 +2454,7 @@ msgstr ""
 #: ../enigma2_master/lib/python/Plugins/SystemPlugins/SoftwareManager/plugin.py:1200
 #: ../enigma2_master/lib/python/Plugins/SystemPlugins/SoftwareManager/plugin.py:1508
 #: ../enigma2_master/lib/python/Plugins/SystemPlugins/SoftwareManager/plugin.py:1530
-msgid "Do you want to reboot your STB?"
+msgid "Do you want to reboot your Dreambox?"
 msgstr ""
 
 #: ../enigma2_experimental/lib/python/Plugins/SystemPlugins/SoftwareManager/plugin.py:1050
@@ -2489,7 +2489,7 @@ msgstr ""
 
 #: ../enigma2_experimental/lib/python/Plugins/SystemPlugins/SoftwareManager/plugin.py:212
 #: ../enigma2_master/lib/python/Plugins/SystemPlugins/SoftwareManager/plugin.py:212
-msgid "Do you want to update your STB?"
+msgid "Do you want to update your Dreambox?"
 msgstr ""
 
 #: ../enigma2_experimental/lib/python/Plugins/SystemPlugins/OldSoftwareUpdate/plugin.py:37
@@ -2497,7 +2497,7 @@ msgstr ""
 #: ../enigma2_master/lib/python/Plugins/SystemPlugins/OldSoftwareUpdate/plugin.py:37
 #: ../enigma2_master/lib/python/Plugins/SystemPlugins/OldSoftwareUpdate/plugin.py:136
 msgid ""
-"Do you want to update your STB?\n"
+"Do you want to update your Dreambox?\n"
 "After pressing OK, please wait!"
 msgstr ""
 
@@ -2585,12 +2585,12 @@ msgstr ""
 
 #: ../enigma2_experimental/lib/python/Plugins/Extensions/DVDBurn/DVDProject.py:33
 #: ../enigma2_master/lib/python/Plugins/Extensions/DVDBurn/DVDProject.py:33
-msgid "STB format data DVD (HDTV compatible)"
+msgid "Dreambox format data DVD (HDTV compatible)"
 msgstr ""
 
 #: ../enigma2_experimental/lib/python/Plugins/SystemPlugins/SoftwareManager/plugin.py:782
 #: ../enigma2_master/lib/python/Plugins/SystemPlugins/SoftwareManager/plugin.py:782
-msgid "STB software because updates are available."
+msgid "Dreambox software because updates are available."
 msgstr ""
 
 #: ../enigma2_plugins/mytube/src/plugin.py:1103
@@ -2704,12 +2704,12 @@ msgstr ""
 
 #: ../enigma2_experimental/lib/python/Screens/NetworkSetup.py:829
 #: ../enigma2_master/lib/python/Screens/NetworkSetup.py:818
-msgid "Edit the Nameserver configuration of your STB.\n"
+msgid "Edit the Nameserver configuration of your Dreambox.\n"
 msgstr ""
 
 #: ../enigma2_experimental/lib/python/Screens/NetworkSetup.py:825
 #: ../enigma2_master/lib/python/Screens/NetworkSetup.py:814
-msgid "Edit the network configuration of your STB.\n"
+msgid "Edit the network configuration of your Dreambox.\n"
 msgstr ""
 
 #: ../enigma2_experimental/lib/python/Plugins/Extensions/DVDBurn/TitleList.py:188
@@ -2909,7 +2909,7 @@ msgid "Enter main menu..."
 msgstr ""
 
 #: ../enigma2_plugins/networkbrowser/src/MountManager.py:108
-msgid "Enter new hostname for your STB"
+msgid "Enter new hostname for your Dreambox"
 msgstr ""
 
 #: ../enigma2_plugins/networkbrowser/src/MountEdit.py:215
@@ -3369,13 +3369,13 @@ msgid "Genre"
 msgstr ""
 
 #: ../enigma2_plugins/genuinedreambox/src/plugin.py:71
-msgid "Genuine STB"
+msgid "Genuine Dreambox"
 msgstr ""
 
 #: ../enigma2_plugins/mytube/src/plugin.py:398
 #: ../enigma2_plugins/mytube/src/plugin.py:422
 #: ../enigma2_plugins/mytube/src/plugin.py:464
-msgid "Genuine STB validation failed!"
+msgid "Genuine Dreambox validation failed!"
 msgstr ""
 
 #: ../enigma2_experimental/lib/python/Components/Language.py:17
@@ -5345,7 +5345,7 @@ msgstr ""
 #: ../enigma2_experimental/lib/python/Plugins/SystemPlugins/NFIFlash/downloader.py:489
 #: ../enigma2_master/lib/python/Plugins/SystemPlugins/NFIFlash/downloader.py:489
 msgid ""
-"Please disconnect all USB devices from your STB and (re-)attach the "
+"Please disconnect all USB devices from your Dreambox and (re-)attach the "
 "target USB stick (minimum size is 64 MB) now!"
 msgstr ""
 
@@ -7088,7 +7088,7 @@ msgstr ""
 
 #: ../enigma2_experimental/lib/python/Screens/SleepTimerEdit.py:43
 #: ../enigma2_master/lib/python/Screens/SleepTimerEdit.py:43
-msgid "Shutdown STB after"
+msgid "Shutdown Dreambox after"
 msgstr ""
 
 #: ../enigma2_experimental/lib/python/Plugins/SystemPlugins/NetworkWizard/NetworkWizard.py:261
@@ -7664,7 +7664,7 @@ msgstr ""
 
 #: ../enigma2_experimental/lib/python/Screens/NetworkSetup.py:827
 #: ../enigma2_master/lib/python/Screens/NetworkSetup.py:816
-msgid "Test the network configuration of your STB.\n"
+msgid "Test the network configuration of your Dreambox.\n"
 msgstr ""
 
 #: ../enigma2_experimental/lib/python/Plugins/DemoPlugins/TestPlugin/plugin.py:47
@@ -7676,7 +7676,7 @@ msgstr ""
 #: ../enigma2_master/lib/python/Plugins/Extensions/DVDBurn/TitleList.py:353
 msgid ""
 "The DVD standard doesn't support H.264 (HDTV) video streams. Do you want to "
-"create a STB format data DVD (which will not play in stand-alone DVD "
+"create a Dreambox format data DVD (which will not play in stand-alone DVD "
 "players) instead?"
 msgstr ""
 
@@ -7745,7 +7745,7 @@ msgstr ""
 #: ../enigma2_master/lib/python/Screens/DefaultWizard.py:40
 msgid ""
 "The installation of the default settings is finished. You can now continue "
-"configuring your STB by pressing the OK button on the remote control."
+"configuring your Dreambox by pressing the OK button on the remote control."
 msgstr ""
 
 #: ../enigma2_plugins/autotimer/src/AutoTimerEditor.py:644
@@ -7896,7 +7896,7 @@ msgstr ""
 
 #: ../enigma2_plugins/genuinedreambox/src/plugin.py:130
 msgid ""
-"There's a certificate update available for your STB. Would you like to "
+"There's a certificate update available for your dreambox. Would you like to "
 "apply this update now?"
 msgstr ""
 
@@ -7932,7 +7932,7 @@ msgstr ""
 #: ../enigma2_master/lib/python/Plugins/Extensions/MediaPlayer/plugin.py:280
 #: ../enigma2_master/lib/python/Plugins/Extensions/MediaPlayer/plugin.py:286
 #, python-format
-msgid "This STB can't decode %s streams!"
+msgid "This Dreambox can't decode %s streams!"
 msgstr ""
 
 #: ../enigma2_plugins/mytube/src/MyTubeSearch.py:167
@@ -8166,7 +8166,7 @@ msgstr ""
 #: ../enigma2_experimental/lib/python/Plugins/SystemPlugins/NFIFlash/downloader.py:653
 #: ../enigma2_master/lib/python/Plugins/SystemPlugins/NFIFlash/downloader.py:653
 msgid ""
-"To update your STB firmware, please follow these steps:\n"
+"To update your Dreambox firmware, please follow these steps:\n"
 "1) Turn off your box with the rear power switch and plug in the bootable USB "
 "stick.\n"
 "2) Turn mains back on and hold the DOWN button on the front panel pressed "
@@ -8393,7 +8393,7 @@ msgstr ""
 #: ../enigma2_experimental/lib/python/Plugins/SystemPlugins/NFIFlash/flasher.py:314
 #: ../enigma2_master/lib/python/Plugins/SystemPlugins/NFIFlash/flasher.py:314
 msgid ""
-"USB stick wizard finished. Your STB will now restart with your new "
+"USB stick wizard finished. Your dreambox will now restart with your new "
 "image!"
 msgstr ""
 
@@ -8499,7 +8499,7 @@ msgstr ""
 
 #: ../enigma2_plugins/genuinedreambox/src/plugin.py:170
 msgid ""
-"Update done... The genuine STB test will now be rerun and should not "
+"Update done... The genuine dreambox test will now be rerun and should not "
 "ask you to update again."
 msgstr ""
 
@@ -8554,7 +8554,7 @@ msgstr ""
 
 #: ../enigma2_experimental/lib/python/Plugins/SystemPlugins/SoftwareManager/plugin.py:1114
 #: ../enigma2_master/lib/python/Plugins/SystemPlugins/SoftwareManager/plugin.py:1114
-msgid "Upgrading STB... Please wait"
+msgid "Upgrading Dreambox... Please wait"
 msgstr ""
 
 #: ../enigma2_plugins/autotimer/src/AutoTimerEditor.py:477
@@ -8664,7 +8664,7 @@ msgstr ""
 #: ../enigma2_plugins/mytube/src/plugin.py:422
 #: ../enigma2_plugins/mytube/src/plugin.py:464
 msgid ""
-"Verify your STB authenticity by running the genuine STB plugin!"
+"Verify your Dreambox authenticity by running the genuine dreambox plugin!"
 msgstr ""
 
 #: ../enigma2_experimental/lib/python/Tools/Transponder.py:32
@@ -8840,7 +8840,7 @@ msgid "View teletext..."
 msgstr ""
 
 #: ../enigma2_plugins/networkbrowser/src/MountManager.py:74
-msgid "View, edit or delete mountpoints on your STB."
+msgid "View, edit or delete mountpoints on your Dreambox."
 msgstr ""
 
 #: ../enigma2_plugins/networkbrowser/src/MountManager.py:75
@@ -9169,7 +9169,7 @@ msgstr ""
 
 #: ../enigma2_experimental/lib/python/Plugins/Extensions/DVDBurn/TitleList.py:215
 #: ../enigma2_master/lib/python/Plugins/Extensions/DVDBurn/TitleList.py:215
-msgid "You can only burn STB recordings!"
+msgid "You can only burn Dreambox recordings!"
 msgstr ""
 
 #: ../enigma2_experimental/lib/python/Plugins/SystemPlugins/SoftwareManager/plugin.py:877
@@ -9210,7 +9210,7 @@ msgstr ""
 #: ../enigma2_experimental/lib/python/Plugins/SystemPlugins/NetworkWizard/NetworkWizard.py:257
 #: ../enigma2_master/lib/python/Plugins/SystemPlugins/NetworkWizard/NetworkWizard.py:257
 msgid ""
-"Your STB is now ready to use.\n"
+"Your Dreambox is now ready to use.\n"
 "\n"
 "Your internet connection is working now.\n"
 "\n"
@@ -9218,7 +9218,7 @@ msgstr ""
 
 #: ../enigma2_experimental/lib/python/Screens/NetworkSetup.py:705
 #: ../enigma2_master/lib/python/Screens/NetworkSetup.py:694
-msgid "Your STB will restart after pressing OK on your remote control."
+msgid "Your Dreambox will restart after pressing OK on your remote control."
 msgstr ""
 
 #: ../enigma2_experimental/lib/python/Plugins/Extensions/DVDBurn/TitleList.py:325
@@ -9245,7 +9245,7 @@ msgstr ""
 #: ../enigma2_experimental/lib/python/Plugins/SystemPlugins/SoftwareManager/plugin.py:1189
 #: ../enigma2_master/lib/python/Plugins/SystemPlugins/SoftwareManager/plugin.py:1189
 msgid ""
-"Your STB isn't connected to the internet properly. Please check it and "
+"Your dreambox isn't connected to the internet properly. Please check it and "
 "try again."
 msgstr ""
 
@@ -11101,8 +11101,8 @@ msgstr ""
 #: ../enigma2_experimental/lib/python/Plugins/SystemPlugins/SoftwareManager/plugin.py:1185
 #: ../enigma2_master/lib/python/Plugins/SystemPlugins/SoftwareManager/plugin.py:1185
 msgid ""
-"your STB might be unusable now. Please consult the manual for further "
-"assistance before rebooting your STB."
+"your dreambox might be unusable now. Please consult the manual for further "
+"assistance before rebooting your dreambox."
 msgstr ""
 
 #: ../enigma2_experimental/lib/python/Screens/TimerEntry.py:96
@@ -11220,7 +11220,7 @@ msgstr ""
 #: ../enigma2_experimental/data/ ../enigma2_master/data/
 msgid ""
 "After the start wizard is completed, you need to protect single services. "
-"Refer to your STB's manual on how to do that."
+"Refer to your dreambox's manual on how to do that."
 msgstr ""
 
 #: ../enigma2_experimental/data/ ../enigma2_master/data/
@@ -11358,7 +11358,7 @@ msgid "Do you want to do another manual service scan?"
 msgstr ""
 
 #: ../enigma2_experimental/data/ ../enigma2_master/data/
-msgid "Do you want to enable the parental control feature on your STB?"
+msgid "Do you want to enable the parental control feature on your dreambox?"
 msgstr ""
 
 #: ../enigma2_experimental/data/ ../enigma2_master/data/
@@ -11589,7 +11589,7 @@ msgstr ""
 #: ../enigma2_experimental/lib/python/Plugins/SystemPlugins/SoftwareManager/
 #: ../enigma2_master/data/
 #: ../enigma2_master/lib/python/Plugins/SystemPlugins/SoftwareManager/
-msgid "No, just start my STB"
+msgid "No, just start my dreambox"
 msgstr ""
 
 #: ../enigma2_experimental/data/ ../enigma2_master/data/
@@ -11787,7 +11787,7 @@ msgstr ""
 #: ../enigma2_experimental/data/ ../enigma2_master/data/
 msgid ""
 "Thank you for using the wizard. Your box is now ready to use.\n"
-"Please press OK to start using your STB."
+"Please press OK to start using your Dreambox."
 msgstr ""
 
 #: ../enigma2_experimental/data/ ../enigma2_master/data/
@@ -11911,7 +11911,7 @@ msgstr ""
 msgid ""
 "Welcome.\n"
 "\n"
-"This start wizard will guide you through the basic setup of your STB.\n"
+"This start wizard will guide you through the basic setup of your Dreambox.\n"
 "Press the OK button on your remote control to move to the next step."
 msgstr ""
 
@@ -12070,7 +12070,7 @@ msgstr ""
 #: ../enigma2_master/lib/python/Plugins/SystemPlugins/SoftwareManager/
 msgid ""
 "Welcome to the Image upgrade wizard. The wizard will assist you in upgrading "
-"the firmware of your STB by providing a backup facility for your "
+"the firmware of your Dreambox by providing a backup facility for your "
 "current settings and a short explanation of how to upgrade your firmware."
 msgstr ""
 
@@ -12111,9 +12111,9 @@ msgstr ""
 #: ../enigma2_experimental/lib/python/Plugins/SystemPlugins/SoftwareManager/
 #: ../enigma2_master/lib/python/Plugins/SystemPlugins/SoftwareManager/
 msgid ""
-"You need a PC connected to your STB. If you need further instructions, "
+"You need a PC connected to your dreambox. If you need further instructions, "
 "please visit the website http://www.dm7025.de.\n"
-"Your STB will now be halted. After you have performed the update "
+"Your dreambox will now be halted. After you have performed the update "
 "instructions from the website, your new firmware will ask you to restore "
 "your settings."
 msgstr ""
@@ -12127,7 +12127,7 @@ msgstr ""
 
 #: ../enigma2_experimental/lib/python/Plugins/SystemPlugins/SoftwareManager/
 #: ../enigma2_master/lib/python/Plugins/SystemPlugins/SoftwareManager/
-msgid "Your STB is shutting down. Please stand by..."
+msgid "Your dreambox is shutting down. Please stand by..."
 msgstr ""
 
 #: ../enigma2_experimental/lib/python/Plugins/SystemPlugins/CleanupWizard/
@@ -12166,7 +12166,7 @@ msgid ""
 "Welcome to the cleanup wizard.\n"
 "\n"
 "We have detected that your available internal memory has dropped below 2MB.\n"
-"To ensure stable operation of your STB, the internal memory should be "
+"To ensure stable operation of your Dreambox, the internal memory should be "
 "cleaned up.\n"
 "You can use this wizard to remove some extensions.\n"
 msgstr ""
@@ -12253,8 +12253,8 @@ msgstr ""
 msgid ""
 "Welcome.\n"
 "\n"
-"If you want to connect your STB to the Internet, this wizard will guide "
-"you through the basic network setup of your STB.\n"
+"If you want to connect your Dreambox to the Internet, this wizard will guide "
+"you through the basic network setup of your Dreambox.\n"
 "\n"
 "Press OK to start configuring your network"
 msgstr ""
@@ -12262,7 +12262,7 @@ msgstr ""
 #: ../enigma2_experimental/lib/python/Plugins/SystemPlugins/NetworkWizard/
 #: ../enigma2_master/lib/python/Plugins/SystemPlugins/NetworkWizard/
 msgid ""
-"Your STB is now ready to use.\n"
+"Your Dreambox is now ready to use.\n"
 "\n"
 "Your internet connection is working now.\n"
 "\n"
