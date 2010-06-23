@@ -7,7 +7,7 @@
                     <name>Fancontrol</name>
                     <packagename>enigma2-plugin-systemplugins-fancontrol</packagename>
                     <shortdescription>Fan Control setting in standbymode.</shortdescription>
-                    <description>The Fan control turn on, turn off, modify fan time.
+                    <description>The Fan control turn on, turn off, modify fan action time on standbymode.
                     </description>
           </info>
 	  <files type="package"> <!-- without version, without .ipk -->
