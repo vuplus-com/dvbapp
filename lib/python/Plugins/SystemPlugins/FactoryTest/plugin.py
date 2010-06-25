@@ -49,7 +49,7 @@ class FactoryTest(Screen):
 		</screen>"""
 	def __init__(self, session):
 
-		self["actions"] = NumberActionMap(["OkCancelActions","WizardActions","NumberActions","ColorActions"],
+		self["actions"] = NumberActionMap(["OkCancelActions","WizardActions","NumberActions","ColorActions",],
 		{
 			"left": self.nothing,
 			"right":self.nothing,
@@ -72,7 +72,7 @@ class FactoryTest(Screen):
 		}, -2)
 
 		Screen.__init__(self, session)
-		TESTPROGRAM_DATE = "2010-06-11"
+		TESTPROGRAM_DATE = "2010-06-25"
 		TESTPROGRAM_VERSION = "Version 00.01"
 
 		self.model = 0
@@ -288,7 +288,12 @@ class FactoryTest(Screen):
 			if retval == 0:
 				self.macConsole = None
 				content =result.splitlines()
-				macline = content[3].split()
+                                for x in content:
+                                        if x.startswith('0x00000010:'):
+                                                macline = x.split()
+                                if len(macline) < 10:
+                                        print 'mac dump read error'
+                                        retrun
 				mac = macline[5]+":"+macline[6]+":"+macline[7]+":"+macline[8]+":"+macline[9]+":"+macline[10]
 				self["mactext"].setText(("MAC : "+mac))
  	
@@ -970,7 +975,12 @@ class MacConfig(Screen):
 			if retval == 0:
 				self.macConsole = None
 				content =result.splitlines()
-				macline = content[3].split()
+                                for x in content:
+                                        if x.startswith('0x00000010:'):
+                                                macline = x.split()
+                                if len(macline) < 10:
+                                        print 'mac dump read error'
+                                        retrun
 				mac = macline[5]+":"+macline[6]+":"+macline[7]+":"+macline[8]+":"+macline[9]+":"+macline[10]
 				self["stattext"].setText(("now : "+mac))
  	
@@ -1025,6 +1035,8 @@ class MacConfig(Screen):
 			macwritetext = "MAC:%02x:%02x:%02x:%02x:%02x:%02x"%(int(macaddr[0:2],16),int(macaddr[2:4],16),int(macaddr[4:6],16),int(macaddr[6:8],16),int(macaddr[8:10],16),int(macaddr[10:12],16))
 			self.macfd.seek(0)
 			self.macfd.write(macwritetext)
+                        self.macfd.close()
+                        system("sync")
 			self.macaddr = macaddr
 			self.close()
 		except:
