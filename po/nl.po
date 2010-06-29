@@ -5274,7 +5274,7 @@ msgstr "Rotor draaisnelheid"
 
 #
 msgid "Running"
-msgstr "In behandeling"
+msgstr "Geactiveerd"
 
 #
 msgid "Russia"

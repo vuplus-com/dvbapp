@@ -110,7 +110,7 @@ class MediaPlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarAudioSelection, InfoB
 
 		# 'None' is magic to start at the list of mountpoints
 		defaultDir = config.mediaplayer.defaultDir.getValue()
-		self.filelist = FileList(defaultDir, matchingPattern = "(?i)^.*\.(mp2|mp3|ogg|ts|wav|wave|m3u|pls|e2pls|mpg|vob|avi|divx|m4v|mkv|mp4|m4a|dat|flac|mov)", useServiceRef = True, additionalExtensions = "4098:m3u 4098:e2pls 4098:pls")
+		self.filelist = FileList(defaultDir, matchingPattern = "(?i)^.*\.(mp2|mp3|ogg|ts|m2ts|wav|wave|m3u|pls|e2pls|mpg|vob|avi|divx|m4v|mkv|mp4|m4a|dat|flac|mov)", useServiceRef = True, additionalExtensions = "4098:m3u 4098:e2pls 4098:pls")
 		self["filelist"] = self.filelist
 
 		self.playlist = MyPlayList()
@@ -906,11 +906,11 @@ class MediaPlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarAudioSelection, InfoB
 
 	def unPauseService(self):
 		self.setSeekState(self.SEEK_STATE_PLAY)
-		
+
 	def subtitleSelection(self):
-		from Screens.Subtitles import Subtitles
-		self.session.open(Subtitles, self)
-	
+		from Screens.AudioSelection import SubtitleSelection
+		self.session.open(SubtitleSelection, self)
+
 	def hotplugCB(self, dev, media_state):
 		if dev == harddiskmanager.getCD():
 			if media_state == "1":
@@ -930,12 +930,17 @@ class MediaPlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarAudioSelection, InfoB
 					self.clear_playlist()
 
 class MediaPlayerLCDScreen(Screen):
-	skin = """
-	<screen position="0,0" size="132,64" title="LCD Text">
+	skin = (
+	"""<screen name="MediaPlayerLCDScreen" position="0,0" size="132,64" id="1">
 		<widget name="text1" position="4,0" size="132,35" font="Regular;16"/>
 		<widget name="text3" position="4,36" size="132,14" font="Regular;10"/>
 		<widget name="text4" position="4,49" size="132,14" font="Regular;10"/>
-	</screen>"""
+	</screen>""",
+	"""<screen name="MediaPlayerLCDScreen" position="0,0" size="96,64" id="2">
+		<widget name="text1" position="0,0" size="96,35" font="Regular;14"/>
+		<widget name="text3" position="0,36" size="96,14" font="Regular;10"/>
+		<widget name="text4" position="0,49" size="96,14" font="Regular;10"/>
+	</screen>""")
 
 	def __init__(self, session, parent):
 		Screen.__init__(self, session)

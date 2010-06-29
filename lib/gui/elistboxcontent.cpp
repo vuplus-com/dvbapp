@@ -516,7 +516,7 @@ void eListboxPythonMultiContent::setSelectionClip(eRect &rect, bool update)
 		m_listbox->entryChanged(m_cursor);
 }
 
-static void clearRegionHelper(gPainter &painter, eListboxStyle *local_style, const ePoint &offset, ePyObject &pbackColor, bool cursorValid)
+static void clearRegionHelper(gPainter &painter, eListboxStyle *local_style, const ePoint &offset, ePyObject &pbackColor, bool cursorValid, bool clear=true)
 {
 	if (pbackColor)
 	{
@@ -538,10 +538,11 @@ static void clearRegionHelper(gPainter &painter, eListboxStyle *local_style, con
 		else if (local_style->m_transparent_background)
 			return;
 	}
-	painter.clear();
+	if (clear)
+		painter.clear();
 }
 
-static void clearRegionSelectedHelper(gPainter &painter, eListboxStyle *local_style, const ePoint &offset, ePyObject &pbackColorSelected, bool cursorValid)
+static void clearRegionSelectedHelper(gPainter &painter, eListboxStyle *local_style, const ePoint &offset, ePyObject &pbackColorSelected, bool cursorValid, bool clear=true)
 {
 	if (pbackColorSelected)
 	{
@@ -561,10 +562,11 @@ static void clearRegionSelectedHelper(gPainter &painter, eListboxStyle *local_st
 			return;
 		}
 	}
-	painter.clear();
+	if (clear)
+		painter.clear();
 }
 
-static void clearRegion(gPainter &painter, eWindowStyle &style, eListboxStyle *local_style, ePyObject pforeColor, ePyObject pforeColorSelected, ePyObject pbackColor, ePyObject pbackColorSelected, int selected, gRegion &rc, eRect &sel_clip, const ePoint &offset, bool cursorValid)
+static void clearRegion(gPainter &painter, eWindowStyle &style, eListboxStyle *local_style, ePyObject pforeColor, ePyObject pforeColorSelected, ePyObject pbackColor, ePyObject pbackColorSelected, int selected, gRegion &rc, eRect &sel_clip, const ePoint &offset, bool cursorValid, bool clear=true)
 {
 	if (selected && sel_clip.valid())
 	{
@@ -573,7 +575,7 @@ static void clearRegion(gPainter &painter, eWindowStyle &style, eListboxStyle *l
 		{
 			painter.clip(part);
 			style.setStyle(painter, eWindowStyle::styleListboxNormal);
-			clearRegionHelper(painter, local_style, offset, pbackColor, cursorValid);
+			clearRegionHelper(painter, local_style, offset, pbackColor, cursorValid, clear);
 			painter.clippop();
 			selected = 0;
 		}
@@ -582,7 +584,7 @@ static void clearRegion(gPainter &painter, eWindowStyle &style, eListboxStyle *l
 		{
 			painter.clip(part);
 			style.setStyle(painter, eWindowStyle::styleListboxSelected);
-			clearRegionSelectedHelper(painter, local_style, offset, pbackColorSelected, cursorValid);
+			clearRegionSelectedHelper(painter, local_style, offset, pbackColorSelected, cursorValid, clear);
 			painter.clippop();
 			selected = 1;
 		}
@@ -590,14 +592,14 @@ static void clearRegion(gPainter &painter, eWindowStyle &style, eListboxStyle *l
 	else if (selected)
 	{
 		style.setStyle(painter, eWindowStyle::styleListboxSelected);
-		clearRegionSelectedHelper(painter, local_style, offset, pbackColorSelected, cursorValid);
+		clearRegionSelectedHelper(painter, local_style, offset, pbackColorSelected, cursorValid, clear);
 		if (local_style && local_style->m_selection)
 			painter.blit(local_style->m_selection, offset, eRect(), gPainter::BT_ALPHATEST);
 	}
 	else
 	{
 		style.setStyle(painter, eWindowStyle::styleListboxNormal);
-		clearRegionHelper(painter, local_style, offset, pbackColor, cursorValid);
+		clearRegionHelper(painter, local_style, offset, pbackColor, cursorValid, clear);
 	}
 
 	if (selected)
@@ -820,7 +822,8 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 
 				{
 					gRegion rc(rect);
-					clearRegion(painter, style, local_style, pforeColor, pforeColorSelected, pbackColor, pbackColorSelected, selected, rc, sel_clip, offset, cursorValid);
+					bool mustClear = (selected && pbackColorSelected) || (!selected && pbackColor);
+					clearRegion(painter, style, local_style, pforeColor, pforeColorSelected, pbackColor, pbackColorSelected, selected, rc, sel_clip, offset, cursorValid, mustClear);
 				}
 
 				painter.setFont(m_font[fnt]);
@@ -854,6 +857,10 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 				}
 				break;
 			}
+			case TYPE_PROGRESS_PIXMAP: // Progress
+			/*
+				(1, x, y, width, height, filled_percent, pixmap [, borderWidth, foreColor, backColor, backColorSelected] )
+			*/
 			case TYPE_PROGRESS: // Progress
 			{
 			/*
@@ -864,41 +871,55 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 							pwidth = PyTuple_GET_ITEM(item, 3),
 							pheight = PyTuple_GET_ITEM(item, 4),
 							pfilled_perc = PyTuple_GET_ITEM(item, 5),
-							pborderWidth, pforeColor, pforeColorSelected, pbackColor, pbackColorSelected;
-
-				if (!(px && py && pwidth && pheight && pfilled_perc))
+							ppixmap, pborderWidth, pforeColor, pforeColorSelected, pbackColor, pbackColorSelected;
+				int idx = 6;
+				if (type == TYPE_PROGRESS)
 				{
-					eDebug("eListboxPythonMultiContent received too small tuple (must be (TYPE_PROGRESS, x, y, width, height, filled percent [,border width, foreColor, backColor, backColorSelected]))");
-					goto error_out;
+					if (!(px && py && pwidth && pheight && pfilled_perc))
+					{
+						eDebug("eListboxPythonMultiContent received too small tuple (must be (TYPE_PROGRESS, x, y, width, height, filled percent [,border width, foreColor, backColor, backColorSelected]))");
+						goto error_out;
+					}
+				}
+				else
+				{
+					ppixmap = PyTuple_GET_ITEM(item, idx++);
+					if (ppixmap == Py_None)
+						continue;
+					if (!(px && py && pwidth && pheight && pfilled_perc, ppixmap))
+					{
+						eDebug("eListboxPythonMultiContent received too small tuple (must be (TYPE_PROGRESS_PIXMAP, x, y, width, height, filled percent, pixmap, [,border width, foreColor, backColor, backColorSelected]))");
+						goto error_out;
+					}
 				}
 
-				if (size > 6)
+				if (size > idx)
 				{
-					pborderWidth = PyTuple_GET_ITEM(item, 6);
+					pborderWidth = PyTuple_GET_ITEM(item, idx++);
 					if (pborderWidth == Py_None)
 						pborderWidth = ePyObject();
 				}
-				if (size > 7)
+				if (size > idx)
 				{
-					pforeColor = PyTuple_GET_ITEM(item, 7);
+					pforeColor = PyTuple_GET_ITEM(item, idx++);
 					if (pforeColor == Py_None)
 						pforeColor = ePyObject();
 				}
-				if (size > 8)
+				if (size > idx)
 				{
-					pforeColorSelected = PyTuple_GET_ITEM(item, 8);
+					pforeColorSelected = PyTuple_GET_ITEM(item, idx++);
 					if (pforeColorSelected == Py_None)
 						pforeColorSelected=ePyObject();
 				}
-				if (size > 9)
+				if (size > idx)
 				{
-					pbackColor = PyTuple_GET_ITEM(item, 9);
+					pbackColor = PyTuple_GET_ITEM(item, idx++);
 					if (pbackColor == Py_None)
 						pbackColor=ePyObject();
 				}
-				if (size > 10)
+				if (size > idx)
 				{
-					pbackColorSelected = PyTuple_GET_ITEM(item, 10);
+					pbackColorSelected = PyTuple_GET_ITEM(item, idx++);
 					if (pbackColorSelected == Py_None)
 						pbackColorSelected=ePyObject();
 				}
@@ -923,7 +944,8 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 
 				{
 					gRegion rc(rect);
-					clearRegion(painter, style, local_style, pforeColor, pforeColorSelected, pbackColor, pbackColorSelected, selected, rc, sel_clip, offset, cursorValid);
+					bool mustClear = (selected && pbackColorSelected) || (!selected && pbackColor);
+					clearRegion(painter, style, local_style, pforeColor, pforeColorSelected, pbackColor, pbackColorSelected, selected, rc, sel_clip, offset, cursorValid, mustClear);
 				}
 
 				// border
@@ -939,12 +961,24 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 				rect.setRect(x+width-bwidth, y+bwidth, bwidth, height-bwidth);
 				painter.fill(rect);
 
-				// progress
 				rect.setRect(x+bwidth, y+bwidth, (width-bwidth*2) * filled / 100, height-bwidth*2);
-				painter.fill(rect);
+
+				// progress
+				if (ppixmap)
+				{
+					ePtr<gPixmap> pixmap;
+					if (SwigFromPython(pixmap, ppixmap))
+					{
+						eDebug("eListboxPythonMultiContent (Pixmap) get pixmap failed");
+						painter.clippop();
+						continue;
+					}
+					painter.blit(pixmap, rect.topLeft(), rect, 0);
+				}
+				else
+					painter.fill(rect);
 
 				painter.clippop();
-
 				break;
 			}
 			case TYPE_PIXMAP_ALPHABLEND:
@@ -997,7 +1031,8 @@ void eListboxPythonMultiContent::paint(gPainter &painter, eWindowStyle &style, c
 
 				{
 					gRegion rc(rect);
-					clearRegion(painter, style, local_style, ePyObject(), ePyObject(), pbackColor, pbackColorSelected, selected, rc, sel_clip, offset, cursorValid);
+					bool mustClear = (selected && pbackColorSelected) || (!selected && pbackColor);
+					clearRegion(painter, style, local_style, ePyObject(), ePyObject(), pbackColor, pbackColorSelected, selected, rc, sel_clip, offset, cursorValid, mustClear);
 				}
 
 				painter.blit(pixmap, rect.topLeft(), rect, (type == TYPE_PIXMAP_ALPHATEST) ? gPainter::BT_ALPHATEST : (type == TYPE_PIXMAP_ALPHABLEND) ? gPainter::BT_ALPHABLEND : 0);
