@@ -32,11 +32,9 @@ class ServiceScan(Screen):
 	def ok(self):
 		print "ok"
 		if self["scan"].isDone():
-			self.resetTimeout()
 			self.close()
 	
 	def cancel(self):
-		self.resetTimeout()
 		self.close()
 		
 	def __init__(self, session, scanList):
