@@ -71,7 +71,7 @@ class ServiceInfo(Converter, object):
 				while idx < n:
 					i = audio.getTrackInfo(idx)
 					description = i.getDescription();
-					if "AC3" in description or "DTS" in description:
+					if "AC3" in description or "DTS" in description or "Dolby Digital" in description:
 						return True
 					idx += 1
 			return False

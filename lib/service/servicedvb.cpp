@@ -1786,7 +1786,7 @@ RESULT eDVBServicePlay::getTrackInfo(struct iAudioTrackInfo &info, unsigned int 
 	if (program.audioStreams[i].type == eDVBServicePMTHandler::audioStream::atMPEG)
 		info.m_description = "MPEG";
 	else if (program.audioStreams[i].type == eDVBServicePMTHandler::audioStream::atAC3)
-		info.m_description = "AC3";
+		info.m_description = "Dolby Digital";
 	else if (program.audioStreams[i].type == eDVBServicePMTHandler::audioStream::atAAC)
 		info.m_description = "AAC";
 	else if (program.audioStreams[i].type == eDVBServicePMTHandler::audioStream::atAACHE)
