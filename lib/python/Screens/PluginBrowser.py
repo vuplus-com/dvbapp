@@ -220,8 +220,8 @@ class PluginDownloadBrowser(Screen):
 			self.remainingdata = ""
 
 		for x in lines:
-			plugin = x.split(" - ", 2)
-			if len(plugin) == 3:
+			plugin = x.split(" - ")
+			if len(plugin) >= 2:
 				if self.run == 1 and self.type == self.DOWNLOAD:
 					if plugin[0] not in self.installedplugins:
 						self.installedplugins.append(plugin[0])
@@ -239,6 +239,13 @@ class PluginDownloadBrowser(Screen):
 		
 		self.plugins = {}
 		for x in self.pluginlist:
+			if len(x) < 4:
+				split = x[0].split('-',3)
+				if not self.plugins.has_key(split[2]):
+					self.plugins[split[2]] = []
+				self.plugins[split[2]].append((PluginDescriptor(name = x[2], description = " ", icon = verticallineIcon), split[3]))
+				continue
+
 			split = x[3].split('-', 1)
 			if len(split) < 2:
 				continue
