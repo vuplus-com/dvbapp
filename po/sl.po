@@ -10301,3 +10301,22 @@ msgstr "prenesen"
 #
 #~ msgid "yes (hold feeds)"
 #~ msgstr "da (zadrA3i feedove)"
+
+msgid "Fan Control"
+msgstr ""
+
+msgid "Fan basic action"
+msgstr ""
+
+msgid "Fan control"
+msgstr ""
+
+msgid "Fan off duration time"
+msgstr ""
+
+msgid "Fan on duration time"
+msgstr ""
+
+msgid "Use Fan timer"
+msgstr ""
+

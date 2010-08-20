@@ -10098,3 +10098,22 @@ msgstr "zapped"
 #
 #~ msgid "until restart"
 #~ msgstr "until restart"
+
+msgid "Fan Control"
+msgstr "Fan Control"
+
+msgid "Fan basic action"
+msgstr "Fan basic action"
+
+msgid "Fan control"
+msgstr "Fan control"
+
+msgid "Fan off duration time"
+msgstr "Fan off duration time"
+
+msgid "Fan on duration time"
+msgstr "Fan on duration time"
+
+msgid "Use Fan timer"
+msgstr "Use Fan timer"
+

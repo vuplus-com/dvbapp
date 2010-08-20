@@ -10148,3 +10148,22 @@ msgstr "zapte"
 #
 #~ msgid "until restart"
 #~ msgstr "tot herstart"
+
+msgid "Fan Control"
+msgstr "Fan Controle"
+
+msgid "Fan basic action"
+msgstr "Fan basis aktie"
+
+msgid "Fan control"
+msgstr "Fan Controle"
+
+msgid "Fan off duration time"
+msgstr "Fan uit tijd"
+
+msgid "Fan on duration time"
+msgstr "Fan aan tijd"
+
+msgid "Use Fan timer"
+msgstr "Gebruik Fan timer"
+

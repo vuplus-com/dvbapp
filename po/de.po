@@ -10590,3 +10590,22 @@ msgstr "umgeschaltet"
 #
 #~ msgid "until restart"
 #~ msgstr "Bis zum Neustart"
+
+msgid "Fan Control"
+msgstr "Lüftersteuerung"
+
+msgid "Fan basic action"
+msgstr "Lüfterverhalten"
+
+msgid "Fan control"
+msgstr "Lüftersteuerung"
+
+msgid "Fan off duration time"
+msgstr "Zeitspanne in Minuten: Lüfter aus"
+
+msgid "Fan on duration time"
+msgstr "Zeitspanne in Minuten: Lüfter an"
+
+msgid "Use Fan timer"
+msgstr "Nutze die zeitgesteuerte Lüftersteuerung"
+

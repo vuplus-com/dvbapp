@@ -8489,3 +8489,22 @@ msgstr "تم الانتقال"
 #
 #~ msgid "القناه السابقه"
 #~ msgstr "vorheriger Kanal"
+
+msgid "Fan Control"
+msgstr ""
+
+msgid "Fan basic action"
+msgstr ""
+
+msgid "Fan control"
+msgstr ""
+
+msgid "Fan off duration time"
+msgstr ""
+
+msgid "Fan on duration time"
+msgstr ""
+
+msgid "Use Fan timer"
+msgstr ""
+

@@ -10667,3 +10667,22 @@ msgstr "zapeado"
 #
 #~ msgid "until restart"
 #~ msgstr "hasta reiniciar"
+
+msgid "Fan Control"
+msgstr ""
+
+msgid "Fan basic action"
+msgstr ""
+
+msgid "Fan control"
+msgstr ""
+
+msgid "Fan off duration time"
+msgstr ""
+
+msgid "Fan on duration time"
+msgstr ""
+
+msgid "Use Fan timer"
+msgstr ""
+
