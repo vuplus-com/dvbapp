@@ -8,6 +8,7 @@ from config import config, ConfigSubsection, ConfigInteger
 profile("VolumeControl")
 #TODO .. move this to a own .py file
 class VolumeControl:
+	instance = None
 	"""Volume control, handles volUp, volDown, volMute actions and display
 	a corresponding dialog"""
 	def __init__(self, session):
@@ -15,6 +16,9 @@ class VolumeControl:
 		globalActionMap.actions["volumeUp"]=self.volUp
 		globalActionMap.actions["volumeDown"]=self.volDown
 		globalActionMap.actions["volumeMute"]=self.volMute
+
+		assert not VolumeControl.instance, "only one VolumeControl instance is allowed!"
+		VolumeControl.instance = self
 
 		config.audio = ConfigSubsection()
 		config.audio.volume = ConfigInteger(default = 100, limits = (0, 100))
