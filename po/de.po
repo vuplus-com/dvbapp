@@ -7,14 +7,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tuxbox-enigma 0.0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-06-09 10:31+0000\n"
-"PO-Revision-Date: 2010-06-11 21:15+0200\n"
-"Last-Translator: Andreas <andreas.frisch@multimedia-labs.de>\n"
+"POT-Creation-Date: 2010-09-29 09:15+0000\n"
+"PO-Revision-Date: 2010-09-28 12:36+0100\n"
+"Last-Translator: Mladen Horvat <acid-burn@opendreambox.org>\n"
 "Language-Team: none\n"
-"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.0.3\n"
 "X-Poedit-Language: German\n"
@@ -40,10 +40,10 @@ msgstr ""
 #
 msgid ""
 "\n"
-"Backup your Dreambox settings."
+"Backup your Vuplus settings."
 msgstr ""
 "\n"
-"Sichern Ihrer Dreambox Einstellungen."
+"Sichern Ihrer Vuplus Einstellungen."
 
 #
 msgid ""
@@ -56,18 +56,18 @@ msgstr ""
 #
 msgid ""
 "\n"
-"Manage extensions or plugins for your Dreambox"
+"Manage extensions or plugins for your Vuplus"
 msgstr ""
 "\n"
-"Verwalten Sie die Erweiterungen und Plugins Ihrer Dreambox"
+"Verwalten Sie die Erweiterungen und Plugins Ihrer Vuplus"
 
 #
 msgid ""
 "\n"
-"Online update of your Dreambox software."
+"Online update of your Vuplus software."
 msgstr ""
 "\n"
-"Online update Ihrer Dreambox Software."
+"Online update Ihrer Vuplus Software."
 
 #
 msgid ""
@@ -80,18 +80,18 @@ msgstr ""
 #
 msgid ""
 "\n"
-"Restore your Dreambox settings."
+"Restore your Vuplus settings."
 msgstr ""
 "\n"
-"Wiederherstellen Ihrer Dreambox Einstellungen."
+"Wiederherstellen Ihrer Vuplus Einstellungen."
 
 #
 msgid ""
 "\n"
-"Restore your Dreambox with a new firmware."
+"Restore your Vuplus with a new firmware."
 msgstr ""
 "\n"
-"Wiederherstellen Ihrer Dreambox mit einer neuen Firmware."
+"Wiederherstellen Ihrer Vuplus mit einer neuen Firmware."
 
 #
 msgid ""
@@ -146,6 +146,9 @@ msgstr " Ergebnisse"
 #
 msgid " extensions."
 msgstr "erweiterungen."
+
+msgid " ms"
+msgstr " ms"
 
 #
 msgid " packages selected."
@@ -406,6 +409,12 @@ msgstr "??"
 msgid "A"
 msgstr "A"
 
+msgid "A basic ftp client"
+msgstr "FTP-Client für die Vuplus"
+
+msgid "A client for www.dyndns.org"
+msgstr "Ein Client für www.dyndns.org"
+
 #
 #, python-format
 msgid ""
@@ -416,27 +425,33 @@ msgstr ""
 "Wollen Sie diese Version behalten?"
 
 msgid "A demo plugin for TPM usage."
-msgstr ""
+msgstr "Ein Demo Plugin für die TPM Bedienung."
 
 #
 msgid ""
 "A finished record timer wants to set your\n"
-"Dreambox to standby. Do that now?"
+"Vuplus to standby. Do that now?"
 msgstr ""
-"Ein Aufnahmetimer will Ihre Dreambox in den Standby-Modus schalten.\n"
+"Ein Aufnahmetimer will Ihre Vuplus in den Standby-Modus schalten.\n"
 "Jetzt ausführen?"
 
 #
 msgid ""
 "A finished record timer wants to shut down\n"
-"your Dreambox. Shutdown now?"
+"your Vuplus. Shutdown now?"
 msgstr ""
-"Ein Aufnahmetimer will Ihre Dreambox ausschalten.\n"
+"Ein Aufnahmetimer will Ihre Vuplus ausschalten.\n"
 "Jetzt ausschalten?"
 
 #
 msgid "A graphical EPG for all services of an specific bouquet"
 msgstr "Grafischer EPG für alle Kanäle eines bestimmten Bouquets"
+
+msgid "A graphical EPG interface"
+msgstr "Eine grafische EPG Ansicht"
+
+msgid "A graphical EPG interface."
+msgstr "Zeigt eine grafische EPG Ansicht."
 
 #
 msgid ""
@@ -445,6 +460,15 @@ msgid ""
 msgstr ""
 "Eine Netzwerkfreigabe mit diesem Namen existiert bereits!\n"
 "Eintrag aktualisieren und fortfahren?\n"
+
+msgid "A nice looking HD skin from Kerni"
+msgstr "Ein HD Skin von Kerni"
+
+msgid "A nice looking HD skin in Brushed Alu Design from Kerni."
+msgstr "Ein HD Skin von Kerni in gebürstetem Alu Design."
+
+msgid "A nice looking skin from Kerni"
+msgstr "Ein Skin von Kerni"
 
 #
 #, python-format
@@ -498,20 +522,23 @@ msgstr ""
 "\n"
 "Wollen Sie diese zweite Netzwerkverbindung deaktivieren?"
 
+msgid "A simple downloading application for other plugins"
+msgstr "Download-Erweiterung  für andere Plugins"
+
 #
 msgid ""
 "A sleep timer wants to set your\n"
-"Dreambox to standby. Do that now?"
+"Vuplus to standby. Do that now?"
 msgstr ""
-"Ein Ausschalt-Timer möchte Ihre Dreambox in\n"
+"Ein Ausschalt-Timer möchte Ihre Vuplus in\n"
 "den Standby-Modus schalten. Dies jetzt tun?"
 
 #
 msgid ""
 "A sleep timer wants to shut down\n"
-"your Dreambox. Shutdown now?"
+"your Vuplus. Shutdown now?"
 msgstr ""
-"Ein Ausschalt-Timer möchte Ihre Dreambox\n"
+"Ein Ausschalt-Timer möchte Ihre Vuplus\n"
 "ausschalten. Jetzt herunterfahren?"
 
 #
@@ -561,6 +588,12 @@ msgstr "Über"
 #
 msgid "About..."
 msgstr "Über..."
+
+msgid "Access to the ARD-Mediathek"
+msgstr "Zugriff auf die ARD-Mediathek"
+
+msgid "Access to the ARD-Mediathek online video database."
+msgstr "Zugriff auf die ARD-Mediathek online Video Datenbank."
 
 #
 msgid "Accesspoint:"
@@ -619,7 +652,7 @@ msgid "Add a mark"
 msgstr "Marker hinzufügen"
 
 #
-msgid "Add a new NFS or CIFS mount point to your Dreambox."
+msgid "Add a new NFS or CIFS mount point to your Vuplus."
 msgstr "Eine neue CIFS oder NFS Freigabe hinzufügen."
 
 #
@@ -695,6 +728,12 @@ msgstr ""
 "OK, um die Feineinstellungen zu beenden. Mit den Zahlentasten können Sie "
 "weitere Testbilder auswählen."
 
+msgid "Adult streaming plugin"
+msgstr "Erwachsenen Stream Plugin"
+
+msgid "Adult streaming plugin."
+msgstr "Erwachsenen Stream Plugin."
+
 #
 msgid "Advanced Options"
 msgstr "Erweiterte Optionen"
@@ -719,6 +758,13 @@ msgstr "Erweiterte Video-Einstellungen"
 msgid "Advanced restore"
 msgstr "Erweiterte Wiederherstellung"
 
+msgid ""
+"After a reboot or power outage, StartupToStandby will bring your Vuplus to "
+"standby-mode."
+msgstr ""
+"StartupToStandby startet nach einem Stromausfall oder Reboot Ihre Vuplus "
+"im Standby-Modus."
+
 #
 msgid "After event"
 msgstr "Nach dem Event"
@@ -730,7 +776,10 @@ msgid ""
 msgstr ""
 "Nachdem der Startassistent beendet wurde, müssen Sie noch die einzelnen "
 "Sender schützen. Wie Sie dies tun können, entnehmen Sie bitte dem Handbuch "
-"Ihrer Dreambox."
+"Ihrer Vuplus."
+
+msgid "Ai.HD skin-style control plugin"
+msgstr "Ai.HD Skin-Stil Einstellungen"
 
 #
 msgid "Album"
@@ -756,6 +805,14 @@ msgstr "Alle sich nicht Wiederholenden"
 msgid "Allow zapping via Webinterface"
 msgstr "Umschalten per Webinterface erlauben"
 
+msgid "Allows the execution of TuxboxPlugins."
+msgstr "das Ausführen von Tuxbox-Plugins."
+
+msgid "Allows user to download files from rapidshare in the background."
+msgstr ""
+"Mit RSDownloader können Sie Dateien von Rapidshare im Hintergrund "
+"herunterladen."
+
 #
 msgid "Alpha"
 msgstr "Transparenz"
@@ -767,6 +824,9 @@ msgstr "Alternativer Radio-Modus"
 #
 msgid "Alternative services tuner priority"
 msgstr "Tuner-Priorität bei Alternativen Services"
+
+msgid "Always ask"
+msgstr "Immer nachfragen"
 
 #
 msgid "Always ask before sending"
@@ -868,8 +928,11 @@ msgstr "Nutzer fragen"
 msgid "Aspect Ratio"
 msgstr "Seitenverhältnis"
 
+msgid "Assigning providers/services/caids to a CI module"
+msgstr "Weist Providern/Services/CAIDs einem CI-Modul zu"
+
 msgid "Atheros"
-msgstr ""
+msgstr "Atheros"
 
 #
 msgid "Audio"
@@ -886,6 +949,13 @@ msgstr "Audio Sync"
 #
 msgid "Audio Sync Setup"
 msgstr "Audio Sync Setup"
+
+msgid ""
+"AudoSync allows delaying the sound output (Bitstream/PCM) so that it is "
+"synchronous to the picture."
+msgstr ""
+"Mit AudioSync kann die Ton-Ausgabe (Bitstream und PCM) verzögert werden, "
+"damit sie zeitrichtig zum Bild erfolgt."
 
 #
 msgid "Australia"
@@ -935,6 +1005,14 @@ msgstr "AutoTimer Einstellungen"
 msgid "AutoTimer overview"
 msgstr "AutoTimer Übersicht"
 
+msgid ""
+"AutoTimer scans the EPG and creates Timers depending on user-defined search  "
+"criteria."
+msgstr ""
+"AutoTimer setzt Timer automatisch auf Basis von benutzerdefinierten Regeln. "
+"Das hauptsächliche und erforderliche Kriterium ist eine Textsuche im Titel "
+"der Sendung."
+
 #
 msgid "Automatic"
 msgstr "Automatisch"
@@ -942,6 +1020,34 @@ msgstr "Automatisch"
 #
 msgid "Automatic Scan"
 msgstr "Automatische Suche"
+
+msgid "Automatic volume adjustment"
+msgstr "Automatische Lautstärken-Anpassung"
+
+msgid "Automatic volume adjustment for ac3/dts services."
+msgstr "Automatische Lautstärken-Anpassung für AC3/DTS Dienste."
+
+msgid "Automatically change video resolution"
+msgstr "Automatisches Umschalten der Auflösung"
+
+msgid ""
+"Automatically changes the output resolution depending on the video "
+"resolution you are watching."
+msgstr ""
+"AutoResolution schaltet automatisch auf die optimale Auflösung für das "
+"angezeigte Video um."
+
+msgid "Automatically create timer events based on keywords"
+msgstr "Erstellt Timereinträge auf Grund von Stichworten"
+
+msgid "Automatically informs you on low internal memory"
+msgstr "Kontrolle des freien Speichers auf der Vuplus"
+
+msgid "Automatically refresh EPG"
+msgstr "Aktualisiert automatisch EPG-Informationen"
+
+msgid "Automatically send crashlogs to Dream Multimedia"
+msgstr "Automatisches Versenden von Crashlogs an Dream Multimedia"
 
 #
 msgid "Autos & Vehicles"
@@ -962,6 +1068,12 @@ msgstr "B"
 #
 msgid "BA"
 msgstr "BA"
+
+msgid "BASIC-HD Skin by Ismail Demir"
+msgstr "BASIC-HD Skin von Ismail Demir"
+
+msgid "BASIC-HD Skin for Vuplus Images created from Ismail Demir"
+msgstr "BASIC-HD Skin für die Vuplus erstellt von Ismail Demir"
 
 #
 msgid "BB"
@@ -1051,6 +1163,12 @@ msgstr ""
 msgid "Blue boost"
 msgstr "Blauanteil erhöhen"
 
+msgid "Bonjour/Avahi control plugin"
+msgstr "Bonjour/Avahi Kontrolle"
+
+msgid "Bonjour/Avahi control plugin."
+msgstr "Bonjour/Avahi Kontrolle und Steuerung"
+
 #
 msgid "Bookmarks"
 msgstr "Lesezeichen"
@@ -1067,6 +1185,14 @@ msgstr "Brasilien"
 msgid "Brightness"
 msgstr "Helligkeit"
 
+msgid "Browse for and connect to network shares"
+msgstr "Durchsucht das Netzwerk nach NFS/CIFS Freigaben"
+
+msgid "Browse for nfs/cifs shares and connect to them."
+msgstr ""
+"Mit NetworkBrowser können Sie Ihr Netzwerk nach NFS- /CIFS-Freigaben "
+"durchsuchen und zu diesen eine Verbindung herstellen."
+
 #
 msgid "Browse network neighbourhood"
 msgstr "Netzwerkumgebung durchsuchen"
@@ -1082,6 +1208,9 @@ msgstr "Vorhandenes Image auf DVD brennen"
 #
 msgid "Burn to DVD"
 msgstr "Auf DVD brennen"
+
+msgid "Burn your recordings to DVD"
+msgstr "Brennt Aufnahmen auf DVD"
 
 #
 msgid "Bus: "
@@ -1106,6 +1235,14 @@ msgstr "C-Band"
 msgid "CDInfo"
 msgstr "Info"
 
+msgid ""
+"CDInfo enables gathering album and track details from CDDB and CD-Text when "
+"playing Audio CDs in Mediaplayer."
+msgstr ""
+"CDInfo ermöglicht bei der Wiedergabe von Audio-CDs im Mediaplayer die "
+"Onlineabfrage von Album- und Titel-Angaben von CDDB bzw. das Auslesen der CD-"
+"Text-Informationen."
+
 #
 msgid "CI assignment"
 msgstr "CI-Zuweisung"
@@ -1126,10 +1263,12 @@ msgstr "Kabel"
 msgid "Cache Thumbnails"
 msgstr "Vorschaubilder zwischenspeichern"
 
+msgid "Callmonitor for the Fritz!Box routers"
+msgstr "Anrufmonitor für Fritz!Boxen"
+
 #
-#, fuzzy
 msgid "Can't connect to server. Please check your network!"
-msgstr "Bitte überprüfen Sie Ihre Netzwerkeinstellungen"
+msgstr "Keine Verbindung zum Server. Bitte überprüfen Sie Ihr Netzwerk!"
 
 #
 msgid "Canada"
@@ -1204,8 +1343,11 @@ msgid "Change step size"
 msgstr "Schrittweite ändern."
 
 #
-msgid "Change the hostname of your Dreambox."
-msgstr "Ändern Sie den Netzwerknamen Ihrer Dreambox."
+msgid "Change the hostname of your Vuplus."
+msgstr "Ändern Sie den Netzwerknamen Ihrer Vuplus."
+
+msgid "Changelog"
+msgstr ""
 
 #
 msgid "Channel"
@@ -1275,6 +1417,9 @@ msgstr "Wählen Sie den Sicherungsort"
 msgid "Choose bouquet"
 msgstr "Bouquet wählen"
 
+msgid "Choose image to download"
+msgstr "Image zum Download auswählen"
+
 #
 msgid "Choose target folder"
 msgstr "Wähle Zielverzeichnis"
@@ -1310,6 +1455,12 @@ msgstr "Aufräumassistent"
 #
 msgid "Cleanup Wizard settings"
 msgstr "Aufräumassistent Einstellungen"
+
+msgid "Cleanup timerlist automatically"
+msgstr "Automatisches Löschen von Timern"
+
+msgid "Cleanup timerlist automatically."
+msgstr "Automatisches Löschen von Timern."
 
 #
 msgid "CleanupWizard"
@@ -1416,7 +1567,7 @@ msgid "Complex (allows mixing audio tracks and aspects)"
 msgstr "Komplex (erlaubt Mischen versch. Ton-u. Bildformate)"
 
 msgid "Composition of the recording filenames"
-msgstr ""
+msgstr "Zusammensetzung des Aufnahme-Dateinamens"
 
 #
 msgid "Configuration Mode"
@@ -1437,6 +1588,9 @@ msgstr "Netzwerkkarte konfigurieren"
 #
 msgid "Configure nameservers"
 msgstr "DNS-Server konfigurieren"
+
+msgid "Configure your WLAN network interface"
+msgstr "beim Konfigurieren der  WLAN-Verbindung"
 
 #
 msgid "Configure your internal LAN"
@@ -1494,10 +1648,36 @@ msgstr "Abspielen fortsetzen"
 msgid "Contrast"
 msgstr "Kontrast"
 
-#
-msgid "Could not connect to Dreambox .NFI Image Feed Server:"
+msgid "Control your Vuplus with your Web browser."
+msgstr "Kontrollieren Sie die Vuplus über den PC mit Ihrem Web Browser."
+
+msgid "Control your Vuplus with your browser"
+msgstr "Kontrolliert die Vuplus über den PC"
+
+msgid "Control your dreambox with only the MUTE button"
+msgstr "Steuern der Vuplus mit der MUTE Taste"
+
+msgid "Control your dreambox with only the MUTE button."
+msgstr "Steuern Sie Ihre Vuplus nur mit der MUTE Taste."
+
+msgid "Control your internal system fan."
+msgstr "Steuern Sie den internen Lüfter Ihrer Vuplus."
+
+msgid "Control your kids's tv usage"
+msgstr "Kontrolle der TV-Nutzung von Kindern"
+
+msgid "Control your system fan"
+msgstr "Steuern Sie den Lüfter Ihrer Vuplus"
+
+msgid "Copy, rename, delete, move local files on your Vuplus."
 msgstr ""
-"Verbindung zum Dreambox .NFI Image Feed Server konnte nicht hergestellt "
+"Filebrowser ermöglicht Ihnen das Löschen, Kopieren, Verschieben und "
+"Umbenennen von lokalen Dateien."
+
+#
+msgid "Could not connect to Vuplus .NFI Image Feed Server:"
+msgstr ""
+"Verbindung zum Vuplus .NFI Image Feed Server konnte nicht hergestellt "
 "werden:"
 
 #
@@ -1541,6 +1721,14 @@ msgstr ""
 msgid "Create DVD-ISO"
 msgstr "DVD-ISO erstellen"
 
+msgid "Create a backup of your Video DVD on your DreamBox hard drive."
+msgstr ""
+"Mit DVD Backup erstellen Sie Backups Ihrer Video-DVDs auf Ihre Vuplus-"
+"Festplatte."
+
+msgid "Create a backup of your Video-DVD"
+msgstr "Erstellen Sie Backups Ihrer DVDs"
+
 #
 msgid "Create a new AutoTimer."
 msgstr "Einen neuen AutoTimer erstellen."
@@ -1556,6 +1744,18 @@ msgstr "Neuen Timer mit dem Wizard erstellen"
 #
 msgid "Create movie folder failed"
 msgstr "Erzeugen des Film-Verzeichnisses fehlgeschlagen"
+
+msgid "Create preview pictures of your Movies"
+msgstr "Erstellt Vorschaubilder von aufgenommenen Filmen"
+
+msgid "Create remote timers"
+msgstr "Erstellen von remote Timern"
+
+msgid "Create timers on remote Vupluses."
+msgstr ""
+"Mit remoteTImer kann auf eine andere Vuplus zugegriffen und deren Timer "
+"verwaltet werden. Man kann sich die Timerliste der anderen Vuplus anzeigen "
+"lassen, Timer hinzufügen oder entfernen sowie die Timerliste organisieren."
 
 #
 #, python-format
@@ -1574,6 +1774,9 @@ msgstr "Kroatisch"
 msgid "Current Transponder"
 msgstr "Aktueller Transponder"
 
+msgid "Current device: "
+msgstr "Aktuelles Gerät:"
+
 #
 msgid "Current settings:"
 msgstr "Aktuelle Einstellungen:"
@@ -1582,9 +1785,11 @@ msgstr "Aktuelle Einstellungen:"
 msgid "Current value: "
 msgstr "Aktueller Wert:"
 
-#
 msgid "Current version:"
-msgstr "Aktuelle Version:"
+msgstr "Derzeitige Version:"
+
+msgid "Currently installed image"
+msgstr "Aktuell installiertes Image"
 
 #
 #, python-format
@@ -1615,9 +1820,34 @@ msgstr "Gewünschte Sprungzeit für '7'/'9'-Tasten"
 msgid "Customize"
 msgstr "Anpassen"
 
+msgid "Customize Vali-XD skins"
+msgstr "Anpassen von Vali-XD Skins"
+
+msgid "Customize Vali-XD skins by yourself."
+msgstr "Passen Sie den Vali-XD Skin nach Ihren Wünschen an."
+
 #
 msgid "Cut"
 msgstr "Schneiden"
+
+msgid "Cut your movies"
+msgstr "Schneiden von aufgenommenen Filmen"
+
+msgid "Cut your movies."
+msgstr "Mit MovieCut können Sie Ihre aufgenommenen Filme schneiden."
+
+msgid "CutListEditor allows you to edit your movies"
+msgstr "Schneiden von aufgenommenen Filmen"
+
+msgid ""
+"CutListEditor allows you to edit your movies.\n"
+"Seek to the start of the stuff you want to cut away. Press OK, select 'start "
+"cut'.\n"
+"Then seek to the end, press OK, select 'end cut'. That's it."
+msgstr ""
+"Mit CutListEditor können Sie Ihre aufgenommenen Filme schneiden.\n"
+"\n"
+" "
 
 #
 msgid "Cutlist editor..."
@@ -1665,6 +1895,18 @@ msgstr "DVD Titelliste"
 #
 msgid "DVD media toolbox"
 msgstr ""
+
+msgid "DVDPlayer plays your DVDs on your Vuplus"
+msgstr "Spielt DVDs mit dem DVDPlayer der Vuplus ab"
+
+msgid ""
+"DVDPlayer plays your DVDs on your Vuplus.\n"
+"With the DVDPlayer you can play your DVDs on your Vuplus from a DVD or "
+"even from an iso file or video_ts folder on your harddisc or network."
+msgstr ""
+"DVD Player spielt DVDs auf der Vuplus ab.\n"
+"Es können DVDs, iso-Dateien und Dateien aus einer video_ts-Ordnerstruktur "
+"von Ihrer Festplatte oder aus dem Netzwerk abgespielt werden."
 
 #
 msgid "Danish"
@@ -1722,6 +1964,12 @@ msgstr "Standard-Kanallisten"
 msgid "Defaults"
 msgstr "Standard"
 
+msgid "Define a startup service"
+msgstr "Legt einen Startsender fest"
+
+msgid "Define a startup service for your Vuplus."
+msgstr "StartUpService legen Sie einen Startsender Ihrer Vuplus fest."
+
 #
 msgid "Delay"
 msgstr "Verzögerung"
@@ -1775,6 +2023,9 @@ msgstr "Zielverzeichnis"
 msgid "Details for extension: "
 msgstr "Details für Erweiterung:"
 
+msgid "Details for plugin: "
+msgstr "Details für Plugin: "
+
 #
 msgid "Detected HDD:"
 msgstr "Erkannte Festplatte:"
@@ -1818,6 +2069,9 @@ msgstr ""
 #
 msgid "Dir:"
 msgstr "Verzeichnis:"
+
+msgid "Direct playback of Youtube videos"
+msgstr "Youtube Filme direkt abspielen"
 
 #
 msgid "Direct playback of linked titles without menu"
@@ -1896,6 +2150,12 @@ msgstr "Display und Userinterface"
 msgid "Display search results by:"
 msgstr "Suchergebnisse anzeigen:"
 
+msgid "Display your photos on the TV"
+msgstr "Zeigt Bilder auf dem Fernseher an"
+
+msgid "Displays movie information from the InternetMovieDatabase"
+msgstr "Filminformationen aus der InternetMovieDatabase"
+
 #
 #, python-format
 msgid ""
@@ -1957,9 +2217,13 @@ msgstr "Jetzt nach Kanälen suchen?"
 msgid "Do you want to do another manual service scan?"
 msgstr "Wollen Sie eine weitere manuelle Suche durchführen?"
 
+#, python-format
+msgid "Do you want to download the image to %s ?"
+msgstr "Wollen Sie das Image nach %s herunterladen?"
+
 #
 msgid "Do you want to enable the parental control feature on your dreambox?"
-msgstr "Möchten Sie den Jugendschutz Ihrer Dreambox aktivieren?"
+msgstr "Möchten Sie den Jugendschutz Ihrer Vuplus aktivieren?"
 
 #
 msgid "Do you want to enter a username and password for this host?\n"
@@ -1983,8 +2247,8 @@ msgid "Do you want to preview this DVD before burning?"
 msgstr "Wollen Sie vor dem Brennen eine Vorschau der DVD ansehen?"
 
 #
-msgid "Do you want to reboot your Dreambox?"
-msgstr "Wollen Sie die Dreambox neu starten?"
+msgid "Do you want to reboot your Vuplus?"
+msgstr "Wollen Sie die Vuplus neu starten?"
 
 #
 msgid "Do you want to remove the package:\n"
@@ -2011,15 +2275,15 @@ msgstr ""
 "nötig kontaktieren können?"
 
 #
-msgid "Do you want to update your Dreambox?"
-msgstr "Wollen Sie Ihre Dreambox aktualisieren?"
+msgid "Do you want to update your Vuplus?"
+msgstr "Wollen Sie Ihre Vuplus aktualisieren?"
 
 #
 msgid ""
-"Do you want to update your Dreambox?\n"
+"Do you want to update your Vuplus?\n"
 "After pressing OK, please wait!"
 msgstr ""
-"Möchten Sie Ihre Dreambox aktualisieren?\n"
+"Möchten Sie Ihre Vuplus aktualisieren?\n"
 "Nach dem Druck auf OK bitte warten!"
 
 #
@@ -2053,6 +2317,10 @@ msgstr ""
 msgid "Download"
 msgstr "Herunterladen"
 
+#, python-format
+msgid "Download %s from Server"
+msgstr "%s vom Server herunterladen"
+
 #
 msgid "Download .NFI-Files for USB-Flasher"
 msgstr ".NFI-Files für USB-Flasher runterladen"
@@ -2064,6 +2332,9 @@ msgstr "Plugins herunterladen"
 #
 msgid "Download Video"
 msgstr "Video runterladen"
+
+msgid "Download files from Rapidshare"
+msgstr "Lädt Dateien von Rapidshare herunter"
 
 #
 msgid "Download location"
@@ -2094,12 +2365,12 @@ msgid "Downloading screenshots. Please wait..."
 msgstr "Bilder werden geladen. Bitte warten..."
 
 #
-msgid "Dreambox format data DVD (HDTV compatible)"
-msgstr "Daten-DVD im Dreambox-Format (HDTV-kompatibel)"
+msgid "Vuplus format data DVD (HDTV compatible)"
+msgstr "Daten-DVD im Vuplus-Format (HDTV-kompatibel)"
 
 #
-msgid "Dreambox software because updates are available."
-msgstr "Dreambox Software, da Updates verfügbar sind."
+msgid "Vuplus software because updates are available."
+msgstr "Vuplus Software, da Updates verfügbar sind."
 
 #
 msgid "Duration: "
@@ -2124,6 +2395,17 @@ msgstr "EPG-Auswahl"
 #
 msgid "EPG encoding"
 msgstr "Zeichensatz des EPG"
+
+msgid ""
+"EPGRefresh will automatically switch to user-defined channels when the box "
+"is idleing\n"
+"(in standby mode without any running recordings) to perform updates of the "
+"epg information on these channels."
+msgstr ""
+"EPGRefresh schaltet auf vorkonfigurierte Sender, wenn die Box nicht genutzt "
+"wird\n"
+"(im Standby und ohne aktive Aufnahme) und aktualisiert so die EPG-"
+"Informationen dieser Sender."
 
 #
 #, python-format
@@ -2164,7 +2446,7 @@ msgstr "Titel schneiden"
 
 #
 msgid "Edit bouquets list"
-msgstr ""
+msgstr "Bouquetliste bearbeiten"
 
 #
 msgid "Edit chapters of current title"
@@ -2186,13 +2468,20 @@ msgstr "Kanalliste bearbeiten"
 msgid "Edit settings"
 msgstr "Einstellungen bearbeiten"
 
-#
-msgid "Edit the Nameserver configuration of your Dreambox.\n"
-msgstr "Bearbeiten Sie die Nameserver-Einstellungen Ihrer Dreambox.\n"
+msgid "Edit tags of recorded movies"
+msgstr "Bearbeiten der Tags aufgenommener Filme"
+
+msgid "Edit tags of recorded movies."
+msgstr ""
+"Mit TagEditor können Sie die Tags Ihrer aufgenommenen Filme bearbeiten."
 
 #
-msgid "Edit the network configuration of your Dreambox.\n"
-msgstr "Bearbeiten Sie die Netzwerk-Konfiguration Ihrer Dreambox.\n"
+msgid "Edit the Nameserver configuration of your Vuplus.\n"
+msgstr "Bearbeiten Sie die Nameserver-Einstellungen Ihrer Vuplus.\n"
+
+#
+msgid "Edit the network configuration of your Vuplus.\n"
+msgstr "Bearbeiten Sie die Netzwerk-Konfiguration Ihrer Vuplus.\n"
 
 #
 msgid "Edit title"
@@ -2217,6 +2506,11 @@ msgstr "Bildung"
 #
 msgid "Electronic Program Guide"
 msgstr "Elektronischer Programmführer"
+
+msgid "Emailclient is an IMAP4 e-mail viewer for the Vuplus."
+msgstr ""
+"Mit dem Emailclient können Sie Ihre E-Mails über die Vuplus abrufen, wenn "
+"Ihr Postfach für IMAP konfiguriert ist."
 
 #
 msgid "Enable"
@@ -2338,6 +2632,14 @@ msgstr "Endzeit"
 msgid "English"
 msgstr "Englisch"
 
+msgid ""
+"Enigma2 Plugin to play AVI/DIVX/WMV/etc. videos from PC on your Vuplus. "
+"Needs a running VLC from www.videolan.org on your pc."
+msgstr ""
+"VlcPlayer decodiert Videodateien auf Ihrem PC und spielt diese dann auf "
+"Ihrer Vuplus ab. Es wird ein funktionierendes VLC von www.videolan.org "
+"benötigt."
+
 #
 msgid ""
 "Enigma2 Skinselector\n"
@@ -2354,7 +2656,7 @@ msgstr "Anfängliche Vorlaufgeschwindigkeit eingeben"
 
 #
 msgid "Enter IP to scan..."
-msgstr ""
+msgstr "IP zum Scannen eingeben..."
 
 #
 msgid "Enter Rewind at speed"
@@ -2365,8 +2667,8 @@ msgid "Enter main menu..."
 msgstr "Öffne Hauptmenü..."
 
 #
-msgid "Enter new hostname for your Dreambox"
-msgstr "Neuen Netzwerknamen für Ihre Dreambox eingeben"
+msgid "Enter new hostname for your Vuplus"
+msgstr "Neuen Netzwerknamen für Ihre Vuplus eingeben"
 
 #
 msgid "Enter options:"
@@ -2378,7 +2680,7 @@ msgstr "Passwort eingeben:"
 
 #
 msgid "Enter pin code"
-msgstr ""
+msgstr "Pin Code eingeben"
 
 #
 msgid "Enter share directory:"
@@ -2459,6 +2761,9 @@ msgstr "Ausschließen"
 msgid "Execute \"after event\" during timespan"
 msgstr "Führe innerhalb der Zeitspanne aus"
 
+msgid "Execute TuxboxPlugins"
+msgstr "Ausführen von Tuxbox Plugins"
+
 #
 msgid "Execution Progress:"
 msgstr "Ausführen eines externen Befehls:"
@@ -2478,6 +2783,9 @@ msgstr "Beenden"
 #
 msgid "Exit editor"
 msgstr "Editor beenden"
+
+msgid "Exit input device selection."
+msgstr "Eingabegeräteauswahl verlassen"
 
 #
 msgid "Exit network wizard"
@@ -2526,6 +2834,13 @@ msgstr "Erweiterungsverwaltung"
 #
 msgid "FEC"
 msgstr "FEC"
+
+msgid ""
+"FTPBrowser allows uploading and downloading files between your Vuplus and "
+"a server using the file transfer protocol."
+msgstr ""
+"Mit FTPBrowser können Dateien mit dem File Transfer Protocol von der "
+"Vuplus auf einen Server übertragen werden und umgekehrt. "
 
 #
 msgid "Factory reset"
@@ -2626,6 +2941,9 @@ msgstr "Netzwerkneustart abgeschlossen"
 msgid "Finnish"
 msgstr "Finnisch"
 
+msgid "First generate your skin-style with the Ai.HD-Control plugin."
+msgstr "Generieren Sie Ihren Ai.HD Skin-Stil mit diesem Plugin."
+
 #
 msgid ""
 "First we need to download the latest boot environment for the USB flasher."
@@ -2635,7 +2953,7 @@ msgstr ""
 
 #
 msgid "Flash"
-msgstr ""
+msgstr "Flash"
 
 #
 msgid "Flashing failed"
@@ -2702,6 +3020,14 @@ msgstr "Freitag"
 msgid "Frisian"
 msgstr "Friesisch"
 
+msgid "FritzCall shows incoming calls to your Fritz!Box on your Vuplus."
+msgstr ""
+"FritzCall zeigt die bei Ihrer Fritz!Box eingehenden Anrufe auf der Vuplus "
+"an."
+
+msgid "Frontend for /tmp/mmi.socket"
+msgstr "Frontend für /tmp/mmi.socket"
+
 #
 #, python-format
 msgid "Frontprocessor version: %d"
@@ -2719,6 +3045,20 @@ msgstr ""
 "Das System muss neu gestartet werden,\n"
 "um das neue Aussehen übernehmen zu können.\n"
 "Wollen Sie jetzt neu starten?"
+
+msgid "GUI that allows user to change the ftp- / telnet password."
+msgstr ""
+"Eine grafische Oberfläche zum Ändern des FTP- und Telnet-Passworts Ihrer "
+"Vuplus."
+
+msgid ""
+"GUI that allows user to change the ftp-/telnet-password of the Vuplus."
+msgstr ""
+"Eine grafische Oberfläche zum Ändern des FTP- und Telnet-Passworts Ihrer "
+"Vuplus."
+
+msgid "GUI to change the ftp and telnet-password"
+msgstr "GUI zum Ändern des FTP-und Telnet-Passworts"
 
 #
 msgid "Gaming"
@@ -2749,19 +3089,37 @@ msgid "Genre"
 msgstr "Kategorie"
 
 #
-msgid "Genuine Dreambox"
-msgstr ""
+msgid "Genuine Vuplus"
+msgstr "Genuine Vuplus"
 
-msgid "Genuine Dreambox validation failed!"
-msgstr ""
+msgid "Genuine Vuplus validation failed!"
+msgstr "Genuine Vuplus Überprüfung fehlgeschlagen!"
+
+msgid "Genuine Vuplus verification"
+msgstr "Überprüft die Echtheit der Vuplus"
 
 #
 msgid "German"
 msgstr "Deutsch"
 
+msgid "German storm information"
+msgstr "Zeigt Aktuelle Unwetterinformationen an"
+
+msgid "German traffic information"
+msgstr "Zeigt aktuelle Verkehrsinformationen an"
+
 #
 msgid "Germany"
 msgstr "Deutschland"
+
+msgid "Get AudioCD info from CDDB and CD-Text"
+msgstr "Ruft Audio-CD-Information von CDDB und CD-Text ab"
+
+msgid "Get latest experimental image"
+msgstr "Neuestes Experimental-Image"
+
+msgid "Get latest release image"
+msgstr "Neuestes Release-Image"
 
 #
 msgid "Getting plugin information. Please wait..."
@@ -2779,6 +3137,16 @@ msgstr "Gehe zu 0"
 msgid "Goto position"
 msgstr "Auf Position drehen"
 
+msgid "GraphMultiEPG shows a graphical timeline EPG"
+msgstr "GraphMultiEPG zeigt ein grafisches Zeitlinien-EPG"
+
+msgid ""
+"GraphMultiEPG shows a graphical timeline EPG.\n"
+"Shows a nice overview of all running und upcoming tv shows."
+msgstr ""
+"Das GraphMultiEPG zeigt ein grafisches Zeitlinien-EPG\n"
+"aller laufenden und zukünftigen Sendungen."
+
 #
 msgid "Graphical Multi EPG"
 msgstr "Grafischer Multi-EPG"
@@ -2794,6 +3162,15 @@ msgstr "Griechisch"
 #
 msgid "Green boost"
 msgstr "Grünanteil erhöhen"
+
+msgid ""
+"Growlee allows your Vuplus to send short messages using the growl "
+"protocol\n"
+"like Recording started notifications to a PC running a growl client"
+msgstr ""
+"Mit Growlee kann Ihre Vuplus Nachrichten mittels des Growl-Protokolls "
+"verschicken,\n"
+"wie z.B. Aufnahme gestartet-Benachrichtigungen an einen PC mit Growl-Client."
 
 #
 msgid "Guard Interval"
@@ -2871,6 +3248,9 @@ msgstr "Hong Kong"
 msgid "Horizontal"
 msgstr "Horizontal"
 
+msgid "Hotplugging for removeable devices"
+msgstr "Informiert über angeschlossene oder entfernte Geräte"
+
 #
 msgid "How many minutes do you want to record?"
 msgstr "Wie viele Minuten möchten Sie aufnehmen?"
@@ -2891,6 +3271,9 @@ msgstr "Farbton"
 msgid "Hungarian"
 msgstr "Ungarisch"
 
+msgid "IMAP4 e-mail viewer for the Vuplus"
+msgstr "IMAP4 E-Mail-Client für Ihre Vuplus"
+
 #
 msgid "IP Address"
 msgstr "IP-Adresse"
@@ -2898,6 +3281,9 @@ msgstr "IP-Adresse"
 #
 msgid "IP:"
 msgstr "IP:"
+
+msgid "IRC Client for Enigma2"
+msgstr "IRC Client für Enigma2"
 
 #
 msgid "ISO file is too large for this filesystem!"
@@ -3033,7 +3419,7 @@ msgstr ""
 
 #
 msgid "Initialization"
-msgstr ""
+msgstr "Initialisierung"
 
 #
 msgid "Initialize"
@@ -3046,6 +3432,12 @@ msgstr "Initialisiere Festplatte..."
 #
 msgid "Input"
 msgstr "Eingabe"
+
+msgid "Input device setup"
+msgstr "Eingabegeräte Setup"
+
+msgid "Input devices"
+msgstr "Eingabegeräte"
 
 #
 msgid "Install"
@@ -3117,7 +3509,7 @@ msgstr "Integriertes WLAN"
 
 #
 msgid "Interface: "
-msgstr ""
+msgstr "Interface: "
 
 #
 msgid "Intermediate"
@@ -3128,7 +3520,10 @@ msgid "Internal Flash"
 msgstr "Interner Flash"
 
 msgid "Internal LAN adapter."
-msgstr ""
+msgstr "Interner LAN Adapter."
+
+msgid "Internal firmware updater"
+msgstr "Interner Firmwareupdater"
 
 #
 msgid "Invalid Location"
@@ -3142,18 +3537,18 @@ msgstr "Ungültiges Verzeichnis ausgewählt: %s"
 #
 # File: tmp/enigma2_plugins/genuinedreambox/src/plugin.py, line: 304
 msgid "Invalid response from Security service pls restart again"
-msgstr ""
+msgstr "Ungültige Antwort vom Sicherheitsdienst, bitte erneut starten."
 
 #
 # File: tmp/enigma2_plugins/genuinedreambox/src/plugin.py, line: 132
 msgid "Invalid response from server."
-msgstr ""
+msgstr "Ungültige Antwort vom Server."
 
 #
 # File: tmp/enigma2_plugins/genuinedreambox/src/plugin.py, line: 177
 #, python-format
 msgid "Invalid response from server. Please report: %s"
-msgstr ""
+msgstr "Ungültige Antwort vom Server. Bitte reporten Sie: %s"
 
 #
 msgid "Invalid selection"
@@ -3196,6 +3591,14 @@ msgstr ""
 msgid "Italian"
 msgstr "Italienisch"
 
+msgid "Italian Weather forecast on Vuplus"
+msgstr "Italienische Wettervorhersagen auf der Vuplus"
+
+msgid "Italian Weather forecast on Vuplus from www.google.it."
+msgstr ""
+"MeteoItalia zeigt italienische Wettervorhersagen auf Ihrer Vuplus von www."
+"google.it an."
+
 #
 msgid "Italy"
 msgstr "Italien"
@@ -3212,6 +3615,51 @@ msgstr "Jobansicht"
 #. TRANSLATORS: (aspect ratio policy: display as fullscreen, even if this breaks the aspect)
 msgid "Just Scale"
 msgstr ""
+
+msgid "Kerni's BrushedAlu-HD skin"
+msgstr "Kerni's BrushedAlu-HD Skin"
+
+msgid "Kerni's DreamMM-HD skin"
+msgstr "Kerni's DreamMM-HD Skin"
+
+msgid "Kerni's Elgato-HD skin"
+msgstr "Kerni's Elgato-HD Skin"
+
+msgid "Kerni's SWAIN skin"
+msgstr "Kerni's SWAIN Skin"
+
+msgid "Kerni's SWAIN-HD skin"
+msgstr "Kerni's SWAIN-HD Skin"
+
+msgid "Kerni's UltraViolet skin"
+msgstr "Kerni's UltraViolet Skin"
+
+msgid "Kerni's YADS-HD skin"
+msgstr "Kerni's YADS-HD Skin"
+
+msgid "Kerni's dTV-HD skin"
+msgstr "Kerni's dTV-HD Skin"
+
+msgid "Kerni's dTV-HD-Reloaded skin"
+msgstr "Kerni's dTV-HD-Reloaded Skin"
+
+msgid "Kerni's dmm-HD skin"
+msgstr "Kerni's dmm-HD Skin"
+
+msgid "Kerni's dreamTV-HD skin"
+msgstr "Kerni's dreamTV-HD Skin"
+
+msgid "Kerni's simple skin"
+msgstr "Kerni's simple Skin"
+
+msgid "Kerni-HD1 skin"
+msgstr "Kerni-HD1 Skin"
+
+msgid "Kerni-HD1R2 skin"
+msgstr "Kerni-HD1R2 Skin"
+
+msgid "Kernis HD1 skin"
+msgstr "Kernis HD1 Skin"
 
 #
 #, python-format
@@ -3239,12 +3687,17 @@ msgstr "Tastatureinstellung"
 msgid "Keymap"
 msgstr "Tastenlayout"
 
+msgid "KiddyTimer allows to control your kids's daily tv usage."
+msgstr ""
+"KiddyTimer hilft Ihnen dabei, die tägliche TV-Nutzung Ihres Kindes zu "
+"kontrollieren."
+
 #
 msgid "LAN Adapter"
 msgstr "Netzwerkadapter"
 
 msgid "LAN connection"
-msgstr ""
+msgstr "LAN Verbindung"
 
 #
 msgid "LNB"
@@ -3335,6 +3788,12 @@ msgstr "Verknüpfte Titel mit einem DVD-Menü"
 msgid "List of Storage Devices"
 msgstr "Speichergeräteliste"
 
+msgid "Listen and record internet radio"
+msgstr "Internetradio mit Aufnahmefunktion"
+
+msgid "Listen and record shoutcast internet radio on your Vuplus."
+msgstr "Shoutcast Internetradio mit Aufnahmefunktion auf der Vuplus."
+
 #
 msgid "Lithuanian"
 msgstr "litauisch"
@@ -3384,7 +3843,7 @@ msgid "Long Keypress"
 msgstr "langer Tastendruck"
 
 msgid "Long filenames"
-msgstr ""
+msgstr "Lange Dateinamen"
 
 #
 msgid "Longitude"
@@ -3434,9 +3893,26 @@ msgstr "Aus dieser Markierung nur eine Markierung machen"
 msgid "Manage extensions"
 msgstr "Erweiterungen verwalten"
 
+msgid "Manage local files"
+msgstr "Dateibrowser für lokale Dateien"
+
+msgid "Manage logos to display at boot time or while in radio mode."
+msgstr ""
+"LogoManager verwaltet die Bilder, die angezeigt werden sollen, wenn die "
+"Vuplus bootet oder im Radiomodus ist."
+
+msgid "Manage logos to display at boottime"
+msgstr "Bilderverwaltung für Boot  und Radio-Modus"
+
 #
 msgid "Manage network shares"
 msgstr "Netzwerkfreigaben verwalten"
+
+msgid ""
+"Manage your music files in a database, play it with Merlin Music Player."
+msgstr ""
+"Merlin Music Player bietet mit iDream eine Datenbankverwaltung für "
+"Musikdateien und dient gleichzeitig zum Abspielen von Musikdateien."
 
 #
 msgid "Manage your network shares..."
@@ -3444,7 +3920,7 @@ msgstr "Verwalten Sie Ihre Netzwerkfreigaben..."
 
 #
 msgid "Manage your receiver's software"
-msgstr "Verwalten Sie die Software Ihrer Dreambox."
+msgstr "Verwalten Sie die Software Ihrer Vuplus."
 
 #
 msgid "Manual Scan"
@@ -3505,6 +3981,22 @@ msgstr "Media Player"
 msgid "MediaPlayer"
 msgstr "Medienwiedergabe"
 
+msgid ""
+"MediaScanner scans devices for playable media files and displays a menu with "
+"possible actions like viewing pictures or playing movies."
+msgstr ""
+"MediaScanner durchsucht Geräte nach Mediendateien und bietet Ihnen dazu "
+"passende Aktionen an, wie z. B. Bilder betrachten oder Videos abspielen."
+
+msgid ""
+"Mediaplayer plays your favorite music and videos.\n"
+"Play all your favorite music and video files, organize them in playlists, "
+"view cover and album information."
+msgstr ""
+"MediaPlayer spielt Ihre Musik- und Videodateien ab.\n"
+"Außerdem können Sie Playlisten organisieren und Cover und Album-"
+"Informationen abrufen."
+
 #
 msgid "Medium is not a writeable DVD!"
 msgstr "Das Medium ist keine beschreibbare DVD!"
@@ -3516,6 +4008,9 @@ msgstr "Das Medium ist nicht leer!"
 #
 msgid "Menu"
 msgstr "Menu"
+
+msgid "Merlin Music Player and iDream"
+msgstr "Merlin Music Player und iDream"
 
 #
 msgid "Message"
@@ -3701,9 +4196,28 @@ msgstr "Plugin nach oben bewegen"
 msgid "Move west"
 msgstr "Drehen nach Westen"
 
+msgid "Movie information from the Online Film Datenbank (German)."
+msgstr ""
+"Mit OFDb können Sie Filminformationen aus der Online Film Datenbank über das "
+"Internet herunterladen."
+
+msgid "Movie informations from the Online Film Datenbank"
+msgstr "Filminformationen aus der Online Film Datenbank"
+
 #
 msgid "Movie location"
 msgstr "Film Verzeichnis"
+
+msgid ""
+"MovieTagger adds tags to recorded movies to sort a large list of movies."
+msgstr "Mit MovieTagger können Sie Tags für Ihre aufgenommenen Filme vergeben."
+
+msgid ""
+"Movielist Preview creates screenshots of recordings and shows them inside "
+"the movielist."
+msgstr ""
+"Movielist Preview erstellt für aufgenommene Filme Vorschaubilder und zeigt "
+"diese in der Filmliste an."
 
 #
 msgid "Movielist menu"
@@ -3777,11 +4291,10 @@ msgstr "NÄCHSTE"
 msgid "NFI Image Flashing"
 msgstr ""
 
-#
 msgid "NFI image flashing completed. Press Yellow to Reboot!"
 msgstr ""
-"NFI Image flashen beendet.\n"
-"Drücken Sie gelb um die Dreambox neu zu starten!"
+"NFI Image Flashen beendet.\n"
+"Drücken Sie Gelb um die Vuplus neu zu starten!"
 
 #
 msgid "NFS share"
@@ -3815,6 +4328,102 @@ msgstr "DNS-Einstellungen"
 #
 msgid "Nameserver settings"
 msgstr "DNS-Einstellungen"
+
+msgid "Nemesis BlackBox Skin"
+msgstr "Nemesis BlackBox Skin"
+
+msgid "Nemesis BlackBox Skin for the Vuplus"
+msgstr "Nemesis BlackBox Skin für die Vuplus."
+
+msgid "Nemesis Blueline Single Skin"
+msgstr "Nemesis Blueline Single Skin"
+
+msgid "Nemesis Blueline Single Skin for the Vuplus"
+msgstr "Nemesis Blueline Single Skin für die Vuplus."
+
+msgid "Nemesis Blueline Skin"
+msgstr "Nemesis Blueline Skin"
+
+msgid "Nemesis Blueline Skin for the Vuplus"
+msgstr "Nemesis Blueline Skin für die Vuplus."
+
+msgid "Nemesis Blueline.Extended Skin"
+msgstr "Nemesis Blueline.Extended Skin"
+
+msgid "Nemesis Blueline.Extended Skin for the Vuplus"
+msgstr "Nemesis Blueline.Extended Skin für die Vuplus."
+
+msgid "Nemesis ChromeLine Cobolt Skin"
+msgstr "Nemesis ChromeLine Cobolt Skin"
+
+msgid "Nemesis ChromeLine Cobolt Skin for the Vuplus"
+msgstr "Nemesis ChromeLine Cobolt Skin für die Vuplus."
+
+msgid "Nemesis ChromeLine Skin"
+msgstr "Nemesis ChromeLine Skin"
+
+msgid "Nemesis ChromeLine Skin for the Vuplus"
+msgstr "Nemesis ChromeLine Skin für die Vuplus."
+
+msgid "Nemesis Flatline Blue Skin"
+msgstr "Nemesis Flatline Blue Skin"
+
+msgid "Nemesis Flatline Blue Skin for the Vuplus"
+msgstr "Nemesis Flatline Blue Skin für die Vuplus."
+
+msgid "Nemesis Flatline Skin"
+msgstr "Nemesis Flatline Skin"
+
+msgid "Nemesis Flatline Skin for the Vuplus"
+msgstr "Nemesis Flatline Skin für die Vuplus."
+
+msgid "Nemesis GlassLine Skin"
+msgstr "Nemesis GlassLine Skin"
+
+msgid "Nemesis GlassLine Skin for the Vuplus"
+msgstr "Nemesis GlassLine Skin für die Vuplus."
+
+msgid "Nemesis Greenline Extended Skin"
+msgstr "Nemesis Greenline Extended Skin"
+
+msgid "Nemesis Greenline Extended Skin for the Vuplus"
+msgstr "Nemesis Greenline Extended Skin für die Vuplus."
+
+msgid "Nemesis Greenline Single Skin"
+msgstr "Nemesis Greenline Single Skin"
+
+msgid "Nemesis Greenline Single Skin for the Vuplus"
+msgstr "Nemesis Greenline Single Skin für die Vuplus."
+
+msgid "Nemesis Greenline Skin"
+msgstr "Nemesis Greenline Skin"
+
+msgid "Nemesis Greenline Skin for the Vuplus"
+msgstr "Nemesis Greenline Skin für die Vuplus."
+
+msgid "Nemesis Greyline Extended Skin"
+msgstr "Nemesis Greyline Extended Skin"
+
+msgid "Nemesis Greyline Extended Skin for the Vuplus"
+msgstr "Nemesis Greyline Extended Skin für die Vuplus."
+
+msgid "Nemesis Greyline Single Skin"
+msgstr "Nemesis Greyline Single Skin"
+
+msgid "Nemesis Greyline Single Skin for the Vuplus"
+msgstr "Nemesis Greyline Single Skin für die Vuplus."
+
+msgid "Nemesis Greyline Skin"
+msgstr "Nemesis Greyline Skin"
+
+msgid "Nemesis Greyline Skin for the Vuplus"
+msgstr "Nemesis Greyline Skin für die Vuplus."
+
+msgid "Nemesis ShadowLine Skin"
+msgstr "Nemesis ShadowLine Skin"
+
+msgid "Nemesis ShadowLine Skin for the Vuplus"
+msgstr "Nemesis ShadowLine Skin für die Vuplus."
 
 #
 msgid "Netmask"
@@ -3861,7 +4470,7 @@ msgid "Network test..."
 msgstr "Netzwerk Test..."
 
 msgid "Network test: "
-msgstr ""
+msgstr "Netzwerk Test:"
 
 #
 msgid "Network:"
@@ -4003,7 +4612,7 @@ msgstr "Kein Satellit-Tuner gefunden"
 
 #
 msgid "No tags are set on these movies."
-msgstr ""
+msgstr "Keine Tags für diese Filme gesetzt."
 
 #
 msgid "No to all"
@@ -4106,7 +4715,10 @@ msgstr "Nein, nichts tun"
 
 #
 msgid "No, just start my dreambox"
-msgstr "Nein, nur die Dreambox starten"
+msgstr "Nein, nur die Vuplus starten"
+
+msgid "No, never"
+msgstr "Nein, niemals"
 
 #
 msgid "No, not now"
@@ -4278,9 +4890,18 @@ msgstr "Orbit Position"
 msgid "Outer Bound (+/-)"
 msgstr "Grenzen (+/-)"
 
+msgid "Overlay for scrolling bars"
+msgstr "Overlay für Scrollbalken"
+
 #
 msgid "Override found with alternative service"
 msgstr "Service mit alternative ersetzen"
+
+msgid "Overwrite configuration files ?"
+msgstr "Konfigurationsdateien überschreiben ?"
+
+msgid "Overwrite configuration files during software upgrade?"
+msgstr "Konfigurationsdateien beim Software-Update überschreiben ?"
 
 #
 msgid "PAL"
@@ -4339,6 +4960,14 @@ msgstr "Jugendschutz-Einstellungen"
 msgid "Parental control type"
 msgstr "Jugendschutz-Typ"
 
+msgid ""
+"Partnerbox allows editing a remote Vuplus's record timers and stream its "
+"TV  program."
+msgstr ""
+"Mit Partnerbox kann auf eine andere Vuplus zugegriffen und deren Timer "
+"verwaltet werden. Zusätzlich kann auch auf das TV Programm der anderen "
+"Vuplus zugegriffen werden."
+
 #
 msgid "Password"
 msgstr "Passwort"
@@ -4350,6 +4979,9 @@ msgstr "Am Filmende pausieren"
 #
 msgid "People & Blogs"
 msgstr "Leute & Blogs"
+
+msgid "PermanentClock shows the clock permanently on the screen."
+msgstr "PermanentClock zeigt die Uhrzeit permanent auf Ihrem Fernseher an."
 
 #
 msgid "Pets & Animals"
@@ -4400,6 +5032,13 @@ msgstr "Musik abspielen..."
 msgid "Play YouTube movies"
 msgstr "YouTube Videos abspielen"
 
+msgid "Play music from Last.fm"
+msgstr "Spielt Musik von Last.fm ab"
+
+msgid "Play music from Last.fm."
+msgstr ""
+"Mit LastFM können Sie Ihre Musik über das Internetradio Last.fm abspielen."
+
 #
 msgid "Play next video"
 msgstr "nächstes Video"
@@ -4411,6 +5050,21 @@ msgstr "Aufgenommene Filme abspielen..."
 #
 msgid "Play video again"
 msgstr "Video noch mal abspielen"
+
+msgid "Play videos from PC on your Vuplus"
+msgstr "Videos von ihrem PC abspielen"
+
+msgid "Playback of Youtube through a PC"
+msgstr "Spielt YouTube-Filme von Ihrem PC ab"
+
+msgid "Player for Network and Internet Streams"
+msgstr "Player für Netzwerk- und Internet-Streams"
+
+msgid "Player for Network and Internet Streams."
+msgstr "NETcaster ist ein Player für Netzwerk- und Internet-Streams."
+
+msgid "Plays your favorite music and videos"
+msgstr "Spielt Musik- und Videodateien ab"
 
 #
 msgid "Please Reboot"
@@ -4470,10 +5124,10 @@ msgstr ""
 
 #
 msgid ""
-"Please disconnect all USB devices from your Dreambox and (re-)attach the "
+"Please disconnect all USB devices from your Vuplus and (re-)attach the "
 "target USB stick (minimum size is 64 MB) now!"
 msgstr ""
-"Bitte ziehen Sie jetzt alle USB-Geräte von Ihrer Dreambox ab und stecken "
+"Bitte ziehen Sie jetzt alle USB-Geräte von Ihrer Vuplus ab und stecken "
 "(erneut) den zu benutzenden USB-Stick (Mindestgröße von 64 MB) ein!"
 
 #
@@ -4568,6 +5222,9 @@ msgstr "Bitte einen Unterkanal zur Aufnahme auswählen..."
 msgid "Please select a subservice..."
 msgstr "Bitte einen Unterkanal auswählen..."
 
+msgid "Please select an NFI file and press green key to flash!"
+msgstr "Bitte wählen Sie eine NFI-Datei aus und drücken Sie Grün zum Flashen!"
+
 #
 msgid "Please select an extension to remove."
 msgstr "Bitte wählen Sie eine Erweiterung zum Deinstallieren."
@@ -4582,7 +5239,7 @@ msgstr "Bitte wählen Sie einen Datenträger für eine Sicherung"
 
 #
 msgid "Please select tag to filter..."
-msgstr ""
+msgstr "Bitte einen Tag zum Filtern auswählen..."
 
 #
 msgid "Please select target directory or medium"
@@ -4645,9 +5302,8 @@ msgstr ""
 "Danach drücken Sie bitte OK."
 
 #
-#, fuzzy
 msgid "Please wait (Step 2)"
-msgstr "Bitte warten..."
+msgstr "Bitte warten (Schritt 2)"
 
 #
 msgid "Please wait for activation of your network configuration..."
@@ -4722,6 +5378,9 @@ msgstr "Plugin: %(plugin)s , Version: %(version)s"
 msgid "Plugins"
 msgstr "Erweiterungen"
 
+msgid "PodCast streams podcasts to your Vuplus."
+msgstr "Mit Podcast können Sie Podcasts auf Ihrer Vuplus abspielen."
+
 #
 msgid "Poland"
 msgstr "Polen"
@@ -4786,6 +5445,9 @@ msgstr "Rotor-Einstellungen"
 msgid "Positioner storage"
 msgstr "Positionsspeicher"
 
+msgid "PositionerSetup helps you installing a motorized dish"
+msgstr "Unterstützt Sie beim Installieren eines Rotors"
+
 #
 msgid ""
 "Power state to change to after recordings. Select \"standard\" to not change "
@@ -4802,9 +5464,18 @@ msgstr "Strom Schwellwert in mA"
 msgid "Predefined transponder"
 msgstr "Vordefinierte Transponder"
 
+msgid "Prepare another USB stick for image flashing"
+msgstr "Weiteren USB-Stick zum Image-Flashen vorbereiten"
+
 #
 msgid "Preparing... Please wait"
 msgstr "Vorbereitung läuft... Bitte warten!"
+
+msgid "Press INFO on your remote control for additional information."
+msgstr "INFO drücken für zusätzliche Informationen."
+
+msgid "Press MENU on your remote control for additional options."
+msgstr "Menu drücken für zusätzliche Optionen."
 
 #
 msgid "Press OK on your remote control to continue."
@@ -4820,7 +5491,7 @@ msgstr "OK drücken zum Aktivieren."
 
 #
 msgid "Press OK to collapse this host"
-msgstr ""
+msgstr "OK drücken zum zuklappen"
 
 #
 msgid "Press OK to edit selected settings."
@@ -4832,7 +5503,7 @@ msgstr "OK drücken zum Editieren."
 
 #
 msgid "Press OK to expand this host"
-msgstr ""
+msgstr "Ok drücken zum erweitern"
 
 #
 #, python-format
@@ -4841,7 +5512,7 @@ msgstr "Drücken Sie OK, um weitere Details zu %s zu erhalten."
 
 #
 msgid "Press OK to mount this share!"
-msgstr ""
+msgstr "Ok drücken um diese Freigabe zu verbinden!"
 
 #
 msgid "Press OK to mount!"
@@ -4899,6 +5570,12 @@ msgstr "Vorschau"
 msgid "Preview menu"
 msgstr "Vorschau des DVD-Menüs"
 
+msgid "Preview screenshots of running tv shows"
+msgstr "Zeigt Vorschaubilder laufender Sendungen"
+
+msgid "Preview screenshots of running tv shows."
+msgstr "Mosaic stellt Vorschaubilder aktuell laufender Sendungen zusammen."
+
 #
 msgid "Primary DNS"
 msgstr "Primärer DNS"
@@ -4941,7 +5618,10 @@ msgstr "Veröffentlicht"
 
 #
 msgid "Python frontend for /tmp/mmi.socket"
-msgstr ""
+msgstr "Python frontend für /tmp/mmi.socket"
+
+msgid "Python frontend for /tmp/mmi.socket."
+msgstr "Python frontend für /tmp/mmi.socket."
 
 #
 msgid "Quick"
@@ -4963,12 +5643,15 @@ msgstr "RF-Ausgang"
 msgid "RGB"
 msgstr "RGB"
 
+msgid "RSS viewer"
+msgstr "Betrachten von RSS-Links"
+
 #
 msgid "Radio"
-msgstr ""
+msgstr "Radio"
 
 msgid "Ralink"
-msgstr ""
+msgstr "Ralink"
 
 #
 msgid "Ram Disk"
@@ -5026,6 +5709,14 @@ msgstr "Kürzlich featured"
 msgid "Reception Settings"
 msgstr "Empfangseinstellungen"
 
+msgid "Reconstruct .ap and .sc files"
+msgstr "Rekonstruiert .ap- und .sc-Dateien"
+
+msgid "Reconstruct missing or corrupt .ap and .sc files of recorded movies."
+msgstr ""
+"Mit ReconstructApSc können Sie fehlende oder zerstörte .ap- und .sc-Dateien "
+"Ihrer aufgenommenen Filme rekonstruieren."
+
 #
 msgid "Record"
 msgstr "Aufnahme"
@@ -5053,7 +5744,7 @@ msgstr "Aufnahme"
 
 #
 msgid "Recording paths"
-msgstr ""
+msgstr "Aufnahmepfade"
 
 #
 msgid "Recording(s) are in progress or coming up in few seconds!"
@@ -5093,15 +5784,18 @@ msgstr "aktualisieren"
 
 #
 msgid "Reload Black-/Whitelists"
-msgstr ""
+msgstr "Black-/Whitelists neu laden"
 
 #
 msgid "Remember service pin"
-msgstr ""
+msgstr "Service Pin merken"
 
 #
 msgid "Remember service pin cancel"
-msgstr ""
+msgstr "Service Pin abbruch merken"
+
+msgid "Remote timer and remote TV player"
+msgstr "Zugriff auf die Timerverwaltung einer zweiten Vuplus"
 
 #
 msgid "Remove"
@@ -5176,6 +5870,9 @@ msgstr "Umbenennen"
 msgid "Rename crashlogs"
 msgstr "Crashlogs umbenennen"
 
+msgid "Rename your movies"
+msgstr "Benennen Sie Ihre Filme um"
+
 #
 msgid "Repeat"
 msgstr "Wiederholung"
@@ -5194,6 +5891,14 @@ msgstr ""
 msgid "Repeats"
 msgstr "Wiederholungen"
 
+msgid "Replace the minute input for the seek functions with a seekbar."
+msgstr ""
+"Seekbar ersetzt die Minuteneingabe für die Spulfunktionen mit einer "
+"Sprungleiste."
+
+msgid "Replace the rewind  input with a seekbar"
+msgstr "Ersetzt die Minuteneingabe für die Spulfunktionen"
+
 #
 msgid "Require description to be unique"
 msgstr "Beschreibung muss eindeutig sein"
@@ -5204,7 +5909,7 @@ msgstr "Benötigte Rohlingsorte:"
 
 #
 msgid "Rescan"
-msgstr ""
+msgstr "Erneut suchen"
 
 #
 msgid "Reset"
@@ -5261,7 +5966,7 @@ msgstr "Test wiederholen"
 
 #
 msgid "Restart your network connection and interfaces.\n"
-msgstr "Neustart der Netzwerk-Konfiguration Ihrer Dreambox.\n"
+msgstr "Neustart der Netzwerk-Konfiguration Ihrer Vuplus.\n"
 
 #
 msgid "Restore"
@@ -5282,6 +5987,9 @@ msgstr "Sicherung läuft"
 #
 msgid "Restore system settings"
 msgstr "Einstellungen wiederherstellen"
+
+msgid "Restore your Vuplus with a USB stick"
+msgstr "Wiederherstellen der Vuplus mittels USB-Stick"
 
 #
 msgid "Restrict \"after event\" to a certain timespan?"
@@ -5357,15 +6065,15 @@ msgstr ""
 
 #
 msgid "SNR"
-msgstr ""
+msgstr "SNR"
 
 #
 msgid "SNR:"
-msgstr ""
+msgstr "SNR:"
 
 #
 msgid "SSID:"
-msgstr ""
+msgstr "SSID:"
 
 #
 msgid "Sat"
@@ -5385,7 +6093,10 @@ msgstr "Satellitenausrüstungseinstellungen"
 
 #
 msgid "Satellite equipment"
-msgstr ""
+msgstr "Satelliten-Ausrüstung"
+
+msgid "SatelliteEquipmentControl allows you to fine-tune DiSEqC-settings"
+msgstr "Hilft beim Feintuning der DiSEqC-Einstellungen"
 
 #
 msgid "Satellites"
@@ -5394,6 +6105,9 @@ msgstr "Satelliten"
 #
 msgid "Satfinder"
 msgstr "Sat-Finder"
+
+msgid "Satfinder helps you to align your dish"
+msgstr "Hilft beim Ausrichten der Satellitenanlage"
 
 #
 msgid "Sats"
@@ -5445,11 +6159,11 @@ msgstr "Suche "
 
 #
 msgid "Scan Files..."
-msgstr ""
+msgstr "Dateien durchsuchen"
 
 #
 msgid "Scan NFS share"
-msgstr ""
+msgstr "NFS Freigabe suchen"
 
 #
 msgid "Scan QAM128"
@@ -5535,9 +6249,12 @@ msgstr "Durchsuche US MID"
 msgid "Scan band US SUPER"
 msgstr "Durchsuche US SUPER"
 
+msgid "Scan devices for playable media files"
+msgstr "Durchsucht Geräte nach Mediendateien."
+
 #
 msgid "Scan range"
-msgstr ""
+msgstr "Bereich durchsuchen"
 
 #
 msgid ""
@@ -5551,11 +6268,18 @@ msgid ""
 "Scan your network for wireless access points and connect to them using your "
 "selected wireless device.\n"
 msgstr ""
+"Durchsucht Ihr Netzwerk nach WLAN-Zugangspunkten und stellt eine Verbindung "
+"mit Hilfe Ihres gewählten WLAN-Gerätes her.\n"
+
+msgid "Scans default lamedbs sorted by satellite"
+msgstr "Sendersuche nach Satellit mit einem Rotor"
 
 #
 msgid ""
 "Scans default lamedbs sorted by satellite with a connected dish positioner"
 msgstr ""
+"DefaultServiceScanner führt eine Sendersuche aller Satelliten durch, wenn "
+"Sie einen Rotor an Ihre Satellitenschüssel angeschlossen haben."
 
 #
 msgid "Science & Technology"
@@ -5593,6 +6317,9 @@ msgstr "Suche ohne Altersbeschränkung:"
 msgid "Search strictness"
 msgstr "Genauigkeit der Suche"
 
+msgid "Search through the EPG"
+msgstr "Durchsucht das EPG"
+
 #
 msgid "Search type"
 msgstr "Suchtyp"
@@ -5620,9 +6347,14 @@ msgid "Secondary DNS"
 msgstr "Sekundärer DNS"
 
 #
-#, fuzzy
 msgid "Security service not running."
-msgstr "Wählen Sie einen Service zum Hinzufügen"
+msgstr "Der Sicherheitsdienst läuft nicht."
+
+msgid "See service-epg (and PiP) from other channels in an infobar."
+msgstr ""
+"Mit Virtual Zap kann man sich bequem durch die Senderliste zappen, während "
+"das aktuelle Fernsehprogramm normal weiter läuft. EPG-Daten und PiP von "
+"Kanälen werden im Infobar angezeigt."
 
 #
 msgid "Seek"
@@ -5681,6 +6413,12 @@ msgstr "Kanal auswählen, von dem aufgenommen werden soll"
 msgid "Select channel to record on"
 msgstr "Wähle Kanal für Aufnahme"
 
+msgid "Select desired image from feed list"
+msgstr "Bestimmtes Image vom Feed-Server herunterladen"
+
+msgid "Select files for backup."
+msgstr "Dateien zum sichern auswählen."
+
 #
 msgid "Select files for backup. Currently selected:\n"
 msgstr "Zu sichernde Dateien auswählen. Aktuell gewählt:\n"
@@ -5692,6 +6430,12 @@ msgstr "Wählen Sie Dateien/Ordner für die Sicherung"
 #
 msgid "Select image"
 msgstr "Wählen Sie ein Image"
+
+msgid "Select input device"
+msgstr "Eingabegerät auswählen."
+
+msgid "Select input device."
+msgstr "Eingabegerät auswählen."
 
 #
 msgid "Select interface"
@@ -5848,9 +6592,12 @@ msgstr "Kanal-Infos"
 msgid "Services"
 msgstr "Kanäle"
 
+msgid "Set Bitstream/PCM audio delays"
+msgstr "Einstellung der Ton- / Bild- Synchronität"
+
 #
 msgid "Set End Time"
-msgstr ""
+msgstr "End-Zeit eingeben"
 
 #
 msgid "Set Voltage and 22KHz"
@@ -5881,6 +6628,9 @@ msgstr "Finde maximale Länge"
 msgid "Set this NO to disable this AutoTimer."
 msgstr "Setze das auf NEIN um den AutoTimer zu deaktivieren."
 
+msgid "Sets your Vuplus into Deep-Standby"
+msgstr "Fährt die Vuplus zu definierten Zeiten in den Deep-Standby"
+
 #
 msgid "Setting key canceled"
 msgstr "Setzen der Taste abgebrochen"
@@ -5901,12 +6651,13 @@ msgstr "Benutzermodus"
 msgid "Setup for the Audio Sync Plugin"
 msgstr "Setup fürs Audio Sync Plugin"
 
-#
 #, python-format
 msgid ""
 "Shall the USB stick wizard proceed and program the image file %s into flash "
 "memory?"
 msgstr ""
+"Soll der Assistent fortfahren und die Image-Datei %s in den Flashspeicher "
+"schreiben?"
 
 #
 msgid "Sharpness"
@@ -5917,7 +6668,7 @@ msgid "Short Movies"
 msgstr "Kurzvideos"
 
 msgid "Short filenames"
-msgstr ""
+msgstr "Kurze Dateinamen"
 
 #
 msgid "Should this AutoTimer be restricted to a timespan?"
@@ -5953,7 +6704,7 @@ msgstr "Blinkende Uhr im Display während Aufnahmen"
 
 #
 msgid "Show event-progress in channel selection"
-msgstr ""
+msgstr "Zeige Sendungs-Fortschritt in der Kanal-Liste"
 
 #
 msgid "Show in extension menu"
@@ -5987,6 +6738,23 @@ msgstr "Radio-Wiedergabemodus..."
 msgid "Show the tv player..."
 msgstr "TV-Wiedergabemodus..."
 
+msgid "Show webcam pictures on your TV Screen"
+msgstr "Zeigt Bilder von Webcams auf der Vuplus"
+
+msgid ""
+"Shows a list containing the zapping-history and allows user to zap to the "
+"entries or to modify them."
+msgstr "ZapHistoryBrowser zeigt eine Liste der zuletzt gesehenen Sender an."
+
+msgid "Shows a list of recent zap entries"
+msgstr "Zeigt eine Liste der zuletzt gesehenen Kanäle"
+
+msgid "Shows statistics of watched services"
+msgstr "Zeigt Statistiken zu angeschauten Sendungen"
+
+msgid "Shows the clock permanently on the screen"
+msgstr "Permanente Uhrzeitanzeige auf dem TV"
+
 #
 msgid "Shows the state of your wireless LAN connection.\n"
 msgstr "Zeigt den Status der WLAN-Verbinung an.\n"
@@ -5996,8 +6764,8 @@ msgid "Shutdown"
 msgstr "Ausschalten"
 
 #
-msgid "Shutdown Dreambox after"
-msgstr "Dreambox ausschalten nach"
+msgid "Shutdown Vuplus after"
+msgstr "Vuplus ausschalten nach"
 
 #
 msgid "Signal Strength:"
@@ -6019,9 +6787,18 @@ msgstr "Ähnliche Sendungen:"
 msgid "Simple"
 msgstr "Einfach"
 
+msgid "Simple IRC GroupChat client for e2 #dm8000-vip channel"
+msgstr ""
+"dreamIRC ist ein IRC Chat-Client, der Ihnen direktenZugriff auf den #dm8000-"
+"vip-Chat ermöglicht."
+
 #
 msgid "Simple titleset (compatibility for legacy players)"
 msgstr "Schlicht (bessere Kompatibilität mit alten DVD-Playern)"
+
+msgid "SimpleRSS allows reading RSS newsfeeds on your Vuplus."
+msgstr ""
+"Mit SimpleRSS können Sie RSS-Links (Newsfeeds) auf Ihrer Vuplus betrachten."
 
 #
 msgid "Single"
@@ -6045,11 +6822,14 @@ msgstr "Einzelschritt (GOP)"
 
 #
 msgid "Skin"
-msgstr ""
+msgstr "Skin"
+
+msgid "SkinSelector shows a menu with selectable skins"
+msgstr "Zeigt ein Menü der auswählbaren Skins"
 
 #
 msgid "Skins"
-msgstr ""
+msgstr "Skins"
 
 #
 msgid "Sleep Timer"
@@ -6086,11 +6866,14 @@ msgstr "Zeitlupen-Geschwindigkeiten"
 
 #
 msgid "Software"
-msgstr ""
+msgstr "Software"
 
 #
 msgid "Software management"
 msgstr "Softwareverwaltung"
+
+msgid "Software manager setup"
+msgstr "Softwaremanager Setup"
 
 #
 msgid "Software restore"
@@ -6099,6 +6882,12 @@ msgstr "Software wiederherstellen"
 #
 msgid "Software update"
 msgstr "Software aktualisieren"
+
+msgid "SoftwareManager manages your Vuplus software"
+msgstr "Verwaltet die Vuplus-Software"
+
+msgid "Softwaremanager information"
+msgstr "Softwaremanager Information"
 
 #
 msgid "Some plugins are not available:\n"
@@ -6195,12 +6984,12 @@ msgstr "Standby / Neustart"
 #
 #, python-format
 msgid "Standby Fan %d PWM"
-msgstr ""
+msgstr "Standby Lüfter %d PWM"
 
 #
 #, python-format
 msgid "Standby Fan %d Voltage"
-msgstr ""
+msgstr "Standby Lüfter %d Spannung"
 
 #
 msgid "Start Webinterface"
@@ -6233,6 +7022,9 @@ msgstr "Beginnend ab"
 #
 msgid "Std. Feeds"
 msgstr "Std. Feeds"
+
+msgid "Step by step network configuration"
+msgstr "Asisstent für die Netzwerk-Konfiguration"
 
 #
 msgid "Step east"
@@ -6300,6 +7092,12 @@ msgstr "Position speichern"
 msgid "Stored position"
 msgstr "gespeicherte Position"
 
+msgid "Stream podcasts"
+msgstr "Spielt Podcasts auf der Vuplus ab"
+
+msgid "Streaming modules for the orf.at iptv web page."
+msgstr "Mit ORFat könnten Sie Filme von iptv.orf.at streamen."
+
 #
 msgid "Subservice list..."
 msgstr "Unterkanal-Liste..."
@@ -6346,7 +7144,7 @@ msgstr "Zum vorhergehenden Unterkanal schalten"
 
 #
 msgid "Switchable tuner types:"
-msgstr ""
+msgstr "Umschaltbare Tuner-Typen:"
 
 #
 msgid "Symbol Rate"
@@ -6379,11 +7177,11 @@ msgstr "Inhalt der Zusammenstellung"
 
 #
 msgid "Tag 1"
-msgstr ""
+msgstr "Tag 1"
 
 #
 msgid "Tag 2"
-msgstr ""
+msgstr "Tag 2"
 
 #
 msgid "Tags"
@@ -6424,19 +7222,22 @@ msgstr "Testtyp"
 #
 # File: tmp/enigma2_plugins/genuinedreambox/src/plugin.py, line: 80
 msgid "Test again"
-msgstr ""
+msgstr "Erneut testen"
 
 #
 msgid "Test mode"
 msgstr "Testmodus"
 
 #
-msgid "Test the network configuration of your Dreambox.\n"
-msgstr "Überprüfen Sie die Netzwerk-Konfiguration Ihrer Dreambox\n"
+msgid "Test the network configuration of your Vuplus.\n"
+msgstr "Überprüfen Sie die Netzwerk-Konfiguration Ihrer Vuplus\n"
+
+msgid "Test your DiSEqC equipment"
+msgstr "Testet Ihr DiSEqC Equipment"
 
 #
 msgid "Test-Messagebox?"
-msgstr ""
+msgstr "Test-Messagebox?"
 
 #
 msgid ""
@@ -6449,9 +7250,9 @@ msgstr ""
 #
 msgid ""
 "Thank you for using the wizard. Your box is now ready to use.\n"
-"Please press OK to start using your Dreambox."
+"Please press OK to start using your Vuplus."
 msgstr ""
-"Der Assistent ist hiermit beendet. Ihre Dreambox kann nun benutzt werden.\n"
+"Der Assistent ist hiermit beendet. Ihre Vuplus kann nun benutzt werden.\n"
 "Bitte drücken Sie OK, um den Assistenten zu verlassen."
 
 #
@@ -6463,27 +7264,91 @@ msgstr ""
 "Vielen Dank für das Benutzen des Wizards. Der neue AutoTimer wurde der Liste "
 "hinzugefügt. Drücke OK um Fortzufahren."
 
+msgid ""
+"The CleanupWizard informs you when the internal free memory of your dreambox "
+"has dropped below a definable threshold.You can use this wizard to remove "
+"some plugins."
+msgstr ""
+"CleanupWizard informiert Sie, wenn der interne freie Speicher Ihrer Vuplus "
+"unter eine definierte Grenze fällt und hilft Ihnen bei der Deinstallation "
+"von Plugins."
+
 #
 msgid ""
 "The DVD standard doesn't support H.264 (HDTV) video streams. Do you want to "
-"create a Dreambox format data DVD (which will not play in stand-alone DVD "
+"create a Vuplus format data DVD (which will not play in stand-alone DVD "
 "players) instead?"
 msgstr ""
 "Der DVD-Standard unterstützt keine H.264 (HDTV) Videos. Soll stattdessen "
-"eine Daten-DVD im Dreambox-Format (die nicht in einem herkömmlichen DVD-"
+"eine Daten-DVD im Vuplus-Format (die nicht in einem herkömmlichen DVD-"
 "Player abspielbar ist) erstellt werden?"
+
+msgid ""
+"The Elektro Power Save plugin puts the box from standby to sleep mode (Deep "
+"Standby) at certain times.\n"
+"This only happens if the box is in standby and no recording is running or "
+"sheduled in the next 20 minutes.\n"
+"The box automatically wakes up for recordings or at the end of the sleep "
+"time. You therefore don't have to wait until it is on again."
+msgstr ""
+"Elektro Power Save sorgt dafür, dass Ihre Vuplus zu bestimmten Zeiten in "
+"den Ruhezustand (Deep Standby) heruntergefahren wird.\n"
+"Dies passiert nur, wenn sie sich im Standby-Modus befindet und keine "
+"Aufnahme aktiv ist oder in den nächsten 20 Minuten gestartet wird.\n"
+"Zu Aufnahmen und nach Ende der Ruhezeit wacht die Box von alleine wieder auf "
+"und ist so ohne lange Wartezeiten wieder betriebsbereit."
+
+msgid ""
+"The Hotplug plugin notifies your system of newly added or removed devices."
+msgstr ""
+"Hotplug informiert Ihr System über neu angeschlossene oder entfernte Geräte."
 
 #
 msgid ""
 "The NetworkWizard extension is not installed!\n"
 "Please install it."
 msgstr ""
+"Das NetzwerkWizard Plugin ist nicht installiert!\n"
+"Bitte installieren Sie es."
+
+msgid ""
+"The PicturePlayer displays your photos on the TV.\n"
+"You can view them as thumbnails or slideshow."
+msgstr ""
+"Mit dem PicturePlayer können Sie Bilder als Thumbnails,\n"
+"einzeln oder als Diashow auf Ihrem Fernseher anzeigen. "
+
+msgid ""
+"The Satfinder plugin helps you to align your dish.\n"
+"It shows you informations about signal rate and errors."
+msgstr ""
+"Satfinder unterstützt Sie beim Ausrichten Ihrer Satellitenanlage\n"
+" und zeigt Ihnen Daten, wie z. B. Signalstärke und Fehlerrate an."
+
+msgid ""
+"The SkinSelector shows a menu with selectable skins.\n"
+"It's now easy to change the look and feel of your Vuplus."
+msgstr ""
+"SkinSelector zeigt Ihnen ein Menü mit auswählbaren Skins,\n"
+"mit denen Sie einfach das Aussehen der grafischen Oberfläche Ihrer Vuplus "
+"verändern können."
+
+msgid ""
+"The SoftwareManager manages your Vuplus software.\n"
+"It's easy to update your receiver's software, install or remove plugins or "
+"even backup and restore your system settings."
+msgstr ""
+"SoftwareManager verwaltet die Software Ihrer Vuplus und hilft Ihnen,\n"
+"Vuplus-Software zu aktualisieren, Plugins zu installieren oder zu "
+"deinstallieren oder Ihre Einstellungen zu sichern oder wiederherzustellen."
 
 #
 msgid ""
 "The Softwaremanagement extension is not installed!\n"
 "Please install it."
 msgstr ""
+"Das Softwaremanagement Plugin ist nicht installiert!\n"
+"Bitte installieren Sie es."
 
 #
 msgid ""
@@ -6510,6 +7375,33 @@ msgid ""
 msgstr ""
 "Der USB-Stick ist nun bootfähig. Wollen Sie das neueste Image vom Update-"
 "Server herunterladen und auf dem Stick speichern?"
+
+msgid ""
+"The USB stick was prepared to be bootable.\n"
+"Now you can download an NFI image file!"
+msgstr ""
+"Der USB-Stick wurde bootfähig gemacht.\n"
+"Sie können nun eine NFI-Imagedatei herunterladen!"
+
+msgid ""
+"The VideoEnhancement plugin provides advanced video enhancement settings."
+msgstr ""
+"Erweiterte A/V Einstellungen bietet zusätzliche AV-Einstellungen für Ihre "
+"Vuplus."
+
+msgid ""
+"The VideoTune helps fine-tuning your tv display.\n"
+"You can control brightness and contrast of your tv."
+msgstr ""
+"VideoTune hilft dabei, die Feineinstellungen zu Kontrast und Helligkeit\n"
+"an Ihrem Fernseher vorzunehmen."
+
+msgid "The Videomode plugin provides advanced video mode settings."
+msgstr "Videomode bietet erweiterte Video-Einstellungen."
+
+msgid ""
+"The WirelessLan plugin helps you configuring your WLAN network interface."
+msgstr "WirelessLan hilft Ihnen bei der Konfiguration Ihrer WLAN-Verbindung."
 
 #
 msgid "The backup failed. Please choose a different backup location."
@@ -6576,15 +7468,19 @@ msgstr "Die Installation der Standard-Kanallisten wurde abgeschlossen."
 #
 msgid ""
 "The installation of the default settings is finished. You can now continue "
-"configuring your Dreambox by pressing the OK button on the remote control."
+"configuring your Vuplus by pressing the OK button on the remote control."
 msgstr ""
 "Die Installation der Standardeinstellungen wurde beendet. Sie können nun mit "
-"der Konfiguration Ihrer Dreambox fortfahren, indem Sie die OK-Taste auf "
+"der Konfiguration Ihrer Vuplus fortfahren, indem Sie die OK-Taste auf "
 "Ihrer Fernbedienung drücken."
 
 #
 msgid "The match attribute is mandatory."
 msgstr "Das Attribut 'Finde in Titel' muss angegeben werden!"
+
+msgid "The md5sum validation failed, the file may be corrupted!"
+msgstr ""
+"Die md5sum Überprüfung ist fehlgeschlagen. Die Datei könnte defekt sein!"
 
 #
 msgid ""
@@ -6634,6 +7530,9 @@ msgstr "Die Pincodes unterscheiden sich."
 msgid "The results have been written to %s."
 msgstr "Die Ergebnisse des Tests wurden in der Datei %s gespeichert."
 
+msgid "The skin is in KingSize-definition 1024x576"
+msgstr "Der Skin ist in 1024x576"
+
 #
 msgid "The sleep timer has been activated."
 msgstr "Der Ausschalt-Timer wurde aktiviert"
@@ -6669,6 +7568,14 @@ msgid ""
 msgstr ""
 "Der Assistent kann jetzt Ihre Einstellungen sichern. Wollen Sie dies nun "
 "durchführen?"
+
+#, python-format
+msgid ""
+"The wizard found a configuration backup. Do you want to restore your old "
+"settings from %s?"
+msgstr ""
+"Der Assistent hat eine Konfigurations-Sicherungsdatei entdeckt. Wollen Sie "
+"Ihre Einstellungen von %s wiederherstellen?"
 
 #
 msgid "The wizard is finished now."
@@ -6726,6 +7633,8 @@ msgid ""
 "There's a certificate update available for your dreambox. Would you like to "
 "apply this update now?"
 msgstr ""
+"Es gibt ein Zertifikats-Update für Ihre Vuplus. Wollen Sie Dieses Update "
+"einspielen?"
 
 #
 #, python-format
@@ -6759,8 +7668,8 @@ msgstr ""
 
 #
 #, python-format
-msgid "This Dreambox can't decode %s streams!"
-msgstr "Diese Dreambox kann %s Streams nicht dekodieren!"
+msgid "This Vuplus can't decode %s streams!"
+msgstr "Diese Vuplus kann %s Streams nicht dekodieren!"
 
 #
 msgid "This Month"
@@ -6792,7 +7701,7 @@ msgstr ""
 
 #
 msgid "This is the help screen. Feed me with something to display."
-msgstr ""
+msgstr "Dies ist der Hilfe Screen."
 
 #
 msgid ""
@@ -6802,6 +7711,24 @@ msgid ""
 msgstr ""
 "Hiernach wird im Sendungstitel gesucht. Die Suche z.B. nach Umlauten ist "
 "etwas komplizierter, da man dazu den Zeichensatz des Sender-EPGs wissen muss."
+
+msgid ""
+"This plugin creates a USB stick which can be used to update the firmware of "
+"your Vuplus without the need for a network or WLAN connection.\n"
+"First, a USB stick needs to be prepared so that it becomes bootable.\n"
+"In the next step, an NFI image file can be downloaded from the update server "
+"and saved on the USB stick.\n"
+"If you already have a prepared bootable USB stick, please insert it now. "
+"Otherwise plug in a USB stick with a minimum size of 64 MB!"
+msgstr ""
+"Dieses Plugin erzeugt einen USB-Stick, mit dessen Hilfe die Firmware Ihrer "
+"Vuplus aktualisiert werden kann, ohne dass dafür eine Netzwerk- oder WLAN-"
+"Verbindung notwendig ist.Zuerst muss ein USB-Stick vorbereitet und bootfähig "
+"gemacht werden. Im nächsten Schritt kann eine NFI-Imagedatei vom Update-"
+"Server heruntergeladen und auf diesem Stick gespeichert werden.Wenn Sie "
+"bereits einen bootfähigen USB-Stick vorbereitet haben, stecken Sie ihn bitte "
+"jetzt ein. Anderenfalls stecken Sie bitte einen USB-Stick mit einer "
+"Mindestgröße von 64 MB ein."
 
 #
 msgid "This plugin is installed."
@@ -6824,6 +7751,13 @@ msgid "This setting controls the behavior when a timer matches a found event."
 msgstr ""
 "Diese Einstellung kontrolliert das Verhalten, wenn ein bestehender Timer mit "
 "einer gefundenen Sendung übereinstimmt."
+
+msgid ""
+"This system tool is internally used to program the hardware with firmware "
+"updates."
+msgstr ""
+"Dieses Systemtool wird intern benutzt um Firmware-Upgrades für die Hardware "
+"aufzuspielen."
 
 #
 msgid ""
@@ -7017,18 +7951,39 @@ msgstr "Titeldetails"
 msgid "Titleset mode"
 msgstr "Titleset"
 
+msgid "To be used as simple downloading application by other Plugins."
+msgstr ""
+"MediaDownloader hilft anderen Plugins beim Download von Dateien aus dem "
+"Internet."
+
+msgid ""
+"To update your Vuplus firmware, please follow these steps:\n"
+"1) Turn off your box with the rear power switch and make sure the bootable "
+"USB stick is plugged in.\n"
+"2) Turn mains back on and hold the DOWN button on the front panel pressed "
+"for 10 seconds.\n"
+"3) Wait for bootup and follow instructions of the wizard."
+msgstr ""
+"Um Ihre Vuplus-Firmware zu aktualisieren, folgen Sie bitte diesen "
+"Anweisungen:\n"
+"1) Schalten Sie Ihre Vuplus mit dem Schalter auf der Rückseite aus und "
+"achten Sie darauf, dass der bootfähige USB-Stick eingesteckt ist.\n"
+"2) Schalten Sie den Netzschalter wieder ein und halten dabei den \"nach unten"
+"\"-Knopf auf der Vorderseite für 10 Sekunden gedrückt.\n"
+"3) Nach dem Bootvorgang folgen Sie bitte den Instruktionen des Assistenten."
+
 #
 msgid ""
-"To update your Dreambox firmware, please follow these steps:\n"
+"To update your Vuplus firmware, please follow these steps:\n"
 "1) Turn off your box with the rear power switch and plug in the bootable USB "
 "stick.\n"
 "2) Turn mains back on and hold the DOWN button on the front panel pressed "
 "for 10 seconds.\n"
 "3) Wait for bootup and follow instructions of the wizard."
 msgstr ""
-"Um Ihre Dreambox-Firmware zu aktualisieren, folgen Sie bitte diesen "
+"Um Ihre Vuplus-Firmware zu aktualisieren, folgen Sie bitte diesen "
 "Anweisungen:\n"
-"1) Schalten Sie Ihre Dreambox mit dem Schalter auf der Rückseite aus und "
+"1) Schalten Sie Ihre Vuplus mit dem Schalter auf der Rückseite aus und "
 "stecken Sie den bootfähigen USB-Stick ein.\n"
 "2) Schalten Sie den Netzschalter wieder ein und halten dabei den \"nach unten"
 "\"-Knopf auf der Vorderseite für 10 Sekunden gedrückt.\n"
@@ -7040,7 +7995,7 @@ msgstr "Heute"
 
 #
 msgid "Tone Amplitude"
-msgstr ""
+msgstr "Ton Amplitude"
 
 #
 msgid "Tone mode"
@@ -7065,6 +8020,10 @@ msgstr "Beste Bewertung"
 #
 msgid "Track"
 msgstr "Spur"
+
+msgid "TrafficInfo shows german traffic information."
+msgstr ""
+"TrafficInfo zeigt Ihnen aktuelle Verkehrsinformationen aus Deutschland an."
 
 #
 msgid "Translation"
@@ -7141,7 +8100,7 @@ msgstr "Tuner"
 
 #
 msgid "Tuner "
-msgstr ""
+msgstr "Tuner "
 
 #
 msgid "Tuner Slot"
@@ -7157,7 +8116,7 @@ msgstr "Tuner-Status"
 
 #
 msgid "Tuner type"
-msgstr ""
+msgstr "Tuner Typ"
 
 #
 msgid "Turkish"
@@ -7183,15 +8142,16 @@ msgstr "USALS"
 msgid "USB Stick"
 msgstr "USB-Stick"
 
-#
 msgid "USB stick wizard"
-msgstr "USB-Stick Assistent"
+msgstr "USB-Stick-Assistent"
 
 #
 msgid ""
 "USB stick wizard finished. Your dreambox will now restart with your new "
 "image!"
 msgstr ""
+"USB-Stick Assistent beendet. Ihre Vuplus wird nun mit dem neuen Image neu "
+"starten!"
 
 #
 msgid "Ukrainian"
@@ -7254,15 +8214,14 @@ msgid "Universal LNB"
 msgstr "Universal-LNB"
 
 msgid "Unknown network adapter."
-msgstr ""
+msgstr "Unbekannter Netzwerk Adapter."
 
-#
 msgid ""
 "Unless this is enabled AutoTimer will NOT automatically look for events "
 "matching your AutoTimers but only when you leave the GUI with the green "
 "button."
 msgstr ""
-"Der AutoTiemr wird nur automatisch nach Sendungen suchen wenn diese "
+"Der AutoTimer wird nur automatisch nach Sendungen suchen wenn diese "
 "Einstellung aktiviert wird. Ansonsten wird nur beim Verlassen der Übersicht "
 "über die grüne Taste gesucht."
 
@@ -7274,14 +8233,16 @@ msgstr "Unmounten fehlgeschlagen"
 msgid "Unsupported"
 msgstr "Nicht unterstützt"
 
+msgid "UnwetterInfo shows german storm information."
+msgstr "UnwetterInfo zeigt Ihnen aktuelle Unwetterinformationen an."
+
 #
 msgid "Update"
 msgstr "Aktualisieren"
 
 #
-#, fuzzy
 msgid "Update done..."
-msgstr "Aktualisieren"
+msgstr "Aktualisierung abgeschlossen."
 
 #
 # File: tmp/enigma2_plugins/genuinedreambox/src/plugin.py, line: 170
@@ -7289,17 +8250,20 @@ msgid ""
 "Update done... The genuine dreambox test will now be rerun and should not "
 "ask you to update again."
 msgstr ""
+"Aktualisierung abgeschlossen. Der Genuine Vuplus Test wird nun erneut "
+"ausgeführt."
 
 #
-#, fuzzy
 msgid "Updatefeed not available."
-msgstr " Updates verfügbar "
+msgstr "Updatefeed nicht verfügbar."
 
 #
 # File: tmp/enigma2_plugins/genuinedreambox/src/plugin.py, line: 150
 msgid ""
 "Updating failed. Nothing is broken, just the update couldn't be applied."
 msgstr ""
+"Aktualisierung fehlgeschlagen. Es ist nichts defekt, es konnten nur keine "
+"Aktualisierungen eingespielt werden."
 
 #
 msgid "Updating finished. Here is the result:"
@@ -7310,9 +8274,8 @@ msgid "Updating software catalog"
 msgstr "Softwarekatalog wird aktualisiert."
 
 #
-#, fuzzy
 msgid "Updating, please wait..."
-msgstr "Bitte warten..."
+msgstr "Aktualisiere, bitte warten..."
 
 #
 msgid "Updating... Please wait... This can take some minutes..."
@@ -7329,8 +8292,8 @@ msgid "Upgrading"
 msgstr "Aktualisiere"
 
 #
-msgid "Upgrading Dreambox... Please wait"
-msgstr "Dreambox wird aktualisiert... Bitte warten"
+msgid "Upgrading Vuplus... Please wait"
+msgstr "Vuplus wird aktualisiert... Bitte warten"
 
 #
 msgid "Upper bound of timespan."
@@ -7368,6 +8331,11 @@ msgstr "Angepasstes Aufnahmeverzeichnis"
 msgid "Use a gateway"
 msgstr "Einen Gateway verwenden?"
 
+msgid "Use and control multiple Vupluses with different RCs."
+msgstr ""
+"Mit MultiRC können Sie mehrere Vuplusen mit verschiedenen Fernbedienungen "
+"verwenden."
+
 #
 msgid "Use non-smooth winding at speeds above"
 msgstr ""
@@ -7379,6 +8347,7 @@ msgstr "Stromaufnahme messen"
 #
 msgid "Use the Networkwizard to configure selected network adapter"
 msgstr ""
+"Nutzen Sie den NetworkWizard um den selektierten Adapter zu konfigurieren"
 
 #
 msgid "Use the Networkwizard to configure your Network\n"
@@ -7401,6 +8370,12 @@ msgid ""
 msgstr ""
 "Mit den hoch/runter-Tasten können Sie eine Option auswählen. Danach bitte OK "
 "drücken."
+
+msgid "Use this input device settings?"
+msgstr "Diese Eingabegeräte Einstellungen benutzten?"
+
+msgid "Use this settings?"
+msgstr "Diese Einstellungen benutzten?"
 
 #
 msgid "Use this video enhancement settings?"
@@ -7446,9 +8421,12 @@ msgstr "Scart-Videorekorder"
 msgid "VMGM (intro trailer)"
 msgstr ""
 
+msgid "Vali-XD skin"
+msgstr "Vali-XD Skin"
+
 msgid ""
-"Verify your Dreambox authenticity by running the genuine dreambox plugin!"
-msgstr ""
+"Verify your Vuplus authenticity by running the genuine dreambox plugin!"
+msgstr "Mit GenuineVuplus können Sie die Echtheit Ihrer Vuplus überprüfen."
 
 #
 msgid "Vertical"
@@ -7506,6 +8484,15 @@ msgstr ""
 msgid "Video mode selection."
 msgstr "Auswahl des Videomodus."
 
+msgid "Video streaming from the orf.at web page"
+msgstr "Streaming von orf.at-Filmen"
+
+msgid "VideoEnhancement provides advanced video enhancement settings"
+msgstr "Erweiterte A/V Einstellungen für Ihre Vuplus"
+
+msgid "VideoTune helps fine-tuning your tv display"
+msgstr "Hilft beim Einstellen des Fernsehers"
+
 #
 msgid "Videobrowser exit behavior:"
 msgstr "Verhalten nach Verlassen der Videoliste:"
@@ -7514,6 +8501,9 @@ msgstr "Verhalten nach Verlassen der Videoliste:"
 msgid "Videoenhancement Setup"
 msgstr "Erweiterte A/V-Einstellungen"
 
+msgid "Videomode provides advanced video mode settings"
+msgstr "Erweiterte Video Einstellungen"
+
 #
 msgid "Videoplayer stop/exit behavior:"
 msgstr "Verhalten beim Drücken der STOPP/EXIT-Taste:"
@@ -7521,6 +8511,14 @@ msgstr "Verhalten beim Drücken der STOPP/EXIT-Taste:"
 #
 msgid "View Count"
 msgstr "Aufrufe"
+
+msgid "View Google maps"
+msgstr "Zeigt Karten von Google Maps an"
+
+msgid "View Google maps with your Vuplus."
+msgstr ""
+"Mit GoogleMaps können Sie Karten von Google Maps auf Ihrem Fernseher "
+"anzeigen."
 
 #
 msgid "View Movies..."
@@ -7565,7 +8563,7 @@ msgstr "Eine Liste der verfügbaren EPG-Erweiterungen anzeigen."
 
 #
 msgid "View list of available Satellite equipment extensions."
-msgstr ""
+msgstr "Liste der verfügbaren Satellitenausrüstungs-Plugins anzeigen."
 
 #
 msgid "View list of available communication extensions."
@@ -7612,7 +8610,7 @@ msgid "View teletext..."
 msgstr "Videotext anzeigen..."
 
 #
-msgid "View, edit or delete mountpoints on your Dreambox."
+msgid "View, edit or delete mountpoints on your Vuplus."
 msgstr "Verwalten, bearbeiten oder löschen Sie Ihre Netzwerkfreigaben."
 
 #
@@ -7644,10 +8642,10 @@ msgid "WEP"
 msgstr "WEP"
 
 msgid "WLAN adapter."
-msgstr ""
+msgstr "WLAN Adapter."
 
 msgid "WLAN connection"
-msgstr ""
+msgstr "WLAN Verbindung"
 
 #
 msgid "WPA"
@@ -7676,6 +8674,15 @@ msgstr "Warte"
 #
 msgid "Warn if free space drops below (kB):"
 msgstr "Warnen wenn der freie interne Speicher unter (kB) fällt:"
+
+msgid "Watch streams from ZDF Mediathek"
+msgstr "Streams von der ZDF Mediathek schauen"
+
+msgid "WeatherPlugin shows weatherforecasts on your Vuplus."
+msgstr "WeatherPlugin zeigt Ihnen aktuelle Wettervorhersagen an."
+
+msgid "Weatherforecast on your Vuplus"
+msgstr "Zeigt aktuelle Wettervorhersagen an"
 
 #
 msgid "Webinterface"
@@ -7718,11 +8725,17 @@ msgid ""
 "\n"
 "Then seek to the end, press OK, select 'end cut'. That's it."
 msgstr ""
+"Welcome to the Cutlist editor.\n"
+"\n"
+"Seek to the start of the stuff you want to cut away. Press OK, select 'start "
+"cut'.\n"
+"\n"
+"Then seek to the end, press OK, select 'end cut'. That's it."
 
 #
 msgid ""
 "Welcome to the Image upgrade wizard. The wizard will assist you in upgrading "
-"the firmware of your Dreambox by providing a backup facility for your "
+"the firmware of your Vuplus by providing a backup facility for your "
 "current settings and a short explanation of how to upgrade your firmware."
 msgstr ""
 "Willkommen im Image-Upgrade-Assistenten. Der Assistent wird Ihnen bei der "
@@ -7786,7 +8799,7 @@ msgid ""
 "Welcome to the cleanup wizard.\n"
 "\n"
 "We have detected that your available internal memory has dropped below 2MB.\n"
-"To ensure stable operation of your Dreambox, the internal memory should be "
+"To ensure stable operation of your Vuplus, the internal memory should be "
 "cleaned up.\n"
 "You can use this wizard to remove some extensions.\n"
 msgstr ""
@@ -7794,7 +8807,7 @@ msgstr ""
 "\n"
 "Es wurde festgestellt, dass Ihr verfügbarer interner Speicher unter den von "
 "Ihnen festgelegten Wert gefallen ist.\n"
-"Um einen stabilen Betrieb Ihrer Dreambox sicherzustellen, sollte der interne "
+"Um einen stabilen Betrieb Ihrer Vuplus sicherzustellen, sollte der interne "
 "Speicher bereinigt werden.\n"
 "Sie können diesen Assistenten benutzen, um Erweiterungen zu entfernen.\n"
 
@@ -7802,14 +8815,14 @@ msgstr ""
 msgid ""
 "Welcome.\n"
 "\n"
-"If you want to connect your Dreambox to the Internet, this wizard will guide "
-"you through the basic network setup of your Dreambox.\n"
+"If you want to connect your Vuplus to the Internet, this wizard will guide "
+"you through the basic network setup of your Vuplus.\n"
 "\n"
 "Press OK to start configuring your network"
 msgstr ""
 "Willkommen.\n"
 "\n"
-"Wenn Sie Ihre Dreambox mit dem Internet verbinden möchten, wird Sie dieser "
+"Wenn Sie Ihre Vuplus mit dem Internet verbinden möchten, wird Sie dieser "
 "Assistent durch die grundlegenden Netzwerkeinstellungen führen.\n"
 "\n"
 "Drücken Sie OK um Ihr Netzwerk zu konfigurieren"
@@ -7829,12 +8842,12 @@ msgstr ""
 msgid ""
 "Welcome.\n"
 "\n"
-"This start wizard will guide you through the basic setup of your Dreambox.\n"
+"This start wizard will guide you through the basic setup of your Vuplus.\n"
 "Press the OK button on your remote control to move to the next step."
 msgstr ""
 "Willkommen.\n"
 "\n"
-"Der Startassistent wird Sie durch die Grundeinstellungen Ihrer Dreambox "
+"Der Startassistent wird Sie durch die Grundeinstellungen Ihrer Vuplus "
 "führen.\n"
 "Drücken Sie OK auf Ihrer Fernbedienung, um zum nächsten Schritt zu gelangen."
 
@@ -7874,7 +8887,7 @@ msgstr ""
 "Wenn Sie die Werkseinstellungen wiederherstellen, verlieren Sie sämtliche "
 "Konfigurationsdateien\n"
 "(einschließlich Kanalliste, Tuner-Konfiguration...)\n"
-"Nach der Wiederherstellung wird die Dreambox automatisch neu starten\n"
+"Nach der Wiederherstellung wird die Vuplus automatisch neu starten\n"
 "\n"
 "Werkseinstellungen wirklich wiederherstellen?"
 
@@ -7901,6 +8914,132 @@ msgstr "Funk-Netzwerk"
 #
 msgid "Wireless Network State"
 msgstr "WLAN-Netzwerk Status"
+
+msgid ""
+"With AntiScrollbar you can cover up annoying ticker lines (e.g. in news "
+"channels)."
+msgstr ""
+"Mit AntiScrollbar können lästige Laufschriften (z.B. in Newskanälen) "
+"abgedeckt werden."
+
+msgid ""
+"With DVDBurn you can make compilations of records from your Vuplus hard "
+"drive.\n"
+"Optionally you can add customizable menus. You can record the compilation to "
+"a standard-compliant DVD that can be played on conventinal DVD players.\n"
+"HDTV recordings can only be burned in proprietary dreambox format."
+msgstr ""
+"Mit DVDBurn können Sie TV-Aufnahmen von der Festplatte Ihrer Vuplus "
+"zusammenstellen,\n"
+"optional mit Menüs verknüpfen und auf eine DVD brennen. Diese kann dann auf "
+"einem normalen DVD-Player wiedergegeben werden.\n"
+"HDTV-Aufnahmen können nur im Vuplus-eigenen Format gebrannt werden."
+
+msgid "With EPGSearch you can search through the EPG and create timers."
+msgstr ""
+"Mit EPGSearch können Sie das EPG nach Sendungen durchsuchen und Timer "
+"erstellen."
+
+msgid "With Genuine Vuplus you can verify the authenticity of your Vuplus."
+msgstr "Mit GenuineVuplus können Sie die Echtheit Ihrer Vuplus überprüfen."
+
+msgid ""
+"With IMDb you can download and displays movie information (rating, poster, "
+"cast, synopsis etc.) about the selected event."
+msgstr ""
+"Mit IMDb können Sie Informationen zur ausgewählten Sendung (Bewertung, "
+"Poster, Mitwirkende, Inhaltsangabe usw.) aus der InternetMovieDatabase über "
+"das Internet herunterladen und anzeigen."
+
+msgid "With MovieRetitle you can rename your movies."
+msgstr "Mit MovieRetitle können Sie Ihre aufgenommenen Filme umbenennen."
+
+msgid ""
+"With MyTube you can play YouTube videos directly on your TV without a PC."
+msgstr ""
+"Mit MyTube können Sie YouTube-Videos direkt auf Ihrem Fernseher abspielen "
+"ohne einen zusätzlichen PC."
+
+msgid "With WebcamViewer you can watch webcams on your TV Screen."
+msgstr ""
+"Mit WebcamViewer können Sie Bilder von Webcams auf Ihrer Vuplus betrachten."
+
+msgid ""
+"With Werbezapper you can bridge commercials by creating short timers\n"
+"(between 1 and 9 minutes long) which will automatically zap back to the "
+"original channel after execution."
+msgstr ""
+"Mit Werbezapper können Sie Werbepausen überbrücken, in dem Sie kurzfristige "
+"Timer erstellen\n"
+"(zwischen 1 und 9 Minuten lang), die nach Ablauf wieder zurück auf den "
+"gerade aktiven Kanal schalten. "
+
+msgid ""
+"With YouTubePlayer you can watch YouTube-Videos on the Vuplus.\n"
+"This plugin requires a PC with the VLC program running."
+msgstr ""
+"Mit YouTubePlayer können Sie YouTube-Videos auf ihrer Vuplus ansehen.\n"
+"Es wird ein PC benötigt, auf dem das Programm VLC läuft."
+
+msgid ""
+"With the CommonInterfaceAssignment plugin it is possible to use differentCI "
+"modules in your Vuplus and assign dedicated providers/services or caids to "
+"each of them.\n"
+"This allows watching a scrambled service while recording another one."
+msgstr ""
+"Mit CommoninterfaceAssignment ist es möglich, jedem CI-Modul bestimmte "
+"Provider, Services oder CAIDs zuzuweisen.\n"
+"So können zeitglich mit einem CI Aufnahmen auf einem Sender gestartet und "
+"mit einem anderen CI Sendungen auf einem anderen Sender angesehen werden."
+
+msgid ""
+"With the CrashlogAutoSubmit plugin it is possible to automaticallymail "
+"crashlogs found on your hard drive to Dream Multimedia."
+msgstr ""
+"Mit CrashlogAutoSubmit ist es möglich, auf Ihrer Festplatte gefundene "
+"Crashlogs automatisch an Dream Multimedia zu versenden."
+
+msgid ""
+"With the DefaultServicesScanner plugin you can scan default lamedbs sorted "
+"by satellite with a connected dish positioner."
+msgstr ""
+"DefaultServiceScanner führt eine Sendersuche aller Satelliten durch, wenn "
+"Sie einen Rotor an Ihre Satellitenschüssel angeschlossen haben."
+
+msgid ""
+"With the DiseqcTester plugin you can test your satellite equipment for "
+"DiSEqC compatibility and errors."
+msgstr ""
+"Mit DiseqcTester können Sie Ihr Satelliten-Equipment nach Diseqc-"
+"Kompatibilität und Fehlern überprüfen."
+
+msgid ""
+"With the NFIFlash plugin it is possible to prepare a USB stick with an "
+"Vuplus image.\n"
+"It is then possible to flash your Vuplus with the image on that stick."
+msgstr ""
+"Mit NFIFlash können Sie ein Vuplus-Image auf einen USB-Stick laden.\n"
+"Mit diesem USB-Stick ist es dann möglich, Ihre Vuplus zu flashen."
+
+msgid ""
+"With the NetworkWizard you can easily configure your network step by step."
+msgstr ""
+"NetzwerkWizard hilft Ihnen, Ihr Netzwerk zu konfigurieren. Sie werden "
+"Schritt für Schritt durch die Konfiguration geleitet."
+
+msgid ""
+"With the PositionerSetup plugin it is easy to install and configure a "
+"motorized dish."
+msgstr ""
+"PositionerSetup unterstützt Sie beim Einrichten und Konfigurieren einer "
+"motorgesteuerten Satellitenantenne."
+
+msgid ""
+"With the SatelliteEquipmentControl plugin it is possible to fine-tune DiSEqC-"
+"settings."
+msgstr ""
+"PositionerSetup unterstützt Sie beim Einrichten und Konfigurieren einer "
+"motorgesteuerten Satellitenantenne."
 
 #
 msgid ""
@@ -7949,6 +9088,9 @@ msgstr "Ja"
 #
 msgid "Yes to all"
 msgstr "Ja zu allen"
+
+msgid "Yes, always"
+msgstr "Ja, immer"
 
 #
 msgid "Yes, and delete this movie"
@@ -8027,8 +9169,8 @@ msgid "You can install this plugin."
 msgstr "Sie können diese Erweiterung installieren."
 
 #
-msgid "You can only burn Dreambox recordings!"
-msgstr "Nur Dreambox-Aufnahmen können gebrannt werden!"
+msgid "You can only burn Vuplus recordings!"
+msgstr "Nur Vuplus-Aufnahmen können gebrannt werden!"
 
 #
 msgid "You can remove this plugin."
@@ -8076,6 +9218,9 @@ msgstr ""
 "Sie haben das Attribut \"Finde in Titel\" nicht angegeben. Da dies ein "
 "notwendiges Attribut ist können Sie nicht fortfahren ohne dies zu tun."
 
+msgid "You didn't select a channel to record from."
+msgstr "Sie haben keinen Sender zum Aufnehmen ausgewählt."
+
 #
 #, python-format
 msgid ""
@@ -8093,14 +9238,13 @@ msgstr ""
 "Sie haben sich entschieden Ihre Einstellungen zu sichern. Drücken Sie OK, um "
 "den Vorgang zu starten."
 
-#
 msgid ""
 "You have chosen to create a new .NFI flasher bootable USB stick. This will "
 "repartition the USB stick and therefore all data on it will be erased."
 msgstr ""
-"Sie möchten einen bootbaren USB-Stick zum Flashen von .NFI-Images erstellen. "
-"Dies wird den USB-Stick repartitionieren wodurch alle darauf enthaltenen "
-"Daten verloren gehen."
+"Sie möchten einen bootfähigen USB-Stick zum Flashen von NFI-Images "
+"erstellen. Dabei wird der USB-Stick repartitioniert, wodurch alle darauf "
+"enthaltenen Daten verloren gehen."
 
 #
 msgid ""
@@ -8124,10 +9268,10 @@ msgid ""
 "instructions from the website, your new firmware will ask you to restore "
 "your settings."
 msgstr ""
-"Sie müssen einen PC mit Ihrer Dreambox verbunden haben. Wenn Sie "
+"Sie müssen einen PC mit Ihrer Vuplus verbunden haben. Wenn Sie "
 "weiterführende Informationen benötigen, besuchen Sie die Webseite http://www."
 "dm7025.de.\n"
-"Die Dreambox wird nun ausgeschaltet. Nachdem Sie das Update wie auf der "
+"Die Vuplus wird nun ausgeschaltet. Nachdem Sie das Update wie auf der "
 "Webseite beschrieben durchgeführt haben, wird Sie die neue Firmware fragen, "
 "ob Sie die Einstellungen wiederherstellen wollen."
 
@@ -8162,34 +9306,34 @@ msgstr ""
 
 #
 msgid ""
-"Your Dreambox is now ready to use.\n"
+"Your Vuplus is now ready to use.\n"
 "\n"
 "Your internet connection is working now.\n"
 "\n"
 msgstr ""
-"Ihre Dreambox ist nun konfiguriert.\n"
+"Ihre Vuplus ist nun konfiguriert.\n"
 "\n"
 "Ihre Internetverbindung funktioniert nun.\n"
 "\n"
 
 #
 msgid ""
-"Your Dreambox is now ready to use.\n"
+"Your Vuplus is now ready to use.\n"
 "\n"
 "Your internet connection is working now.\n"
 "\n"
 "Please press OK to continue."
 msgstr ""
-"Ihre Dreambox ist nun konfiguriert.\n"
+"Ihre Vuplus ist nun konfiguriert.\n"
 "\n"
 "Ihre Internetverbindung funktioniert nun.\n"
 "\n"
 "Drücken Sie OK zum Fortfahren."
 
 #
-msgid "Your Dreambox will restart after pressing OK on your remote control."
+msgid "Your Vuplus will restart after pressing OK on your remote control."
 msgstr ""
-"Ihre Dreambox wird neu starten nachdem Sie OK auf Ihrer Fernbedienung "
+"Ihre Vuplus wird neu starten nachdem Sie OK auf Ihrer Fernbedienung "
 "gedrückt haben."
 
 #
@@ -8197,7 +9341,7 @@ msgid ""
 "Your backup succeeded. We will now continue to explain the further upgrade "
 "process."
 msgstr ""
-"Ihre Sicherung ist geglückt. Die Dreambox wird nun den weiteren "
+"Ihre Sicherung ist geglückt. Die Vuplus wird nun den weiteren "
 "Aktualisierungs-Prozess erklären."
 
 #
@@ -8223,14 +9367,14 @@ msgstr "Ihre aktuelle Zusammenstellung geht dabei verloren!"
 
 #
 msgid "Your dreambox is shutting down. Please stand by..."
-msgstr "Ihre Dreambox schaltet sich nun aus. Bitte warten Sie einen Moment..."
+msgstr "Ihre Vuplus schaltet sich nun aus. Bitte warten Sie einen Moment..."
 
 #
 msgid ""
 "Your dreambox isn't connected to the internet properly. Please check it and "
 "try again."
 msgstr ""
-"Ihre Dreambox ist nicht korrekt mit dem Internet verbunden. Bitte beheben "
+"Ihre Vuplus ist nicht korrekt mit dem Internet verbunden. Bitte beheben "
 "Sie dies und versuchen Sie es dann erneut."
 
 #
@@ -8285,9 +9429,12 @@ msgstr ""
 "\n"
 "Bitte wählen Sie eine Option zum Fortfahren."
 
+msgid "ZDFMediathek allows you to watch streams from ZDF Mediathek."
+msgstr "ZDFMediathek erlaubt das Streamen von Filmen von der ZDF Mediathek."
+
 #
 msgid "Zap back to previously tuned service?"
-msgstr ""
+msgstr "Zurückschalten zum Zuletzt laufenden Sender?"
 
 #
 msgid "Zap back to service before positioner setup?"
@@ -8303,10 +9450,22 @@ msgstr ""
 
 #
 msgid "Zap back to service before tuner setup?"
-msgstr ""
+msgstr "Zurückschalten zum vorher laufenden Sender?"
+
+msgid "Zap between commercials"
+msgstr "Umschalten während der Werbung"
+
+msgid "ZapStatistic shows the watched services with some statistics."
+msgstr "ZapStatistic zeigt die angeschauten Sendungen mit einigen Statistiken."
+
+msgid "Zoom into letterboxed/anamorph movies"
+msgstr "Zoom-In für Letterbox-Filme"
+
+msgid "Zoom into letterboxed/anamorph movies."
+msgstr "Zoom-In für Letterbox/Anamorphe Filme."
 
 msgid "Zydas"
-msgstr ""
+msgstr "Zydas"
 
 #
 msgid "[alternative edit]"
@@ -8323,6 +9482,9 @@ msgstr "[Favoriten-Editor]"
 #
 msgid "[move mode]"
 msgstr "[Verschiebemodus]"
+
+msgid "a HD skin from Kerni"
+msgstr "ein HD Skin von Kerni"
 
 #
 msgid "a gui to assign services/providers to common interface modules"
@@ -8432,6 +9594,9 @@ msgstr "Kanal zu Favoriten hinzufügen"
 msgid "add services"
 msgstr "Neue Sender"
 
+msgid "add tags to recorded movies"
+msgstr "Vergeben Sie Tags für Ihre Filme"
+
 #
 msgid "add to parental protection"
 msgstr "Jugendschutz anschalten"
@@ -8443,6 +9608,20 @@ msgstr "erweitert"
 #
 msgid "alphabetic sort"
 msgstr "Aufnahmen alphabetisch sortieren"
+
+msgid "assign color buttons (red/green/yellow/blue) to plugins from MOVIELIST."
+msgstr "Legen Sie Plugins und Funktionen auf Farbtasten der MOVIELIST."
+
+msgid "assign color buttons to plugins from MOVIELIST"
+msgstr "Plugins auf Farbtasten der MOVIELIST legen"
+
+msgid ""
+"assign long key-press (red/green/yellow/blue) to plugins or E2 functions."
+msgstr ""
+"Plugins oder Funktionen auf den langen Tastendruck der Farbtasten legen."
+
+msgid "assign long key-press on color buttons to plugins or E2 functions"
+msgstr "Plugins auf Farbtasten legen"
 
 #
 msgid "assigned CAIds:"
@@ -8563,6 +9742,10 @@ msgstr "Verbunden"
 msgid "continue"
 msgstr "Weiter"
 
+msgid "control multiple Vupluses with different RCs"
+msgstr ""
+"Kontrollieren Sie mehrere Vuplusen mit verschiedenen Fernbedienungen."
+
 #
 msgid "copy to bouquets"
 msgstr "in Bouquets kopieren"
@@ -8574,6 +9757,10 @@ msgstr "konnte nicht entfernt werden"
 #
 msgid "create directory"
 msgstr "Verzeichnis erstellen"
+
+#, python-format
+msgid "currently installed image: %s"
+msgstr "Derzeit installiertes Image: %s"
 
 #
 msgid "daily"
@@ -8606,6 +9793,9 @@ msgstr "gespeicherte Wiedergabeliste löschen"
 #
 msgid "delete..."
 msgstr "löschen..."
+
+msgid "description"
+msgstr "Beschreibung"
 
 #
 msgid "disable"
@@ -8825,7 +10015,7 @@ msgstr "Modul initialisieren"
 
 #
 msgid "init modules"
-msgstr ""
+msgstr "Module initialisieren"
 
 #
 msgid "insert mark here"
@@ -8869,7 +10059,7 @@ msgstr "Länge"
 
 #
 msgid "list of EPG views..."
-msgstr ""
+msgstr "Liste der EPG Ansichten."
 
 #
 msgid "list style compact"
@@ -9005,7 +10195,7 @@ msgstr "keine"
 
 #
 msgid "not configured"
-msgstr ""
+msgstr "nicht Konfiguriert"
 
 #
 msgid "not locked"
@@ -9115,6 +10305,12 @@ msgstr "nimmt auf..."
 msgid "red"
 msgstr "rot"
 
+msgid "redesigned Kerni-HD1 skin"
+msgstr "Redesigned Kerni-HD1 Skin"
+
+msgid "redirect notifications to Growl"
+msgstr "Sendet Benachrichtigungen an Growl "
+
 #
 msgid "remove a nameserver entry"
 msgstr "DNS-Servereintrag entfernen"
@@ -9216,6 +10412,9 @@ msgstr "Zweites Kabel vom Rotor"
 msgid "seconds"
 msgstr "Sekunden"
 
+msgid "see service-epg (and PiP) from channels in an infobar"
+msgstr "EPG Daten und PiP von Kanälen in Infobar anzeigen"
+
 #
 msgid "select"
 msgstr "wähle"
@@ -9256,6 +10455,9 @@ msgstr "Den Filmpfad auswählen"
 msgid "service pin"
 msgstr "Kanal-Pincode"
 
+msgid "set enigma2 to standby-mode after startup"
+msgstr "Startet die Vuplus im Standby-Modus"
+
 #
 msgid "sets the Audio Delay (LipSync)"
 msgstr "Setzt die verschiedenen Audio- Verzögerungen (LipSync)"
@@ -9274,7 +10476,7 @@ msgstr "Zeige EPG..."
 
 #
 msgid "show Infoline"
-msgstr ""
+msgstr "Infozeile anzeigen"
 
 #
 msgid "show all"
@@ -9350,7 +10552,7 @@ msgstr "Vorwärts springen (Zeit eingeben)"
 
 #
 msgid "slide picture in loop"
-msgstr ""
+msgstr "Bilder als Slideshow anzeigen"
 
 #
 msgid "sort by date"
@@ -9358,7 +10560,7 @@ msgstr "Aufnahmen nach Datum sortieren"
 
 #
 msgid "special characters"
-msgstr ""
+msgstr "Sonderzeichen"
 
 #
 msgid "standard"
@@ -9470,11 +10672,17 @@ msgstr "unbekannter Kanal"
 
 #
 msgid "until standby/restart"
-msgstr ""
+msgstr "bis zum standby/neustart"
 
 #
 msgid "use as HDD replacement"
-msgstr ""
+msgstr "als HDD Ersatz nutzen"
+
+msgid "use your Vuplus as Web proxy"
+msgstr "Nutzung der Vuplus als Web Proxy"
+
+msgid "use your Vuplus as Web proxy."
+msgstr "Mit HTTPProxy können Sie Ihre Vuplus als Web Proxy benutzen."
 
 #
 msgid "user defined"
@@ -9518,7 +10726,7 @@ msgstr "Positivliste"
 
 #
 msgid "working"
-msgstr ""
+msgstr "arbeite"
 
 #
 msgid "yellow"
@@ -9537,8 +10745,8 @@ msgid ""
 "your dreambox might be unusable now. Please consult the manual for further "
 "assistance before rebooting your dreambox."
 msgstr ""
-"Ihre Dreambox könnte jetzt unbenutzbar sein. Bitte konsultieren Sie das "
-"Handbuch bevor Sie Ihre Dreambox rebooten."
+"Ihre Vuplus könnte jetzt unbenutzbar sein. Bitte konsultieren Sie das "
+"Handbuch bevor Sie Ihre Vuplus rebooten."
 
 #
 msgid "zap"
@@ -9547,1065 +10755,3 @@ msgstr "umschalten"
 #
 msgid "zapped"
 msgstr "umgeschaltet"
-
-#
-#~ msgid ""
-#~ "\n"
-#~ "Enigma2 will restart after the restore"
-#~ msgstr ""
-#~ "\n"
-#~ "Enigma2 wird nach der Wiederherstellung neu starten"
-
-#
-#~ msgid ""
-#~ "\n"
-#~ "Scan for local packages and install them."
-#~ msgstr ""
-#~ "\n"
-#~ "Suche nach lokalen Paketen und installiere sie."
-
-#
-#
-#
-#
-#
-#
-#~ msgid "%s:"
-#~ msgstr "%s:"
-
-#
-#~ msgid "* Only available when entering hidden SSID or network key"
-#~ msgstr "* Verfügbar für die Eingabe der Netzwerk SSID oder des Passwortes"
-
-#
-#~ msgid "/usr/share/enigma2 directory"
-#~ msgstr "/usr/share/enigma2 Verzeichnis"
-
-#
-#~ msgid "/var directory"
-#~ msgstr "/var Verzeichnis"
-
-#
-#~ msgid "50 Hz"
-#~ msgstr "50 Hz"
-
-#
-#~ msgid "AGC:"
-#~ msgstr "AGC:"
-
-#
-#
-#~ msgid "Address"
-#~ msgstr "Adresse"
-
-#
-#~ msgid "Advanced"
-#~ msgstr "Erweitert"
-
-#
-#~ msgid "All..."
-#~ msgstr "Alle..."
-
-#
-#~ msgid "An error occured!"
-#~ msgstr "Es ist ein Fehler aufgetreten!"
-
-#
-#~ msgid ""
-#~ "Are you sure you want to enable WLAN support?\n"
-#~ "Connect your Wlan USB Stick to your Dreambox and press OK.\n"
-#~ "\n"
-#~ msgstr ""
-#~ "Sind Sie sicher, dass Sie die WLAN Unterstützung aktivieren wollen?\n"
-#~ "Verbinden Sie Ihren WLAN USB Stick mit der Dreambox und drücken Sie die "
-#~ "OK-Taste.\n"
-#~ "\n"
-
-#
-#~ msgid ""
-#~ "Are you sure you want to reset \n"
-#~ "your network configuration to defaults?\n"
-#~ "\n"
-#~ msgstr ""
-#~ "Sind Sie sicher, dass Sie die Netzwerkkonfiguration\n"
-#~ "auf die Standardeinstellungen zurücksetzen wollen?\n"
-#~ "\n"
-
-#
-#
-#~ msgid "Authorization"
-#~ msgstr "Autorisierung"
-
-#
-#~ msgid "Backup"
-#~ msgstr "Sicherung"
-
-#
-#~ msgid "Backup Location"
-#~ msgstr "Sicherungsort"
-
-#
-#~ msgid "Backup Mode"
-#~ msgstr "Sicherungs-Modus"
-
-#
-#~ msgid "Backup is done. Please press OK to see the result."
-#~ msgstr ""
-#~ "Sicherung wurde durchgeführt. Bitte drücken Sie OK, um das Ergebnis zu "
-#~ "sehen."
-
-#
-#~ msgid "Backup running"
-#~ msgstr "Sicherung läuft"
-
-#
-#~ msgid "Backup running..."
-#~ msgstr "Sicherung läuft..."
-
-#
-#~ msgid "Burn to DVD..."
-#~ msgstr "Auf DVD brennen..."
-
-#
-#~ msgid "CF Drive"
-#~ msgstr "CF-Laufwerk"
-
-#
-#~ msgid "Call monitoring"
-#~ msgstr "Anrufmonitor"
-
-#
-#
-#~ msgid "Change"
-#~ msgstr "Ändern"
-
-#
-#
-#~ msgid "Changing the timer for '%s' failed!"
-#~ msgstr "Timer '%s' konnte nich geändert werden!"
-
-#
-#~ msgid "Choose source"
-#~ msgstr "Quelle wählen"
-
-#
-#~ msgid "Compact flash card"
-#~ msgstr "Compact-Flash-Karte"
-
-#
-#~ msgid "Config"
-#~ msgstr "Konfiguration"
-
-#
-#~ msgid "Confirm"
-#~ msgstr "Bestätigen"
-
-#
-#~ msgid "Connected to Fritz!Box!"
-#~ msgstr "Mit Fritz!Box verbunden!"
-
-#
-#~ msgid "Connecting to Fritz!Box..."
-#~ msgstr "Verbinde zur Fritz!Box..."
-
-#
-#~ msgid ""
-#~ "Connection to Fritz!Box\n"
-#~ "failed! (%s)\n"
-#~ "retrying..."
-#~ msgstr ""
-#~ "Verbindung zur Fritz!Box\n"
-#~ "fehlgeschlagen! (%s)\n"
-#~ "Erneuter Versuch..."
-
-#
-#~ msgid "Continue"
-#~ msgstr "Weiter"
-
-#
-#
-#~ msgid "Could not add timer '%s'!"
-#~ msgstr "Timer '%s' konnte nicht hinzugefügt werden!"
-
-#
-#
-#~ msgid "Could not find timer '%s' with given start and end time!"
-#~ msgstr ""
-#~ "Timer '%s' mit der angegebenen Start- und Endzeit konnte nicht gefunden "
-#~ "werden!"
-
-#
-#~ msgid ""
-#~ "Crashlogs found!\n"
-#~ "Send them to Dream Multimedia ?"
-#~ msgstr ""
-#~ "Crashlogs wurden gefunden!\n"
-#~ "Wollen Sie diese an Dream Multimedia übermitteln?"
-
-#
-#~ msgid "Custom skip time for 1/3 keys"
-#~ msgstr "Benutzerspezifische Sprungzeit für 1/3 Tasten"
-
-#
-#~ msgid "Default settings"
-#~ msgstr "Standard-Einstellungen"
-
-#
-#~ msgid "Default-Wizard"
-#~ msgstr "Standardeinstellungs-Assistent"
-
-#
-#
-#
-#
-#
-#
-#~ msgid "Delay:"
-#~ msgstr "Verzögerung:"
-
-#
-#~ msgid "Delete selected mount"
-#~ msgstr "Ausgewählte Freigabe löschen"
-
-#
-#~ msgid "Device Setup..."
-#~ msgstr "Geräteeinstellungen..."
-
-#
-#~ msgid ""
-#~ "Disconnected from\n"
-#~ "Fritz!Box! (%s)\n"
-#~ "retrying..."
-#~ msgstr ""
-#~ "Von Fritz!Box! getrennt\n"
-#~ "(%s)\n"
-#~ "Erneuter Versuch..."
-
-#
-#~ msgid ""
-#~ "Do you really want to REMOVE\n"
-#~ "the plugin \""
-#~ msgstr ""
-#~ "Möchten Sie das Plugin wirklich\n"
-#~ "entfernen \""
-
-#
-#~ msgid ""
-#~ "Do you really want to download\n"
-#~ "the plugin \""
-#~ msgstr ""
-#~ "Wollen Sie das Plugin mit\n"
-#~ "dem Namen \" wirklich herunterladen?"
-
-#
-#~ msgid ""
-#~ "Do you want to backup now?\n"
-#~ "After pressing OK, please wait!"
-#~ msgstr ""
-#~ "Wollen Sie jetzt eine Sicherung durchführen?\n"
-#~ "Nach einem Druck auf OK bitte warten!"
-
-#
-#~ msgid "Done - Installed or upgraded %d packages with %d errors"
-#~ msgstr "Beendet - %d installierte oder aktualisierte Pakete mit %d Fehlern"
-
-#
-#~ msgid "Enable WLAN Support"
-#~ msgstr "Aktiviere WLAN Unterstützung"
-
-#
-#~ msgid "Encrypted: %s"
-#~ msgstr "verschlüsselt: %s"
-
-#
-#~ msgid ""
-#~ "Enigma2 Skinselector v0.5 BETA\n"
-#~ "\n"
-#~ "If you experience any problems please contact\n"
-#~ "stephan@reichholf.net\n"
-#~ "\n"
-#~ "© 2006 - Stephan Reichholf"
-#~ msgstr ""
-#~ "Enigma2 Skin-Wähler v0.5 BETA\n"
-#~ "\n"
-#~ "Falls Sie irgendwelche Probleme finden, kontaktieren\n"
-#~ "Sie bitte stephan@reichholf.net\n"
-#~ "\n"
-#~ "© 2006 - Stephan Reichholf"
-
-#
-#~ msgid "Enter WLAN networ kname/SSID:"
-#~ msgstr "WLAN Netzwerkname/SSID eingeben:"
-
-#
-#~ msgid "Enter WLAN network name/SSID:"
-#~ msgstr "WLAN-Netzwerkname/SSID eingeben:"
-
-#
-#~ msgid "Enter WLAN passphrase/key:"
-#~ msgstr "WLAN-Schlüssel/Passwort eingeben:"
-
-#
-#
-#~ msgid "EventId not found"
-#~ msgstr "EventId nicht gefunden"
-
-#
-#~ msgid "Filesystem Check..."
-#~ msgstr "Dateisystemüberprüfung..."
-
-#
-#~ msgid "Following tasks will be done after you press continue!"
-#~ msgstr ""
-#~ "Folgende Aktivitäten werden ausgeführt nachdem Sie Weiter gedrückt haben!"
-
-#
-#~ msgid "Font size"
-#~ msgstr "Schriftgröße"
-
-#
-#~ msgid "Fritz!Box FON IP address"
-#~ msgstr "Fritz!Box FON IP-Adresse"
-
-#
-#~ msgid "Function not yet implemented"
-#~ msgstr "Funktion noch nicht eingebaut"
-
-#
-#~ msgid "Games / Plugins"
-#~ msgstr "Spiele / Erweiterungen"
-
-#
-#~ msgid "General AC3 delay"
-#~ msgstr "Allgemeine AC3 Verzögerung"
-
-#
-#~ msgid "General PCM delay"
-#~ msgstr "Allgemeine PCM Verzögerung"
-
-#
-#
-#
-#
-#
-#
-#~ msgid "Global Passthr."
-#~ msgstr "Passthr. Global"
-
-#
-#~ msgid "If you can see this page, please press OK."
-#~ msgstr "Wenn Sie diese Seite sehen, drücken Sie bitte OK."
-
-#
-#
-#~ msgid "Illegal Parameter value for Parameter begin : '%s'"
-#~ msgstr "Unerlabter Parameterwert für Parameter begin: '%s'"
-
-#
-#~ msgid "Image-Upgrade"
-#~ msgstr "Image-Aktualisierung"
-
-#
-#~ msgid "Initialization..."
-#~ msgstr "Initialisierung..."
-
-#
-#~ msgid "Install local IPKG"
-#~ msgstr ".ipk Datei installieren"
-
-#
-#
-#~ msgid "Instant recording started"
-#~ msgstr "Sofortaufnahme gestartet"
-
-#
-#~ msgid "Interface: %s"
-#~ msgstr "Adapter: %s"
-
-#
-#
-#~ msgid "Interfaces"
-#~ msgstr "Schnittstellen"
-
-#
-#~ msgid "Invert display"
-#~ msgstr "Display invertieren"
-
-#
-#~ msgid "Jump to video title 1 (play movie from start)"
-#~ msgstr "Springe zu Videotitel 1 (Film von Anfang abspielen)"
-
-#
-#~ msgid "Language..."
-#~ msgstr "Sprache..."
-
-#
-#
-#~ msgid "Missing Parameter: begin"
-#~ msgstr "Fehlender Parameter: begin"
-
-#
-#
-#~ msgid "Missing Parameter: beginOld"
-#~ msgstr "Fehlender Parameter: beginOld"
-
-#
-#
-#~ msgid "Missing Parameter: description"
-#~ msgstr "Fehlender Parameter: description"
-
-#
-#
-#~ msgid "Missing Parameter: end"
-#~ msgstr "Fehlender Parameter: end"
-
-#
-#
-#~ msgid "Missing Parameter: endOld"
-#~ msgstr "Fehlender Parameter: endOld"
-
-#
-#
-#~ msgid "Missing Parameter: eventid"
-#~ msgstr "Fehlender Parameter: eventid"
-
-#
-#
-#~ msgid "Missing Parameter: name"
-#~ msgstr "Fehelnder Parameter: name"
-
-#
-#
-#~ msgid "Missing Parameter: sRef"
-#~ msgstr "Fehlender Parameter: sRef"
-
-#
-#~ msgid "Movie Menu"
-#~ msgstr "Filmauswahl"
-
-#
-#~ msgid "Nameserver Setup..."
-#~ msgstr "Nameserver-Einstellungen..."
-
-#
-#~ msgid "Network..."
-#~ msgstr "Netzwerk..."
-
-#
-#~ msgid "No 50 Hz, sorry. :("
-#~ msgstr "50 Hz nicht möglich. :("
-
-#
-#
-#~ msgid "No event found, started infinite recording"
-#~ msgstr "Kein Event gefunden, endlosaufnahme gestartet"
-
-#
-#
-#~ msgid "No matching Timer not found"
-#~ msgstr "Kein zutreffender Timer gefunden"
-
-#
-#~ msgid ""
-#~ "No working wireless network interface found.\n"
-#~ "Please verify that you have attached a compatible WLAN device or enable "
-#~ "your local network interface."
-#~ msgstr ""
-#~ "Kein funktionierender WLAN Netzwerkadapter gefunden.\n"
-#~ "Stellen Sie sicher, dass Sie ein kompatibles Gerät angeschlossen haben "
-#~ "und das Ihr Netzwerk richtig konfiguriert ist."
-
-#
-#~ msgid "No, let me choose default lists"
-#~ msgstr "Nein, Standard-Kanalliste verwenden."
-
-#
-#
-#~ msgid "Ok"
-#~ msgstr "Ok"
-
-#
-#~ msgid "Online-Upgrade"
-#~ msgstr "Online-Aktualisierung"
-
-#
-#
-#
-#
-#
-#
-#~ msgid "PCM"
-#~ msgstr "PCM"
-
-#
-#~ msgid "Package details for: "
-#~ msgstr "Paketdetails für:"
-
-#
-#
-#
-#
-#
-#
-#~ msgid "Passthrough"
-#~ msgstr "Passthrough"
-
-#
-#~ msgid "Please add titles to the compilation"
-#~ msgstr "Bitte fügen Sie Titel zur Ihrer Zusammenstellung hinzu"
-
-#
-#~ msgid "Please select keyword to filter..."
-#~ msgstr "Bitte wählen Sie ein Schlüsselwort zum Filtern"
-
-#
-#~ msgid ""
-#~ "Pressing OK enables the built in wireless LAN support of your Dreambox.\n"
-#~ "Wlan USB Sticks with Zydas ZD1211B and RAlink RT73 Chipset are "
-#~ "supported.\n"
-#~ "Connect your Wlan USB Stick to your Dreambox before pressing OK.\n"
-#~ "\n"
-#~ msgstr ""
-#~ "OK aktiviert die eingebaute WLAN-Unterstützung Ihrer Dreambox.\n"
-#~ "WLAN-USB-Sticks mit Zydas-ZD1211B und RAlink-RT73-Chipsatz werden "
-#~ "unterstützt.\n"
-#~ "Schließen Sie Ihren USB-Stick an, bevor Sie OK drücken.\n"
-#~ "\n"
-
-#
-#~ msgid "RSS Feed URI"
-#~ msgstr "RSS-Feed-URI"
-
-#
-#
-#~ msgid "Really delete this Interface?"
-#~ msgstr "Diese Schnittstelle wirklich löschen?"
-
-#
-#~ msgid "Really delete this timer?"
-#~ msgstr "Diesen Timer wirklich löschen?"
-
-#
-#~ msgid "Recording paths..."
-#~ msgstr "Aufnahmepfade"
-
-#
-#~ msgid ""
-#~ "Recording(s) are in progress or coming up in few seconds... really reboot "
-#~ "now?"
-#~ msgstr ""
-#~ "Zurzeit sind Aufnahmen aktiv oder starten gleich...\n"
-#~ "Wollen Sie trotzdem neu starten?"
-
-#
-#~ msgid ""
-#~ "Recording(s) are in progress or coming up in few seconds... really "
-#~ "restart now?"
-#~ msgstr ""
-#~ "Zurzeit sind Aufnahmen aktiv oder starten gleich...\n"
-#~ "Wollen Sie trotzdem neu starten?"
-
-#
-#~ msgid ""
-#~ "Recording(s) are in progress or coming up in few seconds... really "
-#~ "shutdown now?"
-#~ msgstr ""
-#~ "Zurzeit sind Aufnahmen aktiv oder starten gleich...\n"
-#~ "Wollen Sie trotzdem ausschalten?"
-
-#
-#~ msgid "Refresh"
-#~ msgstr "Aktualisieren"
-
-#
-#
-#~ msgid "Require Authorization"
-#~ msgstr "Autorisierung erforderlich"
-
-#
-#~ msgid "Rescan network"
-#~ msgstr "Netzwerk erneut durchsuchen"
-
-#
-#~ msgid "Reset configuration"
-#~ msgstr "Konfig. zurücksetzen"
-
-#
-#~ msgid ""
-#~ "Reset the network configuration of your Dreambox.\n"
-#~ "\n"
-#~ msgstr ""
-#~ "Setzen Sie die Netzwerk-Konfiguration Ihrer Dreambox auf Standardwerte "
-#~ "zurück\n"
-
-#
-#~ msgid "Restore backups..."
-#~ msgstr "Sicherungen wiederherstellen"
-
-#
-#~ msgid "Restore running..."
-#~ msgstr "Sicherung läuft..."
-
-#
-#~ msgid ""
-#~ "Restoring the settings is done. Please press OK to activate the restored "
-#~ "settings now."
-#~ msgstr ""
-#~ "Die Einstellungen wurden wiederhergestellt. Drücken Sie OK, um diese nun "
-#~ "zu aktivieren."
-
-#
-#
-#~ msgid "SSL"
-#~ msgstr "SSL"
-
-#
-#
-#~ msgid "SSL Encryption"
-#~ msgstr "SSL Verschlüsselung"
-
-#
-#~ msgid "Satteliteequipment"
-#~ msgstr "Satteliten-Equipment"
-
-#
-#~ msgid ""
-#~ "Scan your network for wireless Access Points and connect to them using "
-#~ "your WLAN USB Stick\n"
-#~ msgstr ""
-#~ "Durchsucht Ihr Netzwerk nach WLAN-Zugangspunkten und stellt eine "
-#~ "Verbindung mit Hilfe Ihres gewählten WLAN Gerätes her.\n"
-
-#
-#~ msgid "Select channel audio"
-#~ msgstr "Kanal- Tonspur wählen"
-
-#
-#~ msgid "Select files/folders to backup..."
-#~ msgstr "Dateien/Verzeichnisse zum Sichern auswählen..."
-
-#
-#~ msgid "Select video input"
-#~ msgstr "Wählen Sie den Video-Eingang"
-
-#
-#~ msgid "Set as default Interface"
-#~ msgstr "Netzwerkadapter als Standard definieren"
-
-#
-#~ msgid "Show files from %s"
-#~ msgstr "Zeige Dateien von %s"
-
-#
-#~ msgid "Somewhere else"
-#~ msgstr "Andere Stelle"
-
-#
-#~ msgid ""
-#~ "Sorry your Backup destination does not exist\n"
-#~ "\n"
-#~ "Please choose an other one."
-#~ msgstr ""
-#~ "Der Sicherungsort existiert nicht.\n"
-#~ "\n"
-#~ "Bitte einen anderen auswählen!"
-
-#
-#~ msgid "Startwizard"
-#~ msgstr "Startassistent"
-
-#
-#~ msgid "Step "
-#~ msgstr "Schritt "
-
-#
-#~ msgid "Switch audio"
-#~ msgstr "Tonspur..."
-
-#
-#~ msgid ""
-#~ "The installation of the default settings is finished. Your can now "
-#~ "continue configuring your Dreambox by pressing the OK button on the "
-#~ "remote control."
-#~ msgstr "Die Installation der Standardeinstellungen wurde beendet. "
-
-#
-#
-#~ msgid "The timer '%s' has been deleted successfully"
-#~ msgstr "Der Timer %s wurde erfolgreich gelöscht"
-
-#
-#
-#~ msgid "The timer has NOT been deleted"
-#~ msgstr "Der Timer wurde NICHT gelöscht"
-
-#
-#~ msgid "There is nothing to be done."
-#~ msgstr "Es gibt nichts zu tun."
-
-#
-#~ msgid "This Dreambox can't decode %s video streams!"
-#~ msgstr "Diese Dreambox kann keine Videos vom Typ %s wiedergeben!"
-
-#
-#~ msgid "This is unsupported at the moment."
-#~ msgstr "Diese Funktion wird noch nicht unterstützt."
-
-#
-#
-#~ msgid "Timer %s has been changed!"
-#~ msgstr "Timer %s wurde geändert!"
-
-#
-#
-#~ msgid "Timer added"
-#~ msgstr "Timer hinzugefügt"
-
-#
-#
-#~ msgid "Timer added successfully!"
-#~ msgstr "Timer erfolgreich hinzugefügt!"
-
-#
-#~ msgid "Timeshift path..."
-#~ msgstr "Timeshift Verzeichnis..."
-
-#
-#~ msgid "USB"
-#~ msgstr "USB"
-
-#
-#~ msgid ""
-#~ "Unable to initialize harddisk.\n"
-#~ "Please refer to the user manual.\n"
-#~ "Error: "
-#~ msgstr ""
-#~ "Konnte Festplatte nicht initialisieren.\n"
-#~ "Bitte schauen Sie in das Handbuch.\n"
-#~ "Fehler: "
-
-#
-#
-#~ msgid "Unexpected Error"
-#~ msgstr "Unerwarteter Fehler"
-
-#
-#
-#~ msgid "Unknown command: '%s'"
-#~ msgstr "Unbekannter Befehl: '%s'"
-
-#
-#
-#~ msgid "Unknown function: '%s'"
-#~ msgstr "Unbekannte Funktion: '%s'"
-
-#
-#~ msgid "Updates your receiver's software"
-#~ msgstr "Aktualisiert die Software Ihres Receivers"
-
-#
-#~ msgid "Upgrade finished. Do you want to reboot your Dreambox?"
-#~ msgstr "Aktualisierung beendet. Möchten Sie Ihre Dreambox nun neu starten?"
-
-#
-#~ msgid "VCR Switch"
-#~ msgstr "Videorekorderumschaltung"
-
-#
-#
-#
-#
-#~ msgid "View Downloads"
-#~ msgstr "Downloads anzeigen"
-
-#
-#~ msgid "View list of available Satteliteequipment extensions."
-#~ msgstr ""
-#~ "Eine Liste der verfügbaren Satelliten-Equipment Erweiterungen anzeigen."
-
-#
-#~ msgid ""
-#~ "We will now test if your TV can also display this resolution at 50hz. If "
-#~ "your screen goes black, wait 20 seconds and it will switch back to 60hz.\n"
-#~ "Please press OK to begin."
-#~ msgstr ""
-#~ "Wir testen nun, ob Ihr Fernseher diese Auflösung bei 50Hz darstellen "
-#~ "kann. Sollte das Bild schwarz werden, so warten Sie bitte 20 Sekunden, es "
-#~ "wird automatisch auf 60Hz zurückgeschaltet.\n"
-#~ "Bitte drücken Sie OK, um zu beginnen."
-
-#
-#
-#~ msgid "Webinterface: Edit Interface"
-#~ msgstr "Webinterface: Schnittstelle bearbeiten"
-
-#
-#
-#~ msgid "Webinterface: List of configured Interfaces"
-#~ msgstr "Webinterface: Liste konfigurierter Schnittstellen"
-
-#
-#~ msgid ""
-#~ "You do not seem to have a harddisk in your Dreambox. So backing up to a "
-#~ "harddisk is not an option for you."
-#~ msgstr ""
-#~ "Sie scheinen keine Festplatte in der Dreambox zu haben. Daher ist das "
-#~ "Sichern auf Festplatte nicht möglich."
-
-#
-#~ msgid ""
-#~ "You have chosen to backup to a compact flash card. The card must be in "
-#~ "the slot. We do not verify if it is really used at the moment. So better "
-#~ "backup to the harddisk!\n"
-#~ "Please press OK to start the backup now."
-#~ msgstr ""
-#~ "Sie wollen auf eine Compact Flash-Karte sichern. Die Karte muss sich "
-#~ "bereits vor dem Einschalten Ihrer Dreambox im Schacht befinden.\n"
-#~ "Die bevorzugte Methode ist die Sicherung auf Festplatte!\n"
-#~ "Bitte OK drücken, um die Sicherung trotzdem zu starten."
-
-#
-#~ msgid ""
-#~ "You have chosen to backup to an usb drive. Better backup to the "
-#~ "harddisk!\n"
-#~ "Please press OK to start the backup now."
-#~ msgstr ""
-#~ "Sie wollen eine Sicherung auf ein USB-Laufwerk durchführen. Die "
-#~ "empfohlene Methode\n"
-#~ "ist die Sicherung auf Festplatte! Bitte drücken Sie OK, um die Sicherung "
-#~ "zu starten."
-
-#
-#~ msgid ""
-#~ "You have chosen to backup to your harddisk. Please press OK to start the "
-#~ "backup now."
-#~ msgstr ""
-#~ "Sie wollen Ihre Einstellungen auf die Festplatte sichern. Bitte drücken "
-#~ "Sie OK, um die Sicherung zu starten."
-
-#
-#~ msgid "You have to wait for"
-#~ msgstr "Sie müssen warten"
-
-#
-#~ msgid ""
-#~ "You need to define some keywords first!\n"
-#~ "Press the menu-key to define keywords.\n"
-#~ "Do you want to define keywords now?"
-#~ msgstr ""
-#~ "Sie müssen zunächst Schlüsselwörter anlegen!\n"
-#~ "Drücken Sie zum Anlegen die OK-Taste.\n"
-#~ "Wollen Sie dies jetzt machen?"
-
-#
-#~ msgid ""
-#~ "Your 'Match in title' Attribute ends with a Whitespace.\n"
-#~ "Please confirm if this was intentional, if not they will be removed."
-#~ "Enigma2 will restart after the restore"
-#~ msgstr ""
-#~ "Das Attribut \"Finde in Titel\" endet bei Ihnen mit einem Leerzeichen. "
-#~ "Bitte bestätigen Sie ob dies Absicht war, sonst werden diese entfernt."
-
-#
-#~ msgid "Your TV works with 50 Hz. Good!"
-#~ msgstr "Ihr Fernseher arbeitet mit 50 Hz. Prima!"
-
-#
-#~ msgid ""
-#~ "Your network configuration has been activated.\n"
-#~ "A second configured interface has been found.\n"
-#~ "\n"
-#~ "Do you want to disable the second network interface?"
-#~ msgstr ""
-#~ "Ihre Netzwerk-Konfiguration wurde aktiviert.\n"
-#~ "Ein zweiter konfigurierter Netzwerkadapter wurde gefunden.\n"
-#~ "\n"
-#~ "Wollen Sie den zweiten Netzwerkadapter deaktivieren?"
-
-#
-#~ msgid ""
-#~ "are you sure you want to restore\n"
-#~ "following backup:\n"
-#~ msgstr ""
-#~ "Sind Sie sicher, dass Sie die Sicherung zurückspielen wollen?\n"
-#~ "Sicherung:\n"
-
-#
-#~ msgid "assigned CAIds"
-#~ msgstr "zugewiesene CAIDs"
-
-#
-#~ msgid "assigned Services/Provider"
-#~ msgstr "zugewiesene Services/Provider"
-
-#
-#~ msgid "color"
-#~ msgstr "Farbe"
-
-#
-#~ msgid "enigma2 and network"
-#~ msgstr "Enigma2 und Netzwerk"
-
-#
-#~ msgid "equal to Socket A"
-#~ msgstr "Wie Tuner A"
-
-#
-#~ msgid "exceeds dual layer medium!"
-#~ msgstr "übersteigt Größe eines Dual-Layer-Mediums!"
-
-#
-#~ msgid "exit network adapter setup menu"
-#~ msgstr "Netzwerkadaptermenü verlassen"
-
-#
-#~ msgid "font face"
-#~ msgstr "Schriftart"
-
-#
-#~ msgid "full /etc directory"
-#~ msgstr "komplettes Verzeichnis /etc"
-
-#
-#~ msgid "headline"
-#~ msgstr "Überschrift"
-
-#
-#~ msgid "hidden network"
-#~ msgstr "verstecktes Netzwerk"
-
-#
-#~ msgid "hidden..."
-#~ msgstr "hidden..."
-
-#
-#~ msgid "highlighted button"
-#~ msgstr "hervorgehobener Knopf"
-
-#
-#~ msgid ""
-#~ "incoming call!\n"
-#~ "%s calls on %s!"
-#~ msgstr ""
-#~ "Eingehender Anruf!\n"
-#~ "%s ruft Nummer %s!"
-
-#
-#~ msgid "loopthrough to socket A"
-#~ msgstr "Verbunden mit Tuner A"
-
-#
-#~ msgid "no Picture found"
-#~ msgstr "Kein Bild gefunden"
-
-#
-#~ msgid "only /etc/enigma2 directory"
-#~ msgstr "nur Verzeichnis /etc/enigma2"
-
-#
-#~ msgid "open virtual keyboard input help"
-#~ msgstr "Virtuelle Tastatureingabehilfe öffnen"
-
-#
-#~ msgid "play next playlist entry"
-#~ msgstr "nächsten Wiedergabelisteneintrag abspielen"
-
-#
-#~ msgid "play previous playlist entry"
-#~ msgstr "vorherigen Wiedergabelisteneintrag abspielen"
-
-#
-#~ msgid "rebooting..."
-#~ msgstr "starte neu..."
-
-#
-#~ msgid "required medium type:"
-#~ msgstr "Benötigte Rohlingsorte:"
-
-#
-#~ msgid ""
-#~ "scan done!\n"
-#~ "%d services found!"
-#~ msgstr ""
-#~ "Suche beendet.\n"
-#~ "%d Kanäle gefunden."
-
-#
-#~ msgid ""
-#~ "scan done!\n"
-#~ "No service found!"
-#~ msgstr ""
-#~ "Suche beendet.\n"
-#~ "Kein Kanal gefunden."
-
-#
-#~ msgid ""
-#~ "scan done!\n"
-#~ "One service found!"
-#~ msgstr ""
-#~ "Suche beendet.\n"
-#~ "Ein Kanal gefunden."
-
-#
-#~ msgid ""
-#~ "scan in progress - %d %% done!\n"
-#~ "%d services found!"
-#~ msgstr ""
-#~ "Suche läuft - %d %% erledigt!\n"
-#~ "%d Kanäle gefunden!"
-
-#
-#
-#
-#
-#
-#
-#~ msgid "sets the audio Delay (LipSync)"
-#~ msgstr "Setzt die verschiedenen Audio- Verzögerungen (LipSync)"
-
-#
-#~ msgid "show first tag"
-#~ msgstr "Zeige erstes tag"
-
-#
-#~ msgid "show second tag"
-#~ msgstr "Zeige zweites tag"
-
-#
-#~ msgid "skip backward (self defined)"
-#~ msgstr "Rückwärts springen (benutzerdefiniert)"
-
-#
-#~ msgid "skip forward (self defined)"
-#~ msgstr "Vorwärts springen (benutzerdefiniert)"
-
-#
-#~ msgid "spaces (top, between rows, left)"
-#~ msgstr "Abstände (oben, zwischen Reihen, links)"
-
-#
-#~ msgid "text"
-#~ msgstr "Text"
-
-#
-#~ msgid "until restart"
-#~ msgstr "Bis zum Neustart"
-
-msgid "Fan Control"
-msgstr "Lüftersteuerung"
-
-msgid "Fan basic action"
-msgstr "Lüfterverhalten"
-
-msgid "Fan control"
-msgstr "Lüftersteuerung"
-
-msgid "Fan off duration time"
-msgstr "Zeitspanne in Minuten: Lüfter aus"
-
-msgid "Fan on duration time"
-msgstr "Zeitspanne in Minuten: Lüfter an"
-
-msgid "Use Fan timer"
-msgstr "Nutze die zeitgesteuerte Lüftersteuerung"
-

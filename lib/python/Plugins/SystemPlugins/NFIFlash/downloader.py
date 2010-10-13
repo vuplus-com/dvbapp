@@ -35,8 +35,8 @@ class ImageDownloadJob(Job):
 			MountTask(self, device, mountpoint)
 		ImageDownloadTask(self, url, mountpoint+filename)
 		ImageDownloadTask(self, url[:-4]+".nfo", mountpoint+filename[:-4]+".nfo")
-		if device:
-			UmountTask(self, mountpoint)
+		#if device:
+			#UmountTask(self, mountpoint)
 
 	def retry(self):
 		self.tasks[0].args += self.tasks[0].retryargs
@@ -215,7 +215,7 @@ class CopyTask(Task):
 
 class NFOViewer(Screen):
 	skin = """
-		<screen name="NFOViewer" position="center,center" size="610,410" title="Changelog viewer" >
+		<screen name="NFOViewer" position="center,center" size="610,410" title="Changelog" >
 			<widget name="changelog" position="10,10" size="590,380" font="Regular;16" />
 		</screen>"""
 
@@ -539,7 +539,10 @@ class NFIDownload(Screen):
 			self.target_dir = usbpartition[0][1]
 			self.ackDestinationDevice(device_description=usbpartition[0][0])
 		else:
-			self.session.openWithCallback(self.DeviceBrowserClosed, DeviceBrowser, None, showDirectories=True, showMountpoints=True, inhibitMounts=["/autofs/sr0/"])
+			self.openDeviceBrowser()
+	
+	def openDeviceBrowser(self):
+		self.session.openWithCallback(self.DeviceBrowserClosed, DeviceBrowser, None, showDirectories=True, showMountpoints=True, inhibitMounts=["/autofs/sr0/"])
 
 	def DeviceBrowserClosed(self, path):
 		print "[DeviceBrowserClosed]", str(path)
@@ -555,7 +558,7 @@ class NFIDownload(Screen):
 		else:
 			dev = device_description
 		message = _("Do you want to download the image to %s ?") % (dev)
-		choices = [(_("Yes"), self.ackedDestination), (_("List of Storage Devices"),self.askDestination), (_("Cancel"),self.keyRed)]
+		choices = [(_("Yes"), self.ackedDestination), (_("List of Storage Devices"),self.openDeviceBrowser), (_("Cancel"),self.keyRed)]
 		self.session.openWithCallback(self.ackDestination_query, ChoiceBox, title=message, list=choices)
 
 	def ackDestination_query(self, choice):
@@ -566,27 +569,30 @@ class NFIDownload(Screen):
 			self.keyRed()
 
 	def ackedDestination(self):
-		print "[ackedDestination]", self.branch, self.target_dir, self.target_dir[8:]
+		print "[ackedDestination]", self.branch, self.target_dir
 		self.container.setCWD("/mnt")
 		if self.target_dir[:8] == "/autofs/":
 			self.target_dir = "/dev/" + self.target_dir[8:-1]
 
-			if self.branch == STICK_WIZARD:
-				job = StickWizardJob(self.target_dir)
-				job.afterEvent = "close"
-				job_manager.AddJob(job)
-				job_manager.failed_jobs = []
-				self.session.openWithCallback(self.StickWizardCB, JobView, job, afterEventChangeable = False)
+		if self.branch == STICK_WIZARD:
+			job = StickWizardJob(self.target_dir)
+			job.afterEvent = "close"
+			job_manager.AddJob(job)
+			job_manager.failed_jobs = []
+			self.session.openWithCallback(self.StickWizardCB, JobView, job, afterEventChangeable = False)
 
-			elif self.branch != STICK_WIZARD:
-				url = self.feedlists[self.branch][self.image_idx][1]
-				filename = self.feedlists[self.branch][self.image_idx][0]
-				print "[getImage] start downloading %s to %s" % (url, filename)
+		elif self.branch != STICK_WIZARD:
+			url = self.feedlists[self.branch][self.image_idx][1]
+			filename = self.feedlists[self.branch][self.image_idx][0]
+			print "[getImage] start downloading %s to %s" % (url, filename)
+			if self.target_dir.startswith("/dev/"):
 				job = ImageDownloadJob(url, filename, self.target_dir, self.usbmountpoint)
-				job.afterEvent = "close"
-				job_manager.AddJob(job)
-				job_manager.failed_jobs = []
-				self.session.openWithCallback(self.ImageDownloadCB, JobView, job, afterEventChangeable = False)
+			else:
+				job = ImageDownloadJob(url, filename, None, self.target_dir)
+			job.afterEvent = "close"
+			job_manager.AddJob(job)
+			job_manager.failed_jobs = []
+			self.session.openWithCallback(self.ImageDownloadCB, JobView, job, afterEventChangeable = False)
 
 	def StickWizardCB(self, ret=None):
 		print "[StickWizardCB]", ret
@@ -605,10 +611,29 @@ class NFIDownload(Screen):
 		print "[ImageDownloadCB]", ret
 #		print job_manager.active_jobs, job_manager.failed_jobs, job_manager.job_classes, job_manager.in_background, job_manager.active_job
 		if len(job_manager.failed_jobs) == 0:
-			self.session.open(MessageBox, _("To update your Dreambox firmware, please follow these steps:\n1) Turn off your box with the rear power switch and plug in the bootable USB stick.\n2) Turn mains back on and hold the DOWN button on the front panel pressed for 10 seconds.\n3) Wait for bootup and follow instructions of the wizard."), type = MessageBox.TYPE_INFO)
+			self.session.openWithCallback(self.askBackupCB, MessageBox, _("The wizard can backup your current settings. Do you want to do a backup now?"), MessageBox.TYPE_YESNO)
 		else:
 			self.umountCallback = self.keyRed
 			self.umount()
+
+	def askBackupCB(self, ret):
+		if ret:
+			from Plugins.SystemPlugins.SoftwareManager.BackupRestore import BackupScreen
+
+			class USBBackupScreen(BackupScreen):
+				def __init__(self, session, usbmountpoint):
+					BackupScreen.__init__(self, session, runBackup = True)
+					self.backuppath = usbmountpoint
+					self.fullbackupfilename = self.backuppath + "/" + self.backupfile
+
+			self.session.openWithCallback(self.showHint, USBBackupScreen, self.usbmountpoint)
+		else:
+			self.showHint()
+
+	def showHint(self, ret=None):
+		self.session.open(MessageBox, _("To update your Dreambox firmware, please follow these steps:\n1) Turn off your box with the rear power switch and make sure the bootable USB stick is plugged in.\n2) Turn mains back on and hold the DOWN button on the front panel pressed for 10 seconds.\n3) Wait for bootup and follow instructions of the wizard."), type = MessageBox.TYPE_INFO)
+		self.umountCallback = self.keyRed
+		self.umount()
 
 	def getFeed(self):
 		self.feedDownloader15 = feedDownloader(self.feed_base, self.box, OE_vers="1.5")
@@ -665,8 +690,8 @@ class NFIDownload(Screen):
 
 	def askStartWizard(self):
 		self.branch = STICK_WIZARD
-		message = _("""This plugin creates a USB stick which can be used to update the firmware of your Dreambox in case it has no network connection or only WLAN access.
-First, you need to prepare a USB stick so that it is bootable.
+		message = _("""This plugin creates a USB stick which can be used to update the firmware of your Dreambox without the need for a network or WLAN connection.
+First, a USB stick needs to be prepared so that it becomes bootable.
 In the next step, an NFI image file can be downloaded from the update server and saved on the USB stick.
 If you already have a prepared bootable USB stick, please insert it now. Otherwise plug in a USB stick with a minimum size of 64 MB!""")
 		self.session.openWithCallback(self.wizardDeviceBrowserClosed, DeviceBrowser, None, message, showDirectories=True, showMountpoints=True, inhibitMounts=["/","/autofs/sr0/","/autofs/sda1/","/media/hdd/","/media/net/",self.usbmountpoint,"/media/dvd/"])
@@ -728,7 +753,7 @@ If you already have a prepared bootable USB stick, please insert it now. Otherwi
 
 	def nfo_finished(self,nfodata=""):
 		print "[nfo_finished] " + str(nfodata)
-		self["key_blue"].text = _("Changelog viewer")
+		self["key_blue"].text = _("Changelog")
 		self.nfo = nfodata
 
 	def md5verify(self, md5, path):

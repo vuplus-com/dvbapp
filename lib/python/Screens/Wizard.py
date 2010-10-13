@@ -412,9 +412,13 @@ class Wizard(Screen):
 			return
 		if (self.wizard[self.currStep]["config"]["screen"] != None):
 			self.configInstance.keyNumberGlobal(number)
+		elif (self.wizard[self.currStep]["config"]["type"] == "dynamic"):
+			self["config"].handleKey(KEY_0 + number)
 
 	def keyGotAscii(self):
 		if (self.wizard[self.currStep]["config"]["screen"] != None):
+			self["config"].handleKey(KEY_ASCII)
+		elif (self.wizard[self.currStep]["config"]["type"] == "dynamic"):
 			self["config"].handleKey(KEY_ASCII)
 		
 	def left(self):
