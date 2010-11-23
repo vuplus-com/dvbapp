@@ -72,7 +72,7 @@ class FactoryTest(Screen):
 		}, -2)
 
 		Screen.__init__(self, session)
-		TESTPROGRAM_DATE = "2010-06-25"
+		TESTPROGRAM_DATE = "2010-10-29"
 		TESTPROGRAM_VERSION = "Version 00.01"
 
 		self.model = 0
@@ -94,6 +94,8 @@ class FactoryTest(Screen):
 			nimConfig.diseqcMode.value="diseqc_a_b"
 			nimConfig.diseqcA.value="130"
 			nimConfig.diseqcB.value="192"
+		if self.model == 2:
+			pass
 		nimmanager.sec.update()		
 		
 		system("cp /usr/lib/enigma2/python/Plugins/SystemPlugins/FactoryTest/testdb /etc/enigma2/lamedb")
@@ -163,11 +165,36 @@ class FactoryTest(Screen):
 			tlist.append((" 7. Factory default",self.fdefaultIndex))
 			self.shutdownIndex=8
 			tlist.append((" 8. Shutdown",self.shutdownIndex))
+
+		elif self.model == 2:
+			self.scarttestIndex = -1
+			self.satetestIndex=0
+			tlist.append((" 0. Sata & extend hdd test",self.satetestIndex))
+			self.usbtestIndex=1
+			tlist.append((" 1. USB test",self.usbtestIndex))
+			self.fronttestIndex=2
+			tlist.append((" 2. Front test",self.fronttestIndex))
+			self.smarttestIndex=3
+			tlist.append((" 3. Smartcard test",self.smarttestIndex))
+			self.tuner1_1testIndex=4
+			tlist.append((" 4. T1 H 22K x 4:3 CVBS",self.tuner1_1testIndex))
+			self.tuner1_2testIndex=5
+			tlist.append((" 5. T1 V 22k o 16:9 RGB",self.tuner1_2testIndex))
+			self.tuner2_1testIndex = -1
+			self.tuner2_2testIndex=6
+			tlist.append((" 6. T2 DVB-C 4:3 YC CAM",self.tuner2_2testIndex))
+			self.rs232testIndex=7
+			tlist.append((" 7. RS232 test",self.rs232testIndex))
+			self.ethernettestIndex=8
+			tlist.append(("8. Ethernet & mac test",self.ethernettestIndex))
+			self.fdefaultIndex=9
+			tlist.append(("9. Factory default",self.fdefaultIndex))
+			self.shutdownIndex=10
+			tlist.append(("10. Shutdown",self.shutdownIndex))
+			
 		self.menulength= len(tlist)-1
 		self["testlist"] = MenuList(tlist)
 		self.rlist = []
-#		for x in range(15):
-#		for x in range(12):
 		for x in range(self.menulength):
 			self.rlist.append((".."))
 		self["resultlist"] = TestResultList(self.rlist)
@@ -190,9 +217,16 @@ class FactoryTest(Screen):
 		self.tunemsgtimer = eTimer()
 		self.tunemsgtimer.callback.append(self.tunemsg)
 
+		if self.model == 0:
+			self.cam_index = 7
+		elif self.model == 1:
+			self.cam_index = 4
+		elif self.model == 2:
+			self.cam_index = 6	
 		self.camstep = 1
 		self.camtimer = eTimer()
 		self.camtimer.callback.append(self.cam_state)
+		self.mactry = 1
 		self.getmacaddr()
 		self.getversion()
 		
@@ -205,13 +239,20 @@ class FactoryTest(Screen):
 		self.satatimer.callback.append(self.sataCheck)
 
 	def getModelInfo(self):
-		info = open("/proc/stb/info/version").read()
-		print info,info[:2]
-		if info[:2] == "14":
-			self.model = 1
-		elif info[:2] == "12":
-			self.model= 0
-		
+		if fileExists("/proc/stb/info/vumodel"):
+			info = open("/proc/stb/info/vumodel").read()
+			if info[:5] == "combo":
+				self.model = 2
+				print "getModelInfo : combo"
+		else:
+			info = open("/proc/stb/info/version").read()
+#			print info,info[:2]
+			if info[:2] == "14":
+				self.model = 1
+				print "getModelInfo : solo"
+			elif info[:2] == "12":
+				self.model = 0
+				print "getModelInfo : duo"
 
 	def nothing(self):
 		print "nothing"
@@ -253,8 +294,9 @@ class FactoryTest(Screen):
 			tunno = 1
 			result = eSctest.getInstance().getFrontendstatus(0)
 			hv = "Ver"
-			
-		if index == self.tuner1_2testIndex or index==self.tuner2_2testIndex:
+		if self.model == 2 and index==self.tuner2_2testIndex:
+			hv = ""
+		elif index == self.tuner1_2testIndex or index==self.tuner2_2testIndex:
 			hv = "Ver"
 		else:
 			hv = "Hor"
@@ -264,6 +306,7 @@ class FactoryTest(Screen):
 			self.tunerlock = 0
 			self.tunemsgtimer.stop()
 			self.session.nav.stopService()
+			self.avswitch.setColorFormat(0)
 			self.session.open( MessageBox, _("Tune%d %s Locking Fail..."%(tunno,hv)), MessageBox.TYPE_ERROR)	
 			if self.agingmode==0:
 				self.rlist[self["testlist"].getCurrent()[1]]="fail"
@@ -282,27 +325,50 @@ class FactoryTest(Screen):
 			self["testversion"].setText(("Version no load"))
 			
 
+	def getmacaddr(self):
+		try:
+			if self.model == 2:
+				cmd = "nanddump -s 0x" + str((self.mactry-1)*2) + "0000 -b -o -l 64 -p /dev/mtd5"
+			elif self.model == 0 or self.model == 1:
+				cmd = "nanddump -s 0x" + str((self.mactry-1)*2) + "0000 -b -o -l 64 -p /dev/mtd4"
+			self.macConsole = Console()	
+			self.macConsole.ePopen(cmd, self.readmac,self.checkReadmac)	
+		except:
+			return
+
 	def readmac(self, result, retval,extra_args=None):
-		(statecallback) = extra_args
+		(callback) = extra_args
 		if self.macConsole is not None:
 			if retval == 0:
 				self.macConsole = None
+				macline = None
 				content =result.splitlines()
-                                for x in content:
-                                        if x.startswith('0x00000010:'):
-                                                macline = x.split()
-                                if len(macline) < 10:
-                                        print 'mac dump read error'
-                                        retrun
-				mac = macline[5]+":"+macline[6]+":"+macline[7]+":"+macline[8]+":"+macline[9]+":"+macline[10]
-				self["mactext"].setText(("MAC : "+mac))
- 	
-	def getmacaddr(self):
-		try:
-			cmd = "nanddump -b -o -l 64 -p /dev/mtd4"
-			self.macConsole = Console()	
-			self.macConsole.ePopen(cmd, self.readmac)	
-		except:
+				for x in content:
+					if x.startswith('0x000'+str((self.mactry-1)*2)+'0010:'):
+						macline = x.split()
+				if macline == None:
+					callback(0)
+				elif len(macline) < 10:	
+					callback(1)
+				else:	
+					mac = macline[5]+":"+macline[6]+":"+macline[7]+":"+macline[8]+":"+macline[9]+":"+macline[10]
+					self["mactext"].setText(("MAC : "+mac))
+					callback(2)
+
+	def checkReadmac(self,data):
+		if data == 0:
+			print "block %d is bad block" % self.mactry
+			self.mactry = self.mactry + 1
+			if self.mactry > 4:
+				self.session.open(MessageBox, _("FLASH IS BROKEN"), type = MessageBox.TYPE_INFO, enable_input = False)
+				return
+			else:
+				self.getmacaddr()
+		elif data == 1:
+			print 'mac dump read error'
+			return
+		elif data == 2:
+			print 'mac address read ok'
 			return
 		
 	def TestAction(self):
@@ -353,8 +419,10 @@ class FactoryTest(Screen):
 #			self.Test13()
 		elif index==self.fdefaultIndex:
 			self.Test14()
-#		elif index==self.shutdownIndex:
-#			self.Test15()
+		elif index==self.shutdownIndex:
+			self.Test15()
+		else:
+			pass
 
 	def shutdownaction(self):
 		if self["testlist"].getCurrent()[1] == self.shutdownIndex:
@@ -465,7 +533,9 @@ class FactoryTest(Screen):
 		if self.model== 0:
 			self.session.openWithCallback(self.displayresult ,FrontTest)
 		elif self.model == 1:
-			self.session.openWithCallback(self.displayresult ,FrontTest_solo)		
+			self.session.openWithCallback(self.displayresult ,FrontTest_solo)
+		elif self.model == 2:
+			self.session.openWithCallback(self.displayresult ,FrontTest_solo)
 
 	def displayresult(self):
 		global fronttest
@@ -538,16 +608,26 @@ class FactoryTest(Screen):
 #			ref.setData(3,0x85)
 #		ref.setData(4,0xC00000)
 #	ikseong - for 22000 tp ( /home/ikseong/share/lamedb_ORF)
-			ref.setData(0,0x19)
-			ref.setData(1,0x1325)
-			ref.setData(2,0x3ef)
-			ref.setData(3,0x1)
-			ref.setData(4,0xC00000)
-			self.session.nav.playService(ref)
-			self.avswitch.setColorFormat(0)			
-			self.avswitch.setAspectRatio(6)
-		self.tuningtimer.start(2000,True)
-		self.tunemsgtimer.start(3000, True)
+			if self.model==0:
+				ref.setData(0,0x19)
+				ref.setData(1,0x1325)
+				ref.setData(2,0x3ef)
+				ref.setData(3,0x1)
+				ref.setData(4,0xC00000)
+				self.session.nav.playService(ref)
+				self.avswitch.setColorFormat(0)			
+				self.avswitch.setAspectRatio(6)
+			elif self.model==2:
+				ref.setData(0,0x19)
+				ref.setData(1,0x1325)
+				ref.setData(2,0x3ef)
+				ref.setData(3,0x1)
+				ref.setData(4,0xfff029a)
+				self.session.nav.playService(ref)
+				self.avswitch.setColorFormat(2)
+				self.avswitch.setAspectRatio(0)
+		self.tuningtimer.start(4000,True)
+		self.tunemsgtimer.start(5000, True)
 
 	def cam_state(self):
 		if self.camstep == 1:
@@ -637,11 +717,11 @@ class FactoryTest(Screen):
 			self.rlist[self["testlist"].getCurrent()[1]]="pass"
 			if self.tunerlock == 0:
 				self.rlist[self["testlist"].getCurrent()[1]]="fail"
-			elif self["testlist"].getCurrent()[1] == 7 and self.camstep < 5:
+			elif self["testlist"].getCurrent()[1] == self.cam_index and self.camstep < 5:
 				self.rlist[self["testlist"].getCurrent()[1]]="fail"
 		else:
 			self.rlist[self["testlist"].getCurrent()[1]]="fail"
-		if self["testlist"].getCurrent()[1] == 6:
+		if self["testlist"].getCurrent()[1] == 6: # YC
 			self.avswitch.setColorFormat(0)			
 		self.resetSource()
 		self["resultlist"].updateList(self.rlist)
@@ -771,6 +851,39 @@ class FactoryTest(Screen):
 				else:
 					self.session.open( MessageBox, _("USB test error : Success-%d"%result+" Fail-%d\nPress EXIT!"%(2-result)), MessageBox.TYPE_ERROR)
 					self.rlist[self["testlist"].getCurrent()[1]]="fail"
+					
+		if self.model==2:			
+			try:
+				result = 0
+				mtab = open('/etc/mtab','r')
+				while(1):
+					disk = mtab.readline().split(' ')
+					if len(disk) < 2:
+						break
+					if disk[1].startswith('/media/hdd'):
+						continue
+					elif disk[1].startswith('/media/sdb1'):
+						continue
+					elif disk[1].startswith('/media/sd'):
+						result=result +1
+
+				if result < 0 :
+					result = 0
+				if result == 2:
+					self.session.open( MessageBox, _("USB test pass %d devices\nPress OK!"%result), MessageBox.TYPE_INFO)			
+					self.rlist[self["testlist"].getCurrent()[1]]="pass"
+				else:
+					self.session.open( MessageBox, _("USB test error : Success-%d"%result+" Fail-%d\nPress EXIT!"%(2-result)), MessageBox.TYPE_ERROR)
+					self.rlist[self["testlist"].getCurrent()[1]]="fail"
+			except:
+				if result < 0 :
+					result = 0
+				if result == 2:
+					self.session.open( MessageBox, _("USB test pass %d devices\nPress OK!"%result), MessageBox.TYPE_INFO)			
+					self.rlist[self["testlist"].getCurrent()[1]]="pass"
+				else:
+					self.session.open( MessageBox, _("USB test error : Success-%d"%result+" Fail-%d\nPress EXIT!"%(2-result)), MessageBox.TYPE_ERROR)
+					self.rlist[self["testlist"].getCurrent()[1]]="fail"
 		
 
 	def pingtest(self):
@@ -817,7 +930,7 @@ class FactoryTest(Screen):
 		self.pingtest()
 
 	def openMacConfig(self, ret=False):
-		self.session.openWithCallback(self.macresult ,MacConfig)	
+		self.session.openWithCallback(self.macresult ,MacConfig,mactry=self.mactry)	
 			
 	def macresult(self):
 		global ethtest
@@ -900,6 +1013,8 @@ class FactoryTest(Screen):
 			return
 		print "exit"
 		self.close()
+#		if self.oldref is not None:
+#			self.session.nav.playService(self.oldref)
 
 ethtest = 0
 class MacConfig(Screen):
@@ -912,7 +1027,7 @@ class MacConfig(Screen):
 			<widget name="stattext" position="30,75" size="400,25" font="Regular;20" />
 		</screen>"""
 
-	def __init__(self, session):
+	def __init__(self, session, mactry = 1):
 		self["actions"] = ActionMap(["DirectionActions","OkCancelActions"],
 		{
 			"ok": self.keyOk,
@@ -922,7 +1037,10 @@ class MacConfig(Screen):
 		}, -2)
 
 		Screen.__init__(self, session)
-	
+
+		self.mactry = mactry
+		self.model = 0
+		self.getModelInfo()
 		self.result = 0
 		self.macfd = 0
 		self.macaddr = "000000000000"
@@ -933,9 +1051,23 @@ class MacConfig(Screen):
 		self.displaymac()
 		self.loadmacaddr()
 		self.getmacaddr()
-		self.pingok=1
 		global ethtest
 		ethtest = 1
+
+	def getModelInfo(self):
+		if fileExists("/proc/stb/info/vumodel"):
+			info = open("/proc/stb/info/vumodel").read()
+			if info[:5] == "combo":
+				self.model = 2
+				print "MacConfig, model : combo"
+		else:
+			info = open("/proc/stb/info/version").read()
+			if info[:2] == "14":
+				self.model = 1
+				print "MacConfig, model : solo"
+			elif info[:2] == "12":
+				self.model = 0
+				print "MacConfig, model: duo"
 
 	def loadmacaddr(self):
 		try:
@@ -968,34 +1100,58 @@ class MacConfig(Screen):
 			self["stattext"].setText((" Press Exit Key."))
 			self.NetworkState=0
 #			self.session.open( MessageBox, _("Mac address fail"), MessageBox.TYPE_ERROR)
-
-	def readmac(self, result, retval,extra_args=None):
-		(statecallback) = extra_args
-		if self.macConsole is not None:
-			if retval == 0:
-				self.macConsole = None
-				content =result.splitlines()
-                                for x in content:
-                                        if x.startswith('0x00000010:'):
-                                                macline = x.split()
-                                if len(macline) < 10:
-                                        print 'mac dump read error'
-                                        retrun
-				mac = macline[5]+":"+macline[6]+":"+macline[7]+":"+macline[8]+":"+macline[9]+":"+macline[10]
-				self["stattext"].setText(("now : "+mac))
  	
 	def getmacaddr(self):
 		if self.NetworkState==0:
 			return
 		try:
-			cmd = "nanddump -b -o -l 64 -p /dev/mtd4"
+			if self.model == 2:
+				cmd = "nanddump -s 0x" + str((self.mactry-1)*2) + "0000 -b -o -l 64 -p /dev/mtd5"
+			elif self.model == 0 or self.model == 1:
+				cmd = "nanddump -s 0x" + str((self.mactry-1)*2) + "0000 -b -o -l 64 -p /dev/mtd4"
 			self.macConsole = Console()	
-			self.macConsole.ePopen(cmd, self.readmac)	
+			self.macConsole.ePopen(cmd, self.readmac,self.checkReadmac)
 		except:
 			return
+
+	def readmac(self, result, retval,extra_args=None):
+		(callback) = extra_args
+		if self.macConsole is not None:
+			if retval == 0:
+				self.macConsole = None
+				macline = None
+				content =result.splitlines()
+				for x in content:
+					if x.startswith('0x000'+str((self.mactry-1)*2)+'0010:'):
+						macline = x.split()
+				if macline == None:
+					callback(0)
+				elif len(macline) < 10:	
+					callback(1)
+				else:	
+					mac = macline[5]+":"+macline[6]+":"+macline[7]+":"+macline[8]+":"+macline[9]+":"+macline[10]
+					self["stattext"].setText(("now : "+mac))
+					callback(2)
+
+	def checkReadmac(self,data):
+		if data == 0:
+			print "block %d is bad block" % self.mactry
+			self.mactry = self.mactry + 1
+			if self.mactry > 4:
+				self.session.open(MessageBox, _("FLASH IS BROKEN"), type = MessageBox.TYPE_INFO, enable_input = False)
+				return
+			else:
+				self.getmacaddr()
+		elif data == 1:
+			print 'mac dump read error'
+			return
+		elif data == 2:
+			print 'mac address read ok'
+			return
+
 			
 	def keyleft(self):
-		if self.NetworkState==0 or self.pingok<1:
+		if self.NetworkState==0 :
 			return
 		macaddress = long(self.macaddr,16)-1
 		if macaddress < 0 :
@@ -1004,7 +1160,7 @@ class MacConfig(Screen):
 		self.displaymac()
 
 	def keyright(self):
-		if self.NetworkState==0 or self.pingok<1:
+		if self.NetworkState==0 :
 			return
 		macaddress = long(self.macaddr,16)+1
 		if macaddress > 0xffffffffffff:
@@ -1017,7 +1173,7 @@ class MacConfig(Screen):
 		self["text"].setText(("%02x:%02x:%02x:%02x:%02x:%02x"%(int(macaddr[0:2],16),int(macaddr[2:4],16),int(macaddr[4:6],16),int(macaddr[6:8],16),int(macaddr[8:10],16),int(macaddr[10:12],16))))
 
 	def keyOk(self):
-		if self.NetworkState==0 or self.pingok<1:
+		if self.NetworkState==0 :
 			return
 		try:
 			macaddr = self.macaddr
@@ -1026,8 +1182,12 @@ class MacConfig(Screen):
 #nandwrite /dev/mtd4 /tmp/mac.sector -p			
 			cmd = "make_mac_sector %02x-%02x-%02x-%02x-%02x-%02x > /tmp/mac.sector"%(int(macaddr[0:2],16),int(macaddr[2:4],16),int(macaddr[4:6],16),int(macaddr[6:8],16),int(macaddr[8:10],16),int(macaddr[10:12],16))
 			system(cmd)
-			system("flash_eraseall /dev/mtd4")
-			system("nandwrite /dev/mtd4 /tmp/mac.sector -p")
+			if self.model == 2:
+				system("flash_eraseall /dev/mtd5")
+				system("nandwrite /dev/mtd5 /tmp/mac.sector -p")
+			elif self.model == 0 or self.model ==1 :
+				system("flash_eraseall /dev/mtd4")
+				system("nandwrite /dev/mtd4 /tmp/mac.sector -p")
 			macaddress = long(macaddr,16)+1
 			if macaddress > 0xffffffffffff:
 				macaddress = 0
@@ -1035,8 +1195,8 @@ class MacConfig(Screen):
 			macwritetext = "MAC:%02x:%02x:%02x:%02x:%02x:%02x"%(int(macaddr[0:2],16),int(macaddr[2:4],16),int(macaddr[4:6],16),int(macaddr[6:8],16),int(macaddr[8:10],16),int(macaddr[10:12],16))
 			self.macfd.seek(0)
 			self.macfd.write(macwritetext)
-                        self.macfd.close()
-                        system("sync")
+			self.macfd.close()
+			system("sync")
 			self.macaddr = macaddr
 			self.close()
 		except:
@@ -1046,8 +1206,6 @@ class MacConfig(Screen):
 			self.close()		
 
 	def keyCancel(self):
-		if self.pingok == -1:
-			return
 		if self.macfd != 0:
 			self.macfd.close()
 		global ethtest
@@ -1328,16 +1486,30 @@ class SmartCardTest(Screen):
 
 	def check_mode(self):
 		try:
-			fd = open("/proc/stb/info/version","r")
-			version = fd.read()
-			if int(version,16) <= 0x1200A3:
-				self.Testmode = 0
+			if fileExists("/proc/stb/info/vumodel"):
+				info = open("/proc/stb/info/vumodel").read()
+				print info,info[:5]
+				if info[:5] == "combo":
+#					print "combo"
+					self.model = 2
 			else:
-				self.Testmode = 1
-			if int(version,16) < 0x130000:
-				self.model = 0
-			elif int(version,16) > 0x140000:
-				self.model = 1
+				info = open("/proc/stb/info/version").read()
+				print info,info[:2]
+				if info[:2] == "14":
+					self.model = 1
+				elif info[:2] == "12":
+					self.model = 0
+			self.Testmode = 1
+#			fd = open("/proc/stb/info/version","r")
+#			version = fd.read()
+#			if int(version,16) <= 0x1200A3:
+#				self.Testmode = 0
+#			else:
+#				self.Testmode = 1
+#			if int(version,16) < 0x130000:
+#				self.model = 0
+#			elif int(version,16) > 0x140000:
+#				self.model = 1
 		except:
 			self.Testmode = 0
 
@@ -1362,7 +1534,7 @@ class SmartCardTest(Screen):
 		
 		if result == 0:
 			print 'pass'
-			if(index== 0 and self.model== 0):
+			if(index== 0 and ( self.model== 0 or self.model==2) ):
 				self.smartcard = 1
 				self["text"].setText(_("Testing Smartcard 2..."))
 				self.smartcardtimer.start(100,True)
