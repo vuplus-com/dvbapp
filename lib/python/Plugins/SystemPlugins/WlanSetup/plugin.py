@@ -578,6 +578,9 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 			if wlanconfig.usedevice.value is "on":
 				self.getAplist()
 			else:
+				if iNetwork.getAdapterAttribute(self.iface, "up"):
+					os_system('ifconfig '+self.iface+" down")
+					iNetwork.setAdapterAttribute(self.iface, "up",False)
 				self.createConfig()
 		elif self["config"].getCurrent() == self.encryptEntry or self["config"].getCurrent() == self.usedhcpEntry \
 		or self["config"].getCurrent() == self.usegatewayEntry :
@@ -589,10 +592,9 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 
 	def getAplist(self):
 		self["OkCancelActions"].setEnabled(False) #chang
-		if iNetwork.getAdapterAttribute(self.iface, "up"):
-			pass
-		else:
+		if iNetwork.getAdapterAttribute(self.iface, "up") is not True:
 			os_system('ifconfig '+self.iface+" up")
+			iNetwork.setAdapterAttribute(self.iface, "up",True)
 			time.sleep(1.5)
 		self.wlanscanap = Console()
 		cmd1 = "iwlist "+self.iface+" scan"
