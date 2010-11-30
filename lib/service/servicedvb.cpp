@@ -309,7 +309,9 @@ eStaticServiceDVBPVRInformation::eStaticServiceDVBPVRInformation(const eServiceR
 RESULT eStaticServiceDVBPVRInformation::getName(const eServiceReference &ref, std::string &name)
 {
 	ASSERT(ref == m_ref);
-	if (m_parser.m_name.size())
+	if (!ref.name.empty())
+		name = ref.name;
+	else if (!m_parser.m_name.empty())
 		name = m_parser.m_name;
 	else
 	{
@@ -503,18 +505,19 @@ RESULT eDVBPVRServiceOfflineOperations::reindex()
 	int err = f.open(m_ref.path.c_str(), 0);
 	if (err < 0)
 		return -1;
-	
+
+	off_t offset = 0;
 	off_t length = f.length();
 	unsigned char buffer[188*256*4];
 	while (1)
 	{
-		off_t offset = f.lseek(0, SEEK_CUR);
 		eDebug("at %08llx / %08llx (%d %%)", offset, length, (int)(offset * 100 / length));
-		int r = f.read(buffer, sizeof(buffer));
+		int r = f.read(offset, buffer, sizeof(buffer));
 		if (!r)
 			break;
 		if (r < 0)
 			return r;
+		offset += r;
 		parser.parseData(offset, buffer, r);
 	}
 	
@@ -1093,7 +1096,8 @@ void eDVBServicePlay::serviceEventTimeshift(int event)
 
 			if (m_skipmode < 0)
 				m_cue->seekTo(0, -1000);
-			m_service_handler_timeshift.tune(r, 1, m_cue, 0, m_dvb_service); /* use the decoder demux for everything */
+			ePtr<iTsSource> source = createTsSource(r);
+			m_service_handler_timeshift.tuneExt(r, 1, source, r.path.c_str(), m_cue, 0, m_dvb_service); /* use the decoder demux for everything */
 
 			m_event((iPlayableService*)this, evUser+1);
 		}
@@ -1122,7 +1126,8 @@ void eDVBServicePlay::serviceEventTimeshift(int event)
 				m_service_handler_timeshift.free();
 				resetTimeshift(1);
 
-				m_service_handler_timeshift.tune(r, 1, m_cue, 0, m_dvb_service); /* use the decoder demux for everything */
+				ePtr<iTsSource> source = createTsSource(r);
+				m_service_handler_timeshift.tuneExt(r, 1, source, m_timeshift_file_next.c_str(), m_cue, 0, m_dvb_service); /* use the decoder demux for everything */
 
 				m_event((iPlayableService*)this, evUser+1);
 			}
@@ -1152,7 +1157,8 @@ RESULT eDVBServicePlay::start()
 		m_event(this, evStart);
 
 	m_first_program_info = 1;
-	m_service_handler.tune(service, m_is_pvr, m_cue, false, m_dvb_service);
+	ePtr<iTsSource> source = createTsSource(service);
+	m_service_handler.tuneExt(service, m_is_pvr, source, service.path.c_str(), m_cue, false, m_dvb_service);
 
 	if (m_is_pvr)
 	{
@@ -1585,7 +1591,7 @@ int eDVBServicePlay::getInfo(int w)
 {
 	eDVBServicePMTHandler::program program;
 
-	if (w == sCAIDs)
+	if (w == sCAIDs || w == sCAIDPIDs)
 		return resIsPyObject;
 
 	eDVBServicePMTHandler &h = m_timeshift_active ? m_service_handler_timeshift : m_service_handler;
@@ -1726,6 +1732,8 @@ PyObject *eDVBServicePlay::getInfoObject(int w)
 	{
 	case sCAIDs:
 		return m_service_handler.getCaIds();
+	case sCAIDPIDs:
+		return m_service_handler.getCaIds(true);
 	case sTransponderData:
 		return eStaticServiceDVBInformation().getInfoObject(m_reference, w);
 	default:
@@ -1793,6 +1801,8 @@ RESULT eDVBServicePlay::getTrackInfo(struct iAudioTrackInfo &info, unsigned int 
 		info.m_description = "AAC-HE";
 	else  if (program.audioStreams[i].type == eDVBServicePMTHandler::audioStream::atDTS)
 		info.m_description = "DTS";
+	else  if (program.audioStreams[i].type == eDVBServicePMTHandler::audioStream::atDTSHD)
+		info.m_description = "DTS-HD";
 	else
 		info.m_description = "???";
 
@@ -2356,6 +2366,13 @@ void eDVBServicePlay::resetTimeshift(int start)
 		m_timeshift_active = 0;
 }
 
+ePtr<iTsSource> eDVBServicePlay::createTsSource(eServiceReferenceDVB &ref)
+{
+	eRawFile *f = new eRawFile();
+	f->open(ref.path.c_str());
+	return ePtr<iTsSource>(f);
+}
+
 void eDVBServicePlay::switchToTimeshift()
 {
 	if (m_timeshift_active)
@@ -2367,7 +2384,9 @@ void eDVBServicePlay::switchToTimeshift()
 	r.path = m_timeshift_file;
 
 	m_cue->seekTo(0, -1000);
-	m_service_handler_timeshift.tune(r, 1, m_cue, 0, m_dvb_service); /* use the decoder demux for everything */
+
+	ePtr<iTsSource> source = createTsSource(r);
+	m_service_handler_timeshift.tuneExt(r, 1, source, m_timeshift_file.c_str(), m_cue, 0, m_dvb_service); /* use the decoder demux for everything */
 
 	eDebug("eDVBServicePlay::switchToTimeshift, in pause mode now.");
 	pause();

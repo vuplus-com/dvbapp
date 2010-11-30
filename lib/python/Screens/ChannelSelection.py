@@ -8,7 +8,7 @@ from Components.MenuList import MenuList
 from Components.ServiceEventTracker import ServiceEventTracker, InfoBarBase
 profile("ChannelSelection.py 1")
 from EpgSelection import EPGSelection
-from enigma import eServiceReference, eEPGCache, eServiceCenter, eRCInput, eTimer, eDVBDB, iPlayableService, iServiceInformation, getPrevAsciiCode
+from enigma import eServiceReference, eEPGCache, eServiceCenter, eRCInput, eTimer, eDVBDB, iPlayableService, iServiceInformation, getPrevAsciiCode, eEnv
 from Components.config import config, ConfigSubsection, ConfigText
 from Tools.NumericalTextInput import NumericalTextInput
 profile("ChannelSelection.py 2")
@@ -20,7 +20,6 @@ from Components.Sources.ServiceEvent import ServiceEvent
 profile("ChannelSelection.py 2.3")
 from Components.Input import Input
 profile("ChannelSelection.py 3")
-from Components.ParentalControl import parentalControl
 from Components.ChoiceList import ChoiceList, ChoiceEntryComponent
 from Components.SystemInfo import SystemInfo
 from Screens.InputBox import InputBox, PinInput
@@ -77,6 +76,7 @@ def append_when_current_valid(current, menu, args, level = 0, key = ""):
 
 class ChannelContextMenu(Screen):
 	def __init__(self, session, csel):
+
 		Screen.__init__(self, session)
 		#raise Exception("we need a better summary screen here")
 		self.csel = csel
@@ -106,6 +106,7 @@ class ChannelContextMenu(Screen):
 				isPlayable = not (current_sel_flags & (eServiceReference.isMarker|eServiceReference.isDirectory))
 				if isPlayable:
 					if config.ParentalControl.configured.value:
+						from Components.ParentalControl import parentalControl
 						if parentalControl.getProtectionLevel(csel.getCurrentSelection().toCompareString()) == -1:
 							append_when_current_valid(current, menu, (_("add to parental protection"), boundFunction(self.addParentalProtection, csel.getCurrentSelection())), level = 0)
 						else:
@@ -191,6 +192,7 @@ class ChannelContextMenu(Screen):
 		self.close()
 
 	def addParentalProtection(self, service):
+		from Components.ParentalControl import parentalControl
 		parentalControl.protectService(service.toCompareString())
 		self.close()
 
@@ -199,6 +201,7 @@ class ChannelContextMenu(Screen):
 
 	def pinEntered(self, service, result):
 		if result:
+			from Components.ParentalControl import parentalControl
 			parentalControl.unProtectService(service)
 			self.close()
 		else:
@@ -541,7 +544,7 @@ class ChannelSelectionEdit:
 			refstr = refstr[pos+14:]
 			pos = refstr.find('"')
 			if pos != -1:
-				filename = '/etc/enigma2/' + refstr[:pos] # FIXMEEE !!! HARDCODED /etc/enigma2
+				filename = eEnv.resolve('${sysconfdir}/enigma2/') + refstr[:pos]
 		self.removeCurrentService()
 		try:
 			if filename is not None:

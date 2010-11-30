@@ -39,7 +39,10 @@ class FileBrowser(Screen):
 				currDir = "/media/dvd/"
 			if not pathExists(currDir):
 				currDir = "/"
+			if lastpath == "":  # 'None' is magic to start at the list of mountpoints
+				currDir = None
 
+			inhibitDirs = ["/bin", "/boot", "/dev", "/etc", "/home", "/lib", "/proc", "/sbin", "/share", "/sys", "/tmp", "/usr", "/var"]
 			self.filelist = FileList(currDir, matchingPattern = "(?i)^.*\.(iso)", useServiceRef = True)
 			self["filelist"] = self.filelist
 
@@ -78,6 +81,12 @@ class FileBrowser(Screen):
 					print "dvd structure found, trying to open..."
 					lastpath = (pathname.rstrip("/").rsplit("/",1))[0]
 					print "lastpath video_ts.ifo=", lastpath
+					self.close(pathname)
+				if fileExists(pathname+"VIDEO_TS/VIDEO_TS.IFO"):
+					print "dvd structure found, trying to open..."
+					lastpath = (pathname.rstrip("/").rsplit("/",1))[0]
+					print "lastpath video_ts.ifo=", lastpath
+					pathname += "VIDEO_TS"
 					self.close(pathname)
 			else:
 				lastpath = filename[0:filename.rfind("/")]
@@ -235,8 +244,6 @@ class DVDPlayer(Screen, InfoBarBase, InfoBarNotifications, InfoBarSeek, InfoBarP
 		self.saved_config_speeds_backward = config.seek.speeds_backward.value
 		self.saved_config_enter_forward = config.seek.enter_forward.value
 		self.saved_config_enter_backward = config.seek.enter_backward.value
-		self.saved_config_seek_stepwise_minspeed = config.seek.stepwise_minspeed.value
-		self.saved_config_seek_stepwise_repeat = config.seek.stepwise_repeat.value
 		self.saved_config_seek_on_pause = config.seek.on_pause.value
 		self.saved_config_seek_speeds_slowmotion = config.seek.speeds_slowmotion.value
 
@@ -246,8 +253,6 @@ class DVDPlayer(Screen, InfoBarBase, InfoBarNotifications, InfoBarSeek, InfoBarP
 		config.seek.speeds_slowmotion.value = [ ]
 		config.seek.enter_forward.value = "2"
 		config.seek.enter_backward.value = "2"
-		config.seek.stepwise_minspeed.value = "Never"
-		config.seek.stepwise_repeat.value = "3"
 		config.seek.on_pause.value = "play"
 
 	def restore_infobar_seek_config(self):
@@ -256,8 +261,6 @@ class DVDPlayer(Screen, InfoBarBase, InfoBarNotifications, InfoBarSeek, InfoBarP
 		config.seek.speeds_slowmotion.value = self.saved_config_seek_speeds_slowmotion
 		config.seek.enter_forward.value = self.saved_config_enter_forward
 		config.seek.enter_backward.value = self.saved_config_enter_backward
-		config.seek.stepwise_minspeed.value = self.saved_config_seek_stepwise_minspeed
-		config.seek.stepwise_repeat.value = self.saved_config_seek_stepwise_repeat
 		config.seek.on_pause.value = self.saved_config_seek_on_pause
 
 	def __init__(self, session, dvd_device = None, dvd_filelist = [ ], args = None):
@@ -269,7 +272,7 @@ class DVDPlayer(Screen, InfoBarBase, InfoBarNotifications, InfoBarSeek, InfoBarP
 		HelpableScreen.__init__(self)
 		self.save_infobar_seek_config()
 		self.change_infobar_seek_config()
-		InfoBarSeek.__init__(self, useSeekBackHack=False)
+		InfoBarSeek.__init__(self)
 		InfoBarPVRState.__init__(self)
 		self.dvdScreen = self.session.instantiateDialog(DVDOverlay)
 
@@ -625,6 +628,14 @@ class DVDPlayer(Screen, InfoBarBase, InfoBarNotifications, InfoBarSeek, InfoBarP
 			newref = eServiceReference(4369, 0, val)
 			print "play", newref.toString()
 			if curref is None or curref != newref:
+				if newref.toString().endswith("/VIDEO_TS") or newref.toString().endswith("/"):
+					names = newref.toString().rsplit("/",3)
+					if names[2].startswith("Disk ") or names[2].startswith("DVD "):
+						name = str(names[1]) + " - " + str(names[2])
+					else:
+						name = names[2]
+					print "setting name to: ", self.service
+					newref.setName(str(name))
 				self.session.nav.playService(newref)
 				self.service = self.session.nav.getCurrentService()
 				print "self.service", self.service
