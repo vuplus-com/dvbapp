@@ -93,8 +93,6 @@ AM_CONDITIONAL(UPDATE_PO, test "$with_po" = "yes")
 CPPFLAGS="$CPPFLAGS $PYTHON_CPPFLAGS"
 CXXFLAGS="$CXXFLAGS $BASE_CFLAGS $PTHREAD_CFLAGS $DEBUG_CFLAGS -fno-rtti -fno-exceptions -Wall"
 
-AC_DEFINE(BUILD_VUPLUS,1,[Define to 1 for vuplus])
-
 AC_CONFIG_FILES([
 Makefile
 data/Makefile
@@ -208,4 +206,5 @@ tools/Makefile
 tools/enigma2.sh
 enigma2.pc
 ])
+AC_DEFINE(BUILD_VUPLUS,1,[Define to 1 for vuplus])
 AC_OUTPUT
