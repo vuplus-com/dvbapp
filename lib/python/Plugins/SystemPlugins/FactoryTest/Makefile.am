@@ -1,4 +1,4 @@
-installdir = $(pkglibdir)/enigma2/python/Plugins/SystemPlugins/FactoryTest
+installdir = $(pkglibdir)/python/Plugins/SystemPlugins/FactoryTest
 
 install_PYTHON =	\
 	__init__.py \
