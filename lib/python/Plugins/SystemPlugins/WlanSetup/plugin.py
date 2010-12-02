@@ -284,6 +284,7 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 				
 	def saveif(self,ret = False):
 		self["OkCancelActions"].setEnabled(False)
+		self["config_actions"].setEnabled(False)
 		if ret == True:
 			configuredInterfaces = iNetwork.getConfiguredAdapters()
 			for interface in configuredInterfaces:
@@ -344,9 +345,10 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 					status = 1
 					data = iffd.readline()
 					continue
-				elif ret == True and not data.startswith('auto lo') and data.startswith('auto '):
-					data = iffd.readline()
-					continue					
+				elif not data.startswith('auto lo') and data.startswith('auto '):
+					if ret == True or data[5:] not in iNetwork.getConfiguredAdapters():
+						data = iffd.readline()
+						continue
 				if status == 1 and data.startswith('iface ') or data.startswith('auto '):
 					status = 2
 				if status == 0:
@@ -579,8 +581,8 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 				self.getAplist()
 			else:
 				if iNetwork.getAdapterAttribute(self.iface, "up"):
-					os_system('ifconfig '+self.iface+" down")
 					iNetwork.setAdapterAttribute(self.iface, "up",False)
+					iNetwork.deactivateInterface(self.iface)
 				self.createConfig()
 		elif self["config"].getCurrent() == self.encryptEntry or self["config"].getCurrent() == self.usedhcpEntry \
 		or self["config"].getCurrent() == self.usegatewayEntry :
@@ -592,6 +594,7 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 
 	def getAplist(self):
 		self["OkCancelActions"].setEnabled(False) #chang
+		self["config_actions"].setEnabled(False) #chang
 		if iNetwork.getAdapterAttribute(self.iface, "up") is not True:
 			os_system('ifconfig '+self.iface+" up")
 			iNetwork.setAdapterAttribute(self.iface, "up",True)
@@ -654,6 +657,7 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 			
 		self.createConfig()
 		self["OkCancelActions"].setEnabled(True)
+		self["config_actions"].setEnabled(True)
 		if iNetwork.getAdapterAttribute(self.iface, "up"):
 			pass
 		else:
