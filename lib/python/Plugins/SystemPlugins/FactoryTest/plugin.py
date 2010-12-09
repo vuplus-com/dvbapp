@@ -446,45 +446,59 @@ class FactoryTest(Screen):
 			self.satatry -= 1
 			displayerror = 0
 		result =0
+		exerror = 0
 		try:
-			if access("/autofs/sdb1",F_OK|R_OK|W_OK):
-				dummy=open("/autofs/sdb1/dummy03","w")
-				dummy.write("complete")
-				dummy.close()
-				dummy=open("/autofs/sdb1/dummy03","r")
-				if dummy.readline()=="complete":
-					print "complete"
+			if fileExists("/autofs/sdb1"):
+				if access("/autofs/sdb1",F_OK|R_OK|W_OK):
+					dummy=open("/autofs/sdb1/dummy03","w")
+					dummy.write("complete")
+					dummy.close()
+					dummy=open("/autofs/sdb1/dummy03","r")
+					if dummy.readline()=="complete":
+						print "complete"
+					else:
+						result = 1
+						displayerror = 1
+					dummy.close()
+					system("rm /autofs/sdb1/dummy03")
 				else:
 					result = 1
-				dummy.close()
-				system("rm /autofs/sdb1/dummy03")
+					displayerror = 1
 			else:
 				result = 1
 		except:
-			result = 1
+			exerror = 1
 		try:
-			if access("/media/hdd",F_OK|R_OK|W_OK):
-				dummy=open("/media/hdd/dummy03","w")
-				dummy.write("complete")
-				dummy.close()
-				dummy=open("/media/hdd/dummy03","r")
-				if dummy.readline()=="complete":
-					print "complete"
+			if fileExists("/media/hdd"):
+				if access("/media/hdd",F_OK|R_OK|W_OK):
+					dummy=open("/media/hdd/dummy03","w")
+					dummy.write("complete")
+					dummy.close()
+					dummy=open("/media/hdd/dummy03","r")
+					if dummy.readline()=="complete":
+						print "complete"
+					else:
+						result += 1
+						displayerror = 1
+					dummy.close()
+					system("rm /media/hdd/dummy03")
 				else:
 					result += 1
-				dummy.close()
-				system("rm /media/hdd/dummy03")
+					displayerror = 1
 			else:
-				result += 1	
+				result += 1
 		except:
-			result += 1
-			
-		if result == 2:
+			exerror = 1
+
+		if exerror == 1:
+			self.session.open( MessageBox, _("Exception Error!\nPress EXIT!"), MessageBox.TYPE_INFO)			
+			self.rlist[self["testlist"].getCurrent()[1]]="fail"			
+		elif result == 0:
 			self.session.open( MessageBox, _("Sata & extend hdd test pass"), MessageBox.TYPE_INFO)
 			self.rlist[self["testlist"].getCurrent()[1]]="pass"
 		elif result == 1:
 			if displayerror==1:
-				self.session.open( MessageBox, _("internal hdd test error"), MessageBox.TYPE_ERROR)
+				self.session.open( MessageBox, _("One hdd test error"), MessageBox.TYPE_ERROR)
 				self.rlist[self["testlist"].getCurrent()[1]]="fail"
 			else:
 				self.satatimer.start(1100,True)
@@ -777,35 +791,31 @@ class FactoryTest(Screen):
 		result=len(devices)
 		try:
 			for dev in devices:
-				if access(dev,F_OK|R_OK|W_OK):
-					dummy=open(dev+"/dummy03","w")
-					dummy.write("complete")
-					dummy.close()
-					dummy=open(dev+"/dummy03","r")
-					if dummy.readline()=="complete":
-						print dev," - complete"
+				if fileExists(dev):
+					if access(dev,F_OK|R_OK|W_OK):
+						dummy=open(dev+"/dummy03","w")
+						dummy.write("complete")
+						dummy.close()
+						dummy=open(dev+"/dummy03","r")
+						if dummy.readline()=="complete":
+							print dev," - complete"
+						else:
+							result=result -1
+							displayerror = 1
+						dummy.close()
+						system("rm "+dev+"/dummy03")
 					else:
 						result=result -1
-					dummy.close()
-					system("rm "+dev+"/dummy03")
+						displayerror = 1
 				else:
-					result=result -1
-
-			if result < 0 :
-				result = 0
-			if result == len(devices):
-				self.session.open( MessageBox, _("USB test pass %d devices\nPress OK!"%result), MessageBox.TYPE_INFO)			
-				self.rlist[self["testlist"].getCurrent()[1]]="pass"
-			else:
-				if displayerror == 1:
-					self.session.open( MessageBox, _("USB test error : Success-%d"%result+" Fail-%d\nPress EXIT!"%(len(devices)-result)), MessageBox.TYPE_ERROR)
-					self.rlist[self["testlist"].getCurrent()[1]]="fail"
-				else:
-					self.usbtimer.start(1100,True)
+					result=result-1
 		except:
+			self.session.open( MessageBox, _("Exception Error!\nPress EXIT!"), MessageBox.TYPE_INFO)			
+			self.rlist[self["testlist"].getCurrent()[1]]="fail"
+		else:
 			if result < 0 :
 				result = 0
-			if result == len(devices):
+			elif result == len(devices):
 				self.session.open( MessageBox, _("USB test pass %d devices\nPress OK!"%result), MessageBox.TYPE_INFO)			
 				self.rlist[self["testlist"].getCurrent()[1]]="pass"
 			else:
@@ -814,7 +824,6 @@ class FactoryTest(Screen):
 					self.rlist[self["testlist"].getCurrent()[1]]="fail"
 				else:
 					self.usbtimer.start(1100,True)
-	
 
 	def pingtest(self):
 		self.testing = 1
