@@ -446,7 +446,6 @@ class FactoryTest(Screen):
 			self.satatry -= 1
 			displayerror = 0
 		result =0
-		exerror = 0
 		try:
 			if fileExists("/autofs/sdb1"):
 				if access("/autofs/sdb1",F_OK|R_OK|W_OK):
@@ -455,19 +454,24 @@ class FactoryTest(Screen):
 					dummy.close()
 					dummy=open("/autofs/sdb1/dummy03","r")
 					if dummy.readline()=="complete":
-						print "complete"
+						print "/autofs/sdb1 - complete"
 					else:
+						print "/autofs/sdb1 - readline error"
 						result = 1
 						displayerror = 1
 					dummy.close()
 					system("rm /autofs/sdb1/dummy03")
 				else:
+					print "/autofs/sdb1 - rw access error"
 					result = 1
 					displayerror = 1
 			else:
+				print "/autofs/sdb1 - file not exist"
 				result = 1
 		except:
-			exerror = 1
+			print "/autofs/sdb1 - exceptional error"
+			result = 1
+			displayerror = 1
 		try:
 			if fileExists("/media/hdd"):
 				if access("/media/hdd",F_OK|R_OK|W_OK):
@@ -476,24 +480,26 @@ class FactoryTest(Screen):
 					dummy.close()
 					dummy=open("/media/hdd/dummy03","r")
 					if dummy.readline()=="complete":
-						print "complete"
+						print "/media/hdd - complete"
 					else:
+						print "/autofs/sdb1 - readline error"
 						result += 1
 						displayerror = 1
 					dummy.close()
 					system("rm /media/hdd/dummy03")
 				else:
+					print "/autofs/sdb1 - rw access error"
 					result += 1
 					displayerror = 1
 			else:
+				print "/autofs/sdb1 - file not exist"
 				result += 1
 		except:
-			exerror = 1
-
-		if exerror == 1:
-			self.session.open( MessageBox, _("Exception Error!\nPress EXIT!"), MessageBox.TYPE_INFO)			
-			self.rlist[self["testlist"].getCurrent()[1]]="fail"			
-		elif result == 0:
+			print "/autofs/sdb1 - exceptional error"
+			result += 1
+			displayerror = 1
+		
+		if result == 0:
 			self.session.open( MessageBox, _("Sata & extend hdd test pass"), MessageBox.TYPE_INFO)
 			self.rlist[self["testlist"].getCurrent()[1]]="pass"
 		elif result == 1:
@@ -789,8 +795,9 @@ class FactoryTest(Screen):
 			devices = [ "/autofs/sdc1", "/autofs/sdd1" ]
 
 		result=len(devices)
-		try:
-			for dev in devices:
+		
+		for dev in devices:
+			try:
 				if fileExists(dev):
 					if access(dev,F_OK|R_OK|W_OK):
 						dummy=open(dev+"/dummy03","w")
@@ -800,30 +807,34 @@ class FactoryTest(Screen):
 						if dummy.readline()=="complete":
 							print dev," - complete"
 						else:
+							print dev," - readline error"
 							result=result -1
 							displayerror = 1
 						dummy.close()
 						system("rm "+dev+"/dummy03")
 					else:
+						print dev," - rw access error"
 						result=result -1
 						displayerror = 1
 				else:
+					print dev," - file not exist"
 					result=result-1
-		except:
-			self.session.open( MessageBox, _("Exception Error!\nPress EXIT!"), MessageBox.TYPE_INFO)			
-			self.rlist[self["testlist"].getCurrent()[1]]="fail"
+			except:
+				print dev," - exceptional error"
+				result=result -1
+				displayerror = 1
+	
+		if result < 0 :
+			result = 0
+		elif result == len(devices):
+			self.session.open( MessageBox, _("USB test pass %d devices\nPress OK!"%result), MessageBox.TYPE_INFO)			
+			self.rlist[self["testlist"].getCurrent()[1]]="pass"
 		else:
-			if result < 0 :
-				result = 0
-			elif result == len(devices):
-				self.session.open( MessageBox, _("USB test pass %d devices\nPress OK!"%result), MessageBox.TYPE_INFO)			
-				self.rlist[self["testlist"].getCurrent()[1]]="pass"
+			if displayerror == 1:
+				self.session.open( MessageBox, _("USB test error : Success-%d"%result+" Fail-%d\nPress EXIT!"%(len(devices)-result)), MessageBox.TYPE_ERROR)
+				self.rlist[self["testlist"].getCurrent()[1]]="fail"
 			else:
-				if displayerror == 1:
-					self.session.open( MessageBox, _("USB test error : Success-%d"%result+" Fail-%d\nPress EXIT!"%(len(devices)-result)), MessageBox.TYPE_ERROR)
-					self.rlist[self["testlist"].getCurrent()[1]]="fail"
-				else:
-					self.usbtimer.start(1100,True)
+				self.usbtimer.start(1100,True)
 
 	def pingtest(self):
 		self.testing = 1
@@ -1452,7 +1463,7 @@ class SmartCardTest(Screen):
 #			elif int(version,16) > 0x140000:
 #				self.model = 1
 		except:
-			self.Testmode = 0
+			self.Testmode = 1
 
 	def check_smart_card(self):
 		global smartcardtest
