@@ -72,7 +72,7 @@ class FactoryTest(Screen):
 		}, -2)
 
 		Screen.__init__(self, session)
-		TESTPROGRAM_DATE = "2010-12-08-test"
+		TESTPROGRAM_DATE = "2010-12-14"
 		TESTPROGRAM_VERSION = "Version 00.01"
 
 		self.model = 0
@@ -242,20 +242,30 @@ class FactoryTest(Screen):
 		self.usbtimer.callback.append(self.usbCheck)
 
 	def getModelInfo(self):
+		getmodel = 0
 		if fileExists("/proc/stb/info/vumodel"):
-			info = open("/proc/stb/info/vumodel").read()
-			if info[:5] == "combo":
+			info = open("/proc/stb/info/vumodel").read().strip()
+			if info == "combo":
 				self.model = 2
+				getmodel = 1
 				print "getModelInfo : combo"
-		else:
+			if info == "solo":
+				self.model = 1
+				getmodel = 1
+				print "getModelInfo : solo"
+			if info == "duo":
+				self.model = 0
+				getmodel = 1
+				print "getModelInfo : duo"
+		if getmodel == 0 and fileExists("/proc/stb/info/version"):
 			info = open("/proc/stb/info/version").read()
 #			print info,info[:2]
 			if info[:2] == "14":
 				self.model = 1
-				print "getModelInfo : solo"
+				print "getModelInfo : solo_"
 			elif info[:2] == "12":
 				self.model = 0
-				print "getModelInfo : duo"
+				print "getModelInfo : duo_"
 
 	def nothing(self):
 		print "nothing"
@@ -924,7 +934,7 @@ class FactoryTest(Screen):
 			self.rlist[self["testlist"].getCurrent()[1]]="fail"
 
 	def Test10(self):
-		self.session.openWithCallback(self.scciresult ,SmartCardTest)	
+		self.session.openWithCallback(self.scciresult ,SmartCardTest,stbmodel=self.model)
 
 	def Test11(self):
 		self.MemTest(1)
@@ -1005,19 +1015,30 @@ class MacConfig(Screen):
 		ethtest = 1
 
 	def getModelInfo(self):
+		getmodel = 0
 		if fileExists("/proc/stb/info/vumodel"):
-			info = open("/proc/stb/info/vumodel").read()
-			if info[:5] == "combo":
+			info = open("/proc/stb/info/vumodel").read().strip()
+			if info == "combo":
 				self.model = 2
+				getmodel = 1
 				print "MacConfig, model : combo"
-		else:
+			if info == "solo":
+				self.model = 1
+				getmodel = 1
+				print "MacConfig, model : solo"
+			if info == "duo":
+				self.model = 0
+				getmodel = 1
+				print "MacConfig, model : duo"
+		if getmodel == 0 and fileExists("/proc/stb/info/version"):
 			info = open("/proc/stb/info/version").read()
+#			print info,info[:2]
 			if info[:2] == "14":
 				self.model = 1
-				print "MacConfig, model : solo"
+				print "MacConfig, model : solo_"
 			elif info[:2] == "12":
 				self.model = 0
-				print "MacConfig, model: duo"
+				print "MacConfig, model: duo_"
 
 	def loadmacaddr(self):
 		try:
@@ -1413,7 +1434,7 @@ class SmartCardTest(Screen):
 			<widget name="text" position="10,10" size="140,100" font="Regular;22" />
 		</screen>"""
 
-	def __init__(self, session):
+	def __init__(self, session, stbmodel = 0):
 		self["actions"] = ActionMap(["DirectionActions", "OkCancelActions"],
 		{
 			"cancel": self.keyCancel,
@@ -1426,44 +1447,14 @@ class SmartCardTest(Screen):
 		self.step = 0
 		self.smartcardtimer = eTimer()
 		self.smartcardtimer.callback.append(self.check_smart_card)
-		self.smartcardtimer.start(100,True)
 		self.closetimer = eTimer()
 		self.closetimer.callback.append(self.close)
 		self.smartcard=0
 		global smartcardtest
 		smartcardtest = 0
-		self.Testmode = 0
-		self.model = 0
-		self.check_mode()
-
-	def check_mode(self):
-		try:
-			if fileExists("/proc/stb/info/vumodel"):
-				info = open("/proc/stb/info/vumodel").read()
-				print info,info[:5]
-				if info[:5] == "combo":
-#					print "combo"
-					self.model = 2
-			else:
-				info = open("/proc/stb/info/version").read()
-				print info,info[:2]
-				if info[:2] == "14":
-					self.model = 1
-				elif info[:2] == "12":
-					self.model = 0
-			self.Testmode = 1
-#			fd = open("/proc/stb/info/version","r")
-#			version = fd.read()
-#			if int(version,16) <= 0x1200A3:
-#				self.Testmode = 0
-#			else:
-#				self.Testmode = 1
-#			if int(version,16) < 0x130000:
-#				self.model = 0
-#			elif int(version,16) > 0x140000:
-#				self.model = 1
-		except:
-			self.Testmode = 1
+		self.model = stbmodel
+		self.Testmode = 1
+		self.smartcardtimer.start(100,True)
 
 	def check_smart_card(self):
 		global smartcardtest
