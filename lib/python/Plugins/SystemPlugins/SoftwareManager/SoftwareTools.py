@@ -101,7 +101,7 @@ class SoftwareTools(DreamInfoHandler):
 
 	def getUpdates(self, callback = None):
 		if self.lastDownloadDate is None:
-			if  self.hardware_info.device_name != "dm7020hd":
+			if  self.hardware_info.device_name != "dm500hd":
 				etpm = eTPM()
 				l2cert = etpm.getCert(eTPM.TPMD_DT_LEVEL2_CERT)
 				if l2cert is None:
@@ -120,7 +120,7 @@ class SoftwareTools(DreamInfoHandler):
 					return
 				val = etpm.challenge(rnd)
 				result = decrypt_block(val, l3key)
-			if self.hardware_info.device_name == "dm7020hd" or result[80:88] == rnd:
+			if self.hardware_info.device_name == "dm500hd" or result[80:88] == rnd:
 				if self.NetworkConnectionAvailable == True:
 					self.lastDownloadDate = time()
 					if self.list_updating is False and callback is None:
@@ -159,7 +159,7 @@ class SoftwareTools(DreamInfoHandler):
 					self.NotifierCallback = callback
 			else:
 				if self.list_updating and callback is not None:
-					if  self.hardware_info.device_name != "dm7020hd":
+					if  self.hardware_info.device_name != "dm500hd":
 						etpm = eTPM()
 						l2cert = etpm.getCert(eTPM.TPMD_DT_LEVEL2_CERT)
 						if l2cert is None:
@@ -178,7 +178,7 @@ class SoftwareTools(DreamInfoHandler):
 							return
 						val = etpm.challenge(rnd)
 						result = decrypt_block(val, l3key)
-					if self.hardware_info.device_name == "dm7020hd" or result[80:88] == rnd:
+					if self.hardware_info.device_name == "dm500hd" or result[80:88] == rnd:
 						self.NotifierCallback = callback
 						self.startIpkgListAvailable()
 				else:	
