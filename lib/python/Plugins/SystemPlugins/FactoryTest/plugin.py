@@ -492,20 +492,20 @@ class FactoryTest(Screen):
 					if dummy.readline()=="complete":
 						print "/media/hdd - complete"
 					else:
-						print "/autofs/sdb1 - readline error"
+						print "/media/hdd - readline error"
 						result += 1
 						displayerror = 1
 					dummy.close()
 					system("rm /media/hdd/dummy03")
 				else:
-					print "/autofs/sdb1 - rw access error"
+					print "/media/hdd - rw access error"
 					result += 1
 					displayerror = 1
 			else:
-				print "/autofs/sdb1 - file not exist"
+				print "/media/hdd - file not exist"
 				result += 1
 		except:
-			print "/autofs/sdb1 - exceptional error"
+			print "/media/hdd - exceptional error"
 			result += 1
 			displayerror = 1
 		
