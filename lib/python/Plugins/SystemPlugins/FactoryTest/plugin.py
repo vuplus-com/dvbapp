@@ -622,9 +622,15 @@ class FactoryTest(Screen):
 				self.session.nav.playService(ref)
 				self.avswitch.setColorFormat(2)
 				self.avswitch.setAspectRatio(0)
-		self.tuningtimer.start(4000,True)
-		self.tunemsgtimer.start(5000, True)
-
+		if self.model==0 or self.model==1:
+			print "2-3"
+			self.tuningtimer.start(2000,True)
+			self.tunemsgtimer.start(3000, True)
+		elif self.model==2:
+			print "4-5"
+			self.tuningtimer.start(4000,True)
+			self.tunemsgtimer.start(5000, True)
+		
 	def cam_state(self):
 		if self.camstep == 1:
 			slot = 0
@@ -1045,15 +1051,16 @@ class MacConfig(Screen):
 			self.macfd = 0
 
 			if self.model==0:
-				devices = ["/autofs/sda1", "/autofs/sdb1", "/autofs/sdc1", "/autofs/sdd1", "/autofs/sde1" ]
+				devices = ["/autofs/sdb1", "/autofs/sdc1", "/autofs/sdd1", "/autofs/sde1" ]
 			elif self.model==1:
 				devices = [ "/autofs/sda1", "/autofs/sdb1" ]
 			elif self.model==2:
-				devices = [ "/autofs/sda1", "/autofs/sdb1", "/autofs/sdc1", "/autofs/sdd1" ]
+				devices = [ "/autofs/sdb1", "/autofs/sdc1", "/autofs/sdd1" ]
 
 			for dev in devices:
 				print 'try..',dev
 				if  fileExists(dev+"/macinfo.txt"):
+					print "<open>"+dev+"/macinfo.txt"
 					self.macfd = open(dev+"/macinfo.txt","r+")
 					break
 
