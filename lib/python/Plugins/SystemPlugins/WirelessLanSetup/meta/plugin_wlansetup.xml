@@ -4,14 +4,14 @@
 	  </prerequisites>
           <info language="en">
                     <author>ikseong</author>
-                    <name>WlanSetup</name>
-                    <packagename>enigma2-plugin-systemplugins-wlansetup</packagename>
+                    <name>WirelessLanSetup</name>
+                    <packagename>enigma2-plugin-systemplugins-WirelessLanSetup</packagename>
                     <shortdescription>Wireless LAN Setup plugin</shortdescription>
                     <description>Wireless LAN setting and search AP and show status.
                     </description>
           </info>
 	  <files type="package"> <!-- without version, without .ipk -->
-		<file type="package" name="enigma2-plugin-systemplugins-wlansetup" />
+		<file type="package" name="enigma2-plugin-systemplugins-WirelessLanSetup" />
 	</files>
 
 </default>
