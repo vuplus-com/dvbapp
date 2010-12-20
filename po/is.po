@@ -5,8 +5,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Icelandic translation v.1.44\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-09-29 09:15+0000\n"
-"PO-Revision-Date: 2010-09-15 17:40+0200\n"
+"POT-Creation-Date: 2010-11-01 13:01+0000\n"
+"PO-Revision-Date: 2010-10-06 12:12+0200\n"
 "Last-Translator: Baldur <bsveinsson@gmail.com>\n"
 "Language-Team: Polar Team/LT Team <baddi@oreind.is>\n"
 "MIME-Version: 1.0\n"
@@ -35,7 +35,7 @@ msgstr ""
 
 msgid ""
 "\n"
-"Backup your Vuplus settings."
+"Backup your Dreambox settings."
 msgstr ""
 "\n"
 "Taka afrit af stillingum."
@@ -49,7 +49,7 @@ msgstr ""
 
 msgid ""
 "\n"
-"Manage extensions or plugins for your Vuplus"
+"Manage extensions or plugins for your Dreambox"
 msgstr ""
 "\n"
 "Umsýsla á viðbótum eða íforritum fyrir móttakarann þinn"
@@ -57,7 +57,7 @@ msgstr ""
 #
 msgid ""
 "\n"
-"Online update of your Vuplus software."
+"Online update of your Dreambox software."
 msgstr ""
 "\n"
 "Uppfærsla hugbúnaðar beint af neti."
@@ -73,7 +73,7 @@ msgstr ""
 #
 msgid ""
 "\n"
-"Restore your Vuplus settings."
+"Restore your Dreambox settings."
 msgstr ""
 "\n"
 "Setja inn þínar stillingar aftur."
@@ -81,10 +81,10 @@ msgstr ""
 #
 msgid ""
 "\n"
-"Restore your Vuplus with a new firmware."
+"Restore your Dreambox with a new firmware."
 msgstr ""
 "\n"
-"Setja inn nýtt stýrikerfi í Vuplusið þitt."
+"Setja inn nýtt stýrikerfi í Dreamboxið þitt."
 
 #
 msgid ""
@@ -250,16 +250,6 @@ msgid "* Only available if more than one interface is active."
 msgstr "* Bara virkt ef að fleira en eitt tæki er virkt."
 
 #
-msgid ".NFI Download failed:"
-msgstr ".NFI Niðurhal tókst ekki:"
-
-#
-msgid ""
-".NFI file passed md5sum signature check. You can safely flash this image!"
-msgstr ""
-".NFI skráin stóðst md5sum undirskrifta próf. Þú getur notað þetta stýrikerfi!"
-
-#
 msgid "0"
 msgstr "0"
 
@@ -396,11 +386,17 @@ msgstr "??"
 msgid "A"
 msgstr "A"
 
-msgid "A basic ftp client"
+msgid "A BackToTheRoots-Skin .. or good old times."
 msgstr ""
 
-msgid "A client for www.dyndns.org"
+msgid "A BackToTheRoots-Skin ... or good old times."
 msgstr ""
+
+msgid "A basic ftp client"
+msgstr "Einfalt ftp forrit"
+
+msgid "A client for www.dyndns.org"
+msgstr "Forrit til uppfærslu á veffangi vistað hjá www.dyndns.org"
 
 #
 #, python-format
@@ -417,17 +413,17 @@ msgstr "Íforrits sýnishorn."
 #
 msgid ""
 "A finished record timer wants to set your\n"
-"Vuplus to standby. Do that now?"
+"Dreambox to standby. Do that now?"
 msgstr ""
-"Tímastilling vill setja Vuplusið í\n"
+"Tímastilling vill setja Dreamboxið í\n"
 "biðstöðu. Viltu gera það núna?"
 
 #
 msgid ""
 "A finished record timer wants to shut down\n"
-"your Vuplus. Shutdown now?"
+"your Dreambox. Shutdown now?"
 msgstr ""
-"Tímastilling vill slökkva á Vuplusinu.\n"
+"Tímastilling vill slökkva á Dreamboxinu.\n"
 "Viltu gera það núna?"
 
 #
@@ -435,10 +431,10 @@ msgid "A graphical EPG for all services of an specific bouquet"
 msgstr "Myndrænt EPG fyrir allar rásir á ákveðnum rásavendi"
 
 msgid "A graphical EPG interface"
-msgstr ""
+msgstr "Myndrænt EPG viðmót"
 
 msgid "A graphical EPG interface."
-msgstr ""
+msgstr "Myndrænt EPG viðmót."
 
 msgid ""
 "A mount entry with this name already exists!\n"
@@ -448,13 +444,13 @@ msgstr ""
 "Uppfæra núverandi nafn og halda áfram?\n"
 
 msgid "A nice looking HD skin from Kerni"
-msgstr ""
+msgstr "Flott HD skinn frá Kerni"
 
 msgid "A nice looking HD skin in Brushed Alu Design from Kerni."
-msgstr ""
+msgstr "Fallegt HD skinn með burstuðu ál útliti frá Kerni."
 
 msgid "A nice looking skin from Kerni"
-msgstr ""
+msgstr "Flott skinn frá Kerni"
 
 #
 #, python-format
@@ -507,22 +503,22 @@ msgstr ""
 "Viltu hætta að nota það?"
 
 msgid "A simple downloading application for other plugins"
-msgstr ""
+msgstr "Einfalt forrit til að hlaða niður íforrit"
 
 #
 msgid ""
 "A sleep timer wants to set your\n"
-"Vuplus to standby. Do that now?"
+"Dreambox to standby. Do that now?"
 msgstr ""
-"Tímastilling vill setja Vuplusið í\n"
+"Tímastilling vill setja Dreamboxið í\n"
 "biðstöðu. Viltu gera það núna?"
 
 #
 msgid ""
 "A sleep timer wants to shut down\n"
-"your Vuplus. Shutdown now?"
+"your Dreambox. Shutdown now?"
 msgstr ""
-"Tímastilling vill slökkva á Vuplusinu.\n"
+"Tímastilling vill slökkva á Dreamboxinu.\n"
 "Viltu gera það núna?"
 
 #
@@ -570,10 +566,10 @@ msgid "About..."
 msgstr "Um..."
 
 msgid "Access to the ARD-Mediathek"
-msgstr ""
+msgstr "Aðgangur að ARD-Mediathek"
 
 msgid "Access to the ARD-Mediathek online video database."
-msgstr ""
+msgstr "Aðgangur að ARD-Mediathek online video gagnagrunni."
 
 #
 msgid "Accesspoint:"
@@ -628,8 +624,8 @@ msgstr "Bæta við WLAN stillingum?"
 msgid "Add a mark"
 msgstr "Bæta við merki"
 
-msgid "Add a new NFS or CIFS mount point to your Vuplus."
-msgstr "Bæta við nýjum NFS eða CIFS tengingu við Vuplusið."
+msgid "Add a new NFS or CIFS mount point to your Dreambox."
+msgstr "Bæta við nýjum NFS eða CIFS tengingu við Dreamboxið."
 
 #
 msgid "Add a new title"
@@ -690,10 +686,10 @@ msgstr ""
 "loka stillinga skjánum eða ýttu á númeralykil til að velja aðra prufumynd."
 
 msgid "Adult streaming plugin"
-msgstr ""
+msgstr "Fullorðins strauma íforrit"
 
 msgid "Adult streaming plugin."
-msgstr ""
+msgstr "Fullorðins strauma íforrit."
 
 msgid "Advanced Options"
 msgstr "Sérfræði stillingar"
@@ -714,9 +710,9 @@ msgid "Advanced restore"
 msgstr "Sérfræði innsetning afrita"
 
 msgid ""
-"After a reboot or power outage, StartupToStandby will bring your Vuplus to "
+"After a reboot or power outage, StartupToStandby will bring your Dreambox to "
 "standby-mode."
-msgstr ""
+msgstr "Eftir að rafmagnsleysi þá er móttakari settur í biðstöðu."
 
 msgid "After event"
 msgstr "Eftir atriði"
@@ -729,7 +725,7 @@ msgstr ""
 "leiðbeiningarnar til að sjá hvernig á að gera það."
 
 msgid "Ai.HD skin-style control plugin"
-msgstr ""
+msgstr "Ai. HD skinn stýri íforrit"
 
 msgid "Album"
 msgstr "Album"
@@ -750,10 +746,10 @@ msgid "Allow zapping via Webinterface"
 msgstr "Leyfa stökk á milli rása um vefviðmót"
 
 msgid "Allows the execution of TuxboxPlugins."
-msgstr ""
+msgstr "Leyfir keyrslu á TuxboxÍforritum."
 
 msgid "Allows user to download files from rapidshare in the background."
-msgstr ""
+msgstr "Gerir mögulegt að hlaða niður skrám frá Rapidshare í bakgrunni."
 
 msgid "Alpha"
 msgstr "Gegnsæi"
@@ -849,7 +845,7 @@ msgid "Aspect Ratio"
 msgstr "Stærðarhlutfall"
 
 msgid "Assigning providers/services/caids to a CI module"
-msgstr ""
+msgstr "Merkja sendendur/rásir/caids til að nota CI einingu"
 
 msgid "Atheros"
 msgstr "Atheros"
@@ -870,6 +866,8 @@ msgid ""
 "AudoSync allows delaying the sound output (Bitstream/PCM) so that it is "
 "synchronous to the picture."
 msgstr ""
+"Hljóðseinkun gerir mögulegt að leiðrétta tíma á hljóði (Bitstream/PCM út) "
+"þannig að það passi við myndina."
 
 msgid "Australia"
 msgstr "Ástralía"
@@ -911,6 +909,8 @@ msgid ""
 "AutoTimer scans the EPG and creates Timers depending on user-defined search  "
 "criteria."
 msgstr ""
+"Sjálfvirk tímataka leita í EPG og bætir við upptökum eftir þeim "
+"leitarskilyrðum sem notandi slær inn."
 
 msgid "Automatic"
 msgstr "Sjálfvirkt"
@@ -919,30 +919,32 @@ msgid "Automatic Scan"
 msgstr "Sjálfvirk leit"
 
 msgid "Automatic volume adjustment"
-msgstr ""
+msgstr "Sjálfvirk stilling hljóðstyrks"
 
 msgid "Automatic volume adjustment for ac3/dts services."
-msgstr ""
+msgstr "Stillir sjálfvirkt hljóðstyrk fyrir ac3/dts rásir."
 
 msgid "Automatically change video resolution"
-msgstr ""
+msgstr "Stillir sjálfvirkt mynd upplausn"
 
 msgid ""
 "Automatically changes the output resolution depending on the video "
 "resolution you are watching."
 msgstr ""
+"Stillir sjálfvirkt mynd upplausn samkvæmt mynd upplaust á því sem verið er "
+"að horfa á."
 
 msgid "Automatically create timer events based on keywords"
-msgstr ""
+msgstr "Býr sjálfvirkt til tímastilltar upptökur byggðar á leitarorðum"
 
 msgid "Automatically informs you on low internal memory"
-msgstr ""
+msgstr "Lætur vita sjálfvirkt er að lítið er eftir af innra minni"
 
 msgid "Automatically refresh EPG"
-msgstr ""
+msgstr "Uppfærir EPG sjálfvirkt"
 
 msgid "Automatically send crashlogs to Dream Multimedia"
-msgstr ""
+msgstr "Sendir sjálfvirkt hrunskýrslur til Dream Multimedia"
 
 msgid "Autos & Vehicles"
 msgstr "Bílar og farartæki"
@@ -960,10 +962,10 @@ msgid "BA"
 msgstr "BA"
 
 msgid "BASIC-HD Skin by Ismail Demir"
-msgstr ""
+msgstr "BASIC-HD Skinn eftir Ismail Demir"
 
-msgid "BASIC-HD Skin for Vuplus Images created from Ismail Demir"
-msgstr ""
+msgid "BASIC-HD Skin for Dreambox Images created from Ismail Demir"
+msgstr "BASIC-HD Skinn fyrir Dreambox stýrikerfi skrifað af Ismail Demir"
 
 msgid "BB"
 msgstr "BB"
@@ -1032,10 +1034,10 @@ msgid "Blue boost"
 msgstr "Auka bláan"
 
 msgid "Bonjour/Avahi control plugin"
-msgstr ""
+msgstr "Bonjour/Avahi stýri íforrit"
 
 msgid "Bonjour/Avahi control plugin."
-msgstr ""
+msgstr "Bonjour/Avahi stýri íforrit."
 
 msgid "Bookmarks"
 msgstr "Bókamerki"
@@ -1109,6 +1111,9 @@ msgstr "Kapalkerfi"
 msgid "Cache Thumbnails"
 msgstr "Taka nyndir í skyndiminni"
 
+msgid "Callmonitor for NCID-based call notification"
+msgstr ""
+
 msgid "Callmonitor for the Fritz!Box routers"
 msgstr ""
 
@@ -1120,9 +1125,6 @@ msgstr "Kanada"
 
 msgid "Cancel"
 msgstr "Hætta við"
-
-msgid "Cannot parse feed directory"
-msgstr "Get ekki skoðað fæði möppu"
 
 msgid "Capacity: "
 msgstr "Stærð:"
@@ -1148,29 +1150,26 @@ msgstr "Skipta á milli rása flétta í rásastökki"
 msgid "Change default recording offset?"
 msgstr "Breyta sjálfgefinni upptöku hliðrun?"
 
-msgid "Change dir."
-msgstr "Breyta möppu."
-
 msgid "Change hostname"
 msgstr "Breyta netnafni"
 
 msgid "Change pin code"
 msgstr "Breyta aðgangskóða"
 
-msgid "Change service pin"
-msgstr "Breyta rása aðgangskóða"
+msgid "Change service PIN"
+msgstr ""
 
-msgid "Change service pins"
-msgstr "Breyta rása aðgangskóðum"
+msgid "Change service PINs"
+msgstr ""
 
-msgid "Change setup pin"
-msgstr "Breyta valmynda kóða"
+msgid "Change setup PIN"
+msgstr ""
 
 msgid "Change step size"
 msgstr "Breyta skrefa stærð"
 
-msgid "Change the hostname of your Vuplus."
-msgstr "Breyta netnafni á Vuplusinu þínu."
+msgid "Change the hostname of your Dreambox."
+msgstr "Breyta netnafni á Dreamboxinu þínu."
 
 msgid "Changelog"
 msgstr "Breytingaskrá"
@@ -1394,6 +1393,10 @@ msgstr "Constellation"
 msgid "Content does not fit on DVD!"
 msgstr "Innihald passar ekki á DVD!"
 
+#
+msgid "Continue"
+msgstr "Áfram"
+
 msgid "Continue in background"
 msgstr "Halda áfram í bakgrunni"
 
@@ -1403,10 +1406,10 @@ msgstr "Halda áfram að spila"
 msgid "Contrast"
 msgstr "Skerpa"
 
-msgid "Control your Vuplus with your Web browser."
+msgid "Control your Dreambox with your Web browser."
 msgstr ""
 
-msgid "Control your Vuplus with your browser"
+msgid "Control your Dreambox with your browser"
 msgstr ""
 
 msgid "Control your dreambox with only the MUTE button"
@@ -1424,11 +1427,11 @@ msgstr ""
 msgid "Control your system fan"
 msgstr ""
 
-msgid "Copy, rename, delete, move local files on your Vuplus."
+msgid "Copy, rename, delete, move local files on your Dreambox."
 msgstr ""
 
-msgid "Could not connect to Vuplus .NFI Image Feed Server:"
-msgstr "Gat ekki tengt við Vuplus .NFI stýrikerfis vefþjón:"
+msgid "Could not connect to Dreambox .NFI Image Feed Server:"
+msgstr "Gat ekki tengt við Dreambox .NFI stýrikerfis vefþjón:"
 
 msgid "Could not load Medium! No disc inserted?"
 msgstr "Gat ekki lesið disk! Er enginn diskur í drifi?"
@@ -1486,7 +1489,7 @@ msgstr ""
 msgid "Create remote timers"
 msgstr ""
 
-msgid "Create timers on remote Vupluses."
+msgid "Create timers on remote Dreamboxes."
 msgstr ""
 
 #, python-format
@@ -1604,12 +1607,12 @@ msgstr "DVD titlaskrá"
 msgid "DVD media toolbox"
 msgstr "DVD miðla tól"
 
-msgid "DVDPlayer plays your DVDs on your Vuplus"
+msgid "DVDPlayer plays your DVDs on your Dreambox"
 msgstr ""
 
 msgid ""
-"DVDPlayer plays your DVDs on your Vuplus.\n"
-"With the DVDPlayer you can play your DVDs on your Vuplus from a DVD or "
+"DVDPlayer plays your DVDs on your Dreambox.\n"
+"With the DVDPlayer you can play your DVDs on your Dreambox from a DVD or "
 "even from an iso file or video_ts folder on your harddisc or network."
 msgstr ""
 
@@ -1664,7 +1667,7 @@ msgstr "Venjulegt"
 msgid "Define a startup service"
 msgstr ""
 
-msgid "Define a startup service for your Vuplus."
+msgid "Define a startup service for your Dreambox."
 msgstr ""
 
 #
@@ -1709,13 +1712,6 @@ msgstr "Lýsing"
 #
 msgid "Deselect"
 msgstr "Ekki velja"
-
-#
-msgid "Destination directory"
-msgstr "Endanleg mappa"
-
-msgid "Details for extension: "
-msgstr "Nánari upplýsingar:"
 
 msgid "Details for plugin: "
 msgstr ""
@@ -1786,10 +1782,6 @@ msgstr "Gera óvirkt"
 #
 msgid "Disable Picture in Picture"
 msgstr "Gera Mynd í Mynd óvirka"
-
-#
-msgid "Disable Subtitles"
-msgstr "Ekki undirtexta"
 
 #
 msgid "Disable crashlog reporting"
@@ -1937,8 +1929,8 @@ msgid "Do you want to preview this DVD before burning?"
 msgstr "Viltu forskoða þennan DVD disk fyrir brennslu?"
 
 #
-msgid "Do you want to reboot your Vuplus?"
-msgstr "Viltu endurræsa Vuplusinu?"
+msgid "Do you want to reboot your Dreambox?"
+msgstr "Viltu endurræsa Dreamboxinu?"
 
 #
 msgid "Do you want to remove the package:\n"
@@ -1963,15 +1955,15 @@ msgstr ""
 "Viltu senda með netfang og nafn svo að við getum haft samband ef að þarf?"
 
 #
-msgid "Do you want to update your Vuplus?"
-msgstr "Viltu uppfæra Vuplusið þitt?"
+msgid "Do you want to update your Dreambox?"
+msgstr "Viltu uppfæra Dreamboxið þitt?"
 
 #
 msgid ""
-"Do you want to update your Vuplus?\n"
+"Do you want to update your Dreambox?\n"
 "After pressing OK, please wait!"
 msgstr ""
-"Viltu uppfæra Vuplusið þitt?\n"
+"Viltu uppfæra Dreamboxið þitt?\n"
 "Þú þarft að bíða eftir að hafa ýtt á OK!"
 
 #
@@ -2023,10 +2015,6 @@ msgstr ""
 msgid "Download location"
 msgstr "Niðurhals staður"
 
-#
-msgid "Download of USB flasher boot image failed: "
-msgstr "Niðurhleðsla keyranlegs USB stýrikerfis tóks ekki:"
-
 msgid "Downloadable new plugins"
 msgstr "Niðurhalanleg ný íforrit"
 
@@ -2043,12 +2031,12 @@ msgid "Downloading screenshots. Please wait..."
 msgstr "Hleð niður skjámyndum. Vinsamlega bíðið..."
 
 #
-msgid "Vuplus format data DVD (HDTV compatible)"
-msgstr "Vuplus gagna formaður DVD diskur (HDTV samhæfður)"
+msgid "Dreambox format data DVD (HDTV compatible)"
+msgstr "Dreambox gagna formaður DVD diskur (HDTV samhæfður)"
 
 #
-msgid "Vuplus software because updates are available."
-msgstr "Hugbúnaður uppfærslur eru tiltækar fyrir Vuplusið."
+msgid "Dreambox software because updates are available."
+msgstr "Hugbúnaður uppfærslur eru tiltækar fyrir Dreamboxið."
 
 msgid "Duration: "
 msgstr "Lengd:"
@@ -2137,12 +2125,12 @@ msgid "Edit tags of recorded movies."
 msgstr ""
 
 #
-msgid "Edit the Nameserver configuration of your Vuplus.\n"
-msgstr "Breyta nafnaþjóns stillingum Vuplusins.\n"
+msgid "Edit the Nameserver configuration of your Dreambox.\n"
+msgstr "Breyta nafnaþjóns stillingum Dreamboxins.\n"
 
 #
-msgid "Edit the network configuration of your Vuplus.\n"
-msgstr "Breyta stillingum netkorts í Vuplusinu.\n"
+msgid "Edit the network configuration of your Dreambox.\n"
+msgstr "Breyta stillingum netkorts í Dreamboxinu.\n"
 
 #
 msgid "Edit title"
@@ -2164,7 +2152,7 @@ msgstr "Námsefni"
 msgid "Electronic Program Guide"
 msgstr "Rafrænn dagskrárstjóri (EPG)"
 
-msgid "Emailclient is an IMAP4 e-mail viewer for the Vuplus."
+msgid "Emailclient is an IMAP4 e-mail viewer for the Dreambox."
 msgstr ""
 
 #
@@ -2272,7 +2260,7 @@ msgid "English"
 msgstr "Enska"
 
 msgid ""
-"Enigma2 Plugin to play AVI/DIVX/WMV/etc. videos from PC on your Vuplus. "
+"Enigma2 Plugin to play AVI/DIVX/WMV/etc. videos from PC on your Dreambox. "
 "Needs a running VLC from www.videolan.org on your pc."
 msgstr ""
 
@@ -2307,8 +2295,8 @@ msgstr "Hraðspólunar hraði til baka, fyrst"
 msgid "Enter main menu..."
 msgstr "Fara í aðal valmynd..."
 
-msgid "Enter new hostname for your Vuplus"
-msgstr "Slá inn nýtt netnafn fyrir Vuplusið þitt"
+msgid "Enter new hostname for your Dreambox"
+msgstr "Slá inn nýtt netnafn fyrir Dreamboxið þitt"
 
 msgid "Enter options:"
 msgstr "Slá inn aukaupplýsingar:"
@@ -2449,7 +2437,7 @@ msgid "FEC"
 msgstr "FEC"
 
 msgid ""
-"FTPBrowser allows uploading and downloading files between your Vuplus and "
+"FTPBrowser allows uploading and downloading files between your Dreambox and "
 "a server using the file transfer protocol."
 msgstr ""
 
@@ -2547,13 +2535,6 @@ msgid "First generate your skin-style with the Ai.HD-Control plugin."
 msgstr ""
 
 #
-msgid ""
-"First we need to download the latest boot environment for the USB flasher."
-msgstr ""
-"Fyrst þarf að hala niður nýjustu uppfærslum til að búa til keyranlegan USB "
-"Staut. "
-
-#
 msgid "Flash"
 msgstr "Forritun"
 
@@ -2617,7 +2598,7 @@ msgstr "Föstudagur"
 msgid "Frisian"
 msgstr "Frísneska"
 
-msgid "FritzCall shows incoming calls to your Fritz!Box on your Vuplus."
+msgid "FritzCall shows incoming calls to your Fritz!Box on your Dreambox."
 msgstr ""
 
 msgid "Frontend for /tmp/mmi.socket"
@@ -2644,7 +2625,7 @@ msgid "GUI that allows user to change the ftp- / telnet password."
 msgstr ""
 
 msgid ""
-"GUI that allows user to change the ftp-/telnet-password of the Vuplus."
+"GUI that allows user to change the ftp-/telnet-password of the Dreambox."
 msgstr ""
 
 msgid "GUI to change the ftp and telnet-password"
@@ -2675,13 +2656,13 @@ msgstr "Heildar PCM seinkun (ms)"
 msgid "Genre"
 msgstr "Gerð"
 
-msgid "Genuine Vuplus"
-msgstr "Ósvikið Vuplus"
+msgid "Genuine Dreambox"
+msgstr "Ósvikið Dreambox"
 
-msgid "Genuine Vuplus validation failed!"
-msgstr "Staðfesting á að Vuplusið er ósvikið tókst ekki!"
+msgid "Genuine Dreambox validation failed!"
+msgstr "Staðfesting á að Dreamboxið er ósvikið tókst ekki!"
 
-msgid "Genuine Vuplus verification"
+msgid "Genuine Dreambox verification"
 msgstr ""
 
 #
@@ -2743,7 +2724,7 @@ msgid "Green boost"
 msgstr "Auka grænan"
 
 msgid ""
-"Growlee allows your Vuplus to send short messages using the growl "
+"Growlee allows your Dreambox to send short messages using the growl "
 "protocol\n"
 "like Recording started notifications to a PC running a growl client"
 msgstr ""
@@ -2836,7 +2817,7 @@ msgstr "Litatónn"
 msgid "Hungarian"
 msgstr "Ungverska"
 
-msgid "IMAP4 e-mail viewer for the Vuplus"
+msgid "IMAP4 e-mail viewer for the Dreambox"
 msgstr ""
 
 #
@@ -2896,10 +2877,6 @@ msgstr ""
 "viss um að rétt sjá dekkstu tvo grátónana.\n"
 "Ekki hafa áhyggjur af björtum svæðum núna. Þeir verða stilltir næst.\n"
 "Ef stillingin er orðin eins og þér finnst best ýttu þá á OK."
-
-#
-msgid "Image flash utility"
-msgstr "Tól fyrir forritun stýrikerfis"
 
 msgid "Import AutoTimer"
 msgstr "Lesa inn sjálfvirkar tímastillingar"
@@ -3043,14 +3020,6 @@ msgstr "Skyndi upptaka..."
 msgid "Instant record location"
 msgstr "Skyndi upptöku staðsetning"
 
-#
-msgid "Integrated Ethernet"
-msgstr "Innbyggt Netkort"
-
-#
-msgid "Integrated Wireless"
-msgstr "Innbyggt þráðlaust"
-
 msgid "Interface: "
 msgstr "Netkort:"
 
@@ -3129,10 +3098,10 @@ msgstr ""
 msgid "Italian"
 msgstr "Ítalska"
 
-msgid "Italian Weather forecast on Vuplus"
+msgid "Italian Weather forecast on Dreambox"
 msgstr ""
 
-msgid "Italian Weather forecast on Vuplus from www.google.it."
+msgid "Italian Weather forecast on Dreambox from www.google.it."
 msgstr ""
 
 msgid "Italy"
@@ -3319,7 +3288,7 @@ msgstr "Listi geymslu tækja"
 msgid "Listen and record internet radio"
 msgstr ""
 
-msgid "Listen and record shoutcast internet radio on your Vuplus."
+msgid "Listen and record shoutcast internet radio on your Dreambox."
 msgstr ""
 
 #
@@ -3741,6 +3710,11 @@ msgstr "Hjálp Netspilara"
 msgid "N/A"
 msgstr "Ekki til"
 
+msgid ""
+"NCID Client shows incoming voice calls promoted by any NCID server (e.g. "
+"Vodafone Easybox) on your Dreambox."
+msgstr ""
+
 #
 msgid "NEXT"
 msgstr "NÆST"
@@ -3787,97 +3761,97 @@ msgstr "Uppsetning nafnaþjóns"
 msgid "Nemesis BlackBox Skin"
 msgstr ""
 
-msgid "Nemesis BlackBox Skin for the Vuplus"
+msgid "Nemesis BlackBox Skin for the Dreambox"
 msgstr ""
 
 msgid "Nemesis Blueline Single Skin"
 msgstr ""
 
-msgid "Nemesis Blueline Single Skin for the Vuplus"
+msgid "Nemesis Blueline Single Skin for the Dreambox"
 msgstr ""
 
 msgid "Nemesis Blueline Skin"
 msgstr ""
 
-msgid "Nemesis Blueline Skin for the Vuplus"
+msgid "Nemesis Blueline Skin for the Dreambox"
 msgstr ""
 
 msgid "Nemesis Blueline.Extended Skin"
 msgstr ""
 
-msgid "Nemesis Blueline.Extended Skin for the Vuplus"
+msgid "Nemesis Blueline.Extended Skin for the Dreambox"
 msgstr ""
 
 msgid "Nemesis ChromeLine Cobolt Skin"
 msgstr ""
 
-msgid "Nemesis ChromeLine Cobolt Skin for the Vuplus"
+msgid "Nemesis ChromeLine Cobolt Skin for the Dreambox"
 msgstr ""
 
 msgid "Nemesis ChromeLine Skin"
 msgstr ""
 
-msgid "Nemesis ChromeLine Skin for the Vuplus"
+msgid "Nemesis ChromeLine Skin for the Dreambox"
 msgstr ""
 
 msgid "Nemesis Flatline Blue Skin"
 msgstr ""
 
-msgid "Nemesis Flatline Blue Skin for the Vuplus"
+msgid "Nemesis Flatline Blue Skin for the Dreambox"
 msgstr ""
 
 msgid "Nemesis Flatline Skin"
 msgstr ""
 
-msgid "Nemesis Flatline Skin for the Vuplus"
+msgid "Nemesis Flatline Skin for the Dreambox"
 msgstr ""
 
 msgid "Nemesis GlassLine Skin"
 msgstr ""
 
-msgid "Nemesis GlassLine Skin for the Vuplus"
+msgid "Nemesis GlassLine Skin for the Dreambox"
 msgstr ""
 
 msgid "Nemesis Greenline Extended Skin"
 msgstr ""
 
-msgid "Nemesis Greenline Extended Skin for the Vuplus"
+msgid "Nemesis Greenline Extended Skin for the Dreambox"
 msgstr ""
 
 msgid "Nemesis Greenline Single Skin"
 msgstr ""
 
-msgid "Nemesis Greenline Single Skin for the Vuplus"
+msgid "Nemesis Greenline Single Skin for the Dreambox"
 msgstr ""
 
 msgid "Nemesis Greenline Skin"
 msgstr ""
 
-msgid "Nemesis Greenline Skin for the Vuplus"
+msgid "Nemesis Greenline Skin for the Dreambox"
 msgstr ""
 
 msgid "Nemesis Greyline Extended Skin"
 msgstr ""
 
-msgid "Nemesis Greyline Extended Skin for the Vuplus"
+msgid "Nemesis Greyline Extended Skin for the Dreambox"
 msgstr ""
 
 msgid "Nemesis Greyline Single Skin"
 msgstr ""
 
-msgid "Nemesis Greyline Single Skin for the Vuplus"
+msgid "Nemesis Greyline Single Skin for the Dreambox"
 msgstr ""
 
 msgid "Nemesis Greyline Skin"
 msgstr ""
 
-msgid "Nemesis Greyline Skin for the Vuplus"
+msgid "Nemesis Greyline Skin for the Dreambox"
 msgstr ""
 
 msgid "Nemesis ShadowLine Skin"
 msgstr ""
 
-msgid "Nemesis ShadowLine Skin for the Vuplus"
+msgid "Nemesis ShadowLine Skin for the Dreambox"
 msgstr ""
 
 #
@@ -3943,12 +3917,11 @@ msgstr "Aldrei"
 msgid "New"
 msgstr "Nýtt"
 
+msgid "New PIN"
+msgstr ""
+
 msgid "New Zealand"
 msgstr "Nýja Sjáland"
-
-#
-msgid "New pin"
-msgstr "Nýr kóði"
 
 #
 msgid "New version:"
@@ -4069,10 +4042,6 @@ msgid ""
 msgstr ""
 "Enginn móttakari er valinn!\n"
 "Stilltu móttakara áður er að þú ferð að leita að rásum."
-
-#
-msgid "No useable USB stick found"
-msgstr "Ekkert nothæfur USB stautur fannst"
 
 msgid ""
 "No valid service PIN found!\n"
@@ -4345,10 +4314,6 @@ msgid "Packet manager"
 msgstr "Hugbúnaðarpakka stjóri"
 
 #
-msgid "Page"
-msgstr "Blaðsíða"
-
-#
 #. TRANSLATORS: (aspect ratio policy: cropped content on left/right) in doubt, keep english term
 msgid "Pan&Scan"
 msgstr "Pan&Scan"
@@ -4373,7 +4338,7 @@ msgid "Parental control type"
 msgstr "Gerð foreldrastýringar"
 
 msgid ""
-"Partnerbox allows editing a remote Vuplus's record timers and stream its "
+"Partnerbox allows editing a remote Dreambox's record timers and stream its "
 "TV  program."
 msgstr ""
 
@@ -4453,7 +4418,7 @@ msgstr "Spila uppteknar bíómyndir..."
 msgid "Play video again"
 msgstr "Spila bíómynd aftur"
 
-msgid "Play videos from PC on your Vuplus"
+msgid "Play videos from PC on your Dreambox"
 msgstr ""
 
 msgid "Playback of Youtube through a PC"
@@ -4478,16 +4443,17 @@ msgstr "Vinsamlega veljið tæki sem á að leita"
 msgid "Please add titles to the compilation."
 msgstr "Vinsamlega bætið við titlum við efnið."
 
+msgid ""
+"Please be aware, that anyone can disable the parental control, if you have "
+"not set a PIN."
+msgstr ""
+
 msgid "Please change recording endtime"
 msgstr "Vinsamlega breytið lokatíma upptöku"
 
 #
 msgid "Please check your network settings!"
 msgstr "Vinsamlega athugaðu stillingar netkerfis!"
-
-#
-msgid "Please choose .NFI image file from feed server to download"
-msgstr "Vinsamlega veldu .NFI af strauma vefþjón til að hlaða niður"
 
 msgid "Please choose an extension..."
 msgstr "Vinsamlega veldu viðbót..."
@@ -4518,13 +4484,6 @@ msgstr ""
 "Til að stilla nettengingu filltu þá út viðeigandi gildi.\n"
 "Ýttu þá á OK til að halda áfram."
 
-msgid ""
-"Please disconnect all USB devices from your Vuplus and (re-)attach the "
-"target USB stick (minimum size is 64 MB) now!"
-msgstr ""
-"Vinsamlegast aftengið allt frá USB tengjum á Vuplusinu þínu og tengið USB "
-"stautinn sem að þú ætlar að nota (minnst 64 MB) núna!"
-
 #
 msgid "Please do not change any values unless you know what you are doing!"
 msgstr "Ekki breyta gildum ef þú veist ekki hvað þú ert að gera!"
@@ -4553,9 +4512,8 @@ msgstr "Sláðu inn nafn á nýju möppunni"
 msgid "Please enter the correct pin code"
 msgstr "Sláðu inn réttan kóða"
 
-#
-msgid "Please enter the old pin code"
-msgstr "Sláðu inn gamla kóðann"
+msgid "Please enter the old PIN code"
+msgstr ""
 
 #
 msgid "Please enter your email address here:"
@@ -4589,10 +4547,6 @@ msgstr "Ýtið á OK!"
 
 msgid "Please provide a Text to match"
 msgstr "Vinsamlega sláið inn texta við að leita"
-
-#
-msgid "Please select .NFI flash image file from medium"
-msgstr "Vinsamlega veldu .NFI stýrikerfi frá geymslu"
 
 #
 msgid "Please select a playlist to delete..."
@@ -4632,10 +4586,6 @@ msgstr "Vinsamlega veljið tæki til að nota sem afritunar stað"
 #
 msgid "Please select tag to filter..."
 msgstr "Vinsamlega veldu merki til að sía út..."
-
-#
-msgid "Please select target directory or medium"
-msgstr "Vinsamlega veldu möppu eða geymslu"
 
 #
 msgid "Please select the movie path..."
@@ -4759,7 +4709,7 @@ msgstr "Íforrit: %(plugin)s , Útgáfa: %(version)s"
 msgid "Plugins"
 msgstr "Íforrit"
 
-msgid "PodCast streams podcasts to your Vuplus."
+msgid "PodCast streams podcasts to your Dreambox."
 msgstr ""
 
 msgid "Poland"
@@ -4915,10 +4865,6 @@ msgstr "Ýtið á OK til að byrja að leita"
 #
 msgid "Press OK to toggle the selection."
 msgstr "Ýttu á OK til að velja á milli."
-
-#
-msgid "Press OK to view full changelog"
-msgstr "Ýttu á OK til að skoða breytingaskýrslu"
 
 #
 msgid "Press yellow to set this interface as default interface."
@@ -5116,9 +5062,8 @@ msgstr "Upptökur"
 msgid "Recordings always have priority"
 msgstr "Upptaka hefur alltaf forgang"
 
-#
-msgid "Reenter new pin"
-msgstr "Sláðu aftur inn kóða"
+msgid "Reenter new PIN"
+msgstr ""
 
 #
 msgid "Refresh Rate"
@@ -5141,12 +5086,11 @@ msgstr "Endurlesa"
 msgid "Reload Black-/Whitelists"
 msgstr "Endurhlaða svart-/hvítlista"
 
-#
-msgid "Remember service pin"
-msgstr "Muna kóða fyrir rásir"
+msgid "Remember service PIN"
+msgstr ""
 
-msgid "Remember service pin cancel"
-msgstr "Gleyma kóða fyrir rásir"
+msgid "Remember service PIN cancel"
+msgstr ""
 
 msgid "Remote timer and remote TV player"
 msgstr ""
@@ -5183,13 +5127,6 @@ msgstr "Taka út íforrit"
 
 msgid "Remove selected AutoTimer"
 msgstr "Taka út valda sjálfvirka tímatöku"
-
-msgid "Remove the broken .NFI file?"
-msgstr "Taka út skemmda .NFI skrá?"
-
-#
-msgid "Remove the incomplete .NFI file?"
-msgstr "Taka út skemmda .NFI skrá?"
 
 #
 msgid "Remove timer"
@@ -5327,7 +5264,7 @@ msgstr "Innsetning afrita í gangi"
 msgid "Restore system settings"
 msgstr "Setja inn kerfis stillingar"
 
-msgid "Restore your Vuplus with a USB stick"
+msgid "Restore your Dreambox with a USB stick"
 msgstr ""
 
 msgid "Restrict \"after event\" to a certain timespan?"
@@ -5583,12 +5520,6 @@ msgstr ""
 msgid "Scan range"
 msgstr "Leitar svið"
 
-#
-msgid ""
-"Scan your network for wireless Access Points and connect to them using your "
-"selected wireless device.\n"
-msgstr "Leita að þráðlausu neti og tengja svo með völdu þráðlausu netkorti.\n"
-
 msgid ""
 "Scan your network for wireless access points and connect to them using your "
 "selected wireless device.\n"
@@ -5694,10 +5625,6 @@ msgid "Select a timer to import"
 msgstr "Veldu tímastillingar til að flytja inn"
 
 #
-msgid "Select audio mode"
-msgstr "Veldu hljóð stillingu"
-
-#
 msgid "Select audio track"
 msgstr "Veldu hljóð rás"
 
@@ -5718,16 +5645,8 @@ msgid "Select files for backup."
 msgstr "Veldu skrár fyrir afrit."
 
 #
-msgid "Select files for backup. Currently selected:\n"
-msgstr "Veldu skrár fyrir afrit. Núþegar valið:\n"
-
-#
 msgid "Select files/folders to backup"
 msgstr "Veldu skrár/möppur til afritunar"
-
-#
-msgid "Select image"
-msgstr "Veldu stýrikerfi"
 
 msgid "Select input device"
 msgstr "Veldu inntaks tæki"
@@ -5788,10 +5707,6 @@ msgstr "Veldu þráðlaust net"
 
 msgid "Select your choice."
 msgstr "Veldu nú."
-
-#
-msgid "Selected source image"
-msgstr "Veldu grunn stýrikerfi"
 
 #
 msgid "Send DiSEqC"
@@ -5910,7 +5825,7 @@ msgstr "Stilla mesta tímabil"
 msgid "Set this NO to disable this AutoTimer."
 msgstr "Stilla á NEI til að hætta með sjálfvirka tímastillingu"
 
-msgid "Sets your Vuplus into Deep-Standby"
+msgid "Sets your Dreambox into Deep-Standby"
 msgstr ""
 
 msgid "Setting key canceled"
@@ -6022,6 +5937,9 @@ msgstr ""
 msgid "Shows a list of recent zap entries"
 msgstr ""
 
+msgid "Shows average bitrate of video and audio"
+msgstr ""
+
 msgid "Shows statistics of watched services"
 msgstr ""
 
@@ -6036,7 +5954,7 @@ msgid "Shutdown"
 msgstr "Slökkva"
 
 #
-msgid "Shutdown Vuplus after"
+msgid "Shutdown Dreambox after"
 msgstr "Slökkva á móttakara eftir"
 
 #
@@ -6066,7 +5984,7 @@ msgstr ""
 msgid "Simple titleset (compatibility for legacy players)"
 msgstr "Einföld valmynd (virkar fyrir flesta spilara)"
 
-msgid "SimpleRSS allows reading RSS newsfeeds on your Vuplus."
+msgid "SimpleRSS allows reading RSS newsfeeds on your Dreambox."
 msgstr ""
 
 #
@@ -6151,7 +6069,7 @@ msgstr "Hugbúnaðar endurinnsetning"
 msgid "Software update"
 msgstr "Hugbúnaðar uppfærsla"
 
-msgid "SoftwareManager manages your Vuplus software"
+msgid "SoftwareManager manages your Dreambox software"
 msgstr ""
 
 msgid "Softwaremanager information"
@@ -6301,10 +6219,6 @@ msgstr "Þrep í ms fyrir '%s' takka"
 #
 msgid "Step west"
 msgstr "Skref vestur"
-
-#
-msgid "Stereo"
-msgstr "Víðóma"
 
 #
 msgid "Stop"
@@ -6482,8 +6396,8 @@ msgid "Test mode"
 msgstr "Prufu hamur"
 
 #
-msgid "Test the network configuration of your Vuplus.\n"
-msgstr "Prófa stillingar netkorts í Vuplusinu.\n"
+msgid "Test the network configuration of your Dreambox.\n"
+msgstr "Prófa stillingar netkorts í Dreamboxinu.\n"
 
 msgid "Test your DiSEqC equipment"
 msgstr ""
@@ -6502,7 +6416,7 @@ msgstr ""
 
 msgid ""
 "Thank you for using the wizard. Your box is now ready to use.\n"
-"Please press OK to start using your Vuplus."
+"Please press OK to start using your Dreambox."
 msgstr ""
 "Takk fyrir að nota ráðgjafann. Núna er móttakarinn tilbúinn til notkunar.\n"
 "Ýttu á OK til að byrja að nota móttakarann."
@@ -6524,10 +6438,10 @@ msgstr ""
 
 msgid ""
 "The DVD standard doesn't support H.264 (HDTV) video streams. Do you want to "
-"create a Vuplus format data DVD (which will not play in stand-alone DVD "
+"create a Dreambox format data DVD (which will not play in stand-alone DVD "
 "players) instead?"
 msgstr ""
-"DVD staðallinn er ekki með möguleika á H.264 (HDTV). Viltu búa til Vuplus "
+"DVD staðallinn er ekki með möguleika á H.264 (HDTV). Viltu búa til Dreambox "
 "gagna disk (sem ekki er hægt að venjulegum DVD spilara) í staðinn?"
 
 msgid ""
@@ -6550,6 +6464,12 @@ msgstr ""
 "Netkerfis ráðgjafinn er ekki innsettur!\n"
 "Vinsamlega settu hann inn."
 
+msgid "The PIN code has been changed successfully."
+msgstr ""
+
+msgid "The PIN codes you entered are different."
+msgstr ""
+
 msgid ""
 "The PicturePlayer displays your photos on the TV.\n"
 "You can view them as thumbnails or slideshow."
@@ -6562,11 +6482,11 @@ msgstr ""
 
 msgid ""
 "The SkinSelector shows a menu with selectable skins.\n"
-"It's now easy to change the look and feel of your Vuplus."
+"It's now easy to change the look and feel of your Dreambox."
 msgstr ""
 
 msgid ""
-"The SoftwareManager manages your Vuplus software.\n"
+"The SoftwareManager manages your Dreambox software.\n"
 "It's easy to update your receiver's software, install or remove plugins or "
 "even backup and restore your system settings."
 msgstr ""
@@ -6592,14 +6512,6 @@ msgid ""
 msgstr ""
 "Tímabil sjálfvirkar tímastillingar er fyrsta atriðið. Ef að tímabil er valið "
 "þá mun atriði aðeins vera valið er að það passar."
-
-#
-msgid ""
-"The USB stick is now bootable. Do you want to download the latest image from "
-"the feed server and save it on the stick?"
-msgstr ""
-"USB stauturinn er ræsanlegur núna. Viltu hlaða niður nýjasta stýrikerfninu "
-"frá vefþjóninum og vista það á stautinn?"
 
 msgid ""
 "The USB stick was prepared to be bootable.\n"
@@ -6682,34 +6594,16 @@ msgstr "Innsetning sjálfgefins rásalista er lokið."
 #
 msgid ""
 "The installation of the default settings is finished. You can now continue "
-"configuring your Vuplus by pressing the OK button on the remote control."
+"configuring your Dreambox by pressing the OK button on the remote control."
 msgstr ""
 "Innsetning sjálfgefins rásalista er lokið. Þú getur nú haldið áfram að "
-"stilla Vuplusið með því að ýta á OK takkann á fjarstýringunni."
+"stilla Dreamboxið með því að ýta á OK takkann á fjarstýringunni."
 
 msgid "The match attribute is mandatory."
 msgstr "Þú verður að velja hvernig á að leita."
 
 msgid "The md5sum validation failed, the file may be corrupted!"
 msgstr "Md5sum prufun tókst ekki, skráin er sennilega skemmd!"
-
-#
-msgid ""
-"The md5sum validation failed, the file may be corrupted! Are you sure that "
-"you want to burn this image to flash memory? You are doing this at your own "
-"risk!"
-msgstr ""
-"Staðfesting md5sum tókst ekki, skráin gæti verið skemmd! Ertu viss um að þú "
-"viljir setja þetta stýrikerfi inn í minni? Það er ekki mælt með því að gera "
-"það!"
-
-#
-msgid ""
-"The md5sum validation failed, the file may be downloaded incompletely or be "
-"corrupted!"
-msgstr ""
-"Staðfesting md5sum tókst ekki, það gæti vantað hluta á skrána eða þá að hún "
-"sé skemmd!"
 
 #
 msgid "The package doesn't contain anything."
@@ -6725,16 +6619,8 @@ msgid "The path %s already exists."
 msgstr "Slóðin %s er þegar til."
 
 #
-msgid "The pin code has been changed successfully."
-msgstr "Það tókst að breyta kóðanum."
-
-#
 msgid "The pin code you entered is wrong."
 msgstr "Kóðinn sem þú slóst inn er rangur."
-
-#
-msgid "The pin codes you entered are different."
-msgstr "Kóðarnir sem þú slóst inn eru ekki eins."
 
 #
 #, python-format
@@ -6833,29 +6719,8 @@ msgid ""
 "There's a certificate update available for your dreambox. Would you like to "
 "apply this update now?"
 msgstr ""
-"Það er tiltæk uppfærsla fyrir Vuplusið þitt. Viltu setja þessa uppfærslu "
+"Það er tiltæk uppfærsla fyrir Dreamboxið þitt. Viltu setja þessa uppfærslu "
 "inn núna?"
-
-#
-#, python-format
-msgid "This .NFI file does not contain a valid %s image!"
-msgstr "Þessi .NFI skrá inniheldur ekki %s stýrikerfi í lagi!"
-
-#
-msgid ""
-"This .NFI file does not have a md5sum signature and is not guaranteed to "
-"work. Do you really want to burn this image to flash memory?"
-msgstr ""
-"Þessi .NFI skrá er ekki með md5sum undirskrift og er ekki hægt að tryggja að "
-"hún virki. Viltu örugglega forrita hana inn í minni?"
-
-#
-msgid ""
-"This .NFI file has a valid md5 signature. Continue programming this image to "
-"flash memory?"
-msgstr ""
-"Þessi .NFI skrá er með gilda md5 undirskrift. Viltu halda áfram að forrita "
-"minni móttakarans með henni?"
 
 #
 msgid ""
@@ -6867,8 +6732,8 @@ msgstr ""
 
 #
 #, python-format
-msgid "This Vuplus can't decode %s streams!"
-msgstr "Þetta Vuplus getur ekki afrugað %s strauma!"
+msgid "This Dreambox can't decode %s streams!"
+msgstr "Þetta Dreambox getur ekki afrugað %s strauma!"
 
 msgid "This Month"
 msgstr "Þennan mánuð"
@@ -6908,7 +6773,7 @@ msgstr ""
 
 msgid ""
 "This plugin creates a USB stick which can be used to update the firmware of "
-"your Vuplus without the need for a network or WLAN connection.\n"
+"your Dreambox without the need for a network or WLAN connection.\n"
 "First, a USB stick needs to be prepared so that it becomes bootable.\n"
 "In the next step, an NFI image file can be downloaded from the update server "
 "and saved on the USB stick.\n"
@@ -6916,7 +6781,7 @@ msgid ""
 "Otherwise plug in a USB stick with a minimum size of 64 MB!"
 msgstr ""
 "Þetta íforrit útbýr USB staut sem er hægt að nota til að uppfæta stýrikerfið "
-"í Vuplusinu án þess að nota tölvu.\n"
+"í Dreamboxinu án þess að nota tölvu.\n"
 "Fyrst þarf að undirbúa USB stautinn þannig að hægt verði að ræsa frá honum.\n"
 "Næst þarf að hlaða niður NFI stýrikerfi frá uppfærslu vefþjóni sem er vistað "
 "á USB stautnum.\n"
@@ -7129,36 +6994,20 @@ msgid "To be used as simple downloading application by other Plugins."
 msgstr ""
 
 msgid ""
-"To update your Vuplus firmware, please follow these steps:\n"
+"To update your Dreambox firmware, please follow these steps:\n"
 "1) Turn off your box with the rear power switch and make sure the bootable "
 "USB stick is plugged in.\n"
 "2) Turn mains back on and hold the DOWN button on the front panel pressed "
 "for 10 seconds.\n"
 "3) Wait for bootup and follow instructions of the wizard."
 msgstr ""
-"TIl að uppfæra stýrikerfið í Vuplusinu farðu þá eftir þessum "
+"TIl að uppfæra stýrikerfið í Dreamboxinu farðu þá eftir þessum "
 "leiðbeiningum:\n"
 "1. Slökktu á móttakaranum með rofanum aftaná boxinu og vertu viss um að "
 "ræsanlegi USB stauturinn er tengdur.\n"
 "2. Kveiktu á móttakaranum og haltu inn NIÐUR takkanum framaná móttakaranum í "
 "10 sekúndur.\\3. Bíddu eftir að móttakarinn ræsi og farðu eftir "
 "leiðbeiningum ráðgjafans."
-
-#
-msgid ""
-"To update your Vuplus firmware, please follow these steps:\n"
-"1) Turn off your box with the rear power switch and plug in the bootable USB "
-"stick.\n"
-"2) Turn mains back on and hold the DOWN button on the front panel pressed "
-"for 10 seconds.\n"
-"3) Wait for bootup and follow instructions of the wizard."
-msgstr ""
-"Til að uppfæra stýrikerfi Vuplusins, fylgdu þá þessum leiðbeiningum:\n"
-"1) Slökktu á móttakaranum með rofanum aftaná og settu inn startanlega USB "
-"stautinn í USB tengið.\n"
-"2) Kveiktu á rofanum aftaná móttakaranum og haldu inni NIÐUR takkanum á "
-"framhlið móttakarans í 10 sekúndur eftir það.\n"
-"3) Bíðið eftir ræsingu og fylgdu leiðbeiningunum á skjánum."
 
 #
 msgid "Today"
@@ -7308,12 +7157,6 @@ msgstr "USB stautur"
 msgid "USB stick wizard"
 msgstr "USB stauta stjóri"
 
-msgid ""
-"USB stick wizard finished. Your dreambox will now restart with your new "
-"image!"
-msgstr ""
-"USB stauts ráðgjafi er búinn. Vuplusið mun nú endurræsa nýja stýrikerfinu!"
-
 #
 msgid "Ukrainian"
 msgstr "Ukrainian"
@@ -7404,7 +7247,7 @@ msgid ""
 "Update done... The genuine dreambox test will now be rerun and should not "
 "ask you to update again."
 msgstr ""
-"Uppfærslu lokið... Orginal Vuplus prufa verður núna keyrt aftur og mun "
+"Uppfærslu lokið... Orginal Dreambox prufa verður núna keyrt aftur og mun "
 "ekki spyrja aftur."
 
 msgid "Updatefeed not available."
@@ -7438,8 +7281,8 @@ msgid "Upgrading"
 msgstr "Uppfæri"
 
 #
-msgid "Upgrading Vuplus... Please wait"
-msgstr "Uppfæri Vuplusið...vinsamlegast bíðið"
+msgid "Upgrading Dreambox... Please wait"
+msgstr "Uppfæri Dreamboxið...vinsamlegast bíðið"
 
 msgid "Upper bound of timespan."
 msgstr "Efri mörk tímabils."
@@ -7474,7 +7317,7 @@ msgstr "Nota sérstakan stað"
 msgid "Use a gateway"
 msgstr "Nota beini"
 
-msgid "Use and control multiple Vupluses with different RCs."
+msgid "Use and control multiple Dreamboxes with different RCs."
 msgstr ""
 
 #
@@ -7559,10 +7402,13 @@ msgstr "VMGM (mynd sýnishorn)"
 msgid "Vali-XD skin"
 msgstr ""
 
-msgid ""
-"Verify your Vuplus authenticity by running the genuine dreambox plugin!"
+msgid "Vali.HD.nano skin"
 msgstr ""
-"Athuga hvort Vuplusið þitt er orginal með því að keyra genuine dreambox "
+
+msgid ""
+"Verify your Dreambox authenticity by running the genuine dreambox plugin!"
+msgstr ""
+"Athuga hvort Dreamboxið þitt er orginal með því að keyra genuine dreambox "
 "íforrit!"
 
 #
@@ -7646,7 +7492,7 @@ msgstr "Skoða fjölda"
 msgid "View Google maps"
 msgstr ""
 
-msgid "View Google maps with your Vuplus."
+msgid "View Google maps with your Dreambox."
 msgstr ""
 
 #
@@ -7733,8 +7579,8 @@ msgstr "Skoða svörunar myndbönd"
 msgid "View teletext..."
 msgstr "Skoða textavarp..."
 
-msgid "View, edit or delete mountpoints on your Vuplus."
-msgstr "Skoða, breyta eða eyða tengipunkta við Vuplusið."
+msgid "View, edit or delete mountpoints on your Dreambox."
+msgstr "Skoða, breyta eða eyða tengipunkta við Dreamboxið."
 
 msgid "View, edit or delete usernames and passwords for your network."
 msgstr "Skoða, breyta eða eyða notendanöfnum og aðgangsorðum að netkerfinu."
@@ -7745,6 +7591,14 @@ msgstr "Skoðað:"
 #
 msgid "Virtual KeyBoard"
 msgstr "Sýndar lyklaborð"
+
+msgid "Visualization for the European Installation Bus"
+msgstr ""
+
+msgid ""
+"Visualize and control your lights, dimmers, blinds, thermostats etc. through "
+"EIB/KNX. (linknx server required)"
+msgstr ""
 
 #
 msgid "Voltage mode"
@@ -7798,10 +7652,10 @@ msgstr "Vara við ef að laust minni fer niður fyrir (kB):"
 msgid "Watch streams from ZDF Mediathek"
 msgstr ""
 
-msgid "WeatherPlugin shows weatherforecasts on your Vuplus."
+msgid "WeatherPlugin shows weatherforecasts on your Dreambox."
 msgstr ""
 
-msgid "Weatherforecast on your Vuplus"
+msgid "Weatherforecast on your Dreambox"
 msgstr ""
 
 msgid "Webinterface"
@@ -7850,11 +7704,11 @@ msgstr ""
 
 msgid ""
 "Welcome to the Image upgrade wizard. The wizard will assist you in upgrading "
-"the firmware of your Vuplus by providing a backup facility for your "
+"the firmware of your Dreambox by providing a backup facility for your "
 "current settings and a short explanation of how to upgrade your firmware."
 msgstr ""
 "Velkominn til stýrikerfis uppfærslu ráðgjafann. Ráðgjafinn aðstoðar þig við "
-"að uppfæra stýrikerfi Vuplusins með því að sjá um afritun af þínum "
+"að uppfæra stýrikerfi Dreamboxins með því að sjá um afritun af þínum "
 "stillingum og sýnir svo hverning uppfærslan fer fram."
 
 msgid ""
@@ -7909,7 +7763,7 @@ msgid ""
 "Welcome to the cleanup wizard.\n"
 "\n"
 "We have detected that your available internal memory has dropped below 2MB.\n"
-"To ensure stable operation of your Vuplus, the internal memory should be "
+"To ensure stable operation of your Dreambox, the internal memory should be "
 "cleaned up.\n"
 "You can use this wizard to remove some extensions.\n"
 msgstr ""
@@ -7923,14 +7777,14 @@ msgstr ""
 msgid ""
 "Welcome.\n"
 "\n"
-"If you want to connect your Vuplus to the Internet, this wizard will guide "
-"you through the basic network setup of your Vuplus.\n"
+"If you want to connect your Dreambox to the Internet, this wizard will guide "
+"you through the basic network setup of your Dreambox.\n"
 "\n"
 "Press OK to start configuring your network"
 msgstr ""
 "Velkomin (n).\n"
 "\n"
-"Ef þú vilt tengja Vuplusið við veraldarvefinn þá getur þessi ráðgjafi "
+"Ef þú vilt tengja Dreamboxið við veraldarvefinn þá getur þessi ráðgjafi "
 "hjálpað þér að setja upp grunnstillingar til þess.\n"
 "\n"
 "Ýttu á OK til að byrja stillingar á netkortinu"
@@ -7949,12 +7803,12 @@ msgstr ""
 msgid ""
 "Welcome.\n"
 "\n"
-"This start wizard will guide you through the basic setup of your Vuplus.\n"
+"This start wizard will guide you through the basic setup of your Dreambox.\n"
 "Press the OK button on your remote control to move to the next step."
 msgstr ""
 "Velkomin.\n"
 "\n"
-"Þessi ráðgjafi hjálpar þér í gegnum grunnstillingar á Vuplusinu.\n"
+"Þessi ráðgjafi hjálpar þér í gegnum grunnstillingar á Dreamboxinu.\n"
 "Ýttu á OK hnappinn á fjarstýringunni til að fara á næsta þrep."
 
 #
@@ -8004,10 +7858,6 @@ msgid "Where to save temporary timeshift recordings?"
 msgstr "Hvar á að vista tímabundnar tímafærslu upptökur?"
 
 #
-msgid "Wireless"
-msgstr "Þráðlaust"
-
-#
 msgid "Wireless LAN"
 msgstr "­Þráðlaust net"
 
@@ -8025,7 +7875,7 @@ msgid ""
 msgstr ""
 
 msgid ""
-"With DVDBurn you can make compilations of records from your Vuplus hard "
+"With DVDBurn you can make compilations of records from your Dreambox hard "
 "drive.\n"
 "Optionally you can add customizable menus. You can record the compilation to "
 "a standard-compliant DVD that can be played on conventinal DVD players.\n"
@@ -8035,7 +7885,7 @@ msgstr ""
 msgid "With EPGSearch you can search through the EPG and create timers."
 msgstr ""
 
-msgid "With Genuine Vuplus you can verify the authenticity of your Vuplus."
+msgid "With Genuine Dreambox you can verify the authenticity of your Dreambox."
 msgstr ""
 
 msgid ""
@@ -8060,13 +7910,13 @@ msgid ""
 msgstr ""
 
 msgid ""
-"With YouTubePlayer you can watch YouTube-Videos on the Vuplus.\n"
+"With YouTubePlayer you can watch YouTube-Videos on the Dreambox.\n"
 "This plugin requires a PC with the VLC program running."
 msgstr ""
 
 msgid ""
 "With the CommonInterfaceAssignment plugin it is possible to use differentCI "
-"modules in your Vuplus and assign dedicated providers/services or caids to "
+"modules in your Dreambox and assign dedicated providers/services or caids to "
 "each of them.\n"
 "This allows watching a scrambled service while recording another one."
 msgstr ""
@@ -8088,8 +7938,8 @@ msgstr ""
 
 msgid ""
 "With the NFIFlash plugin it is possible to prepare a USB stick with an "
-"Vuplus image.\n"
-"It is then possible to flash your Vuplus with the image on that stick."
+"Dreambox image.\n"
+"It is then possible to flash your Dreambox with the image on that stick."
 msgstr ""
 
 msgid ""
@@ -8130,10 +7980,6 @@ msgstr "Villla við upptöku. Diskur fullur?\n"
 #
 msgid "Write failed!"
 msgstr "Tókst ekki að skrifa!"
-
-#
-msgid "Writing NFI image file to flash completed"
-msgstr "Búið að skrifa .NFI stýrikerfi í minni"
 
 #
 msgid "YPbPr"
@@ -8225,8 +8071,8 @@ msgstr "Þú getur valið það sem að þú vilt setja inn..."
 msgid "You can install this plugin."
 msgstr "Þú getur sett inn þetta íforrit."
 
-msgid "You can only burn Vuplus recordings!"
-msgstr "Þú getur bara brennt Vuplus upptökur!"
+msgid "You can only burn Dreambox recordings!"
+msgstr "Þú getur bara brennt Dreambox upptökur!"
 
 msgid "You can remove this plugin."
 msgstr "Þú getur tekið út þetta íforrit."
@@ -8320,19 +8166,15 @@ msgid ""
 msgstr ""
 "Þú þarft að hafa tölvu tengda við dreamboxið. Ef þú þarft nánari upplýsingar "
 "þá skoðaðu síðuna http://www.dm7025.de.\n"
-"Vuplusið verður núna stoppað. Eftir að þú hefur uppfært samkvæmt "
+"Dreamboxið verður núna stoppað. Eftir að þú hefur uppfært samkvæmt "
 "leiðbeinungunum á síðunni þá mun nýja stýrikerfið biðja þig um að setja "
 "aftur inn afritið."
 
-#
 msgid ""
-"You need to set a pin code and hide it from your children.\n"
+"You need to set a PIN code and hide it from your children.\n"
 "\n"
 "Do you want to set the pin now?"
 msgstr ""
-"Þú þarft að velja númer og fela hann fyrir börnunum.\n"
-"\n"
-"Viltu búa til númerið núna?"
 
 msgid ""
 "You successfully configured a new AutoTimer. Do you want to add it to the "
@@ -8353,34 +8195,34 @@ msgstr ""
 "Vinsamlega staðfestu að það á að vera svo, ef ekki þá verður það tekið út."
 
 msgid ""
-"Your Vuplus is now ready to use.\n"
+"Your Dreambox is now ready to use.\n"
 "\n"
 "Your internet connection is working now.\n"
 "\n"
 msgstr ""
-"Vuplusið þitt er nú tilbúið til notkunar.\n"
+"Dreamboxið þitt er nú tilbúið til notkunar.\n"
 "\n"
 "Veraldarvefs tengingin er virk núna.\n"
 "\n"
 
 #
 msgid ""
-"Your Vuplus is now ready to use.\n"
+"Your Dreambox is now ready to use.\n"
 "\n"
 "Your internet connection is working now.\n"
 "\n"
 "Please press OK to continue."
 msgstr ""
-"Vuplusið þitt er tilbúið til notkunar.\n"
+"Dreamboxið þitt er tilbúið til notkunar.\n"
 "\n"
 "Veraldarvefs tengingu er komið á.\n"
 "\n"
 "Ýttu á OK til að halda áfram."
 
 #
-msgid "Your Vuplus will restart after pressing OK on your remote control."
+msgid "Your Dreambox will restart after pressing OK on your remote control."
 msgstr ""
-"Vuplusið þitt mun endurræsa sig eftir að þú ýtir á OK á fjarstýringunni."
+"Dreamboxið þitt mun endurræsa sig eftir að þú ýtir á OK á fjarstýringunni."
 
 #
 msgid ""
@@ -8409,13 +8251,13 @@ msgstr "Núverandi safn þitt mun glatast!"
 
 #
 msgid "Your dreambox is shutting down. Please stand by..."
-msgstr "Vuplusið er að slökkva á sér. Vinsamlega bíðið..."
+msgstr "Dreamboxið er að slökkva á sér. Vinsamlega bíðið..."
 
 #
 msgid ""
 "Your dreambox isn't connected to the internet properly. Please check it and "
 "try again."
-msgstr "Vuplusið er ekki tengt við internetið. Athugaðu það og reyndu aftur."
+msgstr "Dreamboxið er ekki tengt við internetið. Athugaðu það og reyndu aftur."
 
 #
 msgid "Your email address:"
@@ -8734,10 +8576,6 @@ msgid "chapters"
 msgstr "kaflar"
 
 #
-msgid "choose destination directory"
-msgstr "veldu ákvörðunar möppu"
-
-#
 msgid "circular left"
 msgstr "hringpólun vinstri"
 
@@ -8769,7 +8607,7 @@ msgstr "tengt"
 msgid "continue"
 msgstr "halda áfram"
 
-msgid "control multiple Vupluses with different RCs"
+msgid "control multiple Dreamboxes with different RCs"
 msgstr ""
 
 #
@@ -8943,10 +8781,6 @@ msgstr "fara út úr netkorta lista"
 #
 msgid "exit networkadapter setup menu"
 msgstr "hætta í netkorts stillingum"
-
-#
-msgid "failed"
-msgstr "tókst ekki"
 
 #
 msgid "fileformats (BMP, PNG, JPG, GIF)"
@@ -9219,6 +9053,9 @@ msgstr "ekki stillt"
 msgid "not locked"
 msgstr "ekki læst"
 
+msgid "not supported"
+msgstr ""
+
 #
 msgid "not used"
 msgstr "ekki notað"
@@ -9436,20 +9273,12 @@ msgid "select"
 msgstr "veldu"
 
 #
-msgid "select .NFI flash file"
-msgstr "veldu .NFI stýrikerfis skrá"
-
-#
 msgid "select CAId"
 msgstr "veldu CAId"
 
 #
 msgid "select CAId's"
 msgstr "veldu CAId"
-
-#
-msgid "select image from server"
-msgstr "veldu stýrikerfi frá vefþjón"
 
 #
 msgid "select interface"
@@ -9467,9 +9296,8 @@ msgstr "veldu mynd"
 msgid "select the movie path"
 msgstr "velja slóð að mynd"
 
-#
-msgid "service pin"
-msgstr "rása kóði"
+msgid "service PIN"
+msgstr ""
 
 msgid "set enigma2 to standby-mode after startup"
 msgstr ""
@@ -9477,9 +9305,8 @@ msgstr ""
 msgid "sets the Audio Delay (LipSync)"
 msgstr "stilla hljóð seinkum (LipSync)"
 
-#
-msgid "setup pin"
-msgstr "kóði valmyndar"
+msgid "setup PIN"
+msgstr ""
 
 #
 msgid "show DVD main menu"
@@ -9667,6 +9494,9 @@ msgstr "setja merki á núverandi stað"
 msgid "toggle time, chapter, audio, subtitle info"
 msgstr "skipta á milli tíma, kafla, undirtexta upplýsingar"
 
+msgid "tuner is not supported"
+msgstr ""
+
 #
 msgid "unavailable"
 msgstr "ekki tiltækt"
@@ -9689,10 +9519,10 @@ msgstr "þartil biðstaða/endurræsa"
 msgid "use as HDD replacement"
 msgstr "nota í staðinn fyrir harðan disk"
 
-msgid "use your Vuplus as Web proxy"
+msgid "use your Dreambox as Web proxy"
 msgstr ""
 
-msgid "use your Vuplus as Web proxy."
+msgid "use your Dreambox as Web proxy."
 msgstr ""
 
 #
@@ -9755,8 +9585,8 @@ msgid ""
 "your dreambox might be unusable now. Please consult the manual for further "
 "assistance before rebooting your dreambox."
 msgstr ""
-"Vuplusið þitt gæti verið óstöðugt núna.  Athugaðu leiðbeiningar um aðstoð "
-"með að endurræsa Vuplusið."
+"Dreamboxið þitt gæti verið óstöðugt núna.  Athugaðu leiðbeiningar um aðstoð "
+"með að endurræsa Dreamboxið."
 
 #
 msgid "zap"
@@ -9827,8 +9657,19 @@ msgstr "stokkið"
 #~ msgstr "* Bara virkt þegar slegið er inn falið SSID eða aðgangslykil"
 
 #
+#~ msgid ".NFI Download failed:"
+#~ msgstr ".NFI Niðurhal tókst ekki:"
+
+#
 #~ msgid ".NFI Flasher bootable USB stick successfully created."
 #~ msgstr ".NFI keyranlegt stýrikerfi af USB staut tilbúið."
+
+#
+#~ msgid ""
+#~ ".NFI file passed md5sum signature check. You can safely flash this image!"
+#~ msgstr ""
+#~ ".NFI skráin stóðst md5sum undirskrifta próf. Þú getur notað þetta "
+#~ "stýrikerfi!"
 
 #
 #~ msgid "/usr/share/enigma2 directory"
@@ -9861,7 +9702,7 @@ msgstr "stokkið"
 #
 #~ msgid ""
 #~ "A sleep timer want's to set your\n"
-#~ "Vuplus to standby. Do that now?"
+#~ "Dreambox to standby. Do that now?"
 #~ msgstr ""
 #~ "Búið er að stilla tímann núna til\n"
 #~ "að setja á biðstöðu. Gera það núna?"
@@ -9873,7 +9714,7 @@ msgstr "stokkið"
 #
 #~ msgid ""
 #~ "A sleep timer want's to shut down\n"
-#~ "your Vuplus. Shutdown now?"
+#~ "your Dreambox. Shutdown now?"
 #~ msgstr ""
 #~ "Búið er að stilla tímann núna til að\n"
 #~ "slökkva á boxinu. Gera það núna?"
@@ -9970,6 +9811,21 @@ msgstr "stokkið"
 #~ msgid "Call monitoring"
 #~ msgstr "Fylgist með hringingum"
 
+#~ msgid "Cannot parse feed directory"
+#~ msgstr "Get ekki skoðað fæði möppu"
+
+#~ msgid "Change dir."
+#~ msgstr "Breyta möppu."
+
+#~ msgid "Change service pin"
+#~ msgstr "Breyta rása aðgangskóða"
+
+#~ msgid "Change service pins"
+#~ msgstr "Breyta rása aðgangskóðum"
+
+#~ msgid "Change setup pin"
+#~ msgstr "Breyta valmynda kóða"
+
 #
 #~ msgid "Choose Location"
 #~ msgstr "Velja staðsetningu"
@@ -10013,10 +9869,6 @@ msgstr "stokkið"
 #~ "retrying..."
 
 #
-#~ msgid "Continue"
-#~ msgstr "Áfram"
-
-#
 #~ msgid "Copying USB flasher boot image to stick..."
 #~ msgstr "Afrita keyranlegt USB stýrikerfi yfir á staut..."
 
@@ -10045,12 +9897,23 @@ msgstr "stokkið"
 #~ msgstr "Sjálfgefnar stillingar"
 
 #
+#~ msgid "Destination directory"
+#~ msgstr "Endanleg mappa"
+
+#~ msgid "Details for extension: "
+#~ msgstr "Nánari upplýsingar:"
+
+#
 #~ msgid "Device Setup..."
 #~ msgstr "Uppsetning tækja..."
 
 #
 #~ msgid "DiSEqC Mode"
 #~ msgstr "DiSEqC Gerð"
+
+#
+#~ msgid "Disable Subtitles"
+#~ msgstr "Ekki undirtexta"
 
 #
 #~ msgid "Disable subtitles"
@@ -10096,7 +9959,7 @@ msgstr "stokkið"
 
 #
 #~ msgid "Do you want to enable the parental control feature or your dreambox?"
-#~ msgstr "Viltu gera barnalæsingu virka í Vuplusinu?"
+#~ msgstr "Viltu gera barnalæsingu virka í Dreamboxinu?"
 
 #
 #~ msgid ""
@@ -10115,11 +9978,15 @@ msgstr "stokkið"
 #~ msgstr "Búinn - %d pakkar settir inn eða upp færðir með %d villum"
 
 #
+#~ msgid "Download of USB flasher boot image failed: "
+#~ msgstr "Niðurhleðsla keyranlegs USB stýrikerfis tóks ekki:"
+
+#
 #~ msgid "Downloading image description..."
 #~ msgstr "Hleð niður lýsingu stýrikerfis..."
 
 #
-#~ msgid "Vuplus to standby. Do that now?"
+#~ msgid "Dreambox to standby. Do that now?"
 #~ msgstr "Fara í biðstöðu. Gera það núna?"
 
 #
@@ -10177,6 +10044,13 @@ msgstr "stokkið"
 #
 #~ msgid "Filesystem Check..."
 #~ msgstr "Skráarkerfis athugun...."
+
+#
+#~ msgid ""
+#~ "First we need to download the latest boot environment for the USB flasher."
+#~ msgstr ""
+#~ "Fyrst þarf að hala niður nýjustu uppfærslum til að búa til keyranlegan "
+#~ "USB Staut. "
 
 #
 #~ msgid "Fix USB stick"
@@ -10239,6 +10113,10 @@ msgstr "stokkið"
 #~ msgstr "Ef þú getur séð þessa mynd, ýttu þá á OK."
 
 #
+#~ msgid "Image flash utility"
+#~ msgstr "Tól fyrir forritun stýrikerfis"
+
+#
 #~ msgid "Image-Upgrade"
 #~ msgstr "Uppfærsla stýrikerfi"
 
@@ -10253,6 +10131,14 @@ msgstr "stokkið"
 #
 #~ msgid "Install software updates..."
 #~ msgstr "Setja inn hugbúnaðar uppfærslur..."
+
+#
+#~ msgid "Integrated Ethernet"
+#~ msgstr "Innbyggt Netkort"
+
+#
+#~ msgid "Integrated Wireless"
+#~ msgstr "Innbyggt þráðlaust"
 
 #
 #~ msgid "Interface: %s"
@@ -10279,7 +10165,7 @@ msgstr "stokkið"
 #~ msgstr "Tungumál..."
 
 #
-#~ msgid "Lets you view/edit files in your Vuplus"
+#~ msgid "Lets you view/edit files in your Dreambox"
 #~ msgstr "Leyfir skoðun/breytingu á skrám Dreaboxins þíns"
 
 #
@@ -10311,8 +10197,16 @@ msgstr "stokkið"
 #~ msgstr "Netkerfi..."
 
 #
+#~ msgid "New pin"
+#~ msgstr "Nýr kóði"
+
+#
 #~ msgid "No 50 Hz, sorry. :("
 #~ msgstr "Ekki 50 Hz, því miður. :("
+
+#
+#~ msgid "No useable USB stick found"
+#~ msgstr "Ekkert nothæfur USB stautur fannst"
 
 #
 #~ msgid ""
@@ -10375,6 +10269,10 @@ msgstr "stokkið"
 #~ msgstr "Upplýsingar um pakka:"
 
 #
+#~ msgid "Page"
+#~ msgstr "Blaðsíða"
+
+#
 #~ msgid "Parental Control"
 #~ msgstr "Foreldra stýring"
 
@@ -10387,8 +10285,31 @@ msgstr "stokkið"
 #~ msgstr "Bý til diskhluta á USB staut..."
 
 #
+#~ msgid "Please choose .NFI image file from feed server to download"
+#~ msgstr "Vinsamlega veldu .NFI af strauma vefþjón til að hlaða niður"
+
+#~ msgid ""
+#~ "Please disconnect all USB devices from your Dreambox and (re-)attach the "
+#~ "target USB stick (minimum size is 64 MB) now!"
+#~ msgstr ""
+#~ "Vinsamlegast aftengið allt frá USB tengjum á Dreamboxinu þínu og tengið "
+#~ "USB stautinn sem að þú ætlar að nota (minnst 64 MB) núna!"
+
+#
+#~ msgid "Please enter the old pin code"
+#~ msgstr "Sláðu inn gamla kóðann"
+
+#
+#~ msgid "Please select .NFI flash image file from medium"
+#~ msgstr "Vinsamlega veldu .NFI stýrikerfi frá geymslu"
+
+#
 #~ msgid "Please select keyword to filter..."
 #~ msgstr "Veldu orð til að leita út..."
+
+#
+#~ msgid "Please select target directory or medium"
+#~ msgstr "Vinsamlega veldu möppu eða geymslu"
 
 #
 #~ msgid "Please wait for md5 signature verification..."
@@ -10413,6 +10334,10 @@ msgstr "stokkið"
 #
 #~ msgid "Predefined satellite"
 #~ msgstr "Fyrirfram stilltur gervihnöttur"
+
+#
+#~ msgid "Press OK to view full changelog"
+#~ msgstr "Ýttu á OK til að skoða breytingaskýrslu"
 
 #
 #~ msgid "RSS Feed URI"
@@ -10469,8 +10394,19 @@ msgstr "stokkið"
 #~ "núna?"
 
 #
+#~ msgid "Reenter new pin"
+#~ msgstr "Sláðu aftur inn kóða"
+
+#
 #~ msgid "Refresh"
 #~ msgstr "Hressa"
+
+#
+#~ msgid "Remember service pin"
+#~ msgstr "Muna kóða fyrir rásir"
+
+#~ msgid "Remember service pin cancel"
+#~ msgstr "Gleyma kóða fyrir rásir"
 
 #
 #~ msgid "Remounting stick partition..."
@@ -10479,6 +10415,13 @@ msgstr "stokkið"
 #
 #~ msgid "Remove service"
 #~ msgstr "Eyða rás"
+
+#~ msgid "Remove the broken .NFI file?"
+#~ msgstr "Taka út skemmda .NFI skrá?"
+
+#
+#~ msgid "Remove the incomplete .NFI file?"
+#~ msgstr "Taka út skemmda .NFI skrá?"
 
 #
 #~ msgid "Replace current playlist"
@@ -10525,6 +10468,13 @@ msgstr "stokkið"
 #~ "netkortinu\n"
 
 #
+#~ msgid ""
+#~ "Scan your network for wireless Access Points and connect to them using "
+#~ "your selected wireless device.\n"
+#~ msgstr ""
+#~ "Leita að þráðlausu neti og tengja svo með völdu þráðlausu netkorti.\n"
+
+#
 #~ msgid "Secondary cable from motorized LNB"
 #~ msgstr "Seinni kapall frá mótorstýrðum nema"
 
@@ -10537,8 +10487,20 @@ msgstr "stokkið"
 #~ msgstr "Velja aðra rás"
 
 #
+#~ msgid "Select audio mode"
+#~ msgstr "Veldu hljóð stillingu"
+
+#
+#~ msgid "Select files for backup. Currently selected:\n"
+#~ msgstr "Veldu skrár fyrir afrit. Núþegar valið:\n"
+
+#
 #~ msgid "Select files/folders to backup..."
 #~ msgstr "Veldur skrár/möppur til afritunar..."
+
+#
+#~ msgid "Select image"
+#~ msgstr "Veldu stýrikerfi"
 
 #
 #~ msgid "Select reference service"
@@ -10547,6 +10509,10 @@ msgstr "stokkið"
 #
 #~ msgid "Select video input"
 #~ msgstr "Veldu mynd inngang"
+
+#
+#~ msgid "Selected source image"
+#~ msgstr "Veldu grunn stýrikerfi"
 
 #
 #~ msgid "Service scan type needed"
@@ -10619,6 +10585,10 @@ msgstr "stokkið"
 #~ msgstr "Þrep"
 
 #
+#~ msgid "Stereo"
+#~ msgstr "Víðóma"
+
+#
 #~ msgid "Swap services"
 #~ msgstr "Skipta á milli rása"
 
@@ -10635,6 +10605,40 @@ msgstr "stokkið"
 #~ "móttakaranum þá getur þú valið stýrikerfi frá stautnum!"
 
 #
+#~ msgid ""
+#~ "The USB stick is now bootable. Do you want to download the latest image "
+#~ "from the feed server and save it on the stick?"
+#~ msgstr ""
+#~ "USB stauturinn er ræsanlegur núna. Viltu hlaða niður nýjasta "
+#~ "stýrikerfninu frá vefþjóninum og vista það á stautinn?"
+
+#
+#~ msgid ""
+#~ "The md5sum validation failed, the file may be corrupted! Are you sure "
+#~ "that you want to burn this image to flash memory? You are doing this at "
+#~ "your own risk!"
+#~ msgstr ""
+#~ "Staðfesting md5sum tókst ekki, skráin gæti verið skemmd! Ertu viss um að "
+#~ "þú viljir setja þetta stýrikerfi inn í minni? Það er ekki mælt með því að "
+#~ "gera það!"
+
+#
+#~ msgid ""
+#~ "The md5sum validation failed, the file may be downloaded incompletely or "
+#~ "be corrupted!"
+#~ msgstr ""
+#~ "Staðfesting md5sum tókst ekki, það gæti vantað hluta á skrána eða þá að "
+#~ "hún sé skemmd!"
+
+#
+#~ msgid "The pin code has been changed successfully."
+#~ msgstr "Það tókst að breyta kóðanum."
+
+#
+#~ msgid "The pin codes you entered are different."
+#~ msgstr "Kóðarnir sem þú slóst inn eru ekki eins."
+
+#
 #~ msgid "The sleep timer has been acitvated."
 #~ msgstr "Tímastilling fyrir biðstöðu er virkur."
 
@@ -10643,8 +10647,28 @@ msgstr "stokkið"
 #~ msgstr "Það er ekkert sem þarf að gera."
 
 #
-#~ msgid "This Vuplus can't decode %s video streams!"
-#~ msgstr "Þetta Vuplus getur ekki spilað %s mynd strauma!"
+#~ msgid "This .NFI file does not contain a valid %s image!"
+#~ msgstr "Þessi .NFI skrá inniheldur ekki %s stýrikerfi í lagi!"
+
+#
+#~ msgid ""
+#~ "This .NFI file does not have a md5sum signature and is not guaranteed to "
+#~ "work. Do you really want to burn this image to flash memory?"
+#~ msgstr ""
+#~ "Þessi .NFI skrá er ekki með md5sum undirskrift og er ekki hægt að tryggja "
+#~ "að hún virki. Viltu örugglega forrita hana inn í minni?"
+
+#
+#~ msgid ""
+#~ "This .NFI file has a valid md5 signature. Continue programming this image "
+#~ "to flash memory?"
+#~ msgstr ""
+#~ "Þessi .NFI skrá er með gilda md5 undirskrift. Viltu halda áfram að "
+#~ "forrita minni móttakarans með henni?"
+
+#
+#~ msgid "This Dreambox can't decode %s video streams!"
+#~ msgstr "Þetta Dreambox getur ekki spilað %s mynd strauma!"
 
 #
 #~ msgid "This is unsupported at the moment."
@@ -10673,6 +10697,22 @@ msgstr "stokkið"
 #~ "Ýttu á OK þegar þú er búinn að taka hann úr sambandi."
 
 #
+#~ msgid ""
+#~ "To update your Dreambox firmware, please follow these steps:\n"
+#~ "1) Turn off your box with the rear power switch and plug in the bootable "
+#~ "USB stick.\n"
+#~ "2) Turn mains back on and hold the DOWN button on the front panel pressed "
+#~ "for 10 seconds.\n"
+#~ "3) Wait for bootup and follow instructions of the wizard."
+#~ msgstr ""
+#~ "Til að uppfæra stýrikerfi Dreamboxins, fylgdu þá þessum leiðbeiningum:\n"
+#~ "1) Slökktu á móttakaranum með rofanum aftaná og settu inn startanlega USB "
+#~ "stautinn í USB tengið.\n"
+#~ "2) Kveiktu á rofanum aftaná móttakaranum og haldu inni NIÐUR takkanum á "
+#~ "framhlið móttakarans í 10 sekúndur eftir það.\n"
+#~ "3) Bíðið eftir ræsingu og fylgdu leiðbeiningunum á skjánum."
+
+#
 #~ msgid "Transpondertype"
 #~ msgstr "Gerð sendis"
 
@@ -10683,6 +10723,13 @@ msgstr "stokkið"
 #
 #~ msgid "USB"
 #~ msgstr "USB"
+
+#~ msgid ""
+#~ "USB stick wizard finished. Your dreambox will now restart with your new "
+#~ "image!"
+#~ msgstr ""
+#~ "USB stauts ráðgjafi er búinn. Dreamboxið mun nú endurræsa nýja "
+#~ "stýrikerfinu!"
 
 #
 #~ msgid ""
@@ -10719,8 +10766,8 @@ msgstr "stokkið"
 #~ msgstr "Uppfærsla"
 
 #
-#~ msgid "Upgrade finished. Do you want to reboot your Vuplus?"
-#~ msgstr "Uppfærslu lokið. Viltu endurræsa Vuplusinu þínu?"
+#~ msgid "Upgrade finished. Do you want to reboot your Dreambox?"
+#~ msgstr "Uppfærslu lokið. Viltu endurræsa Dreamboxinu þínu?"
 
 #
 #~ msgid "Usage Settings"
@@ -10762,6 +10809,14 @@ msgstr "stokkið"
 #~ msgstr "Hvað skal gera við hrunskýrslur:"
 
 #
+#~ msgid "Wireless"
+#~ msgstr "Þráðlaust"
+
+#
+#~ msgid "Writing NFI image file to flash completed"
+#~ msgstr "Búið að skrifa .NFI stýrikerfi í minni"
+
+#
 #~ msgid "Writing image file to NAND Flash"
 #~ msgstr "Skrifa stýrikerfi í NAND Flash"
 
@@ -10779,7 +10834,7 @@ msgstr "stokkið"
 
 #
 #~ msgid ""
-#~ "You do not seem to have a harddisk in your Vuplus. So backing up to a "
+#~ "You do not seem to have a harddisk in your Dreambox. So backing up to a "
 #~ "harddisk is not an option for you."
 #~ msgstr ""
 #~ "Þú ert ekki með harðan disk í boxinu svo að afritun á harðan disk er ekki "
@@ -10826,6 +10881,16 @@ msgstr "stokkið"
 #~ "Viltu setja inn orð núna?"
 
 #
+#~ msgid ""
+#~ "You need to set a pin code and hide it from your children.\n"
+#~ "\n"
+#~ "Do you want to set the pin now?"
+#~ msgstr ""
+#~ "Þú þarft að velja númer og fela hann fyrir börnunum.\n"
+#~ "\n"
+#~ "Viltu búa til númerið núna?"
+
+#
 #~ msgid "You selected a playlist"
 #~ msgstr "Þú valdir spilunarlista"
 
@@ -10870,6 +10935,10 @@ msgstr "stokkið"
 #~ msgstr "by Exif"
 
 #
+#~ msgid "choose destination directory"
+#~ msgstr "veldu ákvörðunar möppu"
+
+#
 #~ msgid "color"
 #~ msgstr "litur"
 
@@ -10896,6 +10965,10 @@ msgstr "stokkið"
 #
 #~ msgid "exit network adapter setup menu"
 #~ msgstr "hætta í netkorts stillingum"
+
+#
+#~ msgid "failed"
+#~ msgstr "tókst ekki"
 
 #
 #~ msgid "font face"
@@ -11006,8 +11079,24 @@ msgstr "stokkið"
 #~ "%d rásir fundust!"
 
 #
+#~ msgid "select .NFI flash file"
+#~ msgstr "veldu .NFI stýrikerfis skrá"
+
+#
 #~ msgid "select Slot"
 #~ msgstr "veldu hólf"
+
+#
+#~ msgid "select image from server"
+#~ msgstr "veldu stýrikerfi frá vefþjón"
+
+#
+#~ msgid "service pin"
+#~ msgstr "rása kóði"
+
+#
+#~ msgid "setup pin"
+#~ msgstr "kóði valmyndar"
 
 #
 #~ msgid "show first tag"
@@ -11046,5 +11135,5 @@ msgstr "stokkið"
 #~ msgstr "ár"
 
 #
-#~ msgid "your Vuplus. Shutdown now?"
-#~ msgstr "Vuplusið þitt. Slökkva núna?"
+#~ msgid "your Dreambox. Shutdown now?"
+#~ msgstr "Dreamboxið þitt. Slökkva núna?"

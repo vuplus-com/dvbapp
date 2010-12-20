@@ -28,7 +28,7 @@ from Components.Network import iNetwork
 from Tools.Directories import pathExists, fileExists, resolveFilename, SCOPE_PLUGINS, SCOPE_CURRENT_PLUGIN, SCOPE_CURRENT_SKIN, SCOPE_METADIR
 from Tools.LoadPixmap import LoadPixmap
 from Tools.NumericalTextInput import NumericalTextInput
-from enigma import eTimer, quitMainloop, RT_HALIGN_LEFT, RT_VALIGN_CENTER, eListboxPythonMultiContent, eListbox, gFont, getDesktop, ePicLoad, eRCInput, getPrevAsciiCode
+from enigma import eTimer, quitMainloop, RT_HALIGN_LEFT, RT_VALIGN_CENTER, eListboxPythonMultiContent, eListbox, gFont, getDesktop, ePicLoad, eRCInput, getPrevAsciiCode, eEnv
 from cPickle import dump, load
 from os import path as os_path, system as os_system, unlink, stat, mkdir, popen, makedirs, listdir, access, rename, remove, W_OK, R_OK, F_OK
 from time import time, gmtime, strftime, localtime
@@ -43,7 +43,7 @@ from SoftwareTools import iSoftwareTools
 
 config.plugins.configurationbackup = ConfigSubsection()
 config.plugins.configurationbackup.backuplocation = ConfigText(default = '/media/hdd/', visible_width = 50, fixed_size = False)
-config.plugins.configurationbackup.backupdirs = ConfigLocations(default=['/etc/enigma2/', '/etc/network/interfaces', '/etc/wpa_supplicant.conf', '/etc/resolv.conf', '/etc/default_gw', '/etc/hostname'])
+config.plugins.configurationbackup.backupdirs = ConfigLocations(default=[eEnv.resolve('${sysconfdir}/enigma2/'), '/etc/network/interfaces', '/etc/wpa_supplicant.conf', '/etc/resolv.conf', '/etc/default_gw', '/etc/hostname'])
 
 config.plugins.SoftwareManager = ConfigSubsection()
 config.plugins.SoftwareManager.overwriteConfigFiles = ConfigSelection(
@@ -609,6 +609,7 @@ class PluginManager(Screen, DreamInfoHandler):
 				statuspng = LoadPixmap(cached=True, path=resolveFilename(SCOPE_CURRENT_PLUGIN, "SystemPlugins/SoftwareManager/upgrade.png"))
 				self.statuslist.append(( _("Package list update"), '', _("Searching for new installed or removed packages. Please wait..." ),'', '', statuspng, divpng, None, '' ))
 			elif status == 'error':
+				self["key_green"].setText(_("Continue"))
 				statuspng = LoadPixmap(cached=True, path=resolveFilename(SCOPE_CURRENT_PLUGIN, "SystemPlugins/SoftwareManager/remove.png"))
 				self.statuslist.append(( _("Error"), '', _("There was an error downloading the packetlist. Please try again." ),'', '', statuspng, divpng, None, '' ))
 			self["list"].style = "default"
@@ -616,8 +617,11 @@ class PluginManager(Screen, DreamInfoHandler):
 
 
 	def getUpdateInfos(self):
-		self.setState('update')
-		iSoftwareTools.startSoftwareTools(self.getUpdateInfosCB)
+		if (iSoftwareTools.lastDownloadDate is not None and iSoftwareTools.NetworkConnectionAvailable is False):
+			self.rebuildList()
+		else:
+			self.setState('update')
+			iSoftwareTools.startSoftwareTools(self.getUpdateInfosCB)
 
 	def getUpdateInfosCB(self, retval = None):
 		if retval is not None:
@@ -628,11 +632,17 @@ class PluginManager(Screen, DreamInfoHandler):
 					self["status"].setText(_("There are no updates available."))
 				self.rebuildList()
 			elif retval is False:
-				self.setState('error')
-				if iSoftwareTools.NetworkConnectionAvailable:
-					self["status"].setText(_("Updatefeed not available."))
+				if iSoftwareTools.lastDownloadDate is None:
+					self.setState('error')
+					if iSoftwareTools.NetworkConnectionAvailable:
+						self["status"].setText(_("Updatefeed not available."))
+					else:
+						self["status"].setText(_("No network connection available."))
 				else:
-					self["status"].setText(_("No network connection available."))
+					iSoftwareTools.lastDownloadDate = time()
+					iSoftwareTools.list_updating = True
+					self.setState('update')
+					iSoftwareTools.getUpdates(self.getUpdateInfosCB)					
 
 	def rebuildList(self, retval = None):
 		if self.currentSelectedTag is None:
@@ -650,10 +660,14 @@ class PluginManager(Screen, DreamInfoHandler):
 					self["key_green"].setText(_("Uninstall"))
 				elif current[4] == 'installable':
 					self["key_green"].setText(_("Install"))
+					if iSoftwareTools.NetworkConnectionAvailable is False:
+						self["key_green"].setText("")
 				elif current[4] == 'remove':
 					self["key_green"].setText(_("Undo uninstall"))
 				elif current[4] == 'install':
 					self["key_green"].setText(_("Undo install"))
+					if iSoftwareTools.NetworkConnectionAvailable is False:
+						self["key_green"].setText("")
 				self["key_yellow"].setText(_("View details"))
 				self["key_blue"].setText("")
 				if len(self.selectedFiles) == 0 and iSoftwareTools.available_updates is not 0:
@@ -703,21 +717,31 @@ class PluginManager(Screen, DreamInfoHandler):
 							if entry[0] == detailsFile:
 								alreadyinList = True
 						if not alreadyinList:
-							self.selectedFiles.append((detailsFile,current[4],current[3]))
-							self.currentSelectedPackage = ((detailsFile,current[4],current[3]))
+							if (iSoftwareTools.NetworkConnectionAvailable is False and current[4] in ('installable','install')):
+								pass
+							else:
+								self.selectedFiles.append((detailsFile,current[4],current[3]))
+								self.currentSelectedPackage = ((detailsFile,current[4],current[3]))
 					if current[4] == 'installed':
 						self.list[idx] = self.buildEntryComponent(current[0], current[1], current[2], current[3], 'remove', True)
 					elif current[4] == 'installable':
-						self.list[idx] = self.buildEntryComponent(current[0], current[1], current[2], current[3], 'install', True)
+						if iSoftwareTools.NetworkConnectionAvailable:
+							self.list[idx] = self.buildEntryComponent(current[0], current[1], current[2], current[3], 'install', True)
 					elif current[4] == 'remove':
 						self.list[idx] = self.buildEntryComponent(current[0], current[1], current[2], current[3], 'installed', False)
 					elif current[4] == 'install':
-						self.list[idx] = self.buildEntryComponent(current[0], current[1], current[2], current[3], 'installable',False)
+						if iSoftwareTools.NetworkConnectionAvailable:
+							self.list[idx] = self.buildEntryComponent(current[0], current[1], current[2], current[3], 'installable',False)
 					self["list"].setList(self.list)
 					self["list"].setIndex(idx)
 					self["list"].updateList(self.list)
 					self.selectionChanged()
-
+			elif self.currList == "status":
+				iSoftwareTools.lastDownloadDate = time()
+				iSoftwareTools.list_updating = True
+				self.setState('update')
+				iSoftwareTools.getUpdates(self.getUpdateInfosCB)
+				
 	def handleSelected(self):
 		current = self["list"].getCurrent()
 		if current:
@@ -1187,7 +1211,10 @@ class PluginDetails(Screen, DreamInfoHandler):
 		self["author"].setText(_("Author: ") + self.author)
 		self["detailtext"].setText(_(self.description))
 		if self.pluginstate in ('installable', 'install'):
-			self["key_green"].setText(_("Install"))
+			if iSoftwareTools.NetworkConnectionAvailable:
+				self["key_green"].setText(_("Install"))
+			else:
+				self["key_green"].setText("")
 		else:
 			self["key_green"].setText(_("Remove"))
 
@@ -1202,7 +1229,10 @@ class PluginDetails(Screen, DreamInfoHandler):
 		if thumbnailUrl is not None:
 			self.thumbnail = "/tmp/" + thumbnailUrl.split('/')[-1]
 			print "[PluginDetails] downloading screenshot " + thumbnailUrl + " to " + self.thumbnail
-			client.downloadPage(thumbnailUrl,self.thumbnail).addCallback(self.setThumbnail).addErrback(self.fetchFailed)
+			if iSoftwareTools.NetworkConnectionAvailable:
+				client.downloadPage(thumbnailUrl,self.thumbnail).addCallback(self.setThumbnail).addErrback(self.fetchFailed)
+			else:
+				self.setThumbnail(noScreenshot = True)
 		else:
 			self.setThumbnail(noScreenshot = True)
 
@@ -1242,11 +1272,12 @@ class PluginDetails(Screen, DreamInfoHandler):
 					if len(self.cmdList):
 						self.session.openWithCallback(self.runRemove, MessageBox, _("Do you want to remove the package:\n") + self.pluginname + "\n" + self.oktext)
 		else:
-			if self.packagefiles:
-				for package in self.packagefiles[:]:
-					self.cmdList.append((IpkgComponent.CMD_INSTALL, { "package": package["name"] }))
-					if len(self.cmdList):
-						self.session.openWithCallback(self.runUpgrade, MessageBox, _("Do you want to install the package:\n") + self.pluginname + "\n" + self.oktext)
+			if iSoftwareTools.NetworkConnectionAvailable:
+				if self.packagefiles:
+					for package in self.packagefiles[:]:
+						self.cmdList.append((IpkgComponent.CMD_INSTALL, { "package": package["name"] }))
+						if len(self.cmdList):
+							self.session.openWithCallback(self.runUpgrade, MessageBox, _("Do you want to install the package:\n") + self.pluginname + "\n" + self.oktext)
 
 	def runUpgrade(self, result):
 		if result:
@@ -1292,7 +1323,7 @@ class UpdatePlugin(Screen):
 			<widget name="activityslider" position="0,0" size="550,5"  />
 			<widget name="slider" position="0,150" size="550,30"  />
 			<widget source="package" render="Label" position="10,30" size="540,20" font="Regular;18" halign="center" valign="center" backgroundColor="#25062748" transparent="1" />
-			<widget source="status" render="Label" position="10,60" size="540,45" font="Regular;20" halign="center" valign="center" backgroundColor="#25062748" transparent="1" />
+			<widget source="status" render="Label" position="10,180" size="540,100" font="Regular;20" halign="center" valign="center" backgroundColor="#25062748" transparent="1" />
 		</screen>"""
 
 	def __init__(self, session, args = None):
@@ -1304,9 +1335,9 @@ class UpdatePlugin(Screen):
 		self["slider"] = self.slider
 		self.activityslider = Slider(0, 100)
 		self["activityslider"] = self.activityslider
-		self.status = StaticText(_("Upgrading STB... Please wait"))
+		self.status = StaticText(_("Please wait..."))
 		self["status"] = self.status
-		self.package = StaticText()
+		self.package = StaticText(_("Verifying your internet connection..."))
 		self["package"] = self.package
 		self.oktext = _("Press OK on your remote control to continue.")
 
@@ -1317,20 +1348,35 @@ class UpdatePlugin(Screen):
 		self.activity = 0
 		self.activityTimer = eTimer()
 		self.activityTimer.callback.append(self.doActivityTimer)
-		self.activityTimer.start(100, False)
 
 		self.ipkg = IpkgComponent()
 		self.ipkg.addCallback(self.ipkgCallback)
 
-		self.updating = True
-		self.package.setText(_("Package list update"))
-		self.ipkg.startCmd(IpkgComponent.CMD_UPDATE)
+		self.updating = False
 
 		self["actions"] = ActionMap(["WizardActions"], 
 		{
 			"ok": self.exit,
 			"back": self.exit
 		}, -1)
+		
+		iNetwork.checkNetworkState(self.checkNetworkCB)
+		self.onClose.append(self.cleanup)
+		
+	def cleanup(self):
+		iNetwork.stopPingConsole()
+
+	def checkNetworkCB(self,data):
+		if data is not None:
+			if data <= 2:
+				self.updating = True
+				self.activityTimer.start(100, False)
+				self.package.setText(_("Package list update"))
+				self.status.setText(_("Upgrading Dreambox... Please wait"))
+				self.ipkg.startCmd(IpkgComponent.CMD_UPDATE)
+			else:
+				self.package.setText(_("Your network is not working. Please try again."))
+				self.status.setText(self.oktext)
 
 	def doActivityTimer(self):
 		self.activity += 1
@@ -1386,8 +1432,8 @@ class UpdatePlugin(Screen):
 				self.activityTimer.stop()
 				self.activityslider.setValue(0)
 				
-				self.package.setText("")
-				self.status.setText(_("Done - Installed or upgraded %d packages") % self.packages + "\n\n" + self.oktext)
+				self.package.setText(_("Done - Installed or upgraded %d packages") % self.packages)
+				self.status.setText(self.oktext)
 			else:
 				self.activityTimer.stop()
 				self.activityslider.setValue(0)
@@ -1408,6 +1454,9 @@ class UpdatePlugin(Screen):
 			if self.packages != 0 and self.error == 0:
 				self.session.openWithCallback(self.exitAnswer, MessageBox, _("Upgrade finished.") +" "+_("Do you want to reboot your STB?"))
 			else:
+				self.close()
+		else:
+			if not self.updating:
 				self.close()
 
 	def exitAnswer(self, result):
@@ -1648,13 +1697,15 @@ class PacketManager(Screen, NumericalTextInput):
 		self.list_updating = True
 		self.packetlist = []
 		self.installed_packetlist = {}
+		self.upgradeable_packages = {}
 		self.Console = Console()
 		self.cmdList = []
 		self.cachelist = []
 		self.cache_ttl = 86400  #600 is default, 0 disables, Seconds cache is considered valid (24h should be ok for caching ipkgs)
-		self.cache_file = '/usr/lib/enigma2/python/Plugins/SystemPlugins/SoftwareManager/packetmanager.cache' #Path to cache directory	 
+		self.cache_file = eEnv.resolve('${libdir}/enigma2/python/Plugins/SystemPlugins/SoftwareManager/packetmanager.cache') #Path to cache directory
 		self.oktext = _("\nAfter pressing OK, please wait!")
 		self.unwanted_extensions = ('-dbg', '-dev', '-doc', 'busybox')
+		self.opkgAvail = fileExists('/usr/bin/opkg')
 
 		self.ipkg = IpkgComponent()
 		self.ipkg.addCallback(self.ipkgCallback)
@@ -1816,14 +1867,19 @@ class PacketManager(Screen, NumericalTextInput):
 	def IpkgList_Finished(self, result, retval, extra_args = None):
 		if result:
 			self.packetlist = []
+			last_name = ""
 			for x in result.splitlines():
-				tokens = x.split(' - ')   #self.blacklisted_packages
+				tokens = x.split(' - ') 
 				name = tokens[0].strip()
 				if not any(name.endswith(x) for x in self.unwanted_extensions):
 					l = len(tokens)
 					version = l > 1 and tokens[1].strip() or ""
 					descr = l > 2 and tokens[2].strip() or ""
+					if name == last_name:
+						continue
+					last_name = name 
 					self.packetlist.append([name, version, descr])
+
 		if not self.Console:
 			self.Console = Console()
 		cmd = "ipkg list_installed"
@@ -1833,30 +1889,47 @@ class PacketManager(Screen, NumericalTextInput):
 		if result:
 			self.installed_packetlist = {}
 			for x in result.splitlines():
-				tokens = x.split(' - ')   #self.blacklisted_packages
+				tokens = x.split(' - ')
 				name = tokens[0].strip()
 				if not any(name.endswith(x) for x in self.unwanted_extensions):
 					l = len(tokens)
 					version = l > 1 and tokens[1].strip() or ""
 					self.installed_packetlist[name] = version
-		self.buildPacketList()
+		if self.opkgAvail:
+			if not self.Console:
+				self.Console = Console()
+			cmd = "opkg list-upgradable"
+			self.Console.ePopen(cmd, self.OpkgListUpgradeable_Finished)
+		else:
+			self.buildPacketList()
 
+	def OpkgListUpgradeable_Finished(self, result, retval, extra_args = None):
+		if result:
+			self.upgradeable_packages = {}
+			for x in result.splitlines():
+				tokens = x.split(' - ')
+				name = tokens[0].strip()
+				if not any(name.endswith(x) for x in self.unwanted_extensions):
+					l = len(tokens)
+					version = l > 2 and tokens[2].strip() or ""
+					self.upgradeable_packages[name] = version
+		self.buildPacketList()
+	
 	def buildEntryComponent(self, name, version, description, state):
 		divpng = LoadPixmap(cached=True, path=resolveFilename(SCOPE_CURRENT_SKIN, "skin_default/div-h.png"))
 		if state == 'installed':
 			installedpng = LoadPixmap(cached=True, path=resolveFilename(SCOPE_CURRENT_PLUGIN, "SystemPlugins/SoftwareManager/installed.png"))
-			return((name, version, description, state, installedpng, divpng))	
+			return((name, version, _(description), state, installedpng, divpng))	
 		elif state == 'upgradeable':
 			upgradeablepng = LoadPixmap(cached=True, path=resolveFilename(SCOPE_CURRENT_PLUGIN, "SystemPlugins/SoftwareManager/upgradeable.png"))
-			return((name, version, description, state, upgradeablepng, divpng))	
+			return((name, version, _(description), state, upgradeablepng, divpng))	
 		else:
 			installablepng = LoadPixmap(cached=True, path=resolveFilename(SCOPE_CURRENT_PLUGIN, "SystemPlugins/SoftwareManager/installable.png"))
-			return((name, version, description, state, installablepng, divpng))
+			return((name, version, _(description), state, installablepng, divpng))
 
 	def buildPacketList(self):
 		self.list = []
 		self.cachelist = []
-
 		if self.cache_ttl > 0 and self.vc != 0:
 			print 'Loading packagelist cache from ',self.cache_file
 			try:
@@ -1872,23 +1945,27 @@ class PacketManager(Screen, NumericalTextInput):
 			print 'rebuilding fresh package list'
 			for x in self.packetlist:
 				status = ""
-				if self.installed_packetlist.has_key(x[0].strip()):
-					if self.installed_packetlist[x[0].strip()] == x[1].strip():
-						status = "installed"
-						self.list.append(self.buildEntryComponent(x[0].strip(), x[1].strip(), x[2].strip(), status))
+				if self.installed_packetlist.has_key(x[0]):
+					if self.opkgAvail:
+						if self.upgradeable_packages.has_key(x[0]):
+							status = "upgradeable"
+						else:
+							status = "installed"
 					else:
-						status = "upgradeable"
-						self.list.append(self.buildEntryComponent(x[0].strip(), x[1].strip(), x[2].strip(), status))
+						if self.installed_packetlist[x[0]] == x[1]:
+							status = "installed"
+						else:
+							status = "upgradeable"
 				else:
 					status = "installable"
-					self.list.append(self.buildEntryComponent(x[0].strip(), x[1].strip(), x[2].strip(), status))
-				if not any(x[0].strip().endswith(x) for x in self.unwanted_extensions):
-					self.cachelist.append([x[0].strip(), x[1].strip(), x[2].strip(), status])
+				self.list.append(self.buildEntryComponent(x[0], x[1], x[2], status))	
+				self.cachelist.append([x[0], x[1], x[2], status])
 			write_cache(self.cache_file, self.cachelist)
 			self['list'].setList(self.list)
 
 	def reloadPluginlist(self):
 		plugins.readPluginList(resolveFilename(SCOPE_PLUGINS))
+
 
 class IpkgInstaller(Screen):
 	skin = """

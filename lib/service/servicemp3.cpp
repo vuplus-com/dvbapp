@@ -1,5 +1,3 @@
-#ifdef HAVE_GSTREAMER
-
 	/* note: this requires gstreamer 0.10.x and a big list of plugins. */
 	/* it's currently hardcoded to use a big-endian alsasink as sink. */
 #include <lib/base/ebase.h>
@@ -48,7 +46,6 @@ eServiceFactoryMP3::eServiceFactoryMP3()
 		extensions.push_back("mp4");
 		extensions.push_back("mov");
 		extensions.push_back("m4a");
-		extensions.push_back("m2ts");
 		sc->addServiceFactory(eServiceFactoryMP3::id, this, extensions);
 	}
 
@@ -1792,6 +1789,3 @@ void eServiceMP3::setPCMDelay(int delay)
 	}
 }
 
-#else
-#warning gstreamer not available, not building media player
-#endif

@@ -7,7 +7,6 @@
 #include <stdio.h>
 
 eDVBTSTools::eDVBTSTools()
-	:m_file_lock(true)
 {
 	m_pid = -1;
 	m_maxrange = 256*1024;
@@ -23,19 +22,39 @@ eDVBTSTools::eDVBTSTools()
 	m_futile = 0;
 }
 
+void eDVBTSTools::closeSource()
+{
+	m_source = NULL;
+}
+
 eDVBTSTools::~eDVBTSTools()
 {
-	closeFile();
+	closeSource();
 }
 
 int eDVBTSTools::openFile(const char *filename, int nostreaminfo)
 {
+	eRawFile *f = new eRawFile();
+	ePtr<iTsSource> src = f;
+
+	if (f->open(filename, 1) < 0)
+		return -1;
+
+	setSource(src, nostreaminfo ? NULL : filename);
+
+	return 0;
+}
+
+void eDVBTSTools::setSource(ePtr<iTsSource> &source, const char *stream_info_filename)
+{
 	closeFile();
-	
-	if (!nostreaminfo)
+
+	m_source = source;
+
+	if (stream_info_filename)
 	{
-		eDebug("loading streaminfo for %s", filename);
-		m_streaminfo.load(filename);
+		eDebug("loading streaminfo for %s", stream_info_filename);
+		m_streaminfo.load(stream_info_filename);
 	}
 	
 	if (!m_streaminfo.empty())
@@ -45,19 +64,14 @@ int eDVBTSTools::openFile(const char *filename, int nostreaminfo)
 //		eDebug("no recorded stream information available");
 		m_use_streaminfo = 0;
 	}
-	
-	m_samples_taken = 0;
 
-	eSingleLocker l(m_file_lock);
-	if (m_file.open(filename, 1) < 0)
-		return -1;
-	return 0;
+	m_samples_taken = 0;
 }
 
 void eDVBTSTools::closeFile()
 {
-	eSingleLocker l(m_file_lock);
-	m_file.close();
+	if (m_source)
+		closeSource();
 }
 
 void eDVBTSTools::setSyncPID(int pid)
@@ -77,31 +91,24 @@ int eDVBTSTools::getPTS(off_t &offset, pts_t &pts, int fixed)
 		if (!m_streaminfo.getPTS(offset, pts))
 			return 0;
 	
-	if (!m_file.valid())
+	if (!m_source || !m_source->valid())
 		return -1;
 
 	offset -= offset % 188;
 
-	eSingleLocker l(m_file_lock);
-	if (m_file.lseek(offset, SEEK_SET) < 0)
-	{
-		eDebug("lseek failed");
-		return -1;
-	}
-	
 	int left = m_maxrange;
 	
 	while (left >= 188)
 	{
 		unsigned char packet[188];
-		if (m_file.read(packet, 188) != 188)
+		if (m_source->read(offset, packet, 188) != 188)
 		{
 			eDebug("read error");
 			break;
 		}
 		left -= 188;
 		offset += 188;
-		
+
 		if (packet[0] != 0x47)
 		{
 			eDebug("resync");
@@ -111,8 +118,8 @@ int eDVBTSTools::getPTS(off_t &offset, pts_t &pts, int fixed)
 				if (packet[i] == 0x47)
 					break;
 				++i;
+				--offset;
 			}
-			offset = m_file.lseek(i - 188, SEEK_CUR);
 			continue;
 		}
 		
@@ -204,6 +211,8 @@ int eDVBTSTools::getPTS(off_t &offset, pts_t &pts, int fixed)
 						case 0x55 ... 0x5f: // VC-1
 							break;
 						case 0x71: // AC3 / DTS
+							break;
+						case 0x72: // DTS - HD
 							break;
 						default:
 							eDebug("skip unknwn stream_id_extension %02x\n", payload[9+offs]);
@@ -404,7 +413,7 @@ int eDVBTSTools::getNextAccessPoint(pts_t &ts, const pts_t &start, int direction
 
 void eDVBTSTools::calcBegin()
 {
-	if (!m_file.valid())
+	if (!m_source || !m_source->valid())
 		return;
 
 	if (!(m_begin_valid || m_futile))
@@ -419,11 +428,10 @@ void eDVBTSTools::calcBegin()
 
 void eDVBTSTools::calcEnd()
 {
-	if (!m_file.valid())
+	if (!m_source || !m_source->valid())
 		return;
 
-	eSingleLocker l(m_file_lock);
-	off_t end = m_file.lseek(0, SEEK_END);
+	off_t end = m_source->lseek(0, SEEK_END);
 	
 	if (llabs(end - m_last_filelength) > 1*1024*1024)
 	{
@@ -573,31 +581,28 @@ int eDVBTSTools::takeSample(off_t off, pts_t &p)
 int eDVBTSTools::findPMT(int &pmt_pid, int &service_id)
 {
 		/* FIXME: this will be factored out soon! */
-	if (!m_file.valid())
+	if (!m_source || !m_source->valid())
 	{
 		eDebug(" file not valid");
 		return -1;
 	}
 
-	eSingleLocker l(m_file_lock);
-	if (m_file.lseek(0, SEEK_SET) < 0)
-	{
-		eDebug("seek failed");
-		return -1;
-	}
+	off_t position=0;
 
 	int left = 5*1024*1024;
 	
 	while (left >= 188)
 	{
 		unsigned char packet[188];
-		if (m_file.read(packet, 188) != 188)
+		int ret = m_source->read(position, packet, 188);
+		if (ret != 188)
 		{
 			eDebug("read error");
 			break;
 		}
 		left -= 188;
-		
+		position += 188;
+
 		if (packet[0] != 0x47)
 		{
 			int i = 0;
@@ -605,12 +610,11 @@ int eDVBTSTools::findPMT(int &pmt_pid, int &service_id)
 			{
 				if (packet[i] == 0x47)
 					break;
+				--position;
 				++i;
 			}
-			m_file.lseek(i - 188, SEEK_CUR);
 			continue;
 		}
-		
 		int pid = ((packet[1] << 8) | packet[2]) & 0x1FFF;
 		
 		int pusi = !!(packet[1] & 0x40);
@@ -698,9 +702,26 @@ int eDVBTSTools::findFrame(off_t &_offset, size_t &len, int &direction, int fram
 		else if (direction == +1)
 			direction = 0;
 	}
-			/* let's find the next frame after the given offset */
 	off_t start = offset;
 
+#if 0
+			/* backtrack to find the previous sequence start, in case of MPEG2 */
+	if ((data & 0xFF) == 0x00) {
+		do {
+			--start;
+			if (m_streaminfo.getStructureEntry(start, data, 0))
+			{
+				eDebug("get previous failed");
+				return -1;
+			}
+		} while (((data & 0xFF) != 9) && ((data & 0xFF) != 0x00) && ((data & 0xFF) != 0xB3)); /* sequence start or previous frame */
+		if ((data & 0xFF) != 0xB3)
+			start = offset;  /* Failed to find corresponding sequence start, so never mind */
+	}
+
+#endif
+
+			/* let's find the next frame after the given offset */
 	do {
 		if (m_streaminfo.getStructureEntry(offset, data, 1))
 		{
@@ -715,9 +736,11 @@ int eDVBTSTools::findFrame(off_t &_offset, size_t &len, int &direction, int fram
 //		eDebug("%08llx@%llx (next)", data, offset);
 	} while (((data & 0xFF) != 9) && ((data & 0xFF) != 0x00)); /* next frame */
 
+#if 0
 			/* align to TS pkt start */
-//	start = start - (start % 188);
-//	offset = offset - (offset % 188);
+	start = start - (start % 188);
+	offset = offset - (offset % 188);
+#endif
 
 	len = offset - start;
 	_offset = start;

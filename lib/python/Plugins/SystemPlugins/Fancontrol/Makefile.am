@@ -1,4 +1,4 @@
-installdir = $(LIBDIR)/enigma2/python/Plugins/SystemPlugins/Fancontrol
+installdir = $(pkglibdir)/python/Plugins/SystemPlugins/Fancontrol
 
 SUBDIRS = meta
 
