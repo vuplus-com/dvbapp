@@ -72,7 +72,7 @@ class FactoryTest(Screen):
 		}, -2)
 
 		Screen.__init__(self, session)
-		TESTPROGRAM_DATE = "2010-10-29"
+		TESTPROGRAM_DATE = "2010-12-14"
 		TESTPROGRAM_VERSION = "Version 00.01"
 
 		self.model = 0
@@ -238,21 +238,34 @@ class FactoryTest(Screen):
 		self.satatimer = eTimer()
 		self.satatimer.callback.append(self.sataCheck)
 
+		self.usbtimer = eTimer()
+		self.usbtimer.callback.append(self.usbCheck)
+
 	def getModelInfo(self):
+		getmodel = 0
 		if fileExists("/proc/stb/info/vumodel"):
-			info = open("/proc/stb/info/vumodel").read()
-			if info[:5] == "combo":
+			info = open("/proc/stb/info/vumodel").read().strip()
+			if info == "combo":
 				self.model = 2
+				getmodel = 1
 				print "getModelInfo : combo"
-		else:
+			if info == "solo":
+				self.model = 1
+				getmodel = 1
+				print "getModelInfo : solo"
+			if info == "duo":
+				self.model = 0
+				getmodel = 1
+				print "getModelInfo : duo"
+		if getmodel == 0 and fileExists("/proc/stb/info/version"):
 			info = open("/proc/stb/info/version").read()
 #			print info,info[:2]
 			if info[:2] == "14":
 				self.model = 1
-				print "getModelInfo : solo"
+				print "getModelInfo : solo_"
 			elif info[:2] == "12":
 				self.model = 0
-				print "getModelInfo : duo"
+				print "getModelInfo : duo_"
 
 	def nothing(self):
 		print "nothing"
@@ -442,57 +455,33 @@ class FactoryTest(Screen):
 			self["resultlist"].updateList(self.rlist)
 			self.satatry -= 1
 			displayerror = 0
-		result = 0
-		checktab=0
+		result =0
 		try:
-			mtab = open('/etc/mtab','r')
-			while(1):
-				disk = mtab.readline().split(' ')
-				if len(disk) < 2:
-					break
-				if disk[1].startswith('/media/hdd'):
-					checktab+=1
-				elif disk[1].startswith('/media/sdb1'):
-					checktab+=10
-				if checktab==11:
-					break
-		except:
-			checktab = 0
-
-		if checktab==0:
-			if displayerror==1:
-				self.session.open( MessageBox, _("Sata & extend hdd test error"), MessageBox.TYPE_ERROR)
-				self.rlist[self["testlist"].getCurrent()[1]]="fail"
-			else:
-				self.satatimer.start(1100,True)
-			return
-		elif checktab < 11:
-			if displayerror==1:
-				self.session.open( MessageBox, _("one hdd test error"), MessageBox.TYPE_ERROR)
-				self.rlist[self["testlist"].getCurrent()[1]]="fail"
-			else:
-				self.satatimer.start(1100,True)
-			return
-
-		try:
-			if fileExists("/media/sdb1"):
-				if access("/media/sdb1",F_OK|R_OK|W_OK):
-					dummy=open("/media/sdb1/dummy03","w")
+			if fileExists("/autofs/sdb1"):
+				if access("/autofs/sdb1",F_OK|R_OK|W_OK):
+					dummy=open("/autofs/sdb1/dummy03","w")
 					dummy.write("complete")
 					dummy.close()
-					dummy=open("/media/sdb1/dummy03","r")
+					dummy=open("/autofs/sdb1/dummy03","r")
 					if dummy.readline()=="complete":
-						print "complete"
+						print "/autofs/sdb1 - complete"
 					else:
+						print "/autofs/sdb1 - readline error"
 						result = 1
+						displayerror = 1
 					dummy.close()
-					system("rm /media/sdb1/dummy03")
+					system("rm /autofs/sdb1/dummy03")
 				else:
+					print "/autofs/sdb1 - rw access error"
 					result = 1
+					displayerror = 1
 			else:
+				print "/autofs/sdb1 - file not exist"
 				result = 1
 		except:
+			print "/autofs/sdb1 - exceptional error"
 			result = 1
+			displayerror = 1
 		try:
 			if fileExists("/media/hdd"):
 				if access("/media/hdd",F_OK|R_OK|W_OK):
@@ -501,24 +490,31 @@ class FactoryTest(Screen):
 					dummy.close()
 					dummy=open("/media/hdd/dummy03","r")
 					if dummy.readline()=="complete":
-						print "complete"
+						print "/media/hdd - complete"
 					else:
+						print "/media/hdd - readline error"
 						result += 1
+						displayerror = 1
 					dummy.close()
 					system("rm /media/hdd/dummy03")
 				else:
-					result = 1
+					print "/media/hdd - rw access error"
+					result += 1
+					displayerror = 1
 			else:
+				print "/media/hdd - file not exist"
 				result += 1
 		except:
+			print "/media/hdd - exceptional error"
 			result += 1
-			
-		if result ==0:
+			displayerror = 1
+		
+		if result == 0:
 			self.session.open( MessageBox, _("Sata & extend hdd test pass"), MessageBox.TYPE_INFO)
 			self.rlist[self["testlist"].getCurrent()[1]]="pass"
 		elif result == 1:
 			if displayerror==1:
-				self.session.open( MessageBox, _("one hdd test error"), MessageBox.TYPE_ERROR)
+				self.session.open( MessageBox, _("One hdd test error"), MessageBox.TYPE_ERROR)
 				self.rlist[self["testlist"].getCurrent()[1]]="fail"
 			else:
 				self.satatimer.start(1100,True)
@@ -626,9 +622,15 @@ class FactoryTest(Screen):
 				self.session.nav.playService(ref)
 				self.avswitch.setColorFormat(2)
 				self.avswitch.setAspectRatio(0)
-		self.tuningtimer.start(4000,True)
-		self.tunemsgtimer.start(5000, True)
-
+		if self.model==0 or self.model==1:
+			print "2-3"
+			self.tuningtimer.start(2000,True)
+			self.tunemsgtimer.start(3000, True)
+		elif self.model==2:
+			print "4-5"
+			self.tuningtimer.start(4000,True)
+			self.tunemsgtimer.start(5000, True)
+		
 	def cam_state(self):
 		if self.camstep == 1:
 			slot = 0
@@ -786,105 +788,69 @@ class FactoryTest(Screen):
 			self.Test14()
 			self["testlist"].moveToIndex(self.shutdownIndex)
 		self.agingmode = 0
-#			self["testlist"].instance.moveSelection(self["testlist"].instance.moveDown)
-			
-		
-
+#			self["testlist"].instance.moveSelection(self["testlist"].instance.moveDown)		
+	
 	def Test8(self):
-		if self.model==0:			
-			try:
-				result = 0
-				mtab = open('/etc/mtab','r')
-				while(1):
-					disk = mtab.readline().split(' ')
-					if len(disk) < 2:
-						break
-					if disk[1].startswith('/media/hdd'):
-						continue
-					elif disk[1].startswith('/media/sdb1'):
-						continue
-					elif disk[1].startswith('/media/sd'):
-						result=result +1
+		self.usbtry = 9
+		self.usbtimer.start(100,True)
 
-				if result < 0 :
-					result = 0
-				if result == 3:
-					self.session.open( MessageBox, _("USB test pass %d devices\nPress OK!"%result), MessageBox.TYPE_INFO)			
-					self.rlist[self["testlist"].getCurrent()[1]]="pass"
-				else:
-					self.session.open( MessageBox, _("USB test error : Success-%d"%result+" Fail-%d\nPress EXIT!"%(3-result)), MessageBox.TYPE_ERROR)
-					self.rlist[self["testlist"].getCurrent()[1]]="fail"
-			except:
-				if result < 0 :
-					result = 0
-				if result == 3:
-					self.session.open( MessageBox, _("USB test pass %d devices\nPress OK!"%result), MessageBox.TYPE_INFO)			
-					self.rlist[self["testlist"].getCurrent()[1]]="pass"
-				else:
-					self.session.open( MessageBox, _("USB test error : Success-%d"%result+" Fail-%d\nPress EXIT!"%(3-result)), MessageBox.TYPE_ERROR)
-					self.rlist[self["testlist"].getCurrent()[1]]="fail"
+	def usbCheck(self):
+		if self.usbtry == 0:
+			displayerror = 1
+		else:
+			self.rlist[self["testlist"].getCurrent()[1]]="try %d"%self.usbtry
+			self["resultlist"].updateList(self.rlist)
+			self.usbtry -= 1
+			displayerror = 0
+
+		if self.model==0:
+			devices = [ "/autofs/sdc1", "/autofs/sdd1", "/autofs/sde1" ]
 		elif self.model==1:
-			try:
-				result = 0
-				mtab = open('/etc/mtab','r')
-				while(1):
-					disk = mtab.readline().split(' ')
-					if len(disk) < 2:
-						break
-					if disk[1].startswith('/media/'):
-						result=result +1
+			devices = [ "/autofs/sda1", "/autofs/sdb1" ]
+		elif self.model==2:
+			devices = [ "/autofs/sdc1", "/autofs/sdd1" ]
 
-				if result < 0 :
-					result = 0
-				if result == 2:
-					self.session.open( MessageBox, _("USB test pass %d devices\nPress OK!"%result), MessageBox.TYPE_INFO)			
-					self.rlist[self["testlist"].getCurrent()[1]]="pass"
-				else:
-					self.session.open( MessageBox, _("USB test error : Success-%d"%result+" Fail-%d\nPress EXIT!"%(2-result)), MessageBox.TYPE_ERROR)
-					self.rlist[self["testlist"].getCurrent()[1]]="fail"
-			except:
-				if result < 0 :
-					result = 0
-				if result == 2:
-					self.session.open( MessageBox, _("USB test pass %d devices\nPress OK!"%result), MessageBox.TYPE_INFO)			
-					self.rlist[self["testlist"].getCurrent()[1]]="pass"
-				else:
-					self.session.open( MessageBox, _("USB test error : Success-%d"%result+" Fail-%d\nPress EXIT!"%(2-result)), MessageBox.TYPE_ERROR)
-					self.rlist[self["testlist"].getCurrent()[1]]="fail"
-					
-		if self.model==2:			
-			try:
-				result = 0
-				mtab = open('/etc/mtab','r')
-				while(1):
-					disk = mtab.readline().split(' ')
-					if len(disk) < 2:
-						break
-					if disk[1].startswith('/media/hdd'):
-						continue
-					elif disk[1].startswith('/media/sdb1'):
-						continue
-					elif disk[1].startswith('/media/sd'):
-						result=result +1
-
-				if result < 0 :
-					result = 0
-				if result == 2:
-					self.session.open( MessageBox, _("USB test pass %d devices\nPress OK!"%result), MessageBox.TYPE_INFO)			
-					self.rlist[self["testlist"].getCurrent()[1]]="pass"
-				else:
-					self.session.open( MessageBox, _("USB test error : Success-%d"%result+" Fail-%d\nPress EXIT!"%(2-result)), MessageBox.TYPE_ERROR)
-					self.rlist[self["testlist"].getCurrent()[1]]="fail"
-			except:
-				if result < 0 :
-					result = 0
-				if result == 2:
-					self.session.open( MessageBox, _("USB test pass %d devices\nPress OK!"%result), MessageBox.TYPE_INFO)			
-					self.rlist[self["testlist"].getCurrent()[1]]="pass"
-				else:
-					self.session.open( MessageBox, _("USB test error : Success-%d"%result+" Fail-%d\nPress EXIT!"%(2-result)), MessageBox.TYPE_ERROR)
-					self.rlist[self["testlist"].getCurrent()[1]]="fail"
+		result=len(devices)
 		
+		for dev in devices:
+			try:
+				if fileExists(dev):
+					if access(dev,F_OK|R_OK|W_OK):
+						dummy=open(dev+"/dummy03","w")
+						dummy.write("complete")
+						dummy.close()
+						dummy=open(dev+"/dummy03","r")
+						if dummy.readline()=="complete":
+							print dev," - complete"
+						else:
+							print dev," - readline error"
+							result=result -1
+							displayerror = 1
+						dummy.close()
+						system("rm "+dev+"/dummy03")
+					else:
+						print dev," - rw access error"
+						result=result -1
+						displayerror = 1
+				else:
+					print dev," - file not exist"
+					result=result-1
+			except:
+				print dev," - exceptional error"
+				result=result -1
+				displayerror = 1
+	
+		if result < 0 :
+			result = 0
+		elif result == len(devices):
+			self.session.open( MessageBox, _("USB test pass %d devices\nPress OK!"%result), MessageBox.TYPE_INFO)			
+			self.rlist[self["testlist"].getCurrent()[1]]="pass"
+		else:
+			if displayerror == 1:
+				self.session.open( MessageBox, _("USB test error : Success-%d"%result+" Fail-%d\nPress EXIT!"%(len(devices)-result)), MessageBox.TYPE_ERROR)
+				self.rlist[self["testlist"].getCurrent()[1]]="fail"
+			else:
+				self.usbtimer.start(1100,True)
 
 	def pingtest(self):
 		self.testing = 1
@@ -974,7 +940,7 @@ class FactoryTest(Screen):
 			self.rlist[self["testlist"].getCurrent()[1]]="fail"
 
 	def Test10(self):
-		self.session.openWithCallback(self.scciresult ,SmartCardTest)	
+		self.session.openWithCallback(self.scciresult ,SmartCardTest,stbmodel=self.model)
 
 	def Test11(self):
 		self.MemTest(1)
@@ -1041,10 +1007,10 @@ class MacConfig(Screen):
 		self.mactry = mactry
 		self.model = 0
 		self.getModelInfo()
-		self.result = 0
+#		self.result = 0
 		self.macfd = 0
 		self.macaddr = "000000000000"
-		self.NetworkState = 0
+		self.ReadMacinfo = 0
 		self["text"]=Label((self.macaddr))
 		self["text1"]= Label(("< >"))
 		self["stattext"]= Label((""))
@@ -1055,54 +1021,68 @@ class MacConfig(Screen):
 		ethtest = 1
 
 	def getModelInfo(self):
+		getmodel = 0
 		if fileExists("/proc/stb/info/vumodel"):
-			info = open("/proc/stb/info/vumodel").read()
-			if info[:5] == "combo":
+			info = open("/proc/stb/info/vumodel").read().strip()
+			if info == "combo":
 				self.model = 2
+				getmodel = 1
 				print "MacConfig, model : combo"
-		else:
+			if info == "solo":
+				self.model = 1
+				getmodel = 1
+				print "MacConfig, model : solo"
+			if info == "duo":
+				self.model = 0
+				getmodel = 1
+				print "MacConfig, model : duo"
+		if getmodel == 0 and fileExists("/proc/stb/info/version"):
 			info = open("/proc/stb/info/version").read()
+#			print info,info[:2]
 			if info[:2] == "14":
 				self.model = 1
-				print "MacConfig, model : solo"
+				print "MacConfig, model : solo_"
 			elif info[:2] == "12":
 				self.model = 0
-				print "MacConfig, model: duo"
+				print "MacConfig, model: duo_"
 
 	def loadmacaddr(self):
 		try:
-			result = 0
 			self.macfd = 0
-			mtab = open('/etc/mtab','r')
-			while(1):
-				disk = mtab.readline().split(' ')
-				if len(disk) < 2:
+
+			if self.model==0:
+				devices = ["/autofs/sdb1", "/autofs/sdc1", "/autofs/sdd1", "/autofs/sde1" ]
+			elif self.model==1:
+				devices = [ "/autofs/sda1", "/autofs/sdb1" ]
+			elif self.model==2:
+				devices = [ "/autofs/sdb1", "/autofs/sdc1", "/autofs/sdd1" ]
+
+			for dev in devices:
+				print 'try..',dev
+				if  fileExists(dev+"/macinfo.txt"):
+					print "<open>"+dev+"/macinfo.txt"
+					self.macfd = open(dev+"/macinfo.txt","r+")
 					break
-				if disk[1].startswith('/media/sd') or disk[1].startswith('/media/hdd'):
-					print 'try..',disk[1]
-					if  fileExists(disk[1]+"/macinfo.txt"):
-						self.macfd = open(disk[1]+"/macinfo.txt","r+")
-						break
+
 			if self.macfd == 0:
 				self["text"].setText(("cannot read usb!!"))
 				self["text1"].setText((" "))
 				self["stattext"].setText((" Press Exit Key."))
-				self.NetworkState=0
+				self.ReadMacinfo=0
 				return
 			
 			macaddr=self.macfd.readline().split(":")
 			self.macaddr=macaddr[1]+macaddr[2]+macaddr[3]+macaddr[4]+macaddr[5]+macaddr[6]
 			self.displaymac()
-			self.NetworkState = 1
+			self.ReadMacinfo = 1
 		except:
 			self["text"].setText(("cannot read usb!!"))
 			self["text1"].setText((" "))
 			self["stattext"].setText((" Press Exit Key."))
-			self.NetworkState=0
-#			self.session.open( MessageBox, _("Mac address fail"), MessageBox.TYPE_ERROR)
+			self.ReadMacinfo=0
  	
 	def getmacaddr(self):
-		if self.NetworkState==0:
+		if self.ReadMacinfo==0:
 			return
 		try:
 			if self.model == 2:
@@ -1151,7 +1131,7 @@ class MacConfig(Screen):
 
 			
 	def keyleft(self):
-		if self.NetworkState==0 :
+		if self.ReadMacinfo==0 :
 			return
 		macaddress = long(self.macaddr,16)-1
 		if macaddress < 0 :
@@ -1160,7 +1140,7 @@ class MacConfig(Screen):
 		self.displaymac()
 
 	def keyright(self):
-		if self.NetworkState==0 :
+		if self.ReadMacinfo==0 :
 			return
 		macaddress = long(self.macaddr,16)+1
 		if macaddress > 0xffffffffffff:
@@ -1173,7 +1153,7 @@ class MacConfig(Screen):
 		self["text"].setText(("%02x:%02x:%02x:%02x:%02x:%02x"%(int(macaddr[0:2],16),int(macaddr[2:4],16),int(macaddr[4:6],16),int(macaddr[6:8],16),int(macaddr[8:10],16),int(macaddr[10:12],16))))
 
 	def keyOk(self):
-		if self.NetworkState==0 :
+		if self.ReadMacinfo==0 :
 			return
 		try:
 			macaddr = self.macaddr
@@ -1461,7 +1441,7 @@ class SmartCardTest(Screen):
 			<widget name="text" position="10,10" size="140,100" font="Regular;22" />
 		</screen>"""
 
-	def __init__(self, session):
+	def __init__(self, session, stbmodel = 0):
 		self["actions"] = ActionMap(["DirectionActions", "OkCancelActions"],
 		{
 			"cancel": self.keyCancel,
@@ -1474,44 +1454,14 @@ class SmartCardTest(Screen):
 		self.step = 0
 		self.smartcardtimer = eTimer()
 		self.smartcardtimer.callback.append(self.check_smart_card)
-		self.smartcardtimer.start(100,True)
 		self.closetimer = eTimer()
 		self.closetimer.callback.append(self.close)
 		self.smartcard=0
 		global smartcardtest
 		smartcardtest = 0
-		self.Testmode = 0
-		self.model = 0
-		self.check_mode()
-
-	def check_mode(self):
-		try:
-			if fileExists("/proc/stb/info/vumodel"):
-				info = open("/proc/stb/info/vumodel").read()
-				print info,info[:5]
-				if info[:5] == "combo":
-#					print "combo"
-					self.model = 2
-			else:
-				info = open("/proc/stb/info/version").read()
-				print info,info[:2]
-				if info[:2] == "14":
-					self.model = 1
-				elif info[:2] == "12":
-					self.model = 0
-			self.Testmode = 1
-#			fd = open("/proc/stb/info/version","r")
-#			version = fd.read()
-#			if int(version,16) <= 0x1200A3:
-#				self.Testmode = 0
-#			else:
-#				self.Testmode = 1
-#			if int(version,16) < 0x130000:
-#				self.model = 0
-#			elif int(version,16) > 0x140000:
-#				self.model = 1
-		except:
-			self.Testmode = 0
+		self.model = stbmodel
+		self.Testmode = 1
+		self.smartcardtimer.start(100,True)
 
 	def check_smart_card(self):
 		global smartcardtest

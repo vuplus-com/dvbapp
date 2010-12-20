@@ -131,15 +131,31 @@ void eDVBServicePMTHandler::PATready(int)
 	ePtr<eTable<ProgramAssociationSection> > ptr;
 	if (!m_PAT.getCurrent(ptr))
 	{
+		int service_id_single = -1;
+		int pmtpid_single = -1;
 		int pmtpid = -1;
 		std::vector<ProgramAssociationSection*>::const_iterator i;
-		for (i = ptr->getSections().begin(); i != ptr->getSections().end(); ++i)
+		for (i = ptr->getSections().begin(); pmtpid == -1 && i != ptr->getSections().end(); ++i)
 		{
 			const ProgramAssociationSection &pat = **i;
 			ProgramAssociationConstIterator program;
-			for (program = pat.getPrograms()->begin(); program != pat.getPrograms()->end(); ++program)
+			for (program = pat.getPrograms()->begin(); pmtpid == -1 && program != pat.getPrograms()->end(); ++program)
+			{
 				if (eServiceID((*program)->getProgramNumber()) == m_reference.getServiceID())
 					pmtpid = (*program)->getProgramMapPid();
+				if (pmtpid_single == -1 && pmtpid == -1)
+				{
+					pmtpid_single = (*program)->getProgramMapPid();
+					service_id_single = (*program)->getProgramNumber();
+				}
+				else
+					pmtpid_single = service_id_single = -1;
+			}
+		}
+		if (pmtpid_single != -1) // only one PAT entry .. so we use this one
+		{
+			m_reference.setServiceID(eServiceID(service_id_single));
+			pmtpid = pmtpid_single;
 		}
 		if (pmtpid == -1)
 			serviceEvent(eventNoPATEntry);
@@ -149,7 +165,7 @@ void eDVBServicePMTHandler::PATready(int)
 		serviceEvent(eventNoPAT);
 }
 
-PyObject *eDVBServicePMTHandler::getCaIds()
+PyObject *eDVBServicePMTHandler::getCaIds(bool pair)
 {
 	ePyObject ret;
 
@@ -157,20 +173,37 @@ PyObject *eDVBServicePMTHandler::getCaIds()
 
 	if ( !getProgramInfo(prog) )
 	{
-		int cnt=prog.caids.size();
-		if (cnt)
+		if (pair)
 		{
+			int cnt=prog.caids.size();
+			if (cnt)
+			{
+				ret=PyList_New(cnt);
+				std::list<program::capid_pair>::iterator it(prog.caids.begin());
+				while(cnt--)
+				{
+					ePyObject tuple = PyTuple_New(2);
+					PyTuple_SET_ITEM(tuple, 0, PyInt_FromLong(it->caid));
+					PyTuple_SET_ITEM(tuple, 1, PyInt_FromLong((it++)->capid));
+					PyList_SET_ITEM(ret, cnt, tuple);
+				}
+			}
+		}
+		else
+		{
+			std::set<program::capid_pair> set(prog.caids.begin(), prog.caids.end());
+			std::set<program::capid_pair>::iterator it(set.begin());
+			int cnt=set.size();
 			ret=PyList_New(cnt);
-			std::set<uint16_t>::iterator it(prog.caids.begin());
 			while(cnt--)
-				PyList_SET_ITEM(ret, cnt, PyInt_FromLong(*it++));
+				PyList_SET_ITEM(ret, cnt, PyInt_FromLong((it++)->caid));
 		}
 	}
 
 	return ret ? (PyObject*)ret : (PyObject*)PyList_New(0);
 }
 
-int eDVBServicePMTHandler::getProgramInfo(struct program &program)
+int eDVBServicePMTHandler::getProgramInfo(program &program)
 {
 	ePtr<eTable<ProgramMapSection> > ptr;
 	int cached_apid_ac3 = -1;
@@ -213,7 +246,28 @@ int eDVBServicePMTHandler::getProgramInfo(struct program &program)
 			for (i = ptr->getSections().begin(); i != ptr->getSections().end(); ++i)
 			{
 				const ProgramMapSection &pmt = **i;
+				int is_hdmv = 0;
+
 				program.pcrPid = pmt.getPcrPid();
+
+				for (DescriptorConstIterator desc = pmt.getDescriptors()->begin();
+					desc != pmt.getDescriptors()->end(); ++desc)
+				{
+					if ((*desc)->getTag() == CA_DESCRIPTOR)
+					{
+						CaDescriptor *descr = (CaDescriptor*)(*desc);
+						program::capid_pair pair;
+						pair.caid = descr->getCaSystemId();
+						pair.capid = descr->getCaPid();
+						program.caids.push_back(pair);
+					}
+					else if ((*desc)->getTag() == REGISTRATION_DESCRIPTOR)
+					{
+						RegistrationDescriptor *d = (RegistrationDescriptor*)(*desc);
+						if (d->getFormatIdentifier() == 0x48444d56) // HDMV
+							is_hdmv = 1;
+					}
+				}
 
 				ElementaryStreamInfoConstIterator es;
 				for (es = pmt.getEsInfo()->begin(); es != pmt.getEsInfo()->end(); ++es)
@@ -270,24 +324,33 @@ int eDVBServicePMTHandler::getProgramInfo(struct program &program)
 							audio.type = audioStream::atAACHE;
 							forced_audio = 1;
 						}
-					case 0x80: // user private ... but blueray LPCM
-						if (!isvideo && !isaudio)
+					case 0x80: // user private ... but bluray LPCM
+					case 0xA0: // bluray secondary LPCM
+						if (!isvideo && !isaudio && is_hdmv)
 						{
 							isaudio = 1;
 							audio.type = audioStream::atLPCM;
 						}
-					case 0x81: // user private ... but blueray AC3
-						if (!isvideo && !isaudio)
+					case 0x81: // user private ... but bluray AC3
+					case 0xA1: // bluray secondary AC3
+						if (!isvideo && !isaudio && is_hdmv)
 						{
 							isaudio = 1;
 							audio.type = audioStream::atAC3;
 						}
-					case 0x82: // Blueray DTS (dvb user private...)
-					case 0xA2: // Blueray secondary DTS
-						if (!isvideo && !isaudio)
+					case 0x82: // bluray DTS (dvb user private...)
+					case 0xA2: // bluray secondary DTS
+						if (!isvideo && !isaudio && is_hdmv)
 						{
 							isaudio = 1;
 							audio.type = audioStream::atDTS;
+						}
+					case 0x86: // bluray DTS-HD (dvb user private...)
+					case 0xA6: // bluray secondary DTS-HD
+						if (!isvideo && !isaudio && is_hdmv)
+						{
+							isaudio = 1;
+							audio.type = audioStream::atDTSHD;
 						}
 					case 0x06: // PES Private
 					case 0xEA: // TS_PSI_ST_SMPTE_VC1
@@ -460,7 +523,10 @@ int eDVBServicePMTHandler::getProgramInfo(struct program &program)
 							case CA_DESCRIPTOR:
 							{
 								CaDescriptor *descr = (CaDescriptor*)(*desc);
-								program.caids.insert(descr->getCaSystemId());
+								program::capid_pair pair;
+								pair.caid = descr->getCaSystemId();
+								pair.capid = descr->getCaPid();
+								program.caids.push_back(pair);
 								break;
 							}
 							default:
@@ -477,9 +543,9 @@ int eDVBServicePMTHandler::getProgramInfo(struct program &program)
 					default:
 						break;
 					}
-					if (isteletext && (isaudio || isvideo)) 
+					if (isteletext && (isaudio || isvideo))
 					{
-						eDebug("ambiguous streamtype for PID %04x detected.. forced as teletext!", (*es)->getPid());					
+						eDebug("ambiguous streamtype for PID %04x detected.. forced as teletext!", (*es)->getPid());
 						continue; // continue with next PID
 					}
 					else if (issubtitle && (isaudio || isvideo))
@@ -516,15 +582,6 @@ int eDVBServicePMTHandler::getProgramInfo(struct program &program)
 					}
 					else
 						continue;
-				}
-				for (DescriptorConstIterator desc = pmt.getDescriptors()->begin();
-					desc != pmt.getDescriptors()->end(); ++desc)
-				{
-					if ((*desc)->getTag() == CA_DESCRIPTOR)
-					{
-						CaDescriptor *descr = (CaDescriptor*)(*desc);
-						program.caids.insert(descr->getCaSystemId());
-					}
 				}
 			}
 			ret = 0;
@@ -589,8 +646,12 @@ int eDVBServicePMTHandler::getProgramInfo(struct program &program)
 			program.textPid = cached_tpid;
 		}
 		CAID_LIST &caids = m_service->m_ca;
-		for (CAID_LIST::iterator it(caids.begin()); it != caids.end(); ++it)
-			program.caids.insert(*it);
+		for (CAID_LIST::iterator it(caids.begin()); it != caids.end(); ++it) {
+			program::capid_pair pair;
+			pair.caid = *it;
+			pair.capid = -1; // not known yet
+			program.caids.push_back(pair);
+		}
 		if ( cnt )
 			ret = 0;
 	}
@@ -675,6 +736,12 @@ void eDVBServicePMTHandler::SDTScanEvent(int event)
 
 int eDVBServicePMTHandler::tune(eServiceReferenceDVB &ref, int use_decode_demux, eCueSheet *cue, bool simulate, eDVBService *service)
 {
+	ePtr<iTsSource> s;
+	return tuneExt(ref, use_decode_demux, s, NULL, cue, simulate, service);
+}
+
+int eDVBServicePMTHandler::tuneExt(eServiceReferenceDVB &ref, int use_decode_demux, ePtr<iTsSource> &source, const char *streaminfo_file, eCueSheet *cue, bool simulate, eDVBService *service)
+{
 	RESULT res=0;
 	m_reference = ref;
 	
@@ -702,11 +769,12 @@ int eDVBServicePMTHandler::tune(eServiceReferenceDVB &ref, int use_decode_demux,
 	{
 		if (!ref.getServiceID().get() /* incorrect sid in meta file or recordings.epl*/ )
 		{
-			eWarning("no .meta file found, trying to find PMT pid");
 			eDVBTSTools tstools;
-			if (tstools.openFile(ref.path.c_str()))
-				eWarning("failed to open file");
-			else
+			bool b = source || !tstools.openFile(ref.path.c_str(), 1);
+			eWarning("no .meta file found, trying to find PMT pid");
+			if (source)
+				tstools.setSource(source, NULL);
+			if (b)
 			{
 				int service_id, pmt_pid;
 				if (!tstools.findPMT(pmt_pid, service_id))
@@ -716,6 +784,8 @@ int eDVBServicePMTHandler::tune(eServiceReferenceDVB &ref, int use_decode_demux,
 					m_pmt_pid = pmt_pid;
 				}
 			}
+			else
+				eWarning("no valid source to find PMT pid!");
 		}
 		eDebug("alloc PVR");
 			/* allocate PVR */
@@ -757,7 +827,10 @@ int eDVBServicePMTHandler::tune(eServiceReferenceDVB &ref, int use_decode_demux,
 		if (m_pvr_channel)
 		{
 			m_pvr_channel->setCueSheet(cue);
-			m_pvr_channel->playFile(ref.path.c_str());
+			if (source)
+				m_pvr_channel->playSource(source, streaminfo_file);
+			else
+				m_pvr_channel->playFile(ref.path.c_str());
 		}
 	}
 

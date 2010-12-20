@@ -10,7 +10,7 @@ from enigma import eDVBSatelliteEquipmentControl as secClass, \
 	eDVBSatelliteDiseqcParameters as diseqcParam, \
 	eDVBSatelliteSwitchParameters as switchParam, \
 	eDVBSatelliteRotorParameters as rotorParam, \
-	eDVBResourceManager, eDVBDB
+	eDVBResourceManager, eDVBDB, eEnv
 
 from time import localtime, mktime
 from datetime import datetime
@@ -390,6 +390,7 @@ class SecConfigure:
 
 					if currLnb.diseqcMode.value == "1_0":
 						currCO = currLnb.commandOrder1_0.value
+						sec.setRepeats(0)
 					else:
 						currCO = currLnb.commandOrder.value
 
@@ -1082,7 +1083,7 @@ def InitNimManager(nimmgr):
 
 	unicablelnbproducts = {}
 	unicablematrixproducts = {}
-	doc = xml.etree.cElementTree.parse("/usr/share/enigma2/unicable.xml")
+	doc = xml.etree.cElementTree.parse(eEnv.resolve("${datadir}/enigma2/unicable.xml"))
 	root = doc.getroot()
 
 	entry = root.find("lnb")

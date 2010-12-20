@@ -15,6 +15,7 @@
 #include <lib/base/object.h>
 #include <lib/base/ebase.h>
 #include <lib/base/elock.h>
+#include <lib/base/itssource.h>
 #include <lib/service/service.h>
 #include <libsig_comp.h>
 #include <connection.h>
@@ -605,6 +606,10 @@ public:
 	virtual RESULT playFile(const char *file) = 0;
 	virtual void stopFile() = 0;
 	
+	/* new interface */
+	virtual RESULT playSource(ePtr<iTsSource> &source, const char *priv=NULL) = 0;
+	virtual void stopSource() = 0;
+	
 	virtual void setCueSheet(eCueSheet *cuesheet) = 0;
 	
 	virtual RESULT getLength(pts_t &pts) = 0;
@@ -645,7 +650,7 @@ public:
 		/** Set Displayed Video PID and type */
 	virtual RESULT setVideoPID(int vpid, int type)=0;
 
-	enum { af_MPEG, af_AC3, af_DTS, af_AAC };
+	enum { af_MPEG, af_AC3, af_DTS, af_AAC, af_DTSHD };
 		/** Set Displayed Audio PID and type */
 	virtual RESULT setAudioPID(int apid, int type)=0;
 
