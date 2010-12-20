@@ -42,13 +42,7 @@ class NetworkAdapterSelection(Screen,HelpableScreen):
 		self["key_blue"] = StaticText("")
 		self["introduction"] = StaticText(self.edittext)
 		
-#		self.adapters = [(iNetwork.getFriendlyAdapterName(x),x) for x in iNetwork.getAdapterList()]
-		self.adapters = []
-
-		self.adapterList=[(iNetwork.getFriendlyAdapterName(x),x) for x in iNetwork.getAdapterList()]
-		for x in self.adapterList:
-			if x[1].startswith('eth'):
-				self.adapters.append(x)
+		self.adapters = [(iNetwork.getFriendlyAdapterName(x),x) for x in iNetwork.getAdapterList()]
 		
 		if not self.adapters:
 			self.onFirstExecBegin.append(self.NetworkFallback)
@@ -101,12 +95,7 @@ class NetworkAdapterSelection(Screen,HelpableScreen):
 			else:
 				interfacepng = LoadPixmap(resolveFilename(SCOPE_CURRENT_SKIN, "skin_default/icons/network_wireless.png"))
 
-#chang
-		num_configured_if=0
-		for x in iNetwork.getConfiguredAdapters():
-			if x.startswith('eth'):
-				num_configured_if=num_configured_if+1
-#		num_configured_if = len(iNetwork.getConfiguredAdapters())
+		num_configured_if = len(iNetwork.getConfiguredAdapters())
 		if num_configured_if >= 2:
 			if default is True:
 				defaultpng = LoadPixmap(cached=True, path=resolveFilename(SCOPE_CURRENT_SKIN, "skin_default/buttons/button_blue.png"))
@@ -124,13 +113,7 @@ class NetworkAdapterSelection(Screen,HelpableScreen):
 	def updateList(self):
 		self.list = []
 		default_gw = None
-		# chang
-		num_configured_if=0
-		for x in iNetwork.getConfiguredAdapters():
-			if x.startswith('eth'):
-				num_configured_if=num_configured_if+1
-				
-#		num_configured_if = len(iNetwork.getConfiguredAdapters())
+		num_configured_if = len(iNetwork.getConfiguredAdapters())
 		if num_configured_if >= 2:
 			self["key_yellow"].setText(_("Default"))
 			self["introduction"].setText(self.defaulttext)
@@ -171,12 +154,7 @@ class NetworkAdapterSelection(Screen,HelpableScreen):
 		selection = self["list"].getCurrent()
 		num_if = len(self.list)
 		old_default_gw = None
-		# chang
-		num_configured_if=0
-		for x in iNetwork.getConfiguredAdapters():
-			if x.startswith('eth'):
-				num_configured_if=num_configured_if+1
-#		num_configured_if = len(iNetwork.getConfiguredAdapters())
+		num_configured_if = len(iNetwork.getConfiguredAdapters())
 		if os_path.exists("/etc/default_gw"):
 			fp = open('/etc/default_gw', 'r')
 			old_default_gw = fp.read()
