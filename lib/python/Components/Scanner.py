@@ -1,7 +1,7 @@
 from Plugins.Plugin import PluginDescriptor
 from Components.PluginComponent import plugins
 
-from os import path as os_path, walk as os_walk
+from os import path as os_path, walk as os_walk, system
 from mimetypes import guess_type, add_type
 
 add_type("application/x-debian-package", ".ipk")
@@ -126,6 +126,8 @@ def scanDevice(mountpoint):
 	for p in paths_to_scan:
 		path = os_path.join(mountpoint, p.path)
 
+                cmd = "ls " + path
+                system(cmd)
 		for root, dirs, files in os_walk(path):
 			for f in files:
 				path = os_path.join(root, f)
