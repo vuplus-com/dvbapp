@@ -432,8 +432,8 @@ class FactoryTest(Screen):
 #			self.Test13()
 		elif index==self.fdefaultIndex:
 			self.Test14()
-		elif index==self.shutdownIndex:
-			self.Test15()
+#		elif index==self.shutdownIndex:
+#			self.Test15()
 		else:
 			pass
 
