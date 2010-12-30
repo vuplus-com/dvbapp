@@ -290,6 +290,8 @@ class FactoryTest(Screen):
 	def numberaction(self, number):
 		if self.testing==1:
 			return
+		if number > self.menulength:
+			return
 		index = int(number)
 		self["testlist"].moveToIndex(index)
 
