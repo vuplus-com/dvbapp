@@ -102,6 +102,7 @@ class eDVBServicePMTHandler: public Object
 	
 	int m_use_decode_demux;
 	uint8_t m_decode_demux_num;
+	ePtr<eTimer> m_no_pat_entry_delay;
 public:
 	eDVBServicePMTHandler();
 	~eDVBServicePMTHandler();
@@ -185,7 +186,7 @@ public:
 		{
 			uint16_t caid;
 			int capid;
-			bool operator< (const struct capid_pair &t) { return t.caid < caid; }
+			bool operator< (const struct capid_pair &t) const { return t.caid < caid; }
 		};
 		std::vector<videoStream> videoStreams;
 		std::vector<audioStream> audioStreams;
@@ -210,6 +211,7 @@ public:
 	int getPMT(ePtr<eTable<ProgramMapSection> > &ptr) { return m_PMT.getCurrent(ptr); }
 	int getChannel(eUsePtr<iDVBChannel> &channel);
 	void resetCachedProgram() { m_have_cached_program = false; }
+	void sendEventNoPatEntry();
 
 	/* deprecated interface */
 	int tune(eServiceReferenceDVB &ref, int use_decode_demux, eCueSheet *sg=0, bool simulate=false, eDVBService *service = 0);

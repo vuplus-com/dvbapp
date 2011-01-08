@@ -501,6 +501,7 @@ eListboxPythonMultiContent::~eListboxPythonMultiContent()
 {
 	Py_XDECREF(m_buildFunc);
 	Py_XDECREF(m_selectableFunc);
+	Py_XDECREF(m_template);
 }
 
 void eListboxPythonMultiContent::setSelectionClip(eRect &rect, bool update)
@@ -640,7 +641,8 @@ static ePyObject lookupColor(ePyObject color, ePyObject data)
 	if ((icolor & 0xFF000000) == 0xFF000000)
 	{
 		int index = icolor & 0xFFFFFF;
-		eDebug("[eListboxPythonMultiContent] template color index: %d", index);
+		if (PyTuple_GetItem(data, index) == Py_None)
+			return ePyObject();
 		return PyTuple_GetItem(data, index);
 	}
 
@@ -1158,5 +1160,7 @@ void eListboxPythonMultiContent::entryRemoved(int idx)
 
 void eListboxPythonMultiContent::setTemplate(ePyObject tmplate)
 {
+	Py_XDECREF(m_template);
 	m_template = tmplate;
+	Py_XINCREF(m_template);
 }

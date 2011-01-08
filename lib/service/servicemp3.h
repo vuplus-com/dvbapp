@@ -46,7 +46,7 @@ public:
 typedef struct _GstElement GstElement;
 
 typedef enum { atUnknown, atMPEG, atMP3, atAC3, atDTS, atAAC, atPCM, atOGG, atFLAC } audiotype_t;
-typedef enum { stPlainText, stSSA, stSRT } subtype_t;
+typedef enum { stUnknown, stPlainText, stSSA, stASS, stSRT, stVOB, stPGS } subtype_t;
 typedef enum { ctNone, ctMPEGTS, ctMPEGPS, ctMKV, ctAVI, ctMP4, ctVCD, ctCDA } containertype_t;
 
 class eServiceMP3: public iPlayableService, public iPauseableService,
@@ -197,24 +197,74 @@ private:
 	};
 	int m_state;
 	GstElement *m_gst_playbin;
+	GstElement *m_gst_subtitlebin;
 	GstTagList *m_stream_tags;
-	eFixedMessagePump<int> m_pump;
+
+	struct Message
+	{
+		Message()
+			:type(-1)
+		{}
+		Message(int type)
+			:type(type)
+		{}
+		Message(int type, GstPad *pad)
+			:type(type)
+		{
+			d.pad=pad;
+		}
+
+		int type;
+		union {
+			GstPad *pad; // for msg type 3
+		} d;
+	};
+
+	eFixedMessagePump<Message> m_pump;
 	std::string m_error_message;
 
 	audiotype_t gstCheckAudioPad(GstStructure* structure);
 	void gstBusCall(GstBus *bus, GstMessage *msg);
 	static GstBusSyncReply gstBusSyncHandler(GstBus *bus, GstMessage *message, gpointer user_data);
-	static void gstCBsubtitleAvail(GstElement *element, gpointer user_data);
-	GstPad* gstCreateSubtitleSink(eServiceMP3* _this, subtype_t type);
-	void gstPoll(const int&);
 	static void gstHTTPSourceSetAgent(GObject *source, GParamSpec *unused, gpointer user_data);
+	static void gstCBsubtitleAvail(GstElement *element, gpointer user_data);
+	static GstCaps* gstGhostpadGetCAPS (GstPad * pad);
+	static gboolean gstGhostpadAcceptCAPS(GstPad * pad, GstCaps * caps);
+	static void gstGhostpadLink(gpointer user_data, GstCaps * caps);
+	static GstFlowReturn gstGhostpadBufferAlloc(GstPad *pad, guint64 offset, guint size, GstCaps *caps, GstBuffer **buf);
+	static void gstGhostpadHasCAPS(GstPad *pad, GParamSpec * unused, gpointer user_data);
+	static gboolean gstGhostpadSinkEvent(GstPad * pad, GstEvent * event);
+	static GstFlowReturn gstGhostpadChainFunction(GstPad * pad, GstBuffer * buffer);
+/*	static void gstCBsubtitleCAPS(GObject *obj, GParamSpec *pspec, gpointer user_data);
+	static void gstCBsubtitleLink(subtype_t type, gpointer user_data);
+	static gboolean gstCBsubtitleDrop(GstPad *pad, GstBuffer *buffer, gpointer user_data);*/
+	void gstPoll(const Message&);
+	void gstGhostpadHasCAPS_synced(GstPad *pad);
 
-	std::list<ePangoSubtitlePage> m_subtitle_pages;
+	GstPadBufferAllocFunction m_ghost_pad_buffer_alloc;
+	GstPadChainFunction m_ghost_pad_chain_function;
+	GstPadEventFunction m_ghost_pad_subtitle_sink_event;
+	GstCaps *m_gst_prev_subtitle_caps;
+	GstSegment m_gst_subtitle_segment;
+	GstPadEventFunction m_gst_sink_event;
+
+	struct SubtitlePage
+	{
+		enum { Unknown, Pango, Vob } type;
+		ePangoSubtitlePage pango_page;
+		eVobSubtitlePage vob_page;
+	};
+
+	std::list<SubtitlePage> m_subtitle_pages;
 	ePtr<eTimer> m_subtitle_sync_timer;
-	
+	ePtr<eTimer> m_subtitle_hide_timer;
 	ePtr<eTimer> m_streamingsrc_timeout;
+	pts_t m_prev_decoder_time;
+	int m_decoder_time_valid_state;
+
 	void pushSubtitles();
 	void pullSubtitle();
+	void hideSubtitles();
 	void sourceTimeout();
 	int m_subs_to_pull;
 	sourceStream m_sourceinfo;
