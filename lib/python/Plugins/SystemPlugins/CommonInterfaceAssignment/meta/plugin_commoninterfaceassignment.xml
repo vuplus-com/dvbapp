@@ -1,6 +1,7 @@
 <default>
 	  <prerequisites>
                     <hardware type="dm8000" />
+                    <hardware type="dm500hd" />
                     <tag type="CI" />
                     <tag type="System" />
 	  </prerequisites>
