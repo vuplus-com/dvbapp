@@ -419,11 +419,14 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 	def formatip(self, iplist):
 		list = []
 		list = iplist
-		if len(iplist) == 4:
-			result = str(iplist[0])+"."+str(iplist[1])+"."+str(iplist[2])+"."+str(iplist[3])
-		else:
-			result ="0.0.0.0"
-		return result
+		try:
+			if len(iplist) == 4:
+				result = str(iplist[0])+"."+str(iplist[1])+"."+str(iplist[2])+"."+str(iplist[3])
+			else:
+				result ="0.0.0.0"
+			return result
+		except:
+			return "[N/A]"
 			
 	def createConfig(self):
 #		wlanconfig.essid = ConfigSelection(default = "none", choices = ["maruap3","maruap2","none"])
