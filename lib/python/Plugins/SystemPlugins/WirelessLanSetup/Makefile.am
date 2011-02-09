@@ -1,4 +1,4 @@
-installdir = $(LIBDIR)/enigma2/python/Plugins/SystemPlugins/WirelessLanSetup
+installdir = $(pkglibdir)/python/Plugins/SystemPlugins/WirelessLanSetup
 
 SUBDIRS = meta
 
