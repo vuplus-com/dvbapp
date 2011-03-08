@@ -503,7 +503,7 @@ class FactoryTest(Screen):
 
 	def getmacaddr(self):
 		try:
-			if self.model == 2:
+			if self.model == 2 or self.model == 3 or self.model == 4:
 				cmd = "nanddump -s 0x" + str((self.mactry-1)*2) + "0000 -b -o -l 64 -p /dev/mtd5"
 			elif self.model == 0 or self.model == 1:
 				cmd = "nanddump -s 0x" + str((self.mactry-1)*2) + "0000 -b -o -l 64 -p /dev/mtd4"
@@ -1015,7 +1015,7 @@ class FactoryTest(Screen):
 			self.usbtry -= 1
 			displayerror = 0
 
-		if self.model==0:
+		if self.model==0 or self.model==3 or self.model==4:
 			devices = [ "/autofs/sdc1", "/autofs/sdd1", "/autofs/sde1" ]
 		elif self.model==1:
 			devices = [ "/autofs/sda1", "/autofs/sdb1" ]
@@ -1247,14 +1247,24 @@ class MacConfig(Screen):
 				self.model = 2
 				getmodel = 1
 				print "MacConfig, model : combo"
-			if info == "solo":
+			elif info == "solo":
 				self.model = 1
 				getmodel = 1
 				print "MacConfig, model : solo"
-			if info == "duo":
+			elif info == "duo":
 				self.model = 0
 				getmodel = 1
 				print "MacConfig, model : duo"
+			elif info == "uno":
+				self.model = 3
+				getmodel = 1
+				print "getModelInfo : uno"
+			elif info == "ultimo":
+				self.model = 4
+				getmodel = 1
+				print "getModelInfo : ultimo"
+
+
 		if getmodel == 0 and fileExists("/proc/stb/info/version"):
 			info = open("/proc/stb/info/version").read()
 #			print info,info[:2]
@@ -1269,7 +1279,7 @@ class MacConfig(Screen):
 		try:
 			self.macfd = 0
 
-			if self.model==0:
+			if self.model==0 or self.model==3 or self.model==4 :
 				devices = ["/autofs/sdb1", "/autofs/sdc1", "/autofs/sdd1", "/autofs/sde1" ]
 			elif self.model==1:
 				devices = [ "/autofs/sda1", "/autofs/sdb1" ]
@@ -1304,7 +1314,7 @@ class MacConfig(Screen):
 		if self.ReadMacinfo==0:
 			return
 		try:
-			if self.model == 2:
+			if self.model == 2 or self.model == 3 or self.model == 4:
 				cmd = "nanddump -s 0x" + str((self.mactry-1)*2) + "0000 -b -o -l 64 -p /dev/mtd5"
 			elif self.model == 0 or self.model == 1:
 				cmd = "nanddump -s 0x" + str((self.mactry-1)*2) + "0000 -b -o -l 64 -p /dev/mtd4"
@@ -1381,7 +1391,7 @@ class MacConfig(Screen):
 #nandwrite /dev/mtd4 /tmp/mac.sector -p			
 			cmd = "make_mac_sector %02x-%02x-%02x-%02x-%02x-%02x > /tmp/mac.sector"%(int(macaddr[0:2],16),int(macaddr[2:4],16),int(macaddr[4:6],16),int(macaddr[6:8],16),int(macaddr[8:10],16),int(macaddr[10:12],16))
 			system(cmd)
-			if self.model == 2:
+			if self.model == 2 or self.model == 3 or self.model == 4:
 				system("flash_eraseall /dev/mtd5")
 				system("nandwrite /dev/mtd5 /tmp/mac.sector -p")
 			elif self.model == 0 or self.model ==1 :
