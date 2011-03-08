@@ -23,20 +23,71 @@ from Components.NimManager import nimmanager
 from enigma import eDVBCI_UI,eDVBCIInterfaces
 
 class TestResultList(HTMLComponent, GUIComponent):
-	def __init__(self, source):
+	def __init__(self, list, enableWrapAround=False, content=eListboxPythonStringContent):
 		GUIComponent.__init__(self)
-		self.l = eListboxPythonStringContent()
-		self.list = source
+		self.list = list
+		self.l = content()
 		self.l.setList(self.list)
+		self.onSelectionChanged = [ ]
+		self.enableWrapAround = enableWrapAround
+
+	def getCurrent(self):
+		return self.l.getCurrentSelection()
 
 	GUI_WIDGET = eListbox
 
 	def postWidgetCreate(self, instance):
 		self.instance.setSelectionEnable(0)
-		self.instance.setContent(self.l)
+		instance.setContent(self.l)
+		instance.selectionChanged.get().append(self.selectionChanged)
+		if self.enableWrapAround:
+			self.instance.setWrapAround(True)
 
-	def updateList(self,list):
-		self.l.setList(list)
+	def preWidgetRemove(self, instance):
+		instance.setContent(None)
+		instance.selectionChanged.get().remove(self.selectionChanged)
+
+	def selectionChanged(self):
+		for f in self.onSelectionChanged:
+			f()
+
+	def getSelectionIndex(self):
+		return self.l.getCurrentSelectionIndex()
+
+	def getSelectedIndex(self):
+		return self.l.getCurrentSelectionIndex()
+
+	def setList(self, list):
+		self.list = list
+		self.l.setList(self.list)
+
+	def updateList(self, list):
+		self.list = list
+		self.l.setList(self.list)
+
+	def moveToIndex(self, idx):
+		if self.instance is not None:
+			self.instance.moveSelectionTo(idx)
+
+	def pageUp(self):
+		if self.instance is not None:
+			self.instance.moveSelection(self.instance.pageUp)
+
+	def pageDown(self):
+		if self.instance is not None:
+			self.instance.moveSelection(self.instance.pageDown)
+
+	def up(self):
+		if self.instance is not None:
+			self.instance.moveSelection(self.instance.moveUp)
+
+	def down(self):
+		if self.instance is not None:
+			self.instance.moveSelection(self.instance.moveDown)
+
+	def selectionEnabled(self, enabled):
+		if self.instance is not None:
+			self.instance.setSelectionEnable(enabled)
 
 class FactoryTest(Screen):
 	skin = """
@@ -72,7 +123,7 @@ class FactoryTest(Screen):
 		}, -2)
 
 		Screen.__init__(self, session)
-		TESTPROGRAM_DATE = "2010-12-14"
+		TESTPROGRAM_DATE = "2010-03-02"
 		TESTPROGRAM_VERSION = "Version 00.01"
 
 		self.model = 0
@@ -81,12 +132,13 @@ class FactoryTest(Screen):
 		self["testdate"]=Label((TESTPROGRAM_DATE))
 		self["testversion"]=Label(("Loading version..."))
 		self["mactext"]=Label(("Loading mac address..."))
-		nimConfig = nimmanager.getNimConfig(0)
-		nimConfig.configMode.slot_id=0
-		nimConfig.configMode.value= "simple"
-		nimConfig.diseqcMode.value="diseqc_a_b"
-		nimConfig.diseqcA.value="160"
-		nimConfig.diseqcB.value="100"
+		if self.model == 0 or self.model == 1:
+			nimConfig = nimmanager.getNimConfig(0)
+			nimConfig.configMode.slot_id=0
+			nimConfig.configMode.value= "simple"
+			nimConfig.diseqcMode.value="diseqc_a_b"
+			nimConfig.diseqcA.value="160"
+			nimConfig.diseqcB.value="100"
 		if self.model == 0:
 			nimConfig = nimmanager.getNimConfig(1)
 			nimConfig.configMode.slot_id=1		
@@ -96,13 +148,117 @@ class FactoryTest(Screen):
 			nimConfig.diseqcB.value="192"
 		if self.model == 2:
 			pass
-		nimmanager.sec.update()		
+		if self.model == 3 or self.model == 4:
+			self.NimType = {}
+			sat_list = ["160","100","130","192","620","642"]
+			try:
+				nimfile = open("/proc/bus/nim_sockets")
+			except IOError:
+				nimfile = None
+			if nimfile is None:
+				self.session.openWithCallback(self.close, MessageBox, _("File not Found!\n/proc/bus/nim_sockets"), MessageBox.TYPE_ERROR)
+			for line in nimfile.readlines():
+				print line
+				if line == "":
+					break
+				if line.strip().startswith("NIM Socket"):
+					parts = line.strip().split(" ")
+					current_slot = int(parts[2][:-1])
+					self.NimType[current_slot]={}
+					self.NimType[current_slot]["slot"] = current_slot
+				elif line.strip().startswith("Type:"):
+					print str(line.strip())
+					self.NimType[current_slot]["type"] = str(line.strip()[6:])
+					if self.NimType[current_slot]["type"].startswith("DVB-S"):
+						self.NimType[current_slot]["sat1"] = sat_list.pop(0)
+						self.NimType[current_slot]["sat2"] = sat_list.pop(0)
+					else:
+						self.NimType[current_slot]["sat1"] = None
+						self.NimType[current_slot]["sat2"] = None
+				elif line.strip().startswith("empty"):
+					self.NimType.pop(current_slot)	
+			nimfile.close()
+			if True:
+				for (key, val) in self.NimType.items():
+					print key
+					print val
+					if val["type"].startswith("DVB-S"):
+						print "nimConfig (dvb-s): ",key
+						nimConfig = nimmanager.getNimConfig(key)
+						nimConfig.configMode.slot_id=key
+						nimConfig.configMode.value= "simple"
+						nimConfig.diseqcMode.value="diseqc_a_b"
+						nimConfig.diseqcA.value = val["sat1"]
+						nimConfig.diseqcB.value = val["sat2"]
+					else :
+						nimConfig = nimmanager.getNimConfig(key)
+						print "configMode check : ",nimConfig.configMode.value
+			
+		nimmanager.sec.update()
 		
 		system("cp /usr/lib/enigma2/python/Plugins/SystemPlugins/FactoryTest/testdb /etc/enigma2/lamedb")
 		db = eDVBDB.getInstance()
 		db.reloadServicelist()
+		self.createConfig()
+		
+		self.rlist = []
+		for x in range(self.menulength):
+			self.rlist.append((".."))
+#		self.rlist.append(("  "))
+		self["resultlist"] = TestResultList(self.rlist)
 
+#		self.NetworkState = 0
+#		self.first = 0
+
+		self.avswitch = AVSwitch()
+#		self.memTest = eMemtest()
+		self.scTest= eSctest()
+		
+#		self.feid=0
+#		self.agingmode=0
+		self.testing = 0
+
+		self.servicelist = ServiceList()
+		self.oldref = session.nav.getCurrentlyPlayingServiceReference()
+		print "oldref",self.oldref
+		session.nav.stopService() # try to disable foreground service
+		
+		self.tunemsgtimer = eTimer()
+		self.tunemsgtimer.callback.append(self.tunemsg)
+
+# chang : use "self.tuner_test_last_index" instead of cam_index 
+#		if self.model == 0:
+#			self.cam_index = 7
+#		elif self.model == 1:
+#			self.cam_index = 4
+#		elif self.model == 2:
+#			self.cam_index = 6	
+
+		self.camstep = 1
+		self.camtimer = eTimer()
+		self.camtimer.callback.append(self.cam_state)
+		self.mactry = 1
+		self.getmacaddr()
+		self.getversion()
+		
+		self.tunerlock = 0
+		self.tuningtimer = eTimer()
+		self.tuningtimer.callback.append(self.updateStatus)
+
+		self.satatry = 8
+		self.satatimer = eTimer()
+		self.satatimer.callback.append(self.sataCheck)
+
+		self.usbtimer = eTimer()
+		self.usbtimer.callback.append(self.usbCheck)
+
+		self.agingtimer = eTimer()
+		self.agingtimer.callback.append(self.agingCheck)
+
+	def createConfig(self):
 		tlist = []
+		self.satetestIndex = -1
+		self.scarttestIndex = -1
 		if self.model == 0:
 			self.satetestIndex=0
 			tlist.append((" 0. Sata & extend hdd test",self.satetestIndex))
@@ -126,20 +282,14 @@ class FactoryTest(Screen):
 			tlist.append((" 9. RS232 test",self.rs232testIndex))
 			self.ethernettestIndex=10
 			tlist.append(("10. Ethernet & mac test",self.ethernettestIndex))
-#		tlist.append(("11. DRAM test",11))
-#		tlist.append(("12. Flash test",12))
-#		tlist.append(("13. DRAM+Flash test",13))
 			self.fdefaultIndex=11
 			tlist.append(("11. Factory default",self.fdefaultIndex))
 			self.shutdownIndex=12
 			tlist.append(("12. Shutdown",self.shutdownIndex))
+			self.tuner_test_first_index = 4
+			self.tuner_test_last_index = 7
+			
 		elif self.model == 1:
-#			tlist.append((" 0. Sata & extend hdd test",self.satetestIndex=0))
-			self.satetestIndex = -1
-			self.scarttestIndex = -1
-
-
-
 			self.usbtestIndex=0
 			tlist.append((" 0. USB test",self.usbtestIndex))
 			self.fronttestIndex=1
@@ -148,26 +298,20 @@ class FactoryTest(Screen):
 			tlist.append((" 2. Smartcard test",self.smarttestIndex))
 			self.tuner1_1testIndex=3
 			tlist.append((" 3. T1 H 22K x 4:3 CVBS",self.tuner1_1testIndex))
-			self.tuner1_2testIndex=4
+			self.tuner2_2testIndex = self.tuner1_2testIndex=4
 			tlist.append((" 4. T1 V 22k o 16:9 RGB CAM",self.tuner1_2testIndex))
-			self.tuner2_2testIndex=4
-#			tlist.append((" 6. T2 H 22k x 4:3 YC",self.tuner2_1testIndex=6))
-#			tlist.append((" 7. T2 V 22k o 16:9 CVBS CAM",self.tuner2_2testIndex=7))
-#			tlist.append((" 8. VCR Scart loop",self.scarttestIndex=8))
 			self.rs232testIndex=5
 			tlist.append((" 5. RS232 test",self.rs232testIndex))
 			self.ethernettestIndex=6
 			tlist.append((" 6. Ethernet & mac test",self.ethernettestIndex))
-#		tlist.append(("11. DRAM test",11))
-#		tlist.append(("12. Flash test",12))
-#		tlist.append(("13. DRAM+Flash test",13))
 			self.fdefaultIndex=7
 			tlist.append((" 7. Factory default",self.fdefaultIndex))
 			self.shutdownIndex=8
 			tlist.append((" 8. Shutdown",self.shutdownIndex))
+			self.tuner_test_first_index = 3
+			self.tuner_test_last_index = 4
 
 		elif self.model == 2:
-			self.scarttestIndex = -1
 			self.satetestIndex=0
 			tlist.append((" 0. Sata & extend hdd test",self.satetestIndex))
 			self.usbtestIndex=1
@@ -191,72 +335,116 @@ class FactoryTest(Screen):
 			tlist.append(("9. Factory default",self.fdefaultIndex))
 			self.shutdownIndex=10
 			tlist.append(("10. Shutdown",self.shutdownIndex))
+			self.tuner_test_first_index = 4
+			self.tuner_test_last_index = 6
+
+		elif self.model == 3 or self.model == 4:
+			self.satetestIndex=0
+			tlist.append((" 0. Sata & extend hdd test",self.satetestIndex))
+			self.usbtestIndex=1
+			tlist.append((" 1. USB test",self.usbtestIndex))
+			self.fronttestIndex=2
+			tlist.append((" 2. Front test",self.fronttestIndex))
+			self.smarttestIndex=3
+			tlist.append((" 3. Smartcard test",self.smarttestIndex))
+			self.tuner_test_first_index = current_index = 4
+			AspectRatio=["4:3", "16:9"]
+			ColorFormat=["CVBS","RGB","YC","CVBS","CVBS","CVBS","CVBS","CVBS"]	
+			self.tuneInfo={}
+			if self.model == 3 or self.model == 4:
+				for (key, val) in self.NimType.items():
+					if val["type"].startswith("DVB-S"):
+# Chang : DVB -S setting diseqc A
+						getRatio = AspectRatio.pop(0) # ratio
+						AspectRatio.append(getRatio)
+						getColorFormat=ColorFormat.pop(0) # colorFormat
+						menuname=" %d. T%d %s H 22k 0 %s %s" % (current_index, key+1, val["type"], getRatio, getColorFormat)	#menuname
+						print current_index
+#						current_index=4
+						self.setTuneInfo(index=current_index, slot=key, type=val["type"], sat=val["sat1"], pol="H", tone=True, ratio=getRatio, color=getColorFormat, cam=False) # setTuneInfo
+#						self.setTuneInfo(current_index, key, val["type"], val["sat1"], "H", True, getRatio, getColorFormat, False) # setTuneInfo
+						tlist.append((menuname,current_index))
+						current_index+=1
+# Chang : DVB -S setting diseqc B
+						getRatio = AspectRatio.pop(0)
+						AspectRatio.append(getRatio)
+						getColorFormat=ColorFormat.pop(0)
+						menuname=" %d. T%d %s V 22k x %s %s" % (current_index, key+1, val["type"], getRatio, getColorFormat)	
+						if len(self.NimType) == key+1: # CAM test on/off
+							menuname+=" CAM"
+							camtest = True
+						else:
+							camtest = False			
+						self.setTuneInfo( index=current_index, slot=key, type=val["type"], sat=val["sat2"], pol="V", tone=False, ratio=getRatio, color=getColorFormat, cam=camtest)
+						tlist.append((menuname,current_index))
+						current_index+=1
+# Chang : DVB -T or DVB-C
+					elif val["type"].startswith("DVB-T") or val["type"].startswith("DVB-C"):
+						getRatio = AspectRatio.pop(0)
+						AspectRatio.append(getRatio)
+						getColorFormat=ColorFormat.pop(0)
+						menuname=" %d. T%d %s %s %s" % (current_index, key+1, val["type"], getRatio, getColorFormat)
+						if len(self.NimType) == key+1: # CAM test on/off
+							menuname+=" CAM"
+							camtest = True
+						else:
+							camtest = False	
+						self.setTuneInfo( index=current_index, slot=key, type=val["type"], sat=None, pol=None, tone=None, ratio=getRatio, color=getColorFormat, cam=camtest)
+						tlist.append((menuname,current_index))
+						current_index+=1
+			self.tuner_test_last_index = current_index-1
+			self.rs232testIndex=current_index
+			tlist.append((" %d. RS232 test" % current_index,self.rs232testIndex))
+			current_index+=1
+			self.ethernettestIndex=current_index
+			tlist.append((" %d. Ethernet & mac test" % current_index,self.ethernettestIndex))
+			current_index+=1
+			self.fdefaultIndex=current_index
+			tlist.append((" %d. Factory default" % current_index,self.fdefaultIndex))
+			current_index+=1
+			self.shutdownIndex=current_index
+			tlist.append((" %d. Shutdown" % current_index,self.shutdownIndex))
 			
-		self.menulength= len(tlist)-1
+		self.menulength= len(tlist)
 		self["testlist"] = MenuList(tlist)
-		self.rlist = []
-		for x in range(self.menulength):
-			self.rlist.append((".."))
-		self["resultlist"] = TestResultList(self.rlist)
-		self.NetworkState = 0
-		self.first = 0
-
-		self.avswitch = AVSwitch()
-		self.memTest = eMemtest()
-		self.scTest= eSctest()
-		
-		self.feid=0
-		self.agingmode=0
-		self.testing = 0
-
-		self.servicelist = ServiceList()
-		self.oldref = session.nav.getCurrentlyPlayingServiceReference()
-		print "oldref",self.oldref
-		session.nav.stopService() # try to disable foreground service
-		
-		self.tunemsgtimer = eTimer()
-		self.tunemsgtimer.callback.append(self.tunemsg)
-
-		if self.model == 0:
-			self.cam_index = 7
-		elif self.model == 1:
-			self.cam_index = 4
-		elif self.model == 2:
-			self.cam_index = 6	
-		self.camstep = 1
-		self.camtimer = eTimer()
-		self.camtimer.callback.append(self.cam_state)
-		self.mactry = 1
-		self.getmacaddr()
-		self.getversion()
-		
-		self.tunerlock = 0
-		self.tuningtimer = eTimer()
-		self.tuningtimer.callback.append(self.updateStatus)
-
-		self.satatry = 8
-		self.satatimer = eTimer()
-		self.satatimer.callback.append(self.sataCheck)
-
-		self.usbtimer = eTimer()
-		self.usbtimer.callback.append(self.usbCheck)
+	
+	def setTuneInfo(self,index=0,slot=0,type="DVB-S2",sat="160",pol="H",tone=True,ratio="4:3",color="CVBS",cam=False):
+		self.tuneInfo[index]={}
+		self.tuneInfo[index]["slot"]=slot
+		self.tuneInfo[index]["type"]=type
+		self.tuneInfo[index]["sat"]=sat
+		self.tuneInfo[index]["pol"]=pol
+		self.tuneInfo[index]["22k"]=tone
+		self.tuneInfo[index]["ratio"]=ratio
+		self.tuneInfo[index]["color"]=color
+		self.tuneInfo[index]["cam"]=cam
 
 	def getModelInfo(self):
 		getmodel = 0
-		if fileExists("/proc/stb/info/vumodel"):
-			info = open("/proc/stb/info/vumodel").read().strip()
-			if info == "combo":
-				self.model = 2
-				getmodel = 1
-				print "getModelInfo : combo"
-			if info == "solo":
-				self.model = 1
-				getmodel = 1
-				print "getModelInfo : solo"
+#		if fileExists("/proc/stb/info/vumodel"):
+#			info = open("/proc/stb/info/vumodel").read().strip()
+		if fileExists("/test/vumodel"):
+			info = open("/test/vumodel").read().strip()
 			if info == "duo":
 				self.model = 0
 				getmodel = 1
 				print "getModelInfo : duo"
+			if info == "solo":
+				self.model = 1
+				getmodel = 1
+				print "getModelInfo : solo"
+			if info == "combo":
+				self.model = 2
+				getmodel = 1
+				print "getModelInfo : combo"
+			if info == "uno":
+				self.model = 3
+				getmodel = 1
+				print "getModelInfo : uno"
+			if info == "ultimo":
+				self.model = 4
+				getmodel = 1
+				print "getModelInfo : ultimo"
 		if getmodel == 0 and fileExists("/proc/stb/info/version"):
 			info = open("/proc/stb/info/version").read()
 #			print info,info[:2]
@@ -271,21 +459,29 @@ class FactoryTest(Screen):
 		print "nothing"
 
 	def keyup(self):
+		print "self.menulength = ",self.menulength
+		print "self[\"testlist\"].getCurrent()[1] = ",self["testlist"].getCurrent()[1]
 		if self.testing==1:
 			return
 		if self["testlist"].getCurrent()[1]==0:
-			self["testlist"].moveToIndex(self.menulength)
+			self["testlist"].moveToIndex(self.menulength-1)
+			self["resultlist"].moveToIndex(self.menulength-1)
 		else:
 			self["testlist"].up()
+			self["resultlist"].up()
 
 
 	def keydown(self):
+		print "self.menulength = ",self.menulength
+		print "self[\"testlist\"].getCurrent()[1] = ",self["testlist"].getCurrent()[1]
 		if self.testing==1:
 			return
-		if self["testlist"].getCurrent()[1]==(self.menulength):
+		if self["testlist"].getCurrent()[1]==(self.menulength-1):
 			self["testlist"].moveToIndex(0)
+			self["resultlist"].moveToIndex(0)
 		else:
 			self["testlist"].down()
+			self["resultlist"].down()
 
 	def numberaction(self, number):
 		if self.testing==1:
@@ -294,42 +490,7 @@ class FactoryTest(Screen):
 			return
 		index = int(number)
 		self["testlist"].moveToIndex(index)
-
-
-	def updateStatus(self):
-		index = self["testlist"].getCurrent()[1]
-		if index ==self.tuner1_1testIndex or index==self.tuner1_2testIndex:
-			tunno = 1
-			result = eSctest.getInstance().getFrontendstatus(0)
-		else:
-			tunno = 2
-			result = eSctest.getInstance().getFrontendstatus(1)
-
-		if self.agingmode == 1:
-			tunno = 1
-			result = eSctest.getInstance().getFrontendstatus(0)
-			hv = "Ver"
-		if self.model == 2 and index==self.tuner2_2testIndex:
-			hv = ""
-		elif index == self.tuner1_2testIndex or index==self.tuner2_2testIndex:
-			hv = "Ver"
-		else:
-			hv = "Hor"
-			
-		print "eSctest.getInstance().getFrontendstatus - %d"%result
-		if result == 0:
-			self.tunerlock = 0
-			self.tunemsgtimer.stop()
-			self.session.nav.stopService()
-			self.avswitch.setColorFormat(0)
-			self.session.open( MessageBox, _("Tune%d %s Locking Fail..."%(tunno,hv)), MessageBox.TYPE_ERROR)	
-			if self.agingmode==0:
-				self.rlist[self["testlist"].getCurrent()[1]]="fail"
-			self.agingmode = 0
-		else :
-			self.tunerlock = 1
-			if self.agingmode==1:
-				self.session.openWithCallback(self.checkaging,AgingTest)			
+		self["resultlist"].moveToIndex(index)
 
 	def getversion(self):
 		try:
@@ -387,34 +548,16 @@ class FactoryTest(Screen):
 			return
 		
 	def TestAction(self):
-#
-#			tlist.append((" 0. Sata & extend hdd test",self.satetestIndex=0))
-#			tlist.append((" 1. USB test",self.usbtestIndex=1))
-#			tlist.append((" 2. Front test",self.fronttestIndex=2))
-#			tlist.append((" 3. Smartcard test",self.smarttestIndex=3))
-#			tlist.append((" 4. T1 H 22K x 4:3 CVBS",self.tuner1_1testIndex=4))
-#			tlist.append((" 5. T1 V 22k o 16:9 RGB",self.tuner1_2testIndex=5))
-#			tlist.append((" 6. T2 H 22k x 4:3 YC",self.tuner2_1testIndex=6))
-#			tlist.append((" 7. T2 V 22k o 16:9 CVBS CAM",self.tuner2_2testIndex=7))
-#			tlist.append((" 8. VCR Scart loop",self.scarttestIndex=8))
-#			tlist.append((" 9. RS232 test",self.rs232testIndex=9))
-#			tlist.append(("10. Ethernet & mac test",self.ethernettestIndex=10))
-#		tlist.append(("11. DRAM test",11))
-#		tlist.append(("12. Flash test",12))
-#		tlist.append(("13. DRAM+Flash test",13))
-#			tlist.append(("11. Factory default",self.fdefaultIndex=11))
-#			tlist.append(("12. Shutdown",self.shutdownIndex=12))
-#
 		if self.testing==1:
 			return
 		print "line - ",self["testlist"].getCurrent()[1]
-		index = self["testlist"].getCurrent()[1]
+		self.currentindex = index = self["testlist"].getCurrent()[1]
 		result = 0
 		if index==self.satetestIndex:
 			self.Test0()
 		elif index==self.fronttestIndex:
 			self.Test1()
-		elif index>=self.tuner1_1testIndex and index<=self.tuner2_2testIndex:
+		elif index>=self.tuner_test_first_index and index<=self.tuner_test_last_index:
 			self.TestTune(index)
 		elif index==self.scarttestIndex:
 			self.Test6()
@@ -532,7 +675,7 @@ class FactoryTest(Screen):
 			self.session.openWithCallback(self.displayresult ,FrontTest)
 		elif self.model == 1:
 			self.session.openWithCallback(self.displayresult ,FrontTest_solo)
-		elif self.model == 2:
+		elif self.model == 2 or self.model == 3 or self.model == 4:
 			self.session.openWithCallback(self.displayresult ,FrontTest_solo)
 
 	def displayresult(self):
@@ -541,11 +684,6 @@ class FactoryTest(Screen):
 			self.rlist[self["testlist"].getCurrent()[1]]="pass"
 		else:
 			self.rlist[self["testlist"].getCurrent()[1]]="fail"
-
-	INTERNAL_PID_STATUS_NOOP = 0
-	INTERNAL_PID_STATUS_WAITING = 1
-	INTERNAL_PID_STATUS_SUCCESSFUL = 2
-	INTERNAL_PID_STATUS_FAILED = 3
 
 	def TestTune(self,index):	
 		if self.oldref is None:
@@ -560,53 +698,40 @@ class FactoryTest(Screen):
 		else:
 			ref = self.oldref
 		self.session.nav.stopService() # try to disable foreground service
-		if index==self.tuner1_1testIndex:
-			ref.setData(0,1)
-			ref.setData(1,0x6D3)
-			ref.setData(2,0x3)
-			ref.setData(3,0xA4)
-			ref.setData(4,0xA00000)
-			self.session.nav.playService(ref)
-			self.avswitch.setColorFormat(0)
-			self.avswitch.setAspectRatio(0)
-		elif index==self.tuner1_2testIndex:
-			if self.model == 1:
+		if self.model == 0 or self.model == 1:
+			if index==self.tuner1_1testIndex:
+				ref.setData(0,1)
+				ref.setData(1,0x6D3)
+				ref.setData(2,0x3)
+				ref.setData(3,0xA4)
+				ref.setData(4,0xA00000)
+				self.session.nav.playService(ref)
+				self.avswitch.setColorFormat(0)
+				self.avswitch.setAspectRatio(0)
+			elif index==self.tuner1_2testIndex:
+				if self.model == 1:
+					self.camstep = 1
+					self.camtimer.start(100,True)
+				ref.setData(0,0x19)
+				ref.setData(1,0x1325)
+				ref.setData(2,0x3ef)
+				ref.setData(3,0x1)
+				ref.setData(4,0x64af79)
+				self.session.nav.playService(ref)
+				self.avswitch.setColorFormat(1)
+				self.avswitch.setAspectRatio(6)			
+			elif index==self.tuner2_1testIndex:
+				ref.setData(0,1)
+				ref.setData(1,0x6D3)
+				ref.setData(2,0x3)
+				ref.setData(3,0xA4)
+				ref.setData(4,0x820000)
+				self.session.nav.playService(ref)
+				self.avswitch.setColorFormat(2)			
+				self.avswitch.setAspectRatio(0)			
+			elif index==self.tuner2_2testIndex:
 				self.camstep = 1
 				self.camtimer.start(100,True)
-			ref.setData(0,0x19)
-			ref.setData(1,0x1325)
-			ref.setData(2,0x3ef)
-			ref.setData(3,0x1)
-			ref.setData(4,0x64af79)
-#		ref.setData(0,0x19)
-#		ref.setData(1,0x83)
-#		ref.setData(2,0x6)
-#		ref.setData(3,0x85)
-#		ref.setData(4,0x640000)
-			self.session.nav.playService(ref)
-			self.avswitch.setColorFormat(1)
-			self.avswitch.setAspectRatio(6)			
-		elif index==self.tuner2_1testIndex:
-#			self.camstep = 1
-#			self.camtimer.start(100,True)
-			ref.setData(0,1)
-			ref.setData(1,0x6D3)
-			ref.setData(2,0x3)
-			ref.setData(3,0xA4)
-			ref.setData(4,0x820000)
-			self.session.nav.playService(ref)
-			self.avswitch.setColorFormat(2)			
-			self.avswitch.setAspectRatio(0)			
-		elif index==self.tuner2_2testIndex:
-			self.camstep = 1
-			self.camtimer.start(100,True)
-#			ref.setData(0,0x19)
-#			ref.setData(1,0x83)
-#			ref.setData(2,0x6)
-#			ref.setData(3,0x85)
-#		ref.setData(4,0xC00000)
-#	ikseong - for 22000 tp ( /home/ikseong/share/lamedb_ORF)
-			if self.model==0:
 				ref.setData(0,0x19)
 				ref.setData(1,0x1325)
 				ref.setData(2,0x3ef)
@@ -615,25 +740,66 @@ class FactoryTest(Screen):
 				self.session.nav.playService(ref)
 				self.avswitch.setColorFormat(0)			
 				self.avswitch.setAspectRatio(6)
-			elif self.model==2:
+			self.tuningtimer.start(2000,True)
+			self.tunemsgtimer.start(3000, True)
+		elif self.model == 3 or self.model == 4:
+			getTuneInfo=self.tuneInfo[index]
+			if getTuneInfo["type"].startswith("DVB-S"):
+				if getTuneInfo["pol"] == "H":
+					ref.setData(0,1)
+					ref.setData(1,0x6D3)
+					ref.setData(2,0x3)
+					ref.setData(3,0xA4)
+				else:
+					ref.setData(0,0x19)
+					ref.setData(1,0x1325)
+					ref.setData(2,0x3ef)
+					ref.setData(3,0x1)
+					ref.setData(4,0x64af79)
+				if getTuneInfo["sat"] == "160": # Eutelsat W2
+					ref.setData(4,0xA00000)
+				elif getTuneInfo["sat"] == "100": # Eutelsat
+					ref.setData(4,0x64af79)
+				elif getTuneInfo["sat"] == "130": # Hotbird
+					ref.setData(4,0x820000)
+				elif getTuneInfo["sat"] == "192": # Astra
+					ref.setData(4,0xC00000)
+				elif getTuneInfo["sat"] == "620": # Intelsat 902
+					ref.setData(4,0x26c0000) # need to fix later
+				elif getTuneInfo["sat"] == "642": # Intelsat 906
+					ref.setData(4,0x282AF79) # need to fix later
+			elif getTuneInfo["type"].startswith("DVB-C"):
 				ref.setData(0,0x19)
 				ref.setData(1,0x1325)
 				ref.setData(2,0x3ef)
 				ref.setData(3,0x1)
-				ref.setData(4,0xfff029a)
-				self.session.nav.playService(ref)
+				ref.setData(4,-64870) # ffff029a
+			elif getTuneInfo["type"].startswith("DVB-T"):
+				ref.setData(0,0x19)
+				ref.setData(1,0x1325)
+				ref.setData(2,0x3ef)
+				ref.setData(3,0x1)
+				ref.setData(4,-286391716) # eeee025c
+
+			self.session.nav.playService(ref)
+			if getTuneInfo["color"]=="CVBS":
+				self.avswitch.setColorFormat(0)
+			elif getTuneInfo["color"]=="RGB":
+				self.avswitch.setColorFormat(1)
+			elif getTuneInfo["color"]=="YC":
 				self.avswitch.setColorFormat(2)
+			if getTuneInfo["ratio"] == "4:3":
 				self.avswitch.setAspectRatio(0)
-		if self.model==0 or self.model==1:
-			print "2-3"
+			elif getTuneInfo["ratio"] == "16:9":
+				self.avswitch.setAspectRatio(6)
+			if getTuneInfo["cam"] is True:
+				self.camstep = 1
+				self.camtimer.start(100,True)
 			self.tuningtimer.start(2000,True)
-			self.tunemsgtimer.start(3000, True)
-		elif self.model==2:
-			print "4-5"
-			self.tuningtimer.start(4000,True)
-			self.tunemsgtimer.start(5000, True)
+			self.tunemsgtimer.start(3000, True) 
 		
 	def cam_state(self):
+		current_index = self.currentindex
 		if self.camstep == 1:
 			slot = 0
 			state = eDVBCI_UI.getInstance().getState(slot)
@@ -644,7 +810,7 @@ class FactoryTest(Screen):
 			else:
 				self.session.nav.stopService()
 				self.session.open( MessageBox, _("CAM1_NOT_INSERTED\nPress exit!"), MessageBox.TYPE_ERROR)
-				self.rlist[self["testlist"].getCurrent()[1]]="fail"
+				self.rlist[current_index]="fail"
 				self.tunemsgtimer.stop()
 #				self.rlist[index]="fail"
 #				self["resultlist"].updateList(self.rlist)
@@ -655,7 +821,7 @@ class FactoryTest(Screen):
 			if appname is None:
 				self.session.nav.stopService()
 				self.session.open( MessageBox, _("NO_GET_APPNAME\nPress exit!"), MessageBox.TYPE_ERROR)
-				self.rlist[self["testlist"].getCurrent()[1]]="fail"
+				self.rlist[current_index]="fail"
 				self.tunemsgtimer.stop()				
 			else:
 				self.camstep=3
@@ -670,7 +836,7 @@ class FactoryTest(Screen):
 			else:
 				self.session.nav.stopService()
 				self.session.open( MessageBox, _("CAM2_NOT_INSERTED\nPress exit!"), MessageBox.TYPE_ERROR)
-				self.rlist[self["testlist"].getCurrent()[1]]="fail"
+				self.rlist[current_index]="fail"
 				self.tunemsgtimer.stop()				
 #				self.rlist[index]="fail"
 #				self["resultlist"].updateList(self.rlist)
@@ -681,12 +847,70 @@ class FactoryTest(Screen):
 			if appname is None:
 				self.session.nav.stopService()
 				self.session.open( MessageBox, _("NO_GET_APPNAME\nPress exit!"), MessageBox.TYPE_ERROR)
-				self.rlist[self["testlist"].getCurrent()[1]]="fail"
+				self.rlist[current_index]="fail"
 				self.tunemsgtimer.stop()				
 			else:
 				self.setSource()
 				self.camstep = 5
 #				self.session.open( MessageBox, _("CAM OK!"), MessageBox.TYPE_INFO,2)
+
+	def updateStatus(self):
+		current_index = self.currentindex
+		if self.model == 0 or self.model == 1:
+			if current_index ==self.tuner1_1testIndex or current_index==self.tuner1_2testIndex:
+				tunno = 1
+				result = eSctest.getInstance().getFrontendstatus(0)
+			else:
+				tunno = 2
+				result = eSctest.getInstance().getFrontendstatus(1)
+			if current_index == self.tuner1_2testIndex or current_index==self.tuner2_2testIndex:
+				hv = "Ver"
+			else:
+				hv = "Hor"
+
+		elif self.model == 3 or self.model == 4:
+			getTuneInfo=self.tuneInfo[current_index]
+			result = eSctest.getInstance().getFrontendstatus(getTuneInfo["slot"])
+			tunno = getTuneInfo["slot"]+1
+			hv = getTuneInfo["pol"]
+			if hv == "H":
+				hv = "Hor"
+			elif hv == "V":
+				hv = "Ver"
+			else :
+				hv == ""
+				
+		print "eSctest.getInstance().getFrontendstatus - %d"%result
+		if result == 0:
+			self.tunerlock = 0
+			self.tunemsgtimer.stop()
+			self.session.nav.stopService()
+			self.avswitch.setColorFormat(0)
+			self.session.open( MessageBox, _("Tune%d %s Locking Fail..."%(tunno,hv)), MessageBox.TYPE_ERROR)
+			self.rlist[current_index]="fail"
+		else : 
+			self.tunerlock = 1
+
+	def tuneback(self,yesno):
+		current_index=self.currentindex
+		self.session.nav.stopService() # try to disable foreground service
+		if yesno and self.tunerlock == 1:
+			if current_index == self.tuner_test_last_index and self.camstep < 5:
+				self.rlist[current_index]="fail"
+			else :
+				self.rlist[current_index]="pass"
+		else:
+			self.rlist[current_index]="fail"
+		if self.model == 0 and current_index == 6: # YC
+			self.avswitch.setColorFormat(0)
+		elif ( self.model == 3 or self.model == 4 ) and self.tuneInfo[current_index]["color"] == "YC":
+			self.avswitch.setColorFormat(0)
+		self.resetSource()
+		self["resultlist"].updateList(self.rlist)
+
+	def tunemsg(self):
+		self.tuningtimer.stop()
+		self.session.openWithCallback(self.tuneback, MessageBox, _("%s ok?" %(self["testlist"].getCurrent()[0])), MessageBox.TYPE_YESNO)
 
 #	ikseong - for 22000 tp
 	def setSource(self):
@@ -710,25 +934,6 @@ class FactoryTest(Screen):
 		fd.write("B")
 		fd.close()
 		print "CI loop test end!!!!!!!!!!!!!!"
-		
-	def tunemsg(self):
-		self.tuningtimer.stop()
-		self.session.openWithCallback(self.tuneback, MessageBox, _("%s ok?" %(self["testlist"].getCurrent()[0])), MessageBox.TYPE_YESNO)
-
-	def tuneback(self,yesno):
-		self.session.nav.stopService() # try to disable foreground service
-		if yesno:
-			self.rlist[self["testlist"].getCurrent()[1]]="pass"
-			if self.tunerlock == 0:
-				self.rlist[self["testlist"].getCurrent()[1]]="fail"
-			elif self["testlist"].getCurrent()[1] == self.cam_index and self.camstep < 5:
-				self.rlist[self["testlist"].getCurrent()[1]]="fail"
-		else:
-			self.rlist[self["testlist"].getCurrent()[1]]="fail"
-		if self["testlist"].getCurrent()[1] == 6: # YC
-			self.avswitch.setColorFormat(0)			
-		self.resetSource()
-		self["resultlist"].updateList(self.rlist)
 				
 	def Test6(self):
 		self.avswitch.setInput("SCART")
@@ -772,25 +977,30 @@ class FactoryTest(Screen):
 		ref.setData(2,0x3ef)
 		ref.setData(3,0x1)
 		ref.setData(4,0x64af79)
-#		ref.setData(0,1)
-#		ref.setData(1,0x6D3)
-#		ref.setData(2,0x3)
-#		ref.setData(3,0xA4)
-#		ref.setData(4,0xA00000)
 		self.session.nav.playService(ref)
 		self.avswitch.setColorFormat(0)
 		self.avswitch.setAspectRatio(0)
-		self.tuningtimer.start(2000,True)
-		self.agingmode = 1
+		self.agingtimer.start(2000,True)
 
-	def checkaging(self):
+	def agingCheck(self):
+		result = eSctest.getInstance().getFrontendstatus(0)		
+		hv = "Ver"	
+		print "eSctest.getInstance().getFrontendstatus - %d"%result
+		if result == 0:
+			self.session.nav.stopService()
+			self.session.open( MessageBox, _("Tune 1 Ver Locking Fail..."), MessageBox.TYPE_ERROR)
+		elif result == 1 :
+			self.session.openWithCallback(self.agingResult,AgingTest)
+		else:
+			self.session.nav.stopService()
+			self.session.open( MessageBox, _("Tune 1 Ver Error %d..."%result), MessageBox.TYPE_ERROR)
+
+	def agingResult(self):
 		global Agingresult
 		if(Agingresult ==1):
 			self["testlist"].moveToIndex(self.fdefaultIndex)
 			self.Test14()
-			self["testlist"].moveToIndex(self.shutdownIndex)
-		self.agingmode = 0
-#			self["testlist"].instance.moveSelection(self["testlist"].instance.moveDown)		
+			self["testlist"].moveToIndex(self.shutdownIndex)	
 	
 	def Test8(self):
 		self.usbtry = 9
@@ -811,6 +1021,10 @@ class FactoryTest(Screen):
 			devices = [ "/autofs/sda1", "/autofs/sdb1" ]
 		elif self.model==2:
 			devices = [ "/autofs/sdc1", "/autofs/sdd1" ]
+		else :
+			self.session.open( MessageBox, _("invalid model"), MessageBox.TYPE_ERROR)			
+			self.rlist[self["testlist"].getCurrent()[1]]="fail"
+			return
 
 		result=len(devices)
 		
@@ -956,11 +1170,14 @@ class FactoryTest(Screen):
 
 	def Test14(self):
 		try:
+			print "test14"
 			system("rm -R /etc/enigma2")
+			system("ls /")
 			system("cp -R /usr/share/enigma2/defaults /etc/enigma2")
 			self.rlist[self["testlist"].getCurrent()[1]]="pass"
 			self["resultlist"].updateList(self.rlist)
 		except:
+			print "test14 except"
 			self.rlist[self["testlist"].getCurrent()[1]]="fail"
 			self["resultlist"].updateList(self.rlist)
 			self.session.open( MessageBox, _("Factory reset fail"), MessageBox.TYPE_ERROR)
@@ -1486,7 +1703,7 @@ class SmartCardTest(Screen):
 		
 		if result == 0:
 			print 'pass'
-			if(index== 0 and ( self.model== 0 or self.model==2) ):
+			if(index== 0 and ( self.model== 0 or self.model==2 or self.model == 3 or self.model == 4) ):
 				self.smartcard = 1
 				self["text"].setText(_("Testing Smartcard 2..."))
 				self.smartcardtimer.start(100,True)
@@ -1496,6 +1713,11 @@ class SmartCardTest(Screen):
 #				self.session.open( MessageBox, _("Smart Card OK!!"), MessageBox.TYPE_INFO,2)
 				self.step = 1
 				self["text"].setText(_("Smart Card OK!!"))
+				self.closetimer.start(2000,True)
+				self.smartcardtimer.stop()
+			else :
+				
+				self["text"].setText(_("Smart Card model type error"))
 				self.closetimer.start(2000,True)
 				self.smartcardtimer.stop()
 #			self.session.openWithCallback(self.check6, MessageBox, _("Scart loop ok?"), MessageBox.TYPE_INFO)
@@ -1799,7 +2021,7 @@ class AgingTest(Screen):
 		self.tunerlock = 0
 		self.tuningtimer = eTimer()
 		self.tuningtimer.callback.append(self.updateStatus)
-#		self.tuningtimer.start(2000,True)
+#		self.tuningtimer.start(200,True)
 
 
 	def updateStatus(self):
@@ -1810,13 +2032,13 @@ class AgingTest(Screen):
 		if result == 0:
 			self.tunerlock = 0
 			self.session.nav.stopService()
-			self.session.open( MessageBox, _("Tune 1 Ver Locking Fail..."), MessageBox.TYPE_ERROR)	
+			self.session.open( MessageBox, _("Tune 1 Ver Locking Fail..."), MessageBox.TYPE_ERROR)
 		elif result==1 :
 			self.tunerlock = 1
 		else:
 			self.tunerlock = 0
 			self.session.nav.stopService()
-			self.session.open( MessageBox, _("Tune 1 Ver Error %d..."%result), MessageBox.TYPE_ERROR)	
+			self.session.open( MessageBox, _("Tune 1 Ver Error %d..."%result), MessageBox.TYPE_ERROR)
 
 
 	def nothing(self):
