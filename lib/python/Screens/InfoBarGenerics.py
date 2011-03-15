@@ -1,4 +1,4 @@
-from ChannelSelection import ChannelSelection, BouquetSelector
+from ChannelSelection import ChannelSelection, BouquetSelector, SilentBouquetSelector
 
 from Components.ActionMap import ActionMap, HelpableActionMap
 from Components.ActionMap import NumberActionMap
@@ -555,18 +555,15 @@ class InfoBarEPG:
 
 	def openMultiServiceEPG(self, withCallback=True):
 		bouquets = self.servicelist.getBouquetList()
+		root = self.servicelist.getRoot()
 		if bouquets is None:
 			cnt = 0
 		else:
 			cnt = len(bouquets)
-		if cnt > 1: # show bouquet list
-			if withCallback:
-				self.bouquetSel = self.session.openWithCallback(self.closed, BouquetSelector, bouquets, self.openBouquetEPG, enableWrapAround=True)
-				self.dlg_stack.append(self.bouquetSel)
-			else:
-				self.bouquetSel = self.session.open(BouquetSelector, bouquets, self.openBouquetEPG, enableWrapAround=True)
-		elif cnt == 1:
-			self.openBouquetEPG(bouquets[0][1], withCallback)
+		if cnt > 1: # create bouquet list for bouq+/-
+			self.bouquetSel = SilentBouquetSelector(bouquets, True, self.servicelist.getBouquetNumOffset(root))
+		if cnt >= 1:
+			self.openBouquetEPG(root, withCallback)
 
 	def changeServiceCB(self, direction, epg):
 		if self.serviceSel:
@@ -1353,6 +1350,7 @@ class InfoBarExtensions:
 			answer[1][1]()
 
 from Tools.BoundFunction import boundFunction
+import inspect
 
 # depends on InfoBarExtensions
 
@@ -1364,9 +1362,13 @@ class InfoBarPlugins:
 		return name
 
 	def getPluginList(self):
-		list = [((boundFunction(self.getPluginName, p.name), boundFunction(self.runPlugin, p), lambda: True), None, p.name) for p in plugins.getPlugins(where = PluginDescriptor.WHERE_EXTENSIONSMENU)]
-		list.sort(key = lambda e: e[2]) # sort by name
-		return list
+		l = []
+		for p in plugins.getPlugins(where = PluginDescriptor.WHERE_EXTENSIONSMENU):
+		  args = inspect.getargspec(p.__call__)[0]
+		  if len(args) == 1 or len(args) == 2 and isinstance(self, InfoBarChannelSelection):
+			  l.append(((boundFunction(self.getPluginName, p.name), boundFunction(self.runPlugin, p), lambda: True), None, p.name))
+		l.sort(key = lambda e: e[2]) # sort by name
+		return l
 
 	def runPlugin(self, plugin):
 		if isinstance(self, InfoBarChannelSelection):
@@ -1524,28 +1526,30 @@ class InfoBarInstantRecord:
 
 		recording = RecordTimerEntry(serviceref, begin, end, name, description, eventid, dirname = preferredInstantRecordPath())
 		recording.dontSave = True
-		
+
 		if event is None or limitEvent == False:
 			recording.autoincrease = True
-			if recording.setAutoincreaseEnd():
-				self.session.nav.RecordTimer.record(recording)
-				self.recording.append(recording)
+			recording.setAutoincreaseEnd()
+
+		simulTimerList = self.session.nav.RecordTimer.record(recording)
+
+		if simulTimerList is None:	# no conflict
+			self.recording.append(recording)
 		else:
-				simulTimerList = self.session.nav.RecordTimer.record(recording)
-				if simulTimerList is not None:	# conflict with other recording
-					name = simulTimerList[1].name
-					name_date = ' '.join((name, strftime('%c', localtime(simulTimerList[1].begin))))
-					print "[TIMER] conflicts with", name_date
-					recording.autoincrease = True	# start with max available length, then increment
-					if recording.setAutoincreaseEnd():
-						self.session.nav.RecordTimer.record(recording)
-						self.recording.append(recording)
-						self.session.open(MessageBox, _("Record time limited due to conflicting timer %s") % name_date, MessageBox.TYPE_INFO)
-					else:
-						self.session.open(MessageBox, _("Couldn't record due to conflicting timer %s") % name, MessageBox.TYPE_INFO)
-					recording.autoincrease = False
-				else:
+			if len(simulTimerList) > 1: # with other recording
+				name = simulTimerList[1].name
+				name_date = ' '.join((name, strftime('%c', localtime(simulTimerList[1].begin))))
+				print "[TIMER] conflicts with", name_date
+				recording.autoincrease = True	# start with max available length, then increment
+				if recording.setAutoincreaseEnd():
+					self.session.nav.RecordTimer.record(recording)
 					self.recording.append(recording)
+					self.session.open(MessageBox, _("Record time limited due to conflicting timer %s") % name_date, MessageBox.TYPE_INFO)
+				else:
+					self.session.open(MessageBox, _("Couldn't record due to conflicting timer %s") % name, MessageBox.TYPE_INFO)
+			else:
+				self.session.open(MessageBox, _("Couldn't record due to invalid service %s") % serviceref, MessageBox.TYPE_INFO)
+			recording.autoincrease = False
 
 	def isInstantRecordRunning(self):
 		print "self.recording:", self.recording
