@@ -1277,15 +1277,15 @@ class PluginDetails(Screen, DreamInfoHandler):
 			if self.packagefiles:
 				for package in self.packagefiles[:]:
 					self.cmdList.append((IpkgComponent.CMD_REMOVE, { "package": package["name"] }))
-					if len(self.cmdList):
-						self.session.openWithCallback(self.runRemove, MessageBox, _("Do you want to remove the package:\n") + self.pluginname + "\n" + self.oktext)
+				if len(self.cmdList):
+					self.session.openWithCallback(self.runRemove, MessageBox, _("Do you want to remove the package:\n") + self.pluginname + "\n" + self.oktext)
 		else:
 			if iSoftwareTools.NetworkConnectionAvailable:
 				if self.packagefiles:
 					for package in self.packagefiles[:]:
 						self.cmdList.append((IpkgComponent.CMD_INSTALL, { "package": package["name"] }))
-						if len(self.cmdList):
-							self.session.openWithCallback(self.runUpgrade, MessageBox, _("Do you want to install the package:\n") + self.pluginname + "\n" + self.oktext)
+					if len(self.cmdList):
+						self.session.openWithCallback(self.runUpgrade, MessageBox, _("Do you want to install the package:\n") + self.pluginname + "\n" + self.oktext)
 
 	def runUpgrade(self, result):
 		if result:
