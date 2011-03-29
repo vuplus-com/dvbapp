@@ -370,7 +370,7 @@ class FactoryTest(Screen):
 						AspectRatio.append(getRatio)
 						getColorFormat=ColorFormat.pop(0)
 						menuname=" %d. T%d %s V 22k x %s %s" % (current_index, key+1, val["type"], getRatio, getColorFormat)	
-						if len(self.NimType) == key+1: # CAM test on/off
+						if 1 == key+1: # CAM test on/off
 							menuname+=" CAM"
 							camtest = True
 						else:
@@ -384,7 +384,8 @@ class FactoryTest(Screen):
 						AspectRatio.append(getRatio)
 						getColorFormat=ColorFormat.pop(0)
 						menuname=" %d. T%d %s %s %s" % (current_index, key+1, val["type"], getRatio, getColorFormat)
-						if len(self.NimType) == key+1: # CAM test on/off
+#						if len(self.NimType) == key+1: # CAM test on/off
+						if 1 == key+1: # CAM test on/off
 							menuname+=" CAM"
 							camtest = True
 						else:
@@ -421,10 +422,8 @@ class FactoryTest(Screen):
 
 	def getModelInfo(self):
 		getmodel = 0
-#		if fileExists("/proc/stb/info/vumodel"):
-#			info = open("/proc/stb/info/vumodel").read().strip()
-		if fileExists("/test/vumodel"):
-			info = open("/test/vumodel").read().strip()
+		if fileExists("/proc/stb/info/vumodel"):
+			info = open("/proc/stb/info/vumodel").read().strip()
 			if info == "duo":
 				self.model = 0
 				getmodel = 1
@@ -895,7 +894,7 @@ class FactoryTest(Screen):
 		current_index=self.currentindex
 		self.session.nav.stopService() # try to disable foreground service
 		if yesno and self.tunerlock == 1:
-			if current_index == self.tuner_test_last_index and self.camstep < 5:
+			if current_index == self.tuner_test_last_index and self.camstep < 5: # need fix to depending about CAM exist
 				self.rlist[current_index]="fail"
 			else :
 				self.rlist[current_index]="pass"
