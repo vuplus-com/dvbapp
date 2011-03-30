@@ -370,7 +370,7 @@ class FactoryTest(Screen):
 						AspectRatio.append(getRatio)
 						getColorFormat=ColorFormat.pop(0)
 						menuname=" %d. T%d %s V 22k x %s %s" % (current_index, key+1, val["type"], getRatio, getColorFormat)	
-						if 1 == key+1: # CAM test on/off
+						if len(self.NimType) == key+1: # CAM test on/off
 							menuname+=" CAM"
 							camtest = True
 						else:
@@ -384,8 +384,8 @@ class FactoryTest(Screen):
 						AspectRatio.append(getRatio)
 						getColorFormat=ColorFormat.pop(0)
 						menuname=" %d. T%d %s %s %s" % (current_index, key+1, val["type"], getRatio, getColorFormat)
-#						if len(self.NimType) == key+1: # CAM test on/off
-						if 1 == key+1: # CAM test on/off
+						if len(self.NimType) == key+1: # CAM test on/off
+#						if 1 == key+1: # CAM test on/off
 							menuname+=" CAM"
 							camtest = True
 						else:
@@ -743,6 +743,9 @@ class FactoryTest(Screen):
 			self.tunemsgtimer.start(3000, True)
 		elif self.model == 3 or self.model == 4:
 			getTuneInfo=self.tuneInfo[index]
+			if getTuneInfo["cam"] is True:
+				self.camstep = 1
+				self.camtimer.start(100,True)
 			if getTuneInfo["type"].startswith("DVB-S"):
 				if getTuneInfo["pol"] == "H":
 					ref.setData(0,1)
@@ -754,7 +757,6 @@ class FactoryTest(Screen):
 					ref.setData(1,0x1325)
 					ref.setData(2,0x3ef)
 					ref.setData(3,0x1)
-					ref.setData(4,0x64af79)
 				if getTuneInfo["sat"] == "160": # Eutelsat W2
 					ref.setData(4,0xA00000)
 				elif getTuneInfo["sat"] == "100": # Eutelsat
@@ -791,9 +793,6 @@ class FactoryTest(Screen):
 				self.avswitch.setAspectRatio(0)
 			elif getTuneInfo["ratio"] == "16:9":
 				self.avswitch.setAspectRatio(6)
-			if getTuneInfo["cam"] is True:
-				self.camstep = 1
-				self.camtimer.start(100,True)
 			self.tuningtimer.start(2000,True)
 			self.tunemsgtimer.start(3000, True) 
 		
