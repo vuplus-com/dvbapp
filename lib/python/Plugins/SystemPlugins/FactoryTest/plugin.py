@@ -254,6 +254,7 @@ class FactoryTest(Screen):
 
 		self.agingtimer = eTimer()
 		self.agingtimer.callback.append(self.agingCheck)
+		self.setSourceVar()
 
 	def createConfig(self):
 		tlist = []
@@ -351,45 +352,50 @@ class FactoryTest(Screen):
 			AspectRatio=["4:3", "16:9"]
 			ColorFormat=["CVBS","RGB","YC","CVBS","CVBS","CVBS","CVBS","CVBS"]	
 			self.tuneInfo={}
-			if self.model == 3 or self.model == 4:
-				for (key, val) in self.NimType.items():
-					if val["type"].startswith("DVB-S"):
+			for (key, val) in self.NimType.items():
+				if val["type"].startswith("DVB-S"):
 # Chang : DVB -S setting diseqc A
-						getRatio = AspectRatio.pop(0) # ratio
-						AspectRatio.append(getRatio)
-						getColorFormat=ColorFormat.pop(0) # colorFormat
-						menuname=" %d. T%d %s H 22k 0 %s %s" % (current_index, key+1, val["type"], getRatio, getColorFormat)	#menuname
-						print current_index
+					getRatio = AspectRatio.pop(0) # ratio
+					AspectRatio.append(getRatio)
+					getColorFormat=ColorFormat.pop(0) # colorFormat
+					menuname=" %d. T%d %s H 22k 0 %s %s" % (current_index, key+1, val["type"], getRatio, getColorFormat)	#menuname
+					print current_index
 #						current_index=4
-						self.setTuneInfo(index=current_index, slot=key, type=val["type"], sat=val["sat1"], pol="H", tone=True, ratio=getRatio, color=getColorFormat, cam=False) # setTuneInfo
+					self.setTuneInfo(index=current_index, slot=key, type=val["type"], sat=val["sat1"], pol="H", tone=True, ratio=getRatio, color=getColorFormat, cam=False) # setTuneInfo
 #						self.setTuneInfo(current_index, key, val["type"], val["sat1"], "H", True, getRatio, getColorFormat, False) # setTuneInfo
-						tlist.append((menuname,current_index))
-						current_index+=1
+					tlist.append((menuname,current_index))
+					current_index+=1
 # Chang : DVB -S setting diseqc B
-						getRatio = AspectRatio.pop(0)
-						AspectRatio.append(getRatio)
-						getColorFormat=ColorFormat.pop(0)
-						menuname=" %d. T%d %s V 22k x %s %s" % (current_index, key+1, val["type"], getRatio, getColorFormat)	
-						if len(self.NimType) == key+1: # CAM test on/off
-							menuname+=" CAM"
-							camtest = True
-						else:
-							camtest = False			
-						self.setTuneInfo( index=current_index, slot=key, type=val["type"], sat=val["sat2"], pol="V", tone=False, ratio=getRatio, color=getColorFormat, cam=camtest)
-						tlist.append((menuname,current_index))
-						current_index+=1
+					getRatio = AspectRatio.pop(0)
+					AspectRatio.append(getRatio)
+					getColorFormat=ColorFormat.pop(0)
+					menuname=" %d. T%d %s V 22k x %s %s" % (current_index, key+1, val["type"], getRatio, getColorFormat)
+					if len(self.NimType) == key+1: # CAM test on/off
+						menuname+=" CAM"
+						camtest = True
+					else:
+						camtest = False
+					self.setTuneInfo( index=current_index, slot=key, type=val["type"], sat=val["sat2"], pol="V", tone=False, ratio=getRatio, color=getColorFormat, cam=camtest)
+					tlist.append((menuname,current_index))
+					current_index+=1
 # Chang : DVB -T or DVB-C
-					elif val["type"].startswith("DVB-T") or val["type"].startswith("DVB-C"):
+				elif val["type"].startswith("DVB-T") or val["type"].startswith("DVB-C"):
+					additionalMenu = None
+					menulen = 1
+					if len(self.NimType) == 1:
+						additionalMenu = True
+						menulen +=1
+					for x in range(menulen):
 						getRatio = AspectRatio.pop(0)
 						AspectRatio.append(getRatio)
 						getColorFormat=ColorFormat.pop(0)
 						menuname=" %d. T%d %s %s %s" % (current_index, key+1, val["type"], getRatio, getColorFormat)
-						if len(self.NimType) == key+1: # CAM test on/off
+						if len(self.NimType) == key+1 and (additionalMenu is None or x != 0): # CAM test on/off
 #						if 1 == key+1: # CAM test on/off
 							menuname+=" CAM"
 							camtest = True
 						else:
-							camtest = False	
+							camtest = False
 						self.setTuneInfo( index=current_index, slot=key, type=val["type"], sat=None, pol=None, tone=None, ratio=getRatio, color=getColorFormat, cam=camtest)
 						tlist.append((menuname,current_index))
 						current_index+=1
@@ -692,7 +698,7 @@ class FactoryTest(Screen):
 			if not servicelist is None:
 				ref = servicelist.getNext()
 			else:
-				ref = self.getCurrentSelection()
+				ref = self.getCurrentSelection() # raise error
 				print "servicelist none"
 		else:
 			ref = self.oldref
@@ -781,7 +787,6 @@ class FactoryTest(Screen):
 				ref.setData(2,0x3ef)
 				ref.setData(3,0x1)
 				ref.setData(4,-286391716) # eeee025c
-
 			self.session.nav.playService(ref)
 			if getTuneInfo["color"]=="CVBS":
 				self.avswitch.setColorFormat(0)
@@ -910,26 +915,44 @@ class FactoryTest(Screen):
 		self.tuningtimer.stop()
 		self.session.openWithCallback(self.tuneback, MessageBox, _("%s ok?" %(self["testlist"].getCurrent()[0])), MessageBox.TYPE_YESNO)
 
+	def setSourceVar(self):
+		if self.model == 0:
+			self.input_pad_num=1
+			self.setTuner = 'B'
+		elif self.model == 1:
+			self.input_pad_num=0
+			self.setTuner = 'A'
+		else:
+			self.input_pad_num=len(self.NimType)-1
+			if self.input_pad_num == 0:
+				self.setTuner = 'A'
+			elif self.input_pad_num == 1:
+				self.setTuner = 'B'
+			elif self.input_pad_num == 2:
+				self.setTuner = 'C'
+
 #	ikseong - for 22000 tp
 	def setSource(self):
+# fix input source
+		inputname = ("/proc/stb/tsmux/input%d" % self.input_pad_num)
+		print "<setsource> inputname : ",inputname
+		fd=open(inputname,"w")
+		fd.write("CI0")
+		fd.close()
+# fix ci_input Tuner
 		filename = ("/proc/stb/tsmux/ci0_input")
 		fd = open(filename,'w')
-		fd.write('B')
-#		fd.write('A')
-		fd.close()
-#		filename = ("/proc/stb/tsmux/ci1_input")
-#		fd = open(filename,'w')
-#		fd.write('CI0')
-#		fd.close()
-		fd=open("/proc/stb/tsmux/input1","w")
-#		fd=open("/proc/stb/tsmux/input0","w")
-		fd.write("CI0")
+		fd.write(self.setTuner)
+		print "setTuner(CI0) : ",self.setTuner
 		fd.close()
 		print "CI loop test!!!!!!!!!!!!!!"
 			
 	def resetSource(self):
-		fd=open("/proc/stb/tsmux/input1","w")
-		fd.write("B")
+		inputname = ("/proc/stb/tsmux/input%d" % self.input_pad_num)
+		print "<resetsource> inputname : ",inputname
+		fd=open(inputname,"w")
+#		fd=open("/proc/stb/tsmux/input1","w")
+		fd.write(self.setTuner)
 		fd.close()
 		print "CI loop test end!!!!!!!!!!!!!!"
 				
@@ -970,11 +993,24 @@ class FactoryTest(Screen):
 		else:
 			ref = self.oldref
 		self.session.nav.stopService() # try to disable foreground service
-		ref.setData(0,0x19)
-		ref.setData(1,0x1325)
-		ref.setData(2,0x3ef)
-		ref.setData(3,0x1)
-		ref.setData(4,0x64af79)
+		if self.model == 0 or self.model == 1 or self.NimType[0]["type"].startswith("DVB-S"):
+			ref.setData(0,0x19)
+			ref.setData(1,0x1325)
+			ref.setData(2,0x3ef)
+			ref.setData(3,0x1)
+			ref.setData(4,0x64af79)
+		elif self.NimType[0]["type"].startswith("DVB-C"):
+			ref.setData(0,0x19)
+			ref.setData(1,0x1325)
+			ref.setData(2,0x3ef)
+			ref.setData(3,0x1)
+			ref.setData(4,-64870) # ffff029a
+		elif self.NimType[0]["type"].startswith("DVB-T"):
+			ref.setData(0,0x19)
+			ref.setData(1,0x1325)
+			ref.setData(2,0x3ef)
+			ref.setData(3,0x1)
+			ref.setData(4,-286391716) # eeee025c
 		self.session.nav.playService(ref)
 		self.avswitch.setColorFormat(0)
 		self.avswitch.setAspectRatio(0)
