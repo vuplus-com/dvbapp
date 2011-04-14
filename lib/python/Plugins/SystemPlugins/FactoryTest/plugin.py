@@ -2140,3 +2140,6 @@ def main(session, servicelist, **kwargs):
 
 #def Plugins(**kwargs):
 #	return PluginDescriptor(name=_("Factory Test"), description="Test App for Factory", where = PluginDescriptor.WHERE_EXTENSIONSMENU, fnc=main)
+
+def Plugins(**kwargs):
+	return []
