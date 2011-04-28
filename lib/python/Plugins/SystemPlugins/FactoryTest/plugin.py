@@ -1770,10 +1770,10 @@ class AgingTest(Screen):
 		</screen>"""
 	step=1
 	def __init__(self, session):
-		self["actions"] = ActionMap(["WizardActions","GlobalActions"],
+		self["actions"] = ActionMap(["MediaPlayerActions","GlobalActions"],
 		{
-			"agingend": self.keyEnd,
-			"agingfinish": self.keyFinish,
+			"pause": self.keyEnd,
+			"stop": self.keyFinish,
 			"volumeUp": self.nothing,
 			"volumeDown": self.nothing,
 			"volumeMute": self.nothing,		
