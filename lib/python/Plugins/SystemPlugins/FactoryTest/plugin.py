@@ -123,8 +123,8 @@ class FactoryTest(Screen):
 		}, -2)
 
 		Screen.__init__(self, session)
-		TESTPROGRAM_DATE = "2010-03-02"
-		TESTPROGRAM_VERSION = "Version 00.01"
+		TESTPROGRAM_DATE = "2010-04-28"
+		TESTPROGRAM_VERSION = "Version 01.10"
 
 		self.model = 0
 		self.getModelInfo()
@@ -204,18 +204,11 @@ class FactoryTest(Screen):
 		self.rlist = []
 		for x in range(self.menulength):
 			self.rlist.append((".."))
-#		self.rlist.append(("  "))
 		self["resultlist"] = TestResultList(self.rlist)
 
-#		self.NetworkState = 0
-#		self.first = 0
-
 		self.avswitch = AVSwitch()
-#		self.memTest = eMemtest()
 		self.scTest= eSctest()
 		
-#		self.feid=0
-#		self.agingmode=0
 		self.testing = 0
 
 		self.servicelist = ServiceList()
@@ -225,14 +218,6 @@ class FactoryTest(Screen):
 		
 		self.tunemsgtimer = eTimer()
 		self.tunemsgtimer.callback.append(self.tunemsg)
-
-# chang : use "self.tuner_test_last_index" instead of cam_index 
-#		if self.model == 0:
-#			self.cam_index = 7
-#		elif self.model == 1:
-#			self.cam_index = 4
-#		elif self.model == 2:
-#			self.cam_index = 6	
 
 		self.camstep = 1
 		self.camtimer = eTimer()
@@ -391,7 +376,6 @@ class FactoryTest(Screen):
 						getColorFormat=ColorFormat.pop(0)
 						menuname=" %d. T%d %s %s %s" % (current_index, key+1, val["type"], getRatio, getColorFormat)
 						if len(self.NimType) == key+1 and (additionalMenu is None or x != 0): # CAM test on/off
-#						if 1 == key+1: # CAM test on/off
 							menuname+=" CAM"
 							camtest = True
 						else:
@@ -452,7 +436,6 @@ class FactoryTest(Screen):
 				print "getModelInfo : ultimo"
 		if getmodel == 0 and fileExists("/proc/stb/info/version"):
 			info = open("/proc/stb/info/version").read()
-#			print info,info[:2]
 			if info[:2] == "14":
 				self.model = 1
 				print "getModelInfo : solo_"
@@ -815,8 +798,6 @@ class FactoryTest(Screen):
 				self.session.open( MessageBox, _("CAM1_NOT_INSERTED\nPress exit!"), MessageBox.TYPE_ERROR)
 				self.rlist[current_index]="fail"
 				self.tunemsgtimer.stop()
-#				self.rlist[index]="fail"
-#				self["resultlist"].updateList(self.rlist)
 		elif self.camstep == 2:
 			slot = 0
 			appname = eDVBCI_UI.getInstance().getAppName(slot)
@@ -841,8 +822,6 @@ class FactoryTest(Screen):
 				self.session.open( MessageBox, _("CAM2_NOT_INSERTED\nPress exit!"), MessageBox.TYPE_ERROR)
 				self.rlist[current_index]="fail"
 				self.tunemsgtimer.stop()				
-#				self.rlist[index]="fail"
-#				self["resultlist"].updateList(self.rlist)
 		elif self.camstep == 4:
 			slot = 1
 			appname = eDVBCI_UI.getInstance().getAppName(slot)
@@ -855,7 +834,6 @@ class FactoryTest(Screen):
 			else:
 				self.setSource()
 				self.camstep = 5
-#				self.session.open( MessageBox, _("CAM OK!"), MessageBox.TYPE_INFO,2)
 
 	def updateStatus(self):
 		current_index = self.currentindex
@@ -951,7 +929,6 @@ class FactoryTest(Screen):
 		inputname = ("/proc/stb/tsmux/input%d" % self.input_pad_num)
 		print "<resetsource> inputname : ",inputname
 		fd=open(inputname,"w")
-#		fd=open("/proc/stb/tsmux/input1","w")
 		fd.write(self.setTuner)
 		fd.close()
 		print "CI loop test end!!!!!!!!!!!!!!"
@@ -1133,7 +1110,6 @@ class FactoryTest(Screen):
 		if data == 1:
 			ethtest = 1
 			print "success"
-#			self.session.open( MessageBox, _("Ping test pass"), MessageBox.TYPE_INFO,2)
 			self.session.openWithCallback(self.openMacConfig ,MessageBox, _("Ping test pass"), MessageBox.TYPE_INFO,2)
 		
 		else:
@@ -1152,10 +1128,8 @@ class FactoryTest(Screen):
 		global ethtest
 		if ethtest == 1:
 			self.rlist[self.ethernettestIndex]="pass"		
-#			self.rlist[self["testlist"].getCurrent()[1]]="pass"
 		else:
 			self.rlist[self.ethernettestIndex]="fail"		
-#			self.rlist[self["testlist"].getCurrent()[1]]="fail"
 		self.getmacaddr()
 		self.testing = 0			
 	
@@ -1260,7 +1234,6 @@ class MacConfig(Screen):
 		self.mactry = mactry
 		self.model = 0
 		self.getModelInfo()
-#		self.result = 0
 		self.macfd = 0
 		self.macaddr = "000000000000"
 		self.ReadMacinfo = 0
@@ -1455,249 +1428,7 @@ class MacConfig(Screen):
 		ethtest = 0
 		self.close()
 
-
-sccitest = 0
-
-class ScCiTest(Screen):
-	skin = """
-		<screen position="120,225" size="440,200" title="CI Smartcard Test" >
-			<widget name="testlist" position="10,0" size="340,120" />
-			<widget name="resultlist" position="370,0" size="60,120" />
-			<eLabel text=" " position="5,125" zPosition="-1" size="430,5" backgroundColor="#02e1e8e6" />		
-			<widget name="text" position="10,140" size="420,50" font="Regular;25" />
-		</screen>"""
-	step=1
-	def __init__(self, session):
-		self["actions"] = ActionMap(["DirectionActions","OkCancelActions"],
-		{
-			"ok": self.keyOk,
-			"up": self.up,
-			"down":self.down,
-			"cancel": self.keyCancel,
-		}, -2)
-
-		Screen.__init__(self, session)
-		tlist = []
-		tlist.append(("Smartcard 1 Test",0))
-		tlist.append(("Smartcard 2 Test",1))
-		tlist.append(("CI 1 Test",2))
-		tlist.append(("CI 2 Test",3))
-		self["testlist"] = MenuList(tlist)
-		self.rlist = []
-		for x in range(4):
-			self.rlist.append((".."))
-		self["resultlist"] = TestResultList(self.rlist)
-		self.result = 0
-		self.removecard = eTimer()
-		self.removecard.callback.append(self.remove_card)
-		self["text"]=Label(("Press OK Key"))
-		self.camstate= eTimer()
-		self.camstate.callback.append(self.cam_state)
-		self.camtry = 5
-		self.camstep = 0
-
-	def keyCancel(self):
-		global sccitest
-		print "result ", self.result
-		if self.result==15:
-			sccitest=1
-		self.resetSource()
-		self.close()
-
-	def up(self):
-		self["text"].setText(_("Press OK Key"))
-		self["testlist"].instance.moveSelection(self["testlist"].instance.moveUp)
-		
-	def down(self):
-		self["text"].setText(_("Press OK Key"))
-		self["testlist"].instance.moveSelection(self["testlist"].instance.moveDown)
-		
-	def keyOk(self):
-		print "line - ",self["testlist"].getCurrent()[1]
-		index = self["testlist"].getCurrent()[1]
-		result = 0
-		if index==0 or index==1:		
-			self["text"].setText(_("Insert Card?"))
-			self.ScTest(True)
-		elif index ==2 or index==3:
-			self["text"].setText(_("Insert Cam"))
-			self.CamTest()
-
-	def CamTest(self):
-		self.camtry = 10
-		self.camstep = 1
-		self.camstate.start(1000,True)		
-
-	def setSource(self, cislot):
-		filename = ("/proc/stb/tsmux/ci%d_input"%cislot)
-		fd = open(filename,'w')
-		fd.write('A')
-		fd.close()
-
-	def setInputSource(self, cislot):
-		fd=open("/proc/stb/tsmux/input0","w")
-		if cislot==0:
-			fd.write("CI0")
-		else:
-			fd.write("CI1")
-		fd.close()
-			
-	def resetSource(self):
-		fd=open("/proc/stb/tsmux/input0","w")
-		fd.write("A")
-		fd.close()
-#		fd = open("/proc/stb/tsmux/ci0_input","w")
-#		fd.write("CI0")
-#		fd.close()
-#		fd = open("/proc/stb/tsmux/ci1_input","w")
-#		fd.write("CI1")
-#		fd.close()
-
-	def channelstart(self):
-		ref = eServiceReference("1:0:19:1324:3EF:1:C00000:0:0:0")
-		ref.setData(0,0x19)
-		ref.setData(1,0x83)
-		ref.setData(2,0x6)
-		ref.setData(3,0x85)
-		ref.setData(4,0x640000)
-		self.session.nav.playService(ref)
-
-	def channelstop(self):
-		self.session.nav.stopService() # try to disable foreground service		
-	
-	def cam_state(self):
-		index = self["testlist"].getCurrent()[1] 
-		if (index-2)==0:
-			slot = 1
-		else:
-			slot = 0
-		print 'cam_state', self.camstep,self.camtry
-		if self.camstep == 1:
-			state = eDVBCI_UI.getInstance().getState(slot)
-			print 'stat',state
-			if state == 1:
-				self.camstep=2
-				self.camtry=10
-				self["text"].setText(_("Getting Cam name...."))
-				self.camstate.start(5000,True)
-			else:
-				self.camtry-=1
-				if self.camtry>0:
-					self.camstate.start(1000,True)
-				else:
-					self.session.open( MessageBox, _("NO_NOT_INSERTED"), MessageBox.TYPE_ERROR)
-					self.rlist[index]="fail"
-					self["resultlist"].updateList(self.rlist)
-
-		elif self.camstep == 2:
-			appname = eDVBCI_UI.getInstance().getAppName(slot)
-			print 'appname',appname
-			if appname is None:
-				self.camtry-=1
-				if self.camtry>0:
-					self.camstate.start(1000,True)
-				else:
-					self.session.open( MessageBox, _("NO_GET_APPNAME"), MessageBox.TYPE_ERROR)
-					self.rlist[index]="fail"
-					self["resultlist"].updateList(self.rlist)
-			else:
-				self["text"].setText(_("Get Cam name : %s"%appname+". \n Remove Cam!"))
-				self.channelstart()
-				self.setInputSource(slot)
-				self.setSource(slot)
-				self.camstep=3
-				self.camtry=30
-				self.camstate.start(1000,True)		
-		elif self.camstep==3:
-			state = eDVBCI_UI.getInstance().getState(slot)
-			print 'stat', state
-			if state == 0:
-				self.channelstop()
-				self.result += (1<<index)
-				print self.result
-				self.rlist[index]="pass"
-				self["text"].setText(_("Press OK Key"))
-				self["resultlist"].updateList(self.rlist)				
-				if index==2:
-					self.down()
-				elif index == 3:
-					self.keyCancel()
-			else:
-				self.camtry-=1
-				if self.camtry>0:
-					self.camstate.start(1000,True)
-				else:
-					self.channelstop()
-					self.session.open( MessageBox, _("NO_REMOVE_CAM"), MessageBox.TYPE_ERROR)
-					self.rlist[index]="fail"
-					self["resultlist"].updateList(self.rlist)
-
-	def check_smart_card(self,which):
-		index = which
-		result  = 0
-		if which==0:
-			result = eSctest.getInstance().check_smart_card("/dev/sci0")
-		elif which ==1:
-			result = eSctest.getInstance().check_smart_card("/dev/sci1")
-		else:
-			result = -1
-
-		print result			
-		
-		if result == 0:
-			print 'pass'
-		else:
-			if result ==-1:
-				self.session.open( MessageBox, _("1:NO_DEV_FOUND"), MessageBox.TYPE_ERROR)
-			elif result == -2:
-				self.session.open( MessageBox, _("1:SC_NOT_INSERTED"), MessageBox.TYPE_ERROR)
-			elif result == -3:
-				self.session.open( MessageBox, _("1:SC_NOT_VALID_ATR"), MessageBox.TYPE_ERROR)
-			elif result == -5:
-				self.session.open( MessageBox, _("1:SC_READ_TIMEOUT"), MessageBox.TYPE_ERROR)
-			self.rlist[which]="fail"
-			self["resultlist"].updateList(self.rlist)
-		return result
-		
-	def remove_card(self):
-		index = self["testlist"].getCurrent()[1]
-		if index==0:
-			result = eSctest.getInstance().eject_smart_card("/dev/sci0")	
-		elif index==1:
-			result = eSctest.getInstance().eject_smart_card("/dev/sci1")	
-		print 'remove result' ,result
-		if result == 0:
-			self.rlist[index]="pass"
-			self.result += (1<<index)
-		else:
-			if result ==-1:
-				self.session.open( MessageBox, _("2:NO_DEV_FOUND"), MessageBox.TYPE_ERROR)
-			elif result == -2:
-				self.session.open( MessageBox, _("2:SC_NOT_INSERTED"), MessageBox.TYPE_ERROR)
-			elif result == -3:
-				self.session.open( MessageBox, _("2:SC_NOT_VALID_ATR"), MessageBox.TYPE_ERROR)
-			elif result == -4:
-				self.session.open( MessageBox, _("2:SC_NOT_REMOVED"), MessageBox.TYPE_ERROR)
-			self.rlist[index]="fail"
-		self["resultlist"].updateList(self.rlist)
-		self["text"].setText(_("Press OK Key"))
-		self.down()
-		return result
-	
-
-	def ScTest(self, yesno):
-		if yesno==False:
-			return
-		index = self["testlist"].getCurrent()[1]
-		result = self.check_smart_card(index)
-		if result==0:
-			self.removecard.start(100,True)
-			self["text"].setText(_("Read Ok. Remove Card!"))
-		else:
-			return
-
 smartcardtest = 0
-
 class SmartCardTest(Screen):
 	skin = """
 		<screen position="300,240" size="160,120" title="SmartCard Test" >
@@ -1712,7 +1443,6 @@ class SmartCardTest(Screen):
 		}, -2)
 
 		Screen.__init__(self, session)
-#		self["text"]=Label(("Press Key LEFT"))
 		self["text"]=Label(("Testing Smartcard 1..."))
 		self.step = 0
 		self.smartcardtimer = eTimer()
@@ -1754,7 +1484,6 @@ class SmartCardTest(Screen):
 				return
 			elif (index==1 or self.model==1):
 				smartcardtest = 1
-#				self.session.open( MessageBox, _("Smart Card OK!!"), MessageBox.TYPE_INFO,2)
 				self.step = 1
 				self["text"].setText(_("Smart Card OK!!"))
 				self.closetimer.start(2000,True)
@@ -1764,7 +1493,6 @@ class SmartCardTest(Screen):
 				self["text"].setText(_("Smart Card model type error"))
 				self.closetimer.start(2000,True)
 				self.smartcardtimer.stop()
-#			self.session.openWithCallback(self.check6, MessageBox, _("Scart loop ok?"), MessageBox.TYPE_INFO)
 		else:
 #			if result ==-1:
 #				self.session.open( MessageBox, _("%d:NO_DEV_FOUND"%(index+1)), MessageBox.TYPE_ERROR)
@@ -1849,8 +1577,6 @@ class FrontTest(Screen):
 			self.keytimeout.start(5000,True)
 			self.step=2
 			self["text"].setText(_("Wheel RIGHT"))
-#		else:
-#			print ""
 
 	def keyOk(self):
 		if self.step == 3:
@@ -2021,7 +1747,6 @@ class RS232Test(Screen):
 			if r:
 				input = rs.read(1)
 				if input == "\n":
-#				if input == "m":
 					rstest = 1
 				else:
 					rstest = 0 
@@ -2045,10 +1770,10 @@ class AgingTest(Screen):
 		</screen>"""
 	step=1
 	def __init__(self, session):
-		self["actions"] = ActionMap(["WizardActions","GlobalActions"],
+		self["actions"] = ActionMap(["MediaPlayerActions","GlobalActions"],
 		{
-			"agingend": self.keyEnd,
-			"agingfinish": self.keyFinish,
+			"pause": self.keyEnd,
+			"stop": self.keyFinish,
 			"volumeUp": self.nothing,
 			"volumeDown": self.nothing,
 			"volumeMute": self.nothing,		
