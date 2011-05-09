@@ -11,7 +11,7 @@ class About(Screen):
 	def __init__(self, session):
 		Screen.__init__(self, session)
 
-		self["EnigmaVersion"] = StaticText("Enigma: " + about.getEnigmaVersionString())
+		self["EnigmaVersion"] = StaticText("Version: " + about.getEnigmaVersionString())
 		self["ImageVersion"] = StaticText("Image: " + about.getImageVersionString())
 
 		self["TunerHeader"] = StaticText(_("Detected NIMs:"))
