@@ -89,7 +89,7 @@ class SkinSelector(Screen):
 					self.skinlist.append(subdir)
 				else:
 					subdir = "Default Skin"
-					self.skinlist.append(subdir)
+					#self.skinlist.append(subdir)
 
 	def ok(self):
 		if self["SkinList"].getCurrent() == "Default Skin":
