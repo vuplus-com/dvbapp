@@ -1,4 +1,5 @@
 from urllib import urlretrieve
+import urllib
 
 from Screens.Screen import Screen
 from Screens.MessageBox import MessageBox
@@ -121,16 +122,29 @@ class FPGAUpgrade(Screen):
 	def onClickBlue(self):
 		fname = ''
 		header = ''
-
+		test_opener = urllib.URLopener()
+		try:
+			test_opener.open(self.DOWNLOAD_URL)
+		except:
+			self.session.open(MessageBox, _('File not found'), MessageBox.TYPE_INFO, timeout = 5)
+			del test_opener
+			return
 		try :
 			fname, header = urlretrieve(self.DOWNLOAD_URL, self.DOWNLOAD_TAR_PATH + self.DOWNLOAD_FILE_NAME, self.doHook)
 		except IOError, msg:
 			self.session.open(MessageBox, _(str(msg)), MessageBox.TYPE_INFO, timeout = 5)
+			del test_opener
 			return
-			
+		del test_opener
+
+		before_name = ''
 		self.SOURCELIST.changeDir(self.DOWNLOAD_TAR_PATH)
+		self.SOURCELIST.moveToIndex(0)
 		while cmp(self.SOURCELIST.getFilename(), self.DOWNLOAD_FILE_NAME) != 0 :
 			self.SOURCELIST.down()
+			if cmp(before_name, self.SOURCELIST.getFilename()) == 0:
+				break
+			before_name = self.SOURCELIST.getFilename()
 
 	def onClickOk(self):
 	        if self.SOURCELIST.canDescent() : # isDir                                                                   
