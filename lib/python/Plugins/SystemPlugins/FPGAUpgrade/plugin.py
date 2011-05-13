@@ -61,7 +61,7 @@ class FPGAUpgrade(Screen):
                 self.STATUS_BAR = self["status"]                                                                             
                 self.STATUS_BAR.setText(_(self.SOURCELIST.getCurrentDirectory()))
 
-		self.DEVICE_PATH = 'a'                                                                                       
+		self.DEVICE_PATH = '/dev/misc/dp'                                                                                       
 		self.DOWNLOAD_TAR_PATH = '/tmp/'                                                                             
 		self.DOWNLOAD_FILE_NAME = 'fpga.vuplus'                                                                       
 		self.DOWNLOAD_URL = ''
