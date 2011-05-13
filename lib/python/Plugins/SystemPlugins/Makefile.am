@@ -4,7 +4,7 @@ SUBDIRS = SoftwareManager FrontprocessorUpgrade PositionerSetup Satfinder \
 	SkinSelector SatelliteEquipmentControl Videomode VideoTune Hotplug \
 	DefaultServicesScanner NFIFlash DiseqcTester CommonInterfaceAssignment \
 	CrashlogAutoSubmit CleanupWizard VideoEnhancement WirelessLan NetworkWizard \
-	TempFanControl FactoryTest Fancontrol
+	TempFanControl FactoryTest Fancontrol FPGAUpgrade
 
 install_PYTHON =	\
 	__init__.py
