@@ -1,3 +1,5 @@
+import os
+
 from urllib import urlretrieve
 import urllib
 
@@ -11,6 +13,7 @@ from Components.Pixmap import Pixmap
 from Components.ActionMap import ActionMap
 from Components.Sources.StaticText import StaticText
 from Components.FileList import FileList 
+from Tools.Directories import fileExists
 
 class FPGAUpgrade(Screen):
 	skin = """
@@ -63,7 +66,7 @@ class FPGAUpgrade(Screen):
 
 		self.DEVICE_PATH = '/dev/misc/dp'                                                                                       
 		self.DOWNLOAD_TAR_PATH = '/tmp/'                                                                             
-		self.DOWNLOAD_FILE_NAME = 'fpga.vuplus'                                                                       
+		self.DOWNLOAD_FILE_NAME = 'TS_PRO.dat'                                                                       
 		self.DOWNLOAD_URL = ''
 		self.doLoadConf()
 
@@ -76,12 +79,15 @@ class FPGAUpgrade(Screen):
 		return	
 
 	def doExit(self):
+		if fileExists(self.DOWNLOAD_TAR_PATH + self.DOWNLOAD_FILE_NAME):
+			os.remove(self.DOWNLOAD_TAR_PATH + self.DOWNLOAD_FILE_NAME)
 		self.close()
 
 	def doLoadConf(self):
-		import os
-		f = open('/usr/lib/enigma2/python/Plugins/SystemPlugins/FPGAUpgrade/fpga.conf')
-		self.DOWNLOAD_URL = str(f.readline())
+		if fileExists("/proc/stb/info/vumodel"):
+                        model = open("/proc/stb/info/vumodel").read().strip()
+			download_uri_header = open('/usr/lib/enigma2/python/Plugins/SystemPlugins/FPGAUpgrade/fpga.conf').readline().strip()
+			self.DOWNLOAD_URL = str(download_uri_header) + "vu" + str(model) + "/" + self.DOWNLOAD_FILE_NAME
 
 	def doHook(self, blockNumber, blockSize, totalSize) :
 		if blockNumber*blockSize > totalSize :
@@ -93,15 +99,12 @@ class FPGAUpgrade(Screen):
 		if confirmed:                                                                                                                    
 			self.doExit()	
 
-	def onClickRed(self):
-		self.doExit()
+	def doUpgradeHandler(self, confirmed):
+		if confirmed == False:
+			return
 
-	# run upgrade!!
-	def onClickGreen(self):
 		import fpga
-
 		FPGA = fpga.Fpga()
-		
 		path = ''
 		try:
 			path = self.SOURCELIST.getCurrentDirectory() + self.SOURCELIST.getFilename() 
@@ -118,6 +121,14 @@ class FPGAUpgrade(Screen):
 			print "FILE_PATH : ", path
 		else:
 			self.session.open(MessageBox, _("Success!!"), MessageBox.TYPE_INFO, timeout = 5)
+
+	def onClickRed(self):
+		self.doExit()
+
+	# run upgrade!!
+	def onClickGreen(self):
+		#self.session.open(MessageBox, _("Upgrade will take about 5 minutes to finish."), MessageBox.TYPE_INFO, timeout = 10)
+		self.session.openWithCallback(self.doUpgradeHandler, MessageBox, _("Upgrade will take about 5 minutes to finish.\nDo you want to upgrade?"), MessageBox.TYPE_YESNO, timeout = 10, default = True)
 
 	def onClickBlue(self):
 		fname = ''
