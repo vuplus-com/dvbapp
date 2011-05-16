@@ -123,7 +123,7 @@ class FactoryTest(Screen):
 		}, -2)
 
 		Screen.__init__(self, session)
-		TESTPROGRAM_DATE = "2010-04-28"
+		TESTPROGRAM_DATE = "2011-05-16"
 		TESTPROGRAM_VERSION = "Version 01.10"
 
 		self.model = 0
