@@ -18,6 +18,7 @@
 #include <dvbsi++/teletext_descriptor.h>
 #include <dvbsi++/video_stream_descriptor.h>
 #include <dvbsi++/registration_descriptor.h>
+#include <dvbsi++/ac3_descriptor.h>
 
 eDVBServicePMTHandler::eDVBServicePMTHandler()
 	:m_ca_servicePtr(0), m_dvb_scan(0), m_decode_demux_num(0xFF), m_no_pat_entry_delay(eTimer::create())
