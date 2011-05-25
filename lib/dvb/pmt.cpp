@@ -489,7 +489,6 @@ int eDVBServicePMTHandler::getProgramInfo(program &program)
                                                                         break;
                                                                 }     
                                                                 case ENHANCED_AC3_DESCRIPTOR:
-                                                                        eDebug("ENHANCED_AC3_DESCRIPTOR");
                                                                         isaudio = 1; 
                                                                         audio.type = audioStream::atDDP;
                                                                         break;
