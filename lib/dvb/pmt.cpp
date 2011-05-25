@@ -470,10 +470,32 @@ int eDVBServicePMTHandler::getProgramInfo(program &program)
 									isaudio = 1;
 									audio.type = audioStream::atAACHE; // MPEG4-AAC
 									break;
-								case AC3_DESCRIPTOR:
-									isaudio = 1;
-									audio.type = audioStream::atAC3;
-									break;
+                                                                case AC3_DESCRIPTOR:
+                                                                {    
+                                                                        Ac3Descriptor *ac = (Ac3Descriptor*)(*desc);
+                                                                        eDebug("ac->getAc3TypeFlag() : 0x%x", ac->getAc3TypeFlag());
+     
+                                                                        isaudio = 1; 
+                                                                        audio.type = audioStream::atAC3;
+
+                                                                        if(ac->getAc3TypeFlag())
+                                                                        {    
+     
+                                                                                uint8_t ac3type = ac->getAc3Type();
+                                                                                eDebug("ac->getAc3Type() : 0x%x", ac->getAc3Type());
+                                                                                if( ( ac3type & 0x80 ) && ( (ac3type<<5) == 0xA0 || (ac3type<<5) == 0xC0) ) // From EN-300 468 v1.7.1 Table D.1
+                                                                                        audio.type = audioStream::atDDP;
+                                                                        }    
+     
+                                                                        break;
+                                                                }     
+                                                                case ENHANCED_AC3_DESCRIPTOR:
+                                                                        eDebug("ENHANCED_AC3_DESCRIPTOR");
+                                                                        isaudio = 1; 
+                                                                        audio.type = audioStream::atDDP;
+                                                                        break;
+     
+
 								case REGISTRATION_DESCRIPTOR: /* some services don't have a separate AC3 descriptor */
 								{
 									RegistrationDescriptor *d = (RegistrationDescriptor*)(*desc);
