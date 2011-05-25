@@ -474,7 +474,6 @@ int eDVBServicePMTHandler::getProgramInfo(program &program)
                                                                 case AC3_DESCRIPTOR:
                                                                 {    
                                                                         Ac3Descriptor *ac = (Ac3Descriptor*)(*desc);
-                                                                        eDebug("ac->getAc3TypeFlag() : 0x%x", ac->getAc3TypeFlag());
      
                                                                         isaudio = 1; 
                                                                         audio.type = audioStream::atAC3;
@@ -483,7 +482,6 @@ int eDVBServicePMTHandler::getProgramInfo(program &program)
                                                                         {    
      
                                                                                 uint8_t ac3type = ac->getAc3Type();
-                                                                                eDebug("ac->getAc3Type() : 0x%x", ac->getAc3Type());
                                                                                 if( ( ac3type & 0x80 ) && ( (ac3type<<5) == 0xA0 || (ac3type<<5) == 0xC0) ) // From EN-300 468 v1.7.1 Table D.1
                                                                                         audio.type = audioStream::atDDP;
                                                                         }    
