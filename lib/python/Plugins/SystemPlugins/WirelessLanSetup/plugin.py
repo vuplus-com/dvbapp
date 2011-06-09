@@ -69,6 +69,10 @@ class WlanSelection(Screen,HelpableScreen):
 		})
 
 	def ok(self):
+#		print len(self["menulist"].list)
+		if len(self["menulist"].list) == 0:
+			self.session.open(MessageBox, (_("Can not find any WirelessLan Module\n")),MessageBox.TYPE_ERROR,5 )
+			return
 		ifaces=self["menulist"].getCurrent()[1]
 		if ifaces == None:
 			pass
@@ -80,7 +84,7 @@ class WlanSelection(Screen,HelpableScreen):
 		for x in iNetwork.getAdapterList():
 			if x.startswith('eth'):
 				continue
-			list.append((self.getAdapterDescription(x) + "  (%s)"%x,x))
+			list.append((self.getAdapterDescription(x) + " (%s)"%x,x))
 		return list
 
 	def getAdapterDescription(self, iface):
@@ -103,7 +107,7 @@ class WlanSelection(Screen,HelpableScreen):
 					elif os_path.realpath(driverdir).endswith('rt73usb'):
 						return _("Ralink")+ " " + _("WLAN adapter.")
 					else:
-						return str(os_path.basename(os_path.realpath(driverdir))) + " " + _("WLAN adapter.")
+						return str(os_path.basename(os_path.realpath(driverdir))) + " " + _("WLAN adapter")
 				else:
 					return _("Unknown network adapter.")
 
@@ -1441,12 +1445,19 @@ def openconfig(session, **kwargs):
 	session.open(WlanSelection)
 
 def selSetup(menuid, **kwargs):
+	list=[]
 	if menuid != "system":
 		return [ ]
-
-	return [(_("Wireless LAN Setup"), openconfig, "wlansetup_config", 80)]
+	else:
+		for x in iNetwork.getAdapterList():
+			if x.startswith('eth'):
+				continue
+			list.append(x)
+		if len(list):
+			return [(_("Wireless LAN Setup"), openconfig, "wlansetup_config", 80)]
+		else:
+			return [ ]
+	return [ ]
 
 def Plugins(**kwargs):
-	return 	PluginDescriptor(name=_("Wireless LAN Setup"), description="Wireless LAN Setup", where = PluginDescriptor.WHERE_MENU, fnc=selSetup);
-#	return [PluginDescriptor(name = "Fancontrols", description = "check Fan Control settings", where = PluginDescriptor.WHERE_AUTOSTART, fnc = setfancontrol),
-#	PluginDescriptor(name=_("Wireless LAN Setup"), description="Fan Control", where = PluginDescriptor.WHERE_MENU, fnc=selSetup)]
+	return 	PluginDescriptor(name=_("Wireless LAN Setup"), description="Wireless LAN Setup", where = PluginDescriptor.WHERE_MENU, fnc=selSetup)
