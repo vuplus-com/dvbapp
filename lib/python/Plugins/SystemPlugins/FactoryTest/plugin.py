@@ -1698,11 +1698,11 @@ class FrontTest_solo(Screen):
 
 	def keyOk(self):
 		global fronttest
-		self.fronttimer.stop()
-		eSctest.getInstance().VFD_Close()
 		if self.step == 6:
 			fronttest = 1
-		self.close()
+			self.fronttimer.stop()
+			eSctest.getInstance().VFD_Close()
+			self.close()
 
 	def FrontAnimate(self):
 		if (self.frontturnonoff==0):
@@ -1798,11 +1798,11 @@ class FrontTest_uno(Screen):
 
 	def keyOk(self):
 		global fronttest
-		self.fronttimer.stop()
-		eSctest.getInstance().VFD_Close()
 		if self.step == 6:
 			fronttest = 1
-		self.close()
+			self.fronttimer.stop()
+			eSctest.getInstance().VFD_Close()
+			self.close()
 
 	def FrontAnimate(self):
 		if (self.frontturnonoff==0):
@@ -1853,6 +1853,8 @@ class RS232Test(Screen):
 		except:
 			print 'error'
 			rstest = 0
+		if rstest == 0:
+			self.session.open( MessageBox, _("RS232 Test Failed!\nPress 'EXIT' button!"), MessageBox.TYPE_ERROR)
 		self.close()
 
 	def keyCancel(self):
