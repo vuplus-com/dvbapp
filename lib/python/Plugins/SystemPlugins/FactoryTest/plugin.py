@@ -123,7 +123,7 @@ class FactoryTest(Screen):
 		}, -2)
 
 		Screen.__init__(self, session)
-		TESTPROGRAM_DATE = "2011-06-09"
+		TESTPROGRAM_DATE = "2011-06-09 (Ver 01.00)"
 		TESTPROGRAM_VERSION = "Version 01.10"
 
 		self.model = 0
@@ -616,29 +616,29 @@ class FactoryTest(Screen):
 			result = 1
 			displayerror = 1
 		try:
-			if fileExists("/media/hdd"):
-				if access("/media/hdd",F_OK|R_OK|W_OK):
-					dummy=open("/media/hdd/dummy03","w")
+			if fileExists("/autofs/sda1"):
+				if access("/autofs/sda1",F_OK|R_OK|W_OK):
+					dummy=open("/autofs/sda1/dummy03","w")
 					dummy.write("complete")
 					dummy.close()
-					dummy=open("/media/hdd/dummy03","r")
+					dummy=open("/autofs/sda1/dummy03","r")
 					if dummy.readline()=="complete":
-						print "/media/hdd - complete"
+						print "/autofs/sda1 - complete"
 					else:
-						print "/media/hdd - readline error"
+						print "/autofs/sda1 - readline error"
 						result += 1
 						displayerror = 1
 					dummy.close()
-					system("rm /media/hdd/dummy03")
+					system("rm /autofs/sda1/dummy03")
 				else:
-					print "/media/hdd - rw access error"
+					print "/autofs/sda1 - rw access error"
 					result += 1
 					displayerror = 1
 			else:
-				print "/media/hdd - file not exist"
+				print "/autofs/sda1 - file not exist"
 				result += 1
 		except:
-			print "/media/hdd - exceptional error"
+			print "/autofs/sda1 - exceptional error"
 			result += 1
 			displayerror = 1
 		
