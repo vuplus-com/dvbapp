@@ -21,6 +21,7 @@ from enigma import eSctest
 from enigma import eDVBDB
 from Components.NimManager import nimmanager
 from enigma import eDVBCI_UI,eDVBCIInterfaces
+from Tools.Directories import resolveFilename, SCOPE_SYSETC
 
 class TestResultList(HTMLComponent, GUIComponent):
 	def __init__(self, list, enableWrapAround=False, content=eListboxPythonStringContent):
@@ -96,7 +97,7 @@ class FactoryTest(Screen):
 			<widget name="resultlist" position="370,0" size="60,350" />
 			<widget name="testdate" position="20,350" size="150,25" font="Regular;22" />
 			<widget name="testversion" position="20,375" size="150,25" font="Regular;22" />
-			<widget name="mactext" position="180,350" size="230,25" font="Regular;22" />			
+			<widget name="mactext" position="180,350" size="230,25" font="Regular;22" />
 		</screen>"""
 	def __init__(self, session):
 
@@ -123,7 +124,7 @@ class FactoryTest(Screen):
 		}, -2)
 
 		Screen.__init__(self, session)
-		TESTPROGRAM_DATE = "2011-06-09 (Ver 01.00)"
+		TESTPROGRAM_DATE = self.getImageVersion() +" (v1.00)"
 		TESTPROGRAM_VERSION = "Version 01.10"
 
 		self.model = 0
@@ -479,6 +480,24 @@ class FactoryTest(Screen):
 		index = int(number)
 		self["testlist"].moveToIndex(index)
 		self["resultlist"].moveToIndex(index)
+
+	def getImageVersion(self):
+		date = 'xxxx-xx-xx'
+		file = open(resolveFilename(SCOPE_SYSETC, 'image-version'), 'r')
+		lines = file.readlines()
+		for x in lines:
+			splitted = x.split('=')
+			if splitted[0] == "version":
+			#     YYYY MM DD hh mm
+				#0120 2005 11 29 01 16
+				#0123 4567 89 01 23 45
+				version = splitted[1]
+				year = version[4:8]
+				month = version[8:10]
+				day = version[10:12]
+				date = '-'.join((year, month, day))
+				break;
+		return date
 
 	def getversion(self):
 		try:
