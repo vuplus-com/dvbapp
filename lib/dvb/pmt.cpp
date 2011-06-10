@@ -18,6 +18,7 @@
 #include <dvbsi++/teletext_descriptor.h>
 #include <dvbsi++/video_stream_descriptor.h>
 #include <dvbsi++/registration_descriptor.h>
+#include <dvbsi++/ac3_descriptor.h>
 
 eDVBServicePMTHandler::eDVBServicePMTHandler()
 	:m_ca_servicePtr(0), m_dvb_scan(0), m_decode_demux_num(0xFF), m_no_pat_entry_delay(eTimer::create())
@@ -471,9 +472,28 @@ int eDVBServicePMTHandler::getProgramInfo(program &program)
 									audio.type = audioStream::atAACHE; // MPEG4-AAC
 									break;
 								case AC3_DESCRIPTOR:
-									isaudio = 1;
+								{    
+									Ac3Descriptor *ac = (Ac3Descriptor*)(*desc);
+
+									isaudio = 1; 
 									audio.type = audioStream::atAC3;
+
+									if(ac->getAc3TypeFlag())
+									{    
+
+										uint8_t ac3type = ac->getAc3Type();
+										if( ( ac3type & 0x80 ) && ( (ac3type<<5) == 0xA0 || (ac3type<<5) == 0xC0) ) // From EN-300 468 v1.7.1 Table D.1
+											audio.type = audioStream::atDDP;
+									}    
+
 									break;
+								}     
+								case ENHANCED_AC3_DESCRIPTOR:
+									isaudio = 1; 
+									audio.type = audioStream::atDDP;
+									break;
+     
+
 								case REGISTRATION_DESCRIPTOR: /* some services don't have a separate AC3 descriptor */
 								{
 									RegistrationDescriptor *d = (RegistrationDescriptor*)(*desc);
