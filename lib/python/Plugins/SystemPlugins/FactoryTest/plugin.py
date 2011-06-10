@@ -1439,12 +1439,12 @@ class SmartCardTest(Screen):
 		self["actions"] = ActionMap(["DirectionActions", "OkCancelActions"],
 		{
 			"cancel": self.keyCancel,
-			"ok" : self.keyCancel
+			"ok" : self.keyOk
 		}, -2)
 
 		Screen.__init__(self, session)
 		self["text"]=Label(("Testing Smartcard 1..."))
-		self.step = 0
+		self.testok = 0
 		self.smartcardtimer = eTimer()
 		self.smartcardtimer.callback.append(self.check_smart_card)
 		self.closetimer = eTimer()
@@ -1484,7 +1484,7 @@ class SmartCardTest(Screen):
 				return
 			elif (index==1 or self.model==1):
 				smartcardtest = 1
-				self.step = 1
+				self.testok = 1
 				self["text"].setText(_("Smart Card OK!!"))
 				self.closetimer.start(2000,True)
 				self.smartcardtimer.stop()
@@ -1512,6 +1512,10 @@ class SmartCardTest(Screen):
 				
 	def keyCancel(self):
 		self.close()
+
+	def keyOk(self):
+		if self.testok == 1:
+			self.close()
 
 	
 
