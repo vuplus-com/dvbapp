@@ -414,7 +414,9 @@ class FactoryTest(Screen):
 	def getModelInfo(self):
 		getmodel = 0
 		if fileExists("/proc/stb/info/vumodel"):
-			info = open("/proc/stb/info/vumodel").read().strip()
+			vumodel = open("/proc/stb/info/vumodel")
+			info=vumodel.read().strip()
+			vumodel.close()
 			if info == "duo":
 				self.model = 0
 				getmodel = 1
@@ -435,8 +437,11 @@ class FactoryTest(Screen):
 				self.model = 4
 				getmodel = 1
 				print "getModelInfo : ultimo"
+
 		if getmodel == 0 and fileExists("/proc/stb/info/version"):
-			info = open("/proc/stb/info/version").read()
+			vesion = open("/proc/stb/info/version")
+			info=version.read()
+			version.close()
 			if info[:2] == "14":
 				self.model = 1
 				print "getModelInfo : solo_"
@@ -497,12 +502,14 @@ class FactoryTest(Screen):
 				day = version[10:12]
 				date = '-'.join((year, month, day))
 				break;
+		file.close()
 		return date
 
 	def getversion(self):
 		try:
 			fd = open("/proc/stb/info/version","r")
 			version = fd.read()
+			fd.close()
 			self["testversion"].setText(("Version %s"%version))
 		except:
 			self["testversion"].setText(("Version no load"))
@@ -1268,7 +1275,9 @@ class MacConfig(Screen):
 	def getModelInfo(self):
 		getmodel = 0
 		if fileExists("/proc/stb/info/vumodel"):
-			info = open("/proc/stb/info/vumodel").read().strip()
+			vumodel = open("/proc/stb/info/vumodel")
+			info=vumodel.read().strip()
+			vumodel.close()
 			if info == "combo":
 				self.model = 2
 				getmodel = 1
@@ -1290,9 +1299,10 @@ class MacConfig(Screen):
 				getmodel = 1
 				print "getModelInfo : ultimo"
 
-
 		if getmodel == 0 and fileExists("/proc/stb/info/version"):
-			info = open("/proc/stb/info/version").read()
+			version = open("/proc/stb/info/version")
+			info=version.read()
+			version.close()
 #			print info,info[:2]
 			if info[:2] == "14":
 				self.model = 1
@@ -1873,8 +1883,14 @@ class RS232Test(Screen):
 					rstest = 0 
 			else:
 				rstest = 0
+			rs.close()
 		except:
-			print 'error'
+			try:
+				if rs:
+					rs.close()
+			except:
+				pass
+			print 'except error'
 			rstest = 0
 		if rstest == 0:
 			self.session.open( MessageBox, _("RS232 Test Failed!\nPress 'EXIT' button!"), MessageBox.TYPE_ERROR)
