@@ -325,19 +325,23 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 		self.key_type = None
 		self.encryption_key = None
 		self.wlanscanap = None
-		self.scanAPcount =5
+#		self.scanAPcount =5
+		self.scanAPcount =0
 		self.list = []
 		ConfigListScreen.__init__(self, self.list,session = self.session)
 		self.oldInterfaceState = iNetwork.getAdapterAttribute(self.iface, "up")
 		self.readWpaSupplicantConf()
 #		iNetwork.getInterfaces()
 		self.readWlanSettings()
+		self.scanAPFailedTimer = eTimer()
+		self.scanAPFailedTimer.callback.append(self.scanAPFailed)
 		self.scanAplistTimer = eTimer()
 		self.scanAplistTimer.callback.append(self.scanApList)
-		self.scanAplistTimer.start(100,True)
 		self.Console = Console()
+		self.scanAplistTimer.start(100,True)
 
 	def readWlanSettings(self):
+		iNetwork.getAddrInet(self.iface,None)
 		if iNetwork.getAdapterAttribute(self.iface, "up") == True:
 			default_tmp = "on"
 		else:
@@ -433,7 +437,7 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 							self.key_type = 0 # hex
 							self.encryption_key = data[4:-1]
 						data = wpafd.readline()
-					print self.ssid,self.scan_ssid,self.key_mgmt,self.proto,self.key_type,self.wep_key
+					print self.ssid,self.scan_ssid,self.key_mgmt,self.proto,self.key_type,self.encryption_key
 					wpafd.close()
 				else:
 					print 'read error'
@@ -469,7 +473,7 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 				if wlanconfig.usegateway.value is "on":
 					self.configList.append(self.gatewayEntry)
 			self.configList.append( self.essidEntry )
-			print "#### wlanconfig.essid.value : ",wlanconfig.essid.value
+#			print "#### wlanconfig.essid.value : ",wlanconfig.essid.value
 			if wlanconfig.essid.value == 'Input hidden ESSID':
 				self.configList.append( self.hiddenessidEntry )
 			self.configList.append( self.encryptEntry )
@@ -487,10 +491,12 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 		self.apList = []
 		self.scanAPcount -=1
 		self.configurationmsg = self.session.open(MessageBox, _("Please wait for scanning AP..."), type = MessageBox.TYPE_INFO, enable_input = False)
-		os_system('ifconfig '+self.iface+" up")
+		cmd = "ifconfig "+self.iface+" up"
+		print 'cmd ',cmd
+		os_system(cmd)
 		self.wlanscanap = Console()
 		cmd = "iwlist "+self.iface+" scan"
-		print 'cmd',cmd
+		print 'cmd ',cmd
 		self.wlanscanap.ePopen(cmd, self.apListFinnished,self.apListParse)
 
 	def apListFinnished(self, result, retval,extra_args):
@@ -520,18 +526,19 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 				return
 			else:
 				self.configurationmsg.close(True)
-				self.session.open(MessageBox, _("Scan AP Failed"), MessageBox.TYPE_INFO,2)
+				self.scanAPFailedTimer.start(500,True)
 				return
 		else:
 			self.apList = []
-			self.scanAPcount =5
+#			self.scanAPcount =5
+			self.scanAPcount =0
 			list = data.splitlines()
 			for x in list:
 				xx = x.lstrip()
 				if xx.startswith('ESSID:') and len(xx)>8:
 					self.apList.append(xx[7:-1])
 			self.apList.append('Input hidden ESSID')
-			print "###### selectap : ",selectap
+#			print "###### selectap : ",selectap
 			if selectap is not None and selectap in self.apList:
 				wlanconfig.essid = ConfigSelection(default=selectap,choices = self.apList)
 			elif self.ap_scan is not None and self.ap_scan.strip() == '2':
@@ -546,6 +553,9 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 				wlanconfig.hiddenessid = ConfigText(default = "<Input ESSID>", visible_width = 50, fixed_size = False)
 		self.configurationmsg.close(True)
 		self.createConfig()
+
+	def scanAPFailed(self):
+		self.session.openWithCallback(self.keyCancel ,MessageBox, _("Scan AP Failed"), MessageBox.TYPE_ERROR,10)
 
 	def keyLeft(self):
 		ConfigListScreen.keyLeft(self)
@@ -568,7 +578,7 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 	def checkNetworkShares(self,ret = False):
 		if ret == False:
 			return
-		print "########## checkNetworkShares : "
+#		print "########## checkNetworkShares : "
 		if not self.Console:
 			self.Console = Console()
 		cmd = "cat /proc/mounts"
@@ -655,7 +665,7 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 					else:
 						iNetwork.setAdapterAttribute(self.iface, "dhcp", False)
 						contents +="static\n"
-						print wlanconfig.ip.value
+#						print wlanconfig.ip.value
 						iNetwork.setAdapterAttribute(self.iface, "ip", wlanconfig.ip.value)
 						iNetwork.setAdapterAttribute(self.iface, "netmask", wlanconfig.netmask.value)						
 						contents +="\taddress "+ self.formatip(wlanconfig.ip.value)+"\n"
@@ -774,11 +784,11 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 		else:
 			self.close()
 
-	def keyCancel(self):
+	def keyCancel(self,yesno = True):
 		if self["config"].isChanged():
 			self.session.openWithCallback(self.keyCancelConfirm, MessageBox, _("Really close without saving settings?"))
 		else:
-			self.close()
+			self.keyCancelConfirm(True)
 
 	def keyCancelCB(self,data):
 		if data is not None:
@@ -821,7 +831,8 @@ class WlanScanAp(Screen,HelpableScreen):
 		self.session = session
 		self.iface = iface
 		self.wlanscanap = None
-		self.scanAPcount = 5
+#		self.scanAPcount = 5
+		self.scanAPcount = 0
 		self.apList = {}
 		self.SetApList = []
 
@@ -867,11 +878,12 @@ class WlanScanAp(Screen,HelpableScreen):
 		self["Frequency"] = StaticText(" ")
 		self["Encryption key"] = StaticText(" ")
 		self["BitRate"] = StaticText(" ")
+		self.scanAPFailedTimer = eTimer()
+		self.scanAPFailedTimer.callback.append(self.scanAPFailed)
 		self.scanAplistTimer = eTimer()
 		self.scanAplistTimer.callback.append(self.scanApList)
 		self.scanAplistTimer.start(100,True)
 		
-
 	def left(self):
 		self["menulist"].pageUp()
 		self.displayApInfo()
@@ -902,7 +914,7 @@ class WlanScanAp(Screen,HelpableScreen):
 #		self.close()
 
 	def scanApList(self):
-		print "self.scanAPcount : ",self.scanAPcount
+	#	print "self.scanAPcount : ",self.scanAPcount
 		self.apList = {}
 		self.SetApList = []
 		self.configurationmsg = self.session.open(MessageBox, _("Please wait for scanning AP..."), type = MessageBox.TYPE_INFO, enable_input = False)
@@ -940,12 +952,14 @@ class WlanScanAp(Screen,HelpableScreen):
 				self.scanAplistTimer.start(100,True)
 				return
 			else:
-				self.session.open(MessageBox, _("Scan AP Failed"), MessageBox.TYPE_INFO,5)
+				self.configurationmsg.close(True)
+				self.scanAPFailedTimer.start(500,True)
 				return
 		else:
 #			print data
 			self.apList = {}
-			self.scanAPcount =5
+#			self.scanAPcount =5
+			self.scanAPcount =0
 			list = data.splitlines()
 			for line in list:
 #				print "line : ",line
@@ -969,6 +983,9 @@ class WlanScanAp(Screen,HelpableScreen):
 			print len(self.apList)
 		self.configurationmsg.close(True)
 		self.displayApInfo()
+
+	def scanAPFailed(self):
+		self.session.openWithCallback(self.ScanAPclose,MessageBox, _("Scan AP Failed"), MessageBox.TYPE_ERROR,10)
 
 	def displayApInfo(self):
 		if len(self.apList) >0:
