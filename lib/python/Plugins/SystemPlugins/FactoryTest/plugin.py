@@ -21,6 +21,7 @@ from enigma import eSctest
 from enigma import eDVBDB
 from Components.NimManager import nimmanager
 from enigma import eDVBCI_UI,eDVBCIInterfaces
+from Tools.Directories import resolveFilename, SCOPE_SYSETC
 
 class TestResultList(HTMLComponent, GUIComponent):
 	def __init__(self, list, enableWrapAround=False, content=eListboxPythonStringContent):
@@ -96,7 +97,7 @@ class FactoryTest(Screen):
 			<widget name="resultlist" position="370,0" size="60,350" />
 			<widget name="testdate" position="20,350" size="150,25" font="Regular;22" />
 			<widget name="testversion" position="20,375" size="150,25" font="Regular;22" />
-			<widget name="mactext" position="180,350" size="230,25" font="Regular;22" />			
+			<widget name="mactext" position="180,350" size="230,25" font="Regular;22" />
 		</screen>"""
 	def __init__(self, session):
 
@@ -123,7 +124,7 @@ class FactoryTest(Screen):
 		}, -2)
 
 		Screen.__init__(self, session)
-		TESTPROGRAM_DATE = "2011-06-09"
+		TESTPROGRAM_DATE = self.getImageVersion() +" (v1.00)"
 		TESTPROGRAM_VERSION = "Version 01.10"
 
 		self.model = 0
@@ -480,6 +481,24 @@ class FactoryTest(Screen):
 		self["testlist"].moveToIndex(index)
 		self["resultlist"].moveToIndex(index)
 
+	def getImageVersion(self):
+		date = 'xxxx-xx-xx'
+		file = open(resolveFilename(SCOPE_SYSETC, 'image-version'), 'r')
+		lines = file.readlines()
+		for x in lines:
+			splitted = x.split('=')
+			if splitted[0] == "version":
+			#     YYYY MM DD hh mm
+				#0120 2005 11 29 01 16
+				#0123 4567 89 01 23 45
+				version = splitted[1]
+				year = version[4:8]
+				month = version[8:10]
+				day = version[10:12]
+				date = '-'.join((year, month, day))
+				break;
+		return date
+
 	def getversion(self):
 		try:
 			fd = open("/proc/stb/info/version","r")
@@ -616,29 +635,29 @@ class FactoryTest(Screen):
 			result = 1
 			displayerror = 1
 		try:
-			if fileExists("/media/hdd"):
-				if access("/media/hdd",F_OK|R_OK|W_OK):
-					dummy=open("/media/hdd/dummy03","w")
+			if fileExists("/autofs/sda1"):
+				if access("/autofs/sda1",F_OK|R_OK|W_OK):
+					dummy=open("/autofs/sda1/dummy03","w")
 					dummy.write("complete")
 					dummy.close()
-					dummy=open("/media/hdd/dummy03","r")
+					dummy=open("/autofs/sda1/dummy03","r")
 					if dummy.readline()=="complete":
-						print "/media/hdd - complete"
+						print "/autofs/sda1 - complete"
 					else:
-						print "/media/hdd - readline error"
+						print "/autofs/sda1 - readline error"
 						result += 1
 						displayerror = 1
 					dummy.close()
-					system("rm /media/hdd/dummy03")
+					system("rm /autofs/sda1/dummy03")
 				else:
-					print "/media/hdd - rw access error"
+					print "/autofs/sda1 - rw access error"
 					result += 1
 					displayerror = 1
 			else:
-				print "/media/hdd - file not exist"
+				print "/autofs/sda1 - file not exist"
 				result += 1
 		except:
-			print "/media/hdd - exceptional error"
+			print "/autofs/sda1 - exceptional error"
 			result += 1
 			displayerror = 1
 		
