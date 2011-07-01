@@ -326,12 +326,12 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 		self.encryption_key = None
 		self.wlanscanap = None
 #		self.scanAPcount =5
-		self.scanAPcount =0
+		self.scanAPcount =1
 		self.list = []
 		ConfigListScreen.__init__(self, self.list,session = self.session)
 		self.oldInterfaceState = iNetwork.getAdapterAttribute(self.iface, "up")
 		self.readWpaSupplicantConf()
-#		iNetwork.getInterfaces()
+#		iNetwork.getInterfaces(self.readWlanSettings)
 		self.readWlanSettings()
 		self.scanAPFailedTimer = eTimer()
 		self.scanAPFailedTimer.callback.append(self.scanAPFailed)
@@ -340,8 +340,9 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 		self.Console = Console()
 		self.scanAplistTimer.start(100,True)
 
-	def readWlanSettings(self):
-		iNetwork.getAddrInet(self.iface,None)
+	def readWlanSettings(self,ret=None):
+		if ret is not True:
+			print "getAddrInet Fail... "
 		if iNetwork.getAdapterAttribute(self.iface, "up") == True:
 			default_tmp = "on"
 		else:
@@ -489,7 +490,6 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 
 	def scanApList(self):
 		self.apList = []
-		self.scanAPcount -=1
 		self.configurationmsg = self.session.open(MessageBox, _("Please wait for scanning AP..."), type = MessageBox.TYPE_INFO, enable_input = False)
 		cmd = "ifconfig "+self.iface+" up"
 		print 'cmd ',cmd
@@ -521,8 +521,10 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 		global selectap
 		if data == 0:
 			if self.scanAPcount >0:
+				self.scanAPcount -=1
 				self.configurationmsg.close(True)
-				self.scanAplistTimer.start(100,True)
+				time.sleep(3)
+				self.scanAplistTimer.start(500,True)
 				return
 			else:
 				self.configurationmsg.close(True)
@@ -578,7 +580,6 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 	def checkNetworkShares(self,ret = False):
 		if ret == False:
 			return
-#		print "########## checkNetworkShares : "
 		if not self.Console:
 			self.Console = Console()
 		cmd = "cat /proc/mounts"
@@ -767,11 +768,13 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 	def formatip(self, iplist):
 		list = []
 		list = iplist
+#		print "iplist : ",iplist
 		try:
 			if len(iplist) == 4:
 				result = str(iplist[0])+"."+str(iplist[1])+"."+str(iplist[2])+"."+str(iplist[3])
 			else:
 				result ="0.0.0.0"
+#			print "result : ",result
 			return result
 		except:
 			return "[N/A]"
@@ -780,6 +783,7 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 		if not result:
 			return
 		if self.oldInterfaceState is False:
+			iNetwork.setAdapterAttribute(self.iface, "up", False)
 			iNetwork.deactivateInterface(self.iface,self.keyCancelCB)
 		else:
 			self.close()
@@ -822,7 +826,7 @@ class WlanScanAp(Screen,HelpableScreen):
 		<widget source="Protocol" render="Label" position="490,280" zPosition="1" size="300,30" font="Regular;20" halign="center" valign="center" backgroundColor="#27b5b9bd" foregroundColor="#1c1c1c" transparent="1" />	
 		<widget source="Frequency" render="Label" position="490,310" zPosition="1" size="300,30" font="Regular;20" halign="center" valign="center" backgroundColor="#27b5b9bd" foregroundColor="#1c1c1c" transparent="1" />	
 		<widget source="Encryption key" render="Label" position="490,340" zPosition="1" size="300,30" font="Regular;20" halign="center" valign="center" backgroundColor="#27b5b9bd" foregroundColor="#1c1c1c" transparent="1" />	
-		<widget source="BitRate" render="Label" position="490,370" zPosition="1" size="300,30" font="Regular;20" halign="center" valign="center" backgroundColor="#27b5b9bd" foregroundColor="#1c1c1c" transparent="1" />
+		<widget source="BitRate" render="Label" position="490,370" zPosition="1" size="300,60" font="Regular;20" halign="center" valign="center" backgroundColor="#27b5b9bd" foregroundColor="#1c1c1c" transparent="1" />
 	</screen>"""
 
 	def __init__(self, session, iface):
@@ -832,7 +836,7 @@ class WlanScanAp(Screen,HelpableScreen):
 		self.iface = iface
 		self.wlanscanap = None
 #		self.scanAPcount = 5
-		self.scanAPcount = 0
+		self.scanAPcount = 1
 		self.apList = {}
 		self.SetApList = []
 
@@ -918,7 +922,6 @@ class WlanScanAp(Screen,HelpableScreen):
 		self.apList = {}
 		self.SetApList = []
 		self.configurationmsg = self.session.open(MessageBox, _("Please wait for scanning AP..."), type = MessageBox.TYPE_INFO, enable_input = False)
-		self.scanAPcount -=1
 		os_system('ifconfig '+self.iface+" up")
 		self.wlanscanap = Console()
 		cmd = "iwlist "+self.iface+" scan"
@@ -948,8 +951,10 @@ class WlanScanAp(Screen,HelpableScreen):
 	def APListParse(self,data):
 		if data == 0:
 			if self.scanAPcount >0:
+				self.scanAPcount -=1
 				self.configurationmsg.close(True)
-				self.scanAplistTimer.start(100,True)
+				time.sleep(3)
+				self.scanAplistTimer.start(500,True)
 				return
 			else:
 				self.configurationmsg.close(True)
