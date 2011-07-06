@@ -537,7 +537,7 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 			list = data.splitlines()
 			for x in list:
 				xx = x.lstrip()
-				if xx.startswith('ESSID:') and len(xx)>8:
+				if xx.startswith('ESSID:') and len(xx)>8 and xx[7:-1]not in self.apList:
 					self.apList.append(xx[7:-1])
 			self.apList.append('Input hidden ESSID')
 #			print "###### selectap : ",selectap
