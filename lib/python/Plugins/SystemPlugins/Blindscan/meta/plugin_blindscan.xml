@@ -3,11 +3,11 @@
                     <tag type="System" />
 	  </prerequisites>
           <info>
-                    <author>doliyu & oskwon</author>
+                    <author>doliyu and oskwon</author>
                     <name>Blindscan</name>
                     <packagename>enigma2-plugin-systemplugins-blindscan</packagename>
                     <shortdescription>vuplus blindscan...</shortdescription>
-                    <description></description>
+                    <description>vuplus blindscan...</description>
           </info>
 
 	  <files type="package"> <!-- without version, without .ipk -->

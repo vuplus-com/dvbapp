@@ -181,7 +181,7 @@ class SatBlindscanSearchSupport:
 		print "prepared command : ", cmd
 		self.blind_search_container.execute(cmd)
 		
-		tmpstr = _("Preparing scanning... \nPlease wait a few minutes.")
+		tmpstr = _("Blindscan takes some minute.")
 		self.blind_search_session = self.session.openWithCallback(self.blindTransponderSearchSessionClosed, MessageBox, tmpstr, MessageBox.TYPE_INFO)
 
 class Blindscan(ConfigListScreen, Screen, SatBlindscanSearchSupport):
@@ -231,9 +231,25 @@ class Blindscan(ConfigListScreen, Screen, SatBlindscanSearchSupport):
 		self["key_red"] = StaticText(_("Exit"))
 		self["key_green"] = StaticText("Start")
 		
-		if not self.scan_nims.value == "":
-			self.createSetup()
+		#if not self.scan_nims.value == "":
+		#	self.createSetup()
+		try:
+			if not self.scan_nims.value == "":
+				self.createSetup()
+		except:
+			self["actions"] = ActionMap(["OkCancelActions", "ShortcutActions", "WizardActions", "ColorActions", "SetupActions", ],
+			{
+				"red": self.keyCancel,
+				"green": self.keyNone,
+				"ok": self.keyNone,
+				"cancel": self.keyCancel,
+			}, -2)
+			self["key_red"] = StaticText(_("Exit"))
+			self["key_green"] = StaticText(" ")
 
+	def keyNone(self):
+		None
+		
 	def updateSatList(self):
 		self.satList = []
 		for slot in nimmanager.nim_slots:
@@ -243,67 +259,87 @@ class Blindscan(ConfigListScreen, Screen, SatBlindscanSearchSupport):
 				self.satList.append(None)
 
 	def createConfig(self, frontendData):
-		defaultSat = {"orbpos": 192, "frequency": 11836, "polarization": eDVBFrontendParametersSatellite.Polarisation_Horizontal}
-
+		defaultSat = {
+			"orbpos": 192,
+			"system": eDVBFrontendParametersSatellite.System_DVB_S,
+			"frequency": 11836,
+			"inversion": eDVBFrontendParametersSatellite.Inversion_Unknown,
+			"symbolrate": 27500,
+			"polarization": eDVBFrontendParametersSatellite.Polarisation_Horizontal,
+			"fec": eDVBFrontendParametersSatellite.FEC_Auto,
+			"fec_s2": eDVBFrontendParametersSatellite.FEC_9_10,
+			"modulation": eDVBFrontendParametersSatellite.Modulation_QPSK }
 		if frontendData is not None:
 			ttype = frontendData.get("tuner_type", "UNKNOWN")
-			defaultSat["orbpos"] = frontendData.get("orbital_position", 0)
-			defaultSat["frequency"] = frontendData.get("frequency", 0) / 1000
-			defaultSat["polarization"] = frontendData.get("polarization", eDVBFrontendParametersSatellite.Polarisation_Horizontal)
-			
-			self.scan_sat = ConfigSubsection()
-			self.scan_networkScan = ConfigYesNo(default = False)
-			
-			# blindscan add
-			self.blindscan_hi = ConfigSelection(default = "low", choices = [("low", _("low")), ("high", _("high"))])
-
-			#ConfigYesNo(default = True)
-			self.blindscan_start_frequency = ConfigInteger(default = 950*1000000)
-			self.blindscan_stop_frequency = ConfigInteger(default = 2150*1000000)
-			self.blindscan_start_symbol = ConfigInteger(default = 2*1000000)
-			self.blindscan_stop_symbol = ConfigInteger(default = 45*1000000)
-
-			nim_list = []
-			# collect all nims which are *not* set to "nothing"
-			for n in nimmanager.nim_slots:
-				if n.config_mode == "nothing":
-					continue
-				if n.config_mode == "advanced" and len(nimmanager.getSatListForNim(n.slot)) < 1:
-					continue
-				if n.config_mode in ("loopthrough", "satposdepends"):
-					root_id = nimmanager.sec.getRoot(n.slot_id, int(n.config.connectedTo.value))
-					if n.type == nimmanager.nim_slots[root_id].type: # check if connected from a DVB-S to DVB-S2 Nim or vice versa
-						continue
-				nim_list.append((str(n.slot), n.friendly_full_description))
-
-			self.scan_nims = ConfigSelection(choices = nim_list)
-
-			# status
-			self.scan_snr = ConfigSlider()
-			self.scan_snr.enabled = False
-			self.scan_agc = ConfigSlider()
-			self.scan_agc.enabled = False
-			self.scan_ber = ConfigSlider()
-			self.scan_ber.enabled = False
-
-			# sat
-			self.scan_sat.frequency = ConfigInteger(default = defaultSat["frequency"], limits = (1, 99999))
-			self.scan_sat.polarization = ConfigSelection(default = defaultSat["polarization"], choices = [
-				(eDVBFrontendParametersSatellite.Polarisation_Horizontal, _("horizontal")),
-				(eDVBFrontendParametersSatellite.Polarisation_Vertical, _("vertical")),
-				(eDVBFrontendParametersSatellite.Polarisation_CircularLeft, _("circular left")),
-				(eDVBFrontendParametersSatellite.Polarisation_CircularRight, _("circular right"))])
-			self.scan_scansat = {}
-			for sat in nimmanager.satList:
-				self.scan_scansat[sat[0]] = ConfigYesNo(default = False)
-			
-			self.scan_satselection = []
-			for slot in nimmanager.nim_slots:
-				if slot.isCompatible("DVB-S"):
-					self.scan_satselection.append(getConfigSatlist(defaultSat["orbpos"], self.satList[slot.slot]))
+			if ttype == "DVB-S":
+				defaultSat["system"] = frontendData.get("system", eDVBFrontendParametersSatellite.System_DVB_S)
+				defaultSat["frequency"] = frontendData.get("frequency", 0) / 1000
+				defaultSat["inversion"] = frontendData.get("inversion", eDVBFrontendParametersSatellite.Inversion_Unknown)
+				defaultSat["symbolrate"] = frontendData.get("symbol_rate", 0) / 1000
+				defaultSat["polarization"] = frontendData.get("polarization", eDVBFrontendParametersSatellite.Polarisation_Horizontal)
+				if defaultSat["system"] == eDVBFrontendParametersSatellite.System_DVB_S2:
+					defaultSat["fec_s2"] = frontendData.get("fec_inner", eDVBFrontendParametersSatellite.FEC_Auto)
+					defaultSat["rolloff"] = frontendData.get("rolloff", eDVBFrontendParametersSatellite.RollOff_alpha_0_35)
+					defaultSat["pilot"] = frontendData.get("pilot", eDVBFrontendParametersSatellite.Pilot_Unknown)
 				else:
-					self.scan_satselection.append(None)
-			return True
+					defaultSat["fec"] = frontendData.get("fec_inner", eDVBFrontendParametersSatellite.FEC_Auto)
+				defaultSat["modulation"] = frontendData.get("modulation", eDVBFrontendParametersSatellite.Modulation_QPSK)
+				defaultSat["orbpos"] = frontendData.get("orbital_position", 0)
+				
+		self.scan_sat = ConfigSubsection()
+		self.scan_networkScan = ConfigYesNo(default = False)
+		
+		# blindscan add
+		self.blindscan_hi = ConfigSelection(default = "low", choices = [("low", _("low")), ("high", _("high"))])
+
+		#ConfigYesNo(default = True)
+		self.blindscan_start_frequency = ConfigInteger(default = 950*1000000)
+		self.blindscan_stop_frequency = ConfigInteger(default = 2150*1000000)
+		self.blindscan_start_symbol = ConfigInteger(default = 2*1000000)
+		self.blindscan_stop_symbol = ConfigInteger(default = 45*1000000)
+
+		nim_list = []
+		# collect all nims which are *not* set to "nothing"
+		for n in nimmanager.nim_slots:
+			if n.config_mode == "nothing":
+				continue
+			if n.config_mode == "advanced" and len(nimmanager.getSatListForNim(n.slot)) < 1:
+				continue
+			if n.config_mode in ("loopthrough", "satposdepends"):
+				root_id = nimmanager.sec.getRoot(n.slot_id, int(n.config.connectedTo.value))
+				if n.type == nimmanager.nim_slots[root_id].type: # check if connected from a DVB-S to DVB-S2 Nim or vice versa
+					continue
+			nim_list.append((str(n.slot), n.friendly_full_description))
+
+		self.scan_nims = ConfigSelection(choices = nim_list)
+	
+		# status
+		self.scan_snr = ConfigSlider()
+		self.scan_snr.enabled = False
+		self.scan_agc = ConfigSlider()
+		self.scan_agc.enabled = False
+		self.scan_ber = ConfigSlider()
+		self.scan_ber.enabled = False
+
+		# sat
+		self.scan_sat.frequency = ConfigInteger(default = defaultSat["frequency"], limits = (1, 99999))
+		self.scan_sat.polarization = ConfigSelection(default = defaultSat["polarization"], choices = [
+			(eDVBFrontendParametersSatellite.Polarisation_Horizontal, _("horizontal")),
+			(eDVBFrontendParametersSatellite.Polarisation_Vertical, _("vertical")),
+			(eDVBFrontendParametersSatellite.Polarisation_CircularLeft, _("circular left")),
+			(eDVBFrontendParametersSatellite.Polarisation_CircularRight, _("circular right"))])
+		self.scan_scansat = {}
+		for sat in nimmanager.satList:
+			self.scan_scansat[sat[0]] = ConfigYesNo(default = False)
+		
+		self.scan_satselection = []
+		for slot in nimmanager.nim_slots:
+			if slot.isCompatible("DVB-S"):
+				self.scan_satselection.append(getConfigSatlist(defaultSat["orbpos"], self.satList[slot.slot]))
+			else:
+				self.scan_satselection.append(None)
+		return True
+			
 			
 	def newConfig(self):
 		cur = self["config"].getCurrent()
@@ -395,6 +431,7 @@ class Blindscan(ConfigListScreen, Screen, SatBlindscanSearchSupport):
 			self["config"].l.setList(self.list)
 		else:
 		 	self.session.open(MessageBox, _("Please setup DVB-S Tuner"), MessageBox.TYPE_ERROR)
+
 
 def main(session, **kwargs):
 	session.open(Blindscan)
