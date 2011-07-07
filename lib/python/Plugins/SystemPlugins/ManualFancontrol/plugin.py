@@ -6,6 +6,7 @@ from Screens.MessageBox import MessageBox
 from Components.Sources.StaticText import StaticText
 from Plugins.Plugin import PluginDescriptor
 from Plugins.SystemPlugins.ManualFancontrol.InstandbyOn import instandbyon
+import NavigationInstance
 
 class ManualFancontrol(Screen,ConfigListScreen):
 	skin = """
@@ -20,8 +21,6 @@ class ManualFancontrol(Screen,ConfigListScreen):
 
 	def __init__(self,session):
 		Screen.__init__(self,session)
-		print "init"
-		self.setup_title="TestSetupTitle"
 		self.session = session
 		self["shortcuts"] = ActionMap(["ShortcutActions", "SetupActions" ],
 		{
@@ -35,50 +34,100 @@ class ManualFancontrol(Screen,ConfigListScreen):
 		self["key_red"] = StaticText(_("Cancel"))
 		self["key_green"] = StaticText(_("Save"))
 		self["current"] = StaticText(_(" "))
-		self.createSetup()
+		self.configSetup()
+		self.backup_pwm = instandbyon.getPWM()
+		self.OnRecording = False
+
+	def isRecording(self):
+		recordings = NavigationInstance.instance.getRecordings()
+		if recordings :
+			return True
+		else:
+			return False
 
 	def displayCurrentValue(self):
-		cur = self["config"].getCurrent()[0]
-		val = self["config"].getCurrent()[1].value
-		currrent_val = cur+" : "+str(val)
+		currrent_val = self["config"].getCurrent()[0]+" : "+str(self["config"].getCurrent()[1].value)
 		self["current"].setText(_(currrent_val))
 		print currrent_val
 
 	def selectionChanged(self):
-		self.displayCurrentValue()
 		if self["config"].getCurrent() == self.pwmEntry:
 			instandbyon.setPWM(self["config"].getCurrent()[1].value)
 
 	def keyLeft(self):
+		oldpwmvalue=config.plugins.simplefancontrols.pwmvalue.value
 		ConfigListScreen.keyLeft(self)
-		self.newConfig()
+		if self["config"].getCurrent() == self.pwmEntry and oldpwmvalue == 5:
+			self.createSetup()
+		else:
+			self.displayCurrentValue()
 		self.selectionChanged()
 
 	def keyRight(self):
+		oldpwmvalue=config.plugins.simplefancontrols.pwmvalue.value
 		ConfigListScreen.keyRight(self)
-		self.newConfig()
+		if self["config"].getCurrent() == self.pwmEntry and oldpwmvalue == 0:
+			self.createSetup()
+			while self["config"].getCurrent() != self.pwmEntry:
+				self["config"].setCurrentIndex(self["config"].getCurrentIndex()+1)
+		else:
+			self.displayCurrentValue()
 		self.selectionChanged()
 
 	def createSetup(self):
 		self.list = []
-		self.standbyEntry = getConfigListEntry(_("FanOFF InStanby"), config.plugins.simplefancontrols.standbymode)
-		self.pwmEntry = getConfigListEntry(_("PWM value"), config.plugins.simplefancontrols.pwmvalue)
-		self.list.append( self.standbyEntry )
+		if config.plugins.simplefancontrols.pwmvalue.value > 0:
+			self.list.append( self.standbyEntry )
 		self.list.append( self.pwmEntry )
 		self["config"].list = self.list
 		self["config"].l.setList(self.list)
+
+	def configSetup(self):
+		self.standbyEntry = getConfigListEntry(_("FanOFF InStanby"), config.plugins.simplefancontrols.standbymode)
+		self.pwmEntry = getConfigListEntry(_("PWM value"), config.plugins.simplefancontrols.pwmvalue)
 		if not self.displayCurrentValue in self["config"].onSelectionChanged:
 			self["config"].onSelectionChanged.append(self.displayCurrentValue)
+		self.createSetup()
 
 	def newConfig(self):
-		if self["config"].getCurrent() == self.standbyEntry:
+		if self["config"].getCurrent() == self.pwmEntry and config.plugins.simplefancontrols.pwmvalue.value == 0:
 			self.createSetup()
 
 	def keySave(self):
+		if instandbyon.fanoffmode is 'OFF' and config.plugins.simplefancontrols.pwmvalue.value == 0:
+			instandbyon.appendRecordEventCallback()
+			instandbyon.fanoffmode = 'ON'
+			print "<SimpleFancontrol> instandbyon.fanoffmode 'OFF' -> 'ON'"
+
+		elif instandbyon.fanoffmode is 'ON' and config.plugins.simplefancontrols.pwmvalue.value != 0:
+			instandbyon.removeRecordEventCallback()
+			instandbyon.fanoffmode = 'OFF'
+			print "<SimpleFancontrol> instandbyon.fanoffmode 'ON' -> 'OFF'"
+		if instandbyon.fanoffmode == 'ON' and self.isRecording() and instandbyon.getPWM() != instandbyon.default_pwm_value_onRecordings:
+			instandbyon.setPWM(instandbyon.default_pwm_value_onRecordings)
 		ConfigListScreen.keySave(self)
 
+	def cancelConfirm(self, result):
+		if not result:
+			return
+		for x in self["config"].list:
+			x[1].cancel()
+		if instandbyon.fanoffmode == 'ON' and self.isRecording():
+			if instandbyon.getPWM() != instandbyon.default_pwm_value_onRecordings:
+				instandbyon.setPWM(instandbyon.default_pwm_value_onRecordings)
+			else:
+				pass
+		else:
+			instandbyon.setPWM(config.plugins.simplefancontrols.pwmvalue.value)
+		self.close()
+
 	def keyCancel(self):
-		ConfigListScreen.keyCancel(self)
+		if self["config"].isChanged():
+			self.session.openWithCallback(self.cancelConfirm, MessageBox, _("Really close without saving settings?"))
+		else:
+			if instandbyon.fanoffmode == 'ON' and self.isRecording() and instandbyon.getPWM() != instandbyon.default_pwm_value_onRecordings:
+				instandbyon.setPWM(instandbyon.default_pwm_value_onRecordings)
+			self.close()
 
 def main(session, **kwargs):
 	session.open(ManualFancontrol)
