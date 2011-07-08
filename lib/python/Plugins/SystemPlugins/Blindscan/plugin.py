@@ -177,7 +177,7 @@ class SatBlindscanSearchSupport:
 		self.blind_search_container = eConsoleAppContainer()
 		self.blind_search_container.appClosed.append(self.blindScanSearchClosed)
 		self.blind_search_container.dataAvail.append(self.getBlindTransponderData)
-		cmd = "/usr/lib/enigma2/python/Plugins/SystemPlugins/Blindscan/vuplus_blindscan %d %d %d %d %d %d %d" % (self.blindscan_start_frequency.value/1000000, self.blindscan_stop_frequency.value/1000000, self.blindscan_start_symbol.value/1000000, self.blindscan_stop_symbol.value/1000000, self.scan_sat.polarization.value, tab_hilow[self.blindscan_hi.value], self.feid)
+		cmd = "vuplus_blindscan %d %d %d %d %d %d %d" % (self.blindscan_start_frequency.value/1000000, self.blindscan_stop_frequency.value/1000000, self.blindscan_start_symbol.value/1000000, self.blindscan_stop_symbol.value/1000000, self.scan_sat.polarization.value, tab_hilow[self.blindscan_hi.value], self.feid)
 		print "prepared command : ", cmd
 		self.blind_search_container.execute(cmd)
 		
