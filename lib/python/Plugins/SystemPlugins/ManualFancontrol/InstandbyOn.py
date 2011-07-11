@@ -8,7 +8,7 @@ from enigma import eTimer
 config.plugins.simplefancontrols = ConfigSubsection()
 config.plugins.simplefancontrols.standbymode = ConfigSelection(default = "yes", choices = [
 	("no", _("no")), ("yes", _("yes"))])
-config.plugins.simplefancontrols.pwmvalue = ConfigSlider(default = 100, increment = 5, limits = (0, 255))
+config.plugins.simplefancontrols.pwmvalue = ConfigSlider(default = 10, increment = 5, limits = (0, 255))
 
 class instandbyOn:
 	def __init__(self):

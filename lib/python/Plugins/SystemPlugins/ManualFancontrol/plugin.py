@@ -35,8 +35,6 @@ class ManualFancontrol(Screen,ConfigListScreen):
 		self["key_green"] = StaticText(_("Save"))
 		self["current"] = StaticText(_(" "))
 		self.configSetup()
-		self.backup_pwm = instandbyon.getPWM()
-		self.OnRecording = False
 
 	def isRecording(self):
 		recordings = NavigationInstance.instance.getRecordings()
