@@ -84,32 +84,35 @@ class WlanSelection(Screen,HelpableScreen):
 		for x in iNetwork.getAdapterList():
 			if x.startswith('eth'):
 				continue
-			list.append((self.getAdapterDescription(x) + " (%s)"%x,x))
+			description=self.getAdapterDescription(x)
+			if description == "Unknown network adapter":
+				list.append((description,x))
+			else:
+				list.append((description + " (%s)"%x,x))
 		return list
 
 	def getAdapterDescription(self, iface):
-		if iface == 'eth0':
-			return _("Internal LAN adapter.")
-		else:
-			classdir = "/sys/class/net/" + iface + "/device/"
-			driverdir = "/sys/class/net/" + iface + "/device/driver/"
-			if os_path.exists(classdir):
-				files = listdir(classdir)
-				if 'driver' in files:
-					if os_path.realpath(driverdir).endswith('rtw_usb_drv'):
-						return _("Realtak")+ " " + _("WLAN adapter.")
-					elif os_path.realpath(driverdir).endswith('ath_pci'):
-						return _("Atheros")+ " " + _("WLAN adapter.")
-					elif os_path.realpath(driverdir).endswith('zd1211b'):
-						return _("Zydas")+ " " + _("WLAN adapter.")
-					elif os_path.realpath(driverdir).endswith('rt73'):
-						return _("Ralink")+ " " + _("WLAN adapter.")
-					elif os_path.realpath(driverdir).endswith('rt73usb'):
-						return _("Ralink")+ " " + _("WLAN adapter.")
-					else:
-						return str(os_path.basename(os_path.realpath(driverdir))) + " " + _("WLAN adapter")
+		classdir = "/sys/class/net/" + iface + "/device/"
+		driverdir = "/sys/class/net/" + iface + "/device/driver/"
+		if os_path.exists(classdir):
+			files = listdir(classdir)
+			if 'driver' in files:
+				if os_path.realpath(driverdir).endswith('rtw_usb_drv'):
+					return _("Realtak")+ " " + _("WLAN adapter.")
+				elif os_path.realpath(driverdir).endswith('ath_pci'):
+					return _("Atheros")+ " " + _("WLAN adapter.")
+				elif os_path.realpath(driverdir).endswith('zd1211b'):
+					return _("Zydas")+ " " + _("WLAN adapter.")
+				elif os_path.realpath(driverdir).endswith('rt73'):
+					return _("Ralink")+ " " + _("WLAN adapter.")
+				elif os_path.realpath(driverdir).endswith('rt73usb'):
+					return _("Ralink")+ " " + _("WLAN adapter.")
 				else:
-					return _("Unknown network adapter.")
+					return str(os_path.basename(os_path.realpath(driverdir))) + " " + _("WLAN adapter")
+			else:
+				return _("Unknown network adapter")
+		else:
+			return _("Unknown network adapter")
 
 class WlanSetup(Screen,HelpableScreen):
 	skin = """
@@ -331,18 +334,17 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 		ConfigListScreen.__init__(self, self.list,session = self.session)
 		self.oldInterfaceState = iNetwork.getAdapterAttribute(self.iface, "up")
 		self.readWpaSupplicantConf()
-#		iNetwork.getInterfaces(self.readWlanSettings)
-		self.readWlanSettings()
 		self.scanAPFailedTimer = eTimer()
 		self.scanAPFailedTimer.callback.append(self.scanAPFailed)
 		self.scanAplistTimer = eTimer()
 		self.scanAplistTimer.callback.append(self.scanApList)
 		self.Console = Console()
-		self.scanAplistTimer.start(100,True)
+#		self.scanAplistTimer.start(100,True)
+		iNetwork.getInterfaces(self.readWlanSettings)
 
 	def readWlanSettings(self,ret=None):
 		if ret is not True:
-			print "getAddrInet Fail... "
+			print "getInterfaces Fail... "
 		if iNetwork.getAdapterAttribute(self.iface, "up") == True:
 			default_tmp = "on"
 		else:
@@ -366,9 +368,9 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 
 		wlanconfig.gateway = ConfigIP(default=iNetwork.getAdapterAttribute(self.iface, "gateway") or [0,0,0,0])
 
-		self["ipaddress"] = StaticText(_(self.formatip(iNetwork.getAdapterAttribute(self.iface, "ip"))))
-		self["netmask"] = StaticText(_(self.formatip(iNetwork.getAdapterAttribute(self.iface, "netmask"))))
-		self["gateway"] = StaticText(_(self.formatip(iNetwork.getAdapterAttribute(self.iface, "gateway"))))
+		self["ipaddress"].setText(_(self.formatip(iNetwork.getAdapterAttribute(self.iface, "ip"))))
+		self["netmask"].setText(_(self.formatip(iNetwork.getAdapterAttribute(self.iface, "netmask"))))
+		self["gateway"].setText(_(self.formatip(iNetwork.getAdapterAttribute(self.iface, "gateway"))))
 
 		if self.encryption_key is not None:
 			default_tmp = "on"
@@ -401,6 +403,7 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 			("ascii", _("ASCII")), ("hex", _("HEX"))])
 		default_tmp = self.encryption_key or "XXXXXXXX"
 		wlanconfig.key = ConfigText(default = default_tmp, visible_width = 50, fixed_size = False)
+		self.scanAplistTimer.start(100,True)
 
 	def readWpaSupplicantConf(self):
 		try:
@@ -574,6 +577,8 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 			self.createConfig()
 
 	def saveWlanConfig(self):
+		if self["config"].getCurrent() == self.keyEntry or self["config"].getCurrent() == self.hiddenessidEntry :
+			self["config"].getCurrent()[1].onDeselect(self.session)
 		if self["config"].isChanged():
 			self.session.openWithCallback(self.checkNetworkShares, MessageBox, (_("Are you sure you want to restart your network interfaces?\n") ) )
 		else:
@@ -581,6 +586,8 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 
 	def checkNetworkShares(self,ret = False):
 		if ret == False:
+			if self["config"].getCurrent() == self.keyEntry or self["config"].getCurrent() == self.hiddenessidEntry :
+				self["config"].getCurrent()[1].onSelect(self.session)
 			return
 		if not self.Console:
 			self.Console = Console()
@@ -596,6 +603,8 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 			if split[2] in networks:
 				self.session.open(MessageBox, ("NOT deconfiguring network interfaces :\n network shares still mounted\n"), type = MessageBox.TYPE_ERROR, timeout = 10)
 				callback(False)
+				if self["config"].getCurrent() == self.keyEntry or self["config"].getCurrent() == self.hiddenessidEntry :
+					self["config"].getCurrent()[1].onSelect(self.session)
 				return
 		callback(True)
 
@@ -1358,7 +1367,7 @@ class NetworkAdapterTest(Screen):
 
 	def readAP(self,result,retval,extra_args):
 		(callback) = extra_args
-		self.apState = False
+		self.apState = None
 		if self.iwconfigConsole is not None:
 			if retval == 0:
 				self.iwconfigConsole = None
