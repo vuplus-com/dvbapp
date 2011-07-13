@@ -31,17 +31,14 @@ class instandbyOn:
 			self.InitTimer.startLongTimer(1)
 		else:
 			if config.plugins.simplefancontrols.pwmvalue.value == 0:
-				currentPWM = self.getPWM()
 				NavigationInstance.instance.record_event.append(self.getRecordEvent_onFanOFF)
 				recordings = NavigationInstance.instance.getRecordings()
 				print "<SimpleFancontrol> initConfig :  recordings : ", recordings
-				if recordings and currentPWM != self.default_pwm_value_onRecordings:
+				if recordings:
 					self.setPWM(self.default_pwm_value_onRecordings)
-				elif not recordings and currentPWM > 0:
-					self.setPWM(0)
 				else:
-					print "<SimpleFancontrol> initConfig : setPWM pass"
-			elif self.getPWM() != config.plugins.simplefancontrols.pwmvalue.value:
+					self.setPWM(0)
+			else:
 				self.setPWM(config.plugins.simplefancontrols.pwmvalue.value)
 
 	def standbyBegin(self, configElement):
