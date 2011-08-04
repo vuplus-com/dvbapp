@@ -1,110 +1,119 @@
 from Components.config import config, ConfigSubList, ConfigSubsection
 import NavigationInstance
-from enigma import iRecordableService
+from enigma import iRecordableService, eTimer, iPlayableService, eServiceCenter, iServiceInformation
 from Components.ConfigList import ConfigListScreen
 from Components.config import config, ConfigSubsection, ConfigSelection, ConfigSlider
-from enigma import eTimer
+from Components.Harddisk import harddiskmanager
 
-config.plugins.simplefancontrols = ConfigSubsection()
-config.plugins.simplefancontrols.standbymode = ConfigSelection(default = "yes", choices = [
+config.plugins.manualfancontrols = ConfigSubsection()
+config.plugins.manualfancontrols.standbymode = ConfigSelection(default = "yes", choices = [
 	("no", _("no")), ("yes", _("yes"))])
-config.plugins.simplefancontrols.pwmvalue = ConfigSlider(default = 10, increment = 5, limits = (0, 255))
+config.plugins.manualfancontrols.pwmvalue = ConfigSlider(default = 10, increment = 5, limits = (0, 255))
+config.plugins.manualfancontrols.checkperiod = ConfigSelection(default = "10", choices = [
+		("5", "5 " + _("seconds")), ("10", "10 " + _("seconds")), ("30", "30 " + _("seconds")),
+		("60", "1 " + _("minute")), ("120", "2 " + _("minutes")),
+		("300", "5 " + _("minutes")), ("600", "10 " + _("minutes"))])
+
+instandbyOn_playingpvr = False
 
 class instandbyOn:
 	def __init__(self):
 		self.fanoffmode = 'OFF'
-		self.default_pwm_value_onRecordings = 5
-		config.misc.standbyCounter.addNotifier(self.standbyBegin, initial_call = False)
-		if config.plugins.simplefancontrols.pwmvalue.value == 0:
+		self.minimum_pwm = 5
+		self.setPWM(config.plugins.manualfancontrols.pwmvalue.value)
+		self.checkStstusTimer = eTimer()
+		self.checkStstusTimer.callback.append(self.checkStstus)
+		if config.plugins.manualfancontrols.pwmvalue.value == 0:
 			self.fanoffmode = 'ON'
-		self.InitTimer = eTimer()
-		if self.initConfig not in self.InitTimer.callback:
-			self.InitTimer.callback.append(self.initConfig)
-		print "<SimpleFancontrol> init : Timer loop start!!"
-		self.InitTimer.startLongTimer(3)
-		print "<SimpleFancontrol> init :  self.fanoffmode : ", self.fanoffmode
-		print "<SimpleFancontrol> init :  config.plugins.simplefancontrols.pwmvalue.value : ", config.plugins.simplefancontrols.pwmvalue.value
+		if self.fanoffmode == 'ON':
+			self.checkStatusLoopStart()
 
-	def initConfig(self):
-		print "<SimpleFancontrol>Try initConfig..."
-		if NavigationInstance.instance is None:
-			self.InitTimer.startLongTimer(1)
-		else:
-			if config.plugins.simplefancontrols.pwmvalue.value == 0:
-				NavigationInstance.instance.record_event.append(self.getRecordEvent_onFanOFF)
-				recordings = NavigationInstance.instance.getRecordings()
-				print "<SimpleFancontrol> initConfig :  recordings : ", recordings
-				if recordings:
-					self.setPWM(self.default_pwm_value_onRecordings)
-				else:
-					self.setPWM(0)
+		config.misc.standbyCounter.addNotifier(self.standbyBegin, initial_call = False)
+		print "<ManualFancontrol> init :  self.fanoffmode : ", self.fanoffmode
+		print "<ManualFancontrol> init :  config.plugins.manualfancontrols.pwmvalue.value : ", config.plugins.manualfancontrols.pwmvalue.value
+
+	def checkStatusLoopStart(self):
+		print "<ManualFancontrol> checkStatusLoopStart"
+		self.checkStstusTimer.start(int(config.plugins.manualfancontrols.checkperiod.value) * 1000)
+
+	def checkStatusLoopStop(self):
+		print "<ManualFancontrol> checkStatusLoopStop"
+		self.checkStstusTimer.stop()
+
+	def checkStstus(self):
+		from Screens.Standby import inStandby
+		print "<ManualFancontrol> checkStstus, fanoffmode : %s, "%self.fanoffmode,"inStandby : ",inStandby and True or False
+		if self.fanoffmode is 'ON' : # pwmvalue is '0'
+			if self.isRecording() or self.isHDDActive():
+				self.setPWM(self.minimum_pwm)
 			else:
-				self.setPWM(config.plugins.simplefancontrols.pwmvalue.value)
+				self.setPWM(0)
+		elif inStandby : # standby mode but pwm > 0
+			if self.isRecording() or self.isHDDActive():
+				self.setPWM(config.plugins.manualfancontrols.pwmvalue.value)
+			else:
+				self.setPWM(0)
+		elif self.getPWM() != config.plugins.manualfancontrols.pwmvalue.value : # normal mode
+			self.setPWM(config.plugins.manualfancontrols.pwmvalue.value)
 
 	def standbyBegin(self, configElement):
-			print "<SimpleFancontrol> standbyBegin : config.plugins.fancontrols.standbymode.value : ", config.plugins.simplefancontrols.standbymode.value
-			print "<SimpleFancontrol> standbyBegin : self.fanoffmode : ", self.fanoffmode
-			if config.plugins.simplefancontrols.standbymode.value == "yes" and config.plugins.simplefancontrols.pwmvalue > 0:
-				from Screens.Standby import inStandby
-				inStandby.onClose.append(self.StandbyEnd)
-				NavigationInstance.instance.record_event.append(self.getRecordEvent)
-				recordings = NavigationInstance.instance.getRecordings()
-				if not recordings:
-					self.setPWM(0)
+		print "<ManualFancontrol> Standby Begin"
+		if config.plugins.manualfancontrols.standbymode.value == "yes" and self.fanoffmode is "OFF":
+			from Screens.Standby import inStandby
+			inStandby.onClose.append(self.StandbyEnd)
+			self.addRecordEventCB()
+			self.checkStatusLoopStart()
+			self.checkStstus()
 
 	def StandbyEnd(self):
-			print "<SimpleFancontrol> Standby End"
+		print "<ManualFancontrol> Standby End"
+		if self.fanoffmode is "OFF":
+			self.removeRecordEventCB()
+			self.checkStatusLoopStop()
+		self.checkStstus()
+
+	def addRecordEventCB(self):
+		print "<ManualFancontrol> addRecordEventCB"
+		if self.getRecordEvent not in NavigationInstance.instance.record_event:
+			NavigationInstance.instance.record_event.append(self.getRecordEvent)
+
+	def removeRecordEventCB(self):
+		print "<ManualFancontrol> removeRecordEventCB"
+		if self.getRecordEvent in NavigationInstance.instance.record_event:
 			NavigationInstance.instance.record_event.remove(self.getRecordEvent)
-			if self.getPWM() == 0:
-				self.setPWM(config.plugins.simplefancontrols.pwmvalue.value)
 
 	def getRecordEvent(self, recservice, event):
-			recordings = len(NavigationInstance.instance.getRecordings())
-			print "<SimpleFancontrol> recordings : %d , event : %d" % (recordings,event)
-			if event == iRecordableService.evEnd:
-				print "<SimpleFancontrol> getRecordEvent : evEnd"
-				if recordings == 0:
-					self.setPWM(0)
-			elif event == iRecordableService.evStart:
-				print "<SimpleFancontrol> getRecordEvent : evStart"
-				if self.getPWM() == 0:
-					self.setPWM(config.plugins.simplefancontrols.pwmvalue.value)
+		if event == iRecordableService.evEnd or event == iRecordableService.evStart:
+			self.checkStstus()
+
+	def isRecording(self):
+		recordings = NavigationInstance.instance.getRecordings()
+		print "<ManualFancontrol_> recordings : ",len(recordings)
+		if recordings :
+			return True
+		else:
+			return False
+
+	def isHDDActive(self): # remake certainly
+		for hdd in harddiskmanager.HDDList():
+			if not hdd[1].isSleeping():
+				print "<ManualFancontrol_> %s is not Sleeping"%hdd[0]
+				return True
+		print "<ManualFancontrol_> All HDDs are Sleeping"
+		return False
 
 	def getPWM(self):
 		f = open("/proc/stb/fp/fan_pwm", "r")
 		value = int(f.readline().strip(), 16)
 		f.close()
-		print "<SimpleFancontrol> getPWM : %d "%value
+		print "<ManualFancontrol> getPWM : %d "%value
 		return value
 
 	def setPWM(self, value):
-		print "<SimpleFancontrol> setPWM to : %d"%value
+		print "<ManualFancontrol> setPWM to : %d"%value
 		f = open("/proc/stb/fp/fan_pwm", "w")
 		f.write("%x" % value)
 		f.close()
-
-	def appendRecordEventCallback(self):
-		print "<SimpleFancontrol> appendRecordEventCallback "
-		NavigationInstance.instance.record_event.append(self.getRecordEvent_onFanOFF)
-		recordings = NavigationInstance.instance.getRecordings()
-		if recordings:
-			instandbyon.setPWM(self.default_pwm_value_onRecordings)
-
-	def removeRecordEventCallback(self):
-		print "<SimpleFancontrol> removeRecordEventCallback "
-		NavigationInstance.instance.record_event.remove(self.getRecordEvent_onFanOFF)
-
-	def getRecordEvent_onFanOFF(self, recservice, event):
-		recordings = len(NavigationInstance.instance.getRecordings())
-		print "<SimpleFancontrol_> recordings : %d , event : %d" % (recordings,event)
-		if event == iRecordableService.evEnd:
-			print "<SimpleFancontrol_> getRecordEvent : evEnd"
-			if recordings == 0:
-				self.setPWM(0)
-		elif event == iRecordableService.evStart:
-			print "<SimpleFancontrol_> getRecordEvent : evStart"
-			if self.getPWM() == 0:
-				self.setPWM(self.default_pwm_value_onRecordings)
 
 instandbyon = instandbyOn()
 
