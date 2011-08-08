@@ -67,6 +67,13 @@ class WlanSelection(Screen,HelpableScreen):
 			"green": (self.ok, _("select interface")),
 			"red": (self.close, _("exit network interface list")),
 		})
+		self.updateInterfaces()
+		self.onClose.append(self.cleanup)
+
+	def updateInterfaces(self):
+		iNetwork.config_ready = False
+		iNetwork.msgPlugins()
+		iNetwork.getInterfaces()
 
 	def ok(self):
 #		print len(self["menulist"].list)
@@ -81,7 +88,7 @@ class WlanSelection(Screen,HelpableScreen):
 
 	def getWlandevice(self):
 		list = []
-		for x in iNetwork.getAdapterList():
+		for x in iNetwork.getInstalledAdapters():
 			if x.startswith('eth'):
 				continue
 			description=self.getAdapterDescription(x)
@@ -113,6 +120,9 @@ class WlanSelection(Screen,HelpableScreen):
 				return _("Unknown network adapter")
 		else:
 			return _("Unknown network adapter")
+
+	def cleanup(self):
+		iNetwork.stopGetInterfacesConsole()
 
 class WlanSetup(Screen,HelpableScreen):
 	skin = """
@@ -183,6 +193,7 @@ class WlanSetup(Screen,HelpableScreen):
 			"left": self.left,
 			"right": self.right,
 		}, -2)
+		self.onClose.append(self.cleanup)
 
 	def loadDescription(self):
 		if self["menulist"].getCurrent()[1] == 'setting':
@@ -215,6 +226,7 @@ class WlanSetup(Screen,HelpableScreen):
 		self.loadDescription()
 
 	def ok(self):
+		self.cleanup()
 		if self["menulist"].getCurrent()[1] == 'setting':
 			self.session.openWithCallback(self.checklist, WlanConfig, self.iface)
 		elif self["menulist"].getCurrent()[1] == 'scanap':
@@ -259,6 +271,10 @@ class WlanSetup(Screen,HelpableScreen):
 	def restartfinishedCB(self,data):
 		if data is True:
 			self.session.open(MessageBox, _("Finished restarting your network"), type = MessageBox.TYPE_INFO, timeout = 5, default = False)
+
+	def cleanup(self):
+		iNetwork.stopRestartConsole()
+		iNetwork.stopGetInterfacesConsole()
 
 wlanconfig = ConfigSubsection()
 wlanconfig.usedevice = ConfigSelection(default = "off", choices = [
@@ -340,7 +356,13 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 		self.scanAplistTimer.callback.append(self.scanApList)
 		self.Console = Console()
 #		self.scanAplistTimer.start(100,True)
-		iNetwork.getInterfaces(self.readWlanSettings)
+		self.updateInterfaces(self.readWlanSettings)
+		self.onClose.append(self.cleanup)
+
+	def updateInterfaces(self,callback = None):
+		iNetwork.config_ready = False
+		iNetwork.msgPlugins()
+		iNetwork.getInterfaces(callback)
 
 	def readWlanSettings(self,ret=None):
 		if ret is not True:
@@ -768,9 +790,24 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 			if data is True:
 				self.close()
 
-#	def selectionChanged(self):
-#		current = self["config"].getCurrent()
-#		print current
+	def cleanup(self):
+		iNetwork.stopRestartConsole()
+		iNetwork.stopGetInterfacesConsole()
+		iNetwork.stopDeactivateInterfaceConsole()
+		self.stopwlanscanapConsole()
+		self.stopCheckNetworkSharesConsole()
+
+	def stopwlanscanapConsole(self):
+		if self.wlanscanap is not None:
+			if len(self.wlanscanap.appContainers):
+				for name in self.wlanscanap.appContainers.keys():
+					self.wlanscanap.kill(name)
+
+	def stopCheckNetworkSharesConsole(self):
+		if self.Console is not None:
+			if len(self.Console.appContainers):
+				for name in self.Console.appContainers.keys():
+					self.Console.kill(name)
 
 class WlanScanAp(Screen,HelpableScreen):
 	skin = """
@@ -856,6 +893,7 @@ class WlanScanAp(Screen,HelpableScreen):
 		self.scanAplistTimer = eTimer()
 		self.scanAplistTimer.callback.append(self.scanApList)
 		self.scanAplistTimer.start(100,True)
+		self.onClose.append(self.cleanup)
 		
 	def left(self):
 		self["menulist"].pageUp()
@@ -883,6 +921,7 @@ class WlanScanAp(Screen,HelpableScreen):
 		global selectap
 		selectAp=self["menulist"].getCurrent()[0]
 		selectap = selectAp
+		self.cleanup()
 		self.session.open(WlanConfig,self.iface)
 #		self.close()
 
@@ -975,6 +1014,15 @@ class WlanScanAp(Screen,HelpableScreen):
 
 	def ScanAPclose(self,data):
 		self.close()
+
+	def cleanup(self):
+		self.stopwlanscanapConsole()
+
+	def stopwlanscanapConsole(self):
+		if self.wlanscanap is not None:
+			if len(self.wlanscanap.appContainers):
+				for name in self.wlanscanap.appContainers.keys():
+					self.wlanscanap.kill(name)
 
 class NetworkAdapterTest(Screen):
 	def __init__(self, session,iface):
@@ -1233,6 +1281,7 @@ class NetworkAdapterTest(Screen):
 			self["InfoText"].show()
 			self["key_red"].setText(_("Back"))
 		if self.activebutton == 6: # Edit Settings
+			self.cleanup()
 			self.session.open(WlanConfig,self.iface)
 			self["shortcuts"].setEnabled(True)		
 			self["infoshortcuts"].setEnabled(False)
@@ -1358,6 +1407,7 @@ class NetworkAdapterTest(Screen):
 						
 	def cleanup(self):
 		iNetwork.stopLinkStateConsole()
+		iNetwork.stopPingConsole()
 		iNetwork.stopDNSConsole()
 
 	def AccessPointInfo(self,iface):
@@ -1405,6 +1455,7 @@ class Wlanstatus(Screen):
 			"red": self.close,
 		}, -2)
 		self.readstatus()
+		self.onClose.append(self.cleanup)
 
 	def readstatus(self):
 		self.wlanstatus = Console()
@@ -1432,6 +1483,15 @@ class Wlanstatus(Screen):
 	def ok(self):
 		pass
 
+	def cleanup(self):
+		self.stopWlanStatusConsole()
+
+	def stopWlanStatusConsole(self):
+		if self.wlanstatus is not None:
+			if len(self.wlanstatus.appContainers):
+				for name in self.wlanstatus.appContainers.keys():
+					self.wlanstatus.kill(name)
+
 def openconfig(session, **kwargs):
 	session.open(WlanSelection)
 
@@ -1440,7 +1500,7 @@ def selSetup(menuid, **kwargs):
 	if menuid != "system":
 		return [ ]
 	else:
-		for x in iNetwork.getAdapterList():
+		for x in iNetwork.getInstalledAdapters():
 			if x.startswith('eth'):
 				continue
 			list.append(x)
