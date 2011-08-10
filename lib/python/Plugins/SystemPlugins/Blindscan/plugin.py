@@ -300,6 +300,7 @@ class Blindscan(ConfigListScreen, Screen):
 		self.doRun(tmp_list, tmp_pol, tmp_band)
 		
 	def doRun(self, tmp_list, tmp_pol, tmp_band):
+		self.full_data = ""
 		self.total_list=[]
 		for x in tmp_list:
 			for y in tmp_pol:
@@ -387,40 +388,37 @@ class Blindscan(ConfigListScreen, Screen):
 			self.blindscan_session = self.session.openWithCallback(self.blindscanSessionNone, MessageBox, _(tmpstr), MessageBox.TYPE_INFO)
 
 	def blindscanContainerClose(self, retval):
-		self.blindscan_session.close(True)
-
-	def blindscanContainerAvail(self, str):
-		lines = str.split('\n')
+		lines = self.full_data.split('\n')
 		for line in lines:
 			data = line.split()
-			if len(data):
-				print data
+			print "cnt :", len(data), ", data :", data
+			if len(data) >= 10:
 				if data[0] == 'OK':
 					parm = eDVBFrontendParametersSatellite()
-					sys = { 	"DVB-S" : eDVBFrontendParametersSatellite.System_DVB_S,
-							"DVB-S2" : eDVBFrontendParametersSatellite.System_DVB_S2 	}
-					qam = { 	"QPSK" : parm.Modulation_QPSK,
-							"8PSK" : parm.Modulation_8PSK }
-					inv = { 	"INVERSION_OFF" : parm.Inversion_Off,
-							"INVERSION_ON" : parm.Inversion_On,
-							"INVERSION_AUTO" : parm.Inversion_Unknown }
-					fec = { 	"FEC_AUTO" : parm.FEC_Auto,
-							"FEC_1_2" : parm.FEC_1_2,
-							"FEC_2_3" : parm.FEC_2_3,
-							"FEC_3_4" : parm.FEC_3_4,
-							"FEC_5_6": parm.FEC_5_6,
-							"FEC_7_8" : parm.FEC_7_8,
-							"FEC_8_9" : parm.FEC_8_9,
-							"FEC_3_5" : parm.FEC_3_5,
-							"FEC_9_10" : parm.FEC_9_10,
-							"FEC_NONE" : parm.FEC_None }
-					roll = { 	"ROLLOFF_20" : parm.RollOff_alpha_0_20,
-							"ROLLOFF_25" : parm.RollOff_alpha_0_25,
-							"ROLLOFF_35" : parm.RollOff_alpha_0_35 }
-					pilot = { 	"PILOT_ON" : parm.Pilot_On,
-						  	"PILOT_OFF" : parm.Pilot_Off }
+					sys = { "DVB-S" : eDVBFrontendParametersSatellite.System_DVB_S,
+						"DVB-S2" : eDVBFrontendParametersSatellite.System_DVB_S2}
+					qam = { "QPSK" : parm.Modulation_QPSK,
+						"8PSK" : parm.Modulation_8PSK}
+					inv = { "INVERSION_OFF" : parm.Inversion_Off,
+						"INVERSION_ON" : parm.Inversion_On,
+						"INVERSION_AUTO" : parm.Inversion_Unknown}
+					fec = { "FEC_AUTO" : parm.FEC_Auto,
+						"FEC_1_2" : parm.FEC_1_2,
+						"FEC_2_3" : parm.FEC_2_3,
+						"FEC_3_4" : parm.FEC_3_4,
+						"FEC_5_6": parm.FEC_5_6,
+						"FEC_7_8" : parm.FEC_7_8,
+						"FEC_8_9" : parm.FEC_8_9,
+						"FEC_3_5" : parm.FEC_3_5,
+						"FEC_9_10" : parm.FEC_9_10,
+						"FEC_NONE" : parm.FEC_None}
+					roll ={ "ROLLOFF_20" : parm.RollOff_alpha_0_20,
+						"ROLLOFF_25" : parm.RollOff_alpha_0_25,
+						"ROLLOFF_35" : parm.RollOff_alpha_0_35}
+					pilot={ "PILOT_ON" : parm.Pilot_On,
+						"PILOT_OFF" : parm.Pilot_Off}
 					pol = {	"HORIZONTAL" : parm.Polarisation_Horizontal,
-							"VERTICAL" : parm.Polarisation_Vertical }
+						"VERTICAL" : parm.Polarisation_Vertical}
 					parm.orbital_position = self.orb_position
 					parm.polarisation = pol[data[1]]
 					parm.frequency = int(data[2])
@@ -432,6 +430,10 @@ class Blindscan(ConfigListScreen, Screen):
 					parm.modulation = qam[data[8]]
 					parm.rolloff = roll[data[9]]
 					self.tmp_tplist.append(parm)
+		self.blindscan_session.close(True)
+
+	def blindscanContainerAvail(self, str):
+		self.full_data = self.full_data + str
 
 	def blindscanSessionNone(self, *val):
 		import time
@@ -446,9 +448,9 @@ class Blindscan(ConfigListScreen, Screen):
 		if val[0] == False:
 			self.tmp_tplist = []
 			self.running_count = self.max_count
-			
+
 		self.is_runable = True
-		
+
 	def blindscanSessionClose(self, *val):
 		self.blindscanSessionNone(val[0])
 
