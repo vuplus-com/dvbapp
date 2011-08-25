@@ -146,13 +146,13 @@ class FPGAUpgrade(Screen):
                 self.STATUS_BAR = self["status"]                                                                             
                 self.STATUS_BAR.setText(_(self.SOURCELIST.getCurrentDirectory()))
 
-		self.DEVICE_PATH = '/dev/misc/dp'                                                                                       
+		self.DEVICE_LIST = '/dev/fpga_dp;/dev/misc/dp;'
 		self.DOWNLOAD_TAR_PATH = '/tmp/'                                                                             
 		self.DOWNLOAD_FILE_NAME = 'TS_PRO.dat'                                                                       
 		self.DOWNLOAD_URL = ''
 		self.doLoadConf()
 		self.FPGA = fpga.Fpga()
-		print self.DEVICE_PATH
+		print self.DEVICE_LIST
 		print self.DOWNLOAD_TAR_PATH
 		print self.DOWNLOAD_FILE_NAME
 		print self.DOWNLOAD_URL
@@ -181,8 +181,6 @@ class FPGAUpgrade(Screen):
 		if confirmed:                                                                                                                    
 			self.doExit()	
 
-
-
 	def doUpgradeHandler(self, confirmed):
 		if confirmed == False:
 			return
@@ -194,14 +192,27 @@ class FPGAUpgrade(Screen):
 			#self.session.open(MessageBox, _("Can't select directory."), MessageBox.TYPE_INFO, timeout = 5)
 			return
 
-		self.ERROR_CODE = self.FPGA.fpga_upgrade(path, self.DEVICE_PATH)
+		device = ""
+		device_list = self.DEVICE_LIST.split(";")
+
+		for d in device_list:
+			if os.path.exists(d):
+				device = d
+				break
+
+		if device == None or len(device) == 0:
+			message = "Fail to upgrade.\nCause : Can't found device.\nDo you want to exit?"
+			self.session.openWithCallback(self.onCallbackHandler, MessageBox, _(message), MessageBox.TYPE_YESNO, timeout = 10, default = True)
+			print "DEVICE_LIST : ", device_list
+
+		print "DEVICE : ", device
+		self.ERROR_CODE = self.FPGA.fpga_upgrade(path, device)
 		if self.ERROR_CODE > 0:
 			self.ERROR_MSG = self.FPGA.get_error_msg(self.ERROR_CODE, self.ERROR_MSG)
 			message = "Fail to upgrade.\nCause : " + self.ERROR_MSG + "\nDo you want to exit?"
 			self.session.openWithCallback(self.onCallbackHandler, MessageBox, _(message), MessageBox.TYPE_YESNO, timeout = 10, default = True)
-
-			print "DEVICE_PATH : ", self.DEVICE_PATH
-			print "FILE_PATH : ", path
+			print "DEVICE : ", device
+			print "FILE : ", path
 		else:
 			#self.session.open(MessageBox, _("Success!!"), MessageBox.TYPE_INFO, timeout = 5)
 			self.session.open(UpgradeStatus, self, timeout = 10)			
