@@ -13,6 +13,7 @@ from ServiceReference import ServiceReference
 from TimerEntry import TimerEntry, TimerLog
 from Tools.BoundFunction import boundFunction
 from time import time
+from timer import TimerEntry as RealTimerEntry
 
 class TimerEditList(Screen):
 	EMPTY = 0
@@ -88,7 +89,9 @@ class TimerEditList(Screen):
 				if not timersanitycheck.check():
 					t.disable()
 					print "Sanity check failed"
-					self.session.openWithCallback(self.finishedEdit, TimerSanityConflict, timersanitycheck.getSimulTimerList())
+					simulTimerList = timersanitycheck.getSimulTimerList()
+					if simulTimerList is not None:
+						self.session.openWithCallback(self.finishedEdit, TimerSanityConflict, simulTimerList)
 				else:
 					print "Sanity check passed"
 					if timersanitycheck.doubleCheck():
@@ -172,11 +175,20 @@ class TimerEditList(Screen):
 			self.key_blue_choice = self.EMPTY
 
 	def fillTimerList(self):
+		#helper function to move finished timers to end of list
+		def eol_compare(x, y):
+			if x[0].state != y[0].state and x[0].state == RealTimerEntry.StateEnded or y[0].state == RealTimerEntry.StateEnded:
+				return cmp(x[0].state, y[0].state)
+			return cmp(x[0].begin, y[0].begin)
+
 		list = self.list
 		del list[:]
 		list.extend([(timer, False) for timer in self.session.nav.RecordTimer.timer_list])
 		list.extend([(timer, True) for timer in self.session.nav.RecordTimer.processed_timers])
-		list.sort(cmp = lambda x, y: x[0].begin < y[0].begin)
+		if config.usage.timerlist_finished_timer_position.index: #end of list
+			list.sort(cmp = eol_compare)
+		else:
+			list.sort(key = lambda x: x[0].begin)
 
 	def showLog(self):
 		cur=self["timerlist"].getCurrent()

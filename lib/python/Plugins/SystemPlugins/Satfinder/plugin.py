@@ -79,15 +79,15 @@ class Satfinder(ScanSetup):
 				self.scan_sat.system.value = eDVBFrontendParametersSatellite.System_DVB_S
 			self.list.append(getConfigListEntry(_('Frequency'), self.scan_sat.frequency))
 			self.list.append(getConfigListEntry(_('Inversion'), self.scan_sat.inversion))
-			self.list.append(getConfigListEntry(_('Symbol Rate'), self.scan_sat.symbolrate))
-			self.list.append(getConfigListEntry(_("Polarity"), self.scan_sat.polarization))
+			self.list.append(getConfigListEntry(_('Symbol rate'), self.scan_sat.symbolrate))
+			self.list.append(getConfigListEntry(_('Polarization'), self.scan_sat.polarization))
 			if self.scan_sat.system.value == eDVBFrontendParametersSatellite.System_DVB_S:
 				self.list.append(getConfigListEntry(_("FEC"), self.scan_sat.fec))
 			elif self.scan_sat.system.value == eDVBFrontendParametersSatellite.System_DVB_S2:
 				self.list.append(getConfigListEntry(_("FEC"), self.scan_sat.fec_s2))
 				self.modulationEntry = getConfigListEntry(_('Modulation'), self.scan_sat.modulation)
 				self.list.append(self.modulationEntry)
-				self.list.append(getConfigListEntry(_('Rolloff'), self.scan_sat.rolloff))
+				self.list.append(getConfigListEntry(_('Roll-off'), self.scan_sat.rolloff))
 				self.list.append(getConfigListEntry(_('Pilot'), self.scan_sat.pilot))
 		elif self.tuning_transponder and self.tuning_type.value == "predefined_transponder":
 			self.list.append(getConfigListEntry(_("Transponder"), self.tuning_transponder))
@@ -276,6 +276,6 @@ def SatfinderStart(menuid, **kwargs):
 
 def Plugins(**kwargs):
 	if (nimmanager.hasNimType("DVB-S")):
-		return PluginDescriptor(name=_("Satfinder"), description="Helps setting up your dish", where = PluginDescriptor.WHERE_MENU, fnc=SatfinderStart)
+		return PluginDescriptor(name=_("Satfinder"), description="Helps setting up your dish", where = PluginDescriptor.WHERE_MENU, needsRestart = False, fnc=SatfinderStart)
 	else:
 		return []

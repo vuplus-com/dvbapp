@@ -21,21 +21,9 @@ from enigma import eSctest
 from enigma import eDVBDB
 from Components.NimManager import nimmanager
 from enigma import eDVBCI_UI,eDVBCIInterfaces
+from Tools.Directories import resolveFilename, SCOPE_SYSETC
 
-class TestResultList(HTMLComponent, GUIComponent):
-	def __init__(self, list, enableWrapAround=False, content=eListboxPythonStringContent):
-		GUIComponent.__init__(self)
-		self.list = list
-		self.l = content()
-		self.l.setList(self.list)
-		self.onSelectionChanged = [ ]
-		self.enableWrapAround = enableWrapAround
-
-	def getCurrent(self):
-		return self.l.getCurrentSelection()
-
-	GUI_WIDGET = eListbox
-
+class TestResultList(MenuList):
 	def postWidgetCreate(self, instance):
 		self.instance.setSelectionEnable(0)
 		instance.setContent(self.l)
@@ -43,51 +31,9 @@ class TestResultList(HTMLComponent, GUIComponent):
 		if self.enableWrapAround:
 			self.instance.setWrapAround(True)
 
-	def preWidgetRemove(self, instance):
-		instance.setContent(None)
-		instance.selectionChanged.get().remove(self.selectionChanged)
-
-	def selectionChanged(self):
-		for f in self.onSelectionChanged:
-			f()
-
-	def getSelectionIndex(self):
-		return self.l.getCurrentSelectionIndex()
-
-	def getSelectedIndex(self):
-		return self.l.getCurrentSelectionIndex()
-
-	def setList(self, list):
-		self.list = list
-		self.l.setList(self.list)
-
 	def updateList(self, list):
 		self.list = list
 		self.l.setList(self.list)
-
-	def moveToIndex(self, idx):
-		if self.instance is not None:
-			self.instance.moveSelectionTo(idx)
-
-	def pageUp(self):
-		if self.instance is not None:
-			self.instance.moveSelection(self.instance.pageUp)
-
-	def pageDown(self):
-		if self.instance is not None:
-			self.instance.moveSelection(self.instance.pageDown)
-
-	def up(self):
-		if self.instance is not None:
-			self.instance.moveSelection(self.instance.moveUp)
-
-	def down(self):
-		if self.instance is not None:
-			self.instance.moveSelection(self.instance.moveDown)
-
-	def selectionEnabled(self, enabled):
-		if self.instance is not None:
-			self.instance.setSelectionEnable(enabled)
 
 class FactoryTest(Screen):
 	skin = """
@@ -96,7 +42,7 @@ class FactoryTest(Screen):
 			<widget name="resultlist" position="370,0" size="60,350" />
 			<widget name="testdate" position="20,350" size="150,25" font="Regular;22" />
 			<widget name="testversion" position="20,375" size="150,25" font="Regular;22" />
-			<widget name="mactext" position="180,350" size="230,25" font="Regular;22" />			
+			<widget name="mactext" position="180,350" size="230,25" font="Regular;22" />
 		</screen>"""
 	def __init__(self, session):
 
@@ -123,7 +69,7 @@ class FactoryTest(Screen):
 		}, -2)
 
 		Screen.__init__(self, session)
-		TESTPROGRAM_DATE = "2011-06-09"
+		TESTPROGRAM_DATE = self.getImageVersion() +" (v1.00)"
 		TESTPROGRAM_VERSION = "Version 01.10"
 
 		self.model = 0
@@ -413,7 +359,9 @@ class FactoryTest(Screen):
 	def getModelInfo(self):
 		getmodel = 0
 		if fileExists("/proc/stb/info/vumodel"):
-			info = open("/proc/stb/info/vumodel").read().strip()
+			vumodel = open("/proc/stb/info/vumodel")
+			info=vumodel.read().strip()
+			vumodel.close()
 			if info == "duo":
 				self.model = 0
 				getmodel = 1
@@ -434,8 +382,11 @@ class FactoryTest(Screen):
 				self.model = 4
 				getmodel = 1
 				print "getModelInfo : ultimo"
+
 		if getmodel == 0 and fileExists("/proc/stb/info/version"):
-			info = open("/proc/stb/info/version").read()
+			vesion = open("/proc/stb/info/version")
+			info=version.read()
+			version.close()
 			if info[:2] == "14":
 				self.model = 1
 				print "getModelInfo : solo_"
@@ -480,10 +431,30 @@ class FactoryTest(Screen):
 		self["testlist"].moveToIndex(index)
 		self["resultlist"].moveToIndex(index)
 
+	def getImageVersion(self):
+		date = 'xxxx-xx-xx'
+		file = open(resolveFilename(SCOPE_SYSETC, 'image-version'), 'r')
+		lines = file.readlines()
+		for x in lines:
+			splitted = x.split('=')
+			if splitted[0] == "version":
+			#     YYYY MM DD hh mm
+				#0120 2005 11 29 01 16
+				#0123 4567 89 01 23 45
+				version = splitted[1]
+				year = version[4:8]
+				month = version[8:10]
+				day = version[10:12]
+				date = '-'.join((year, month, day))
+				break;
+		file.close()
+		return date
+
 	def getversion(self):
 		try:
 			fd = open("/proc/stb/info/version","r")
 			version = fd.read()
+			fd.close()
 			self["testversion"].setText(("Version %s"%version))
 		except:
 			self["testversion"].setText(("Version no load"))
@@ -616,29 +587,29 @@ class FactoryTest(Screen):
 			result = 1
 			displayerror = 1
 		try:
-			if fileExists("/media/hdd"):
-				if access("/media/hdd",F_OK|R_OK|W_OK):
-					dummy=open("/media/hdd/dummy03","w")
+			if fileExists("/autofs/sda1"):
+				if access("/autofs/sda1",F_OK|R_OK|W_OK):
+					dummy=open("/autofs/sda1/dummy03","w")
 					dummy.write("complete")
 					dummy.close()
-					dummy=open("/media/hdd/dummy03","r")
+					dummy=open("/autofs/sda1/dummy03","r")
 					if dummy.readline()=="complete":
-						print "/media/hdd - complete"
+						print "/autofs/sda1 - complete"
 					else:
-						print "/media/hdd - readline error"
+						print "/autofs/sda1 - readline error"
 						result += 1
 						displayerror = 1
 					dummy.close()
-					system("rm /media/hdd/dummy03")
+					system("rm /autofs/sda1/dummy03")
 				else:
-					print "/media/hdd - rw access error"
+					print "/autofs/sda1 - rw access error"
 					result += 1
 					displayerror = 1
 			else:
-				print "/media/hdd - file not exist"
+				print "/autofs/sda1 - file not exist"
 				result += 1
 		except:
-			print "/media/hdd - exceptional error"
+			print "/autofs/sda1 - exceptional error"
 			result += 1
 			displayerror = 1
 		
@@ -1249,7 +1220,9 @@ class MacConfig(Screen):
 	def getModelInfo(self):
 		getmodel = 0
 		if fileExists("/proc/stb/info/vumodel"):
-			info = open("/proc/stb/info/vumodel").read().strip()
+			vumodel = open("/proc/stb/info/vumodel")
+			info=vumodel.read().strip()
+			vumodel.close()
 			if info == "combo":
 				self.model = 2
 				getmodel = 1
@@ -1271,9 +1244,10 @@ class MacConfig(Screen):
 				getmodel = 1
 				print "getModelInfo : ultimo"
 
-
 		if getmodel == 0 and fileExists("/proc/stb/info/version"):
-			info = open("/proc/stb/info/version").read()
+			version = open("/proc/stb/info/version")
+			info=version.read()
+			version.close()
 #			print info,info[:2]
 			if info[:2] == "14":
 				self.model = 1
@@ -1854,8 +1828,14 @@ class RS232Test(Screen):
 					rstest = 0 
 			else:
 				rstest = 0
+			rs.close()
 		except:
-			print 'error'
+			try:
+				if rs:
+					rs.close()
+			except:
+				pass
+			print 'except error'
 			rstest = 0
 		if rstest == 0:
 			self.session.open( MessageBox, _("RS232 Test Failed!\nPress 'EXIT' button!"), MessageBox.TYPE_ERROR)

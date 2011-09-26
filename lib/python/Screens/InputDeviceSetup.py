@@ -52,7 +52,7 @@ class InputDeviceSelection(Screen,HelpableScreen):
 		self["key_blue"] = StaticText("")
 		self["introduction"] = StaticText(self.edittext)
 		
-		self.devices = [(iInputDevices.getDeviceName(x),x) for x in iInputDevices.getDeviceList()]
+		self.devices = [(iInputDevices.getDeviceName(x)[9:],x) for x in iInputDevices.getDeviceList()]
 		print "[InputDeviceSelection] found devices :->", len(self.devices),self.devices
 			
 		self["OkCancelActions"] = HelpableActionMap(self, "OkCancelActions",

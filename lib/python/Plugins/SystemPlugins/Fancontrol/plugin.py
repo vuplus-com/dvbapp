@@ -154,7 +154,7 @@ def selSetup(menuid, **kwargs):
 
 def setfancontrol(reason, **kwargs):
 	try:
-		if config.plugins.fancontrols.standbymode.value is "on":
+		if config.plugins.fancontrols.standbymode.value == "on":
 			open('/proc/stb/system/standby_fan_off','w').write('0')
 		else:
 			open('/proc/stb/system/standby_fan_off','w').write('1')

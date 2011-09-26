@@ -89,7 +89,7 @@ class SkinSelector(Screen):
 					self.skinlist.append(subdir)
 				else:
 					subdir = "Default Skin"
-					self.skinlist.append(subdir)
+					#self.skinlist.append(subdir)
 
 	def ok(self):
 		if self["SkinList"].getCurrent() == "Default Skin":
@@ -131,4 +131,4 @@ def SkinSelSetup(menuid, **kwargs):
 		return []
 
 def Plugins(**kwargs):
-	return PluginDescriptor(name="Skinselector", description="Select Your Skin", where = PluginDescriptor.WHERE_MENU, fnc=SkinSelSetup)
+	return PluginDescriptor(name="Skinselector", description="Select Your Skin", where = PluginDescriptor.WHERE_MENU, needsRestart = False, fnc=SkinSelSetup)

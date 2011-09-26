@@ -8,9 +8,13 @@ from Plugins.Plugin import PluginDescriptor
 import keymapparser
 
 class PluginComponent:
+	firstRun = True
+	restartRequired = False
+	
 	def __init__(self):
 		self.plugins = {}
 		self.pluginList = [ ]
+		self.installedPluginList = [ ]
 		self.setPluginPrefix("Plugins.")
 		self.resetWarnings()
 
@@ -18,12 +22,15 @@ class PluginComponent:
 		self.prefix = prefix
 
 	def addPlugin(self, plugin):
-		self.pluginList.append(plugin)
-		for x in plugin.where:
-			self.plugins.setdefault(x, []).append(plugin)
-			if x == PluginDescriptor.WHERE_AUTOSTART:
-				plugin(reason=0)
-
+		if self.firstRun or plugin.needsRestart is False:
+			self.pluginList.append(plugin)
+			for x in plugin.where:
+				self.plugins.setdefault(x, []).append(plugin)
+				if x == PluginDescriptor.WHERE_AUTOSTART:
+					plugin(reason=0)
+		else:
+			self.restartRequired = True
+				
 	def removePlugin(self, plugin):
 		self.pluginList.remove(plugin)
 		for x in plugin.where:
@@ -42,7 +49,6 @@ class PluginComponent:
 			directory_category = directory + c
 			if not os_path.isdir(directory_category):
 				continue
-			open(directory_category + "/__init__.py", "a").close()
 			for pluginname in os_listdir(directory_category):
 				path = directory_category + "/" + pluginname
 				if os_path.isdir(path):
@@ -67,6 +73,7 @@ class PluginComponent:
 							plugins = [ plugins ]
 
 						for p in plugins:
+							p.path = path
 							p.updateIcon(path)
 							new_plugins.append(p)
 
@@ -81,12 +88,29 @@ class PluginComponent:
 		# internally, the "fnc" argument will be compared with __eq__
 		plugins_added = [p for p in new_plugins if p not in self.pluginList]
 		plugins_removed = [p for p in self.pluginList if not p.internal and p not in new_plugins]
+		
+		#ignore already installed but reloaded plugins
+		for p in plugins_removed: 
+			for pa in plugins_added:
+				if pa.path == p.path and pa.where == p.where:
+					pa.needsRestart = False
 
 		for p in plugins_removed:
 			self.removePlugin(p)
 
 		for p in plugins_added:
-			self.addPlugin(p)
+			if self.firstRun or p.needsRestart is False:
+				self.addPlugin(p)
+			else:
+				for installed_plugin in self.installedPluginList:
+					if installed_plugin.path == p.path:
+						if installed_plugin.where == p.where:
+							p.needsRestart = False
+				self.addPlugin(p)
+						
+		if self.firstRun:
+			self.firstRun = False
+			self.installedPluginList = self.pluginList
 
 	def getPlugins(self, where):
 		"""Get list of plugins in a specific category"""
@@ -97,8 +121,8 @@ class PluginComponent:
 
 		for x in where:
 			res.extend(self.plugins.get(x, [ ]))
-
-		return  res
+		res.sort(key=lambda x:x.weight)
+		return res
 
 	def getPluginsForMenu(self, menuid):
 		res = [ ]

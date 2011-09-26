@@ -43,10 +43,10 @@ from SoftwareTools import iSoftwareTools
 
 config.plugins.configurationbackup = ConfigSubsection()
 config.plugins.configurationbackup.backuplocation = ConfigText(default = '/media/hdd/', visible_width = 50, fixed_size = False)
-config.plugins.configurationbackup.backupdirs = ConfigLocations(default=[eEnv.resolve('${sysconfdir}/enigma2/'), '/etc/network/interfaces', '/etc/wpa_supplicant.conf', '/etc/resolv.conf', '/etc/default_gw', '/etc/hostname'])
+config.plugins.configurationbackup.backupdirs = ConfigLocations(default=[eEnv.resolve('${sysconfdir}/enigma2/'), '/etc/network/interfaces', '/etc/wpa_supplicant.conf', '/etc/wpa_supplicant.ath0.conf', '/etc/wpa_supplicant.wlan0.conf', '/etc/resolv.conf', '/etc/default_gw', '/etc/hostname'])
 
-config.plugins.SoftwareManager = ConfigSubsection()
-config.plugins.SoftwareManager.overwriteConfigFiles = ConfigSelection(
+config.plugins.softwaremanager = ConfigSubsection()
+config.plugins.softwaremanager.overwriteConfigFiles = ConfigSelection(
 				[
 				 ("Y", _("Yes, always")),
 				 ("N", _("No, never")),				 
@@ -365,7 +365,7 @@ class SoftwareManagerSetup(Screen, ConfigListScreen):
 
 	def createSetup(self):
 		self.list = [ ]
-		self.overwriteConfigfilesEntry = getConfigListEntry(_("Overwrite configuration files ?"), config.plugins.SoftwareManager.overwriteConfigFiles)
+		self.overwriteConfigfilesEntry = getConfigListEntry(_("Overwrite configuration files ?"), config.plugins.softwaremanager.overwriteConfigFiles)
 		self.list.append(self.overwriteConfigfilesEntry)	
 		self["config"].list = self.list
 		self["config"].l.setSeperation(400)
@@ -489,7 +489,6 @@ class SoftwareManagerInfo(Screen):
 			self.list = []
 			backupfiles = config.plugins.configurationbackup.backupdirs.value
 			for entry in backupfiles:
-				print entry
 				self.list.append((entry,))
 			self['list'].setList(self.list)
 			
@@ -569,6 +568,7 @@ class PluginManager(Screen, DreamInfoHandler):
 		self.currentSelectedIndex = None
 		self.currentSelectedPackage = None
 		self.saved_currentSelectedPackage = None
+		self.restartRequired = False
 		
 		self.onShown.append(self.setWindowTitle)
 		self.onLayoutFinish.append(self.getUpdateInfos)
@@ -809,6 +809,8 @@ class PluginManager(Screen, DreamInfoHandler):
 				name = x[0].strip()
 				details = x[1].strip()
 				description = x[2].strip()
+				if description == "":
+					description = "No description available."
 				packagename = x[3].strip()
 				selectState = self.getSelectionState(details)
 				if iSoftwareTools.installed_packetlist.has_key(packagename):
@@ -890,6 +892,8 @@ class PluginManager(Screen, DreamInfoHandler):
 					self.package = iSoftwareTools.packageDetails[0]
 					if self.package[0].has_key("attributes"):
 						self.attributes = self.package[0]["attributes"]
+						if self.attributes.has_key("needsRestart"):
+							self.restartRequired = True
 					if self.attributes.has_key("package"):
 						self.packagefiles = self.attributes["package"]
 					if plugin[1] == 'installed':
@@ -921,17 +925,21 @@ class PluginManager(Screen, DreamInfoHandler):
 			self.close()
 
 	def runExecuteFinished(self):
-		self.session.openWithCallback(self.ExecuteReboot, MessageBox, _("Install or remove finished.") +" "+_("Do you want to reboot your STB?"), MessageBox.TYPE_YESNO)
+		self.reloadPluginlist()
+		if plugins.restartRequired or self.restartRequired:
+			self.session.openWithCallback(self.ExecuteReboot, MessageBox, _("Install or remove finished.") +" "+_("Do you want to reboot your STB?"), MessageBox.TYPE_YESNO)
+		else:
+			self.selectedFiles = []
+			self.restartRequired = False
+			self.detailsClosed(True)
 
 	def ExecuteReboot(self, result):
-		if result is None:
-			return
-		if result is False:
-			self.reloadPluginlist()
-			self.selectedFiles = []
-			self.detailsClosed(True)
 		if result:
 			quitMainloop(3)
+		else:
+			self.selectedFiles = []
+			self.restartRequired = False
+			self.detailsClosed(True)
 
 	def reloadPluginlist(self):
 		plugins.readPluginList(resolveFilename(SCOPE_PLUGINS))
@@ -1169,7 +1177,7 @@ class PluginDetails(Screen, DreamInfoHandler):
 		self.package = self.packageDetails[0]
 		if self.package[0].has_key("attributes"):
 			self.attributes = self.package[0]["attributes"]
-
+		self.restartRequired = False
 		self.cmdList = []
 		self.oktext = _("\nAfter pressing OK, please wait!")
 		self.picload = ePicLoad()
@@ -1267,50 +1275,45 @@ class PluginDetails(Screen, DreamInfoHandler):
 	def go(self):
 		if self.attributes.has_key("package"):
 			self.packagefiles = self.attributes["package"]
+		if self.attributes.has_key("needsRestart"):
+			self.restartRequired = True
 		self.cmdList = []
 		if self.pluginstate in ('installed', 'remove'):
 			if self.packagefiles:
 				for package in self.packagefiles[:]:
 					self.cmdList.append((IpkgComponent.CMD_REMOVE, { "package": package["name"] }))
-					if len(self.cmdList):
-						self.session.openWithCallback(self.runRemove, MessageBox, _("Do you want to remove the package:\n") + self.pluginname + "\n" + self.oktext)
+				if len(self.cmdList):
+					self.session.openWithCallback(self.runRemove, MessageBox, _("Do you want to remove the package:\n") + self.pluginname + "\n" + self.oktext)
 		else:
 			if iSoftwareTools.NetworkConnectionAvailable:
 				if self.packagefiles:
 					for package in self.packagefiles[:]:
 						self.cmdList.append((IpkgComponent.CMD_INSTALL, { "package": package["name"] }))
-						if len(self.cmdList):
-							self.session.openWithCallback(self.runUpgrade, MessageBox, _("Do you want to install the package:\n") + self.pluginname + "\n" + self.oktext)
+					if len(self.cmdList):
+						self.session.openWithCallback(self.runUpgrade, MessageBox, _("Do you want to install the package:\n") + self.pluginname + "\n" + self.oktext)
 
 	def runUpgrade(self, result):
 		if result:
 			self.session.openWithCallback(self.runUpgradeFinished, Ipkg, cmdList = self.cmdList)
 
 	def runUpgradeFinished(self):
-		self.session.openWithCallback(self.UpgradeReboot, MessageBox, _("Installation finished.") +" "+_("Do you want to reboot your STB?"), MessageBox.TYPE_YESNO)
-
-	def UpgradeReboot(self, result):
-		if result is None:
-			return
-		if result is False:
+		self.reloadPluginlist()
+		if plugins.restartRequired or self.restartRequired:
+			self.session.openWithCallback(self.UpgradeReboot, MessageBox, _("Installation finished.") +" "+_("Do you want to reboot your STB?"), MessageBox.TYPE_YESNO)
+		else:
 			self.close(True)
+	def UpgradeReboot(self, result):
 		if result:
 			quitMainloop(3)
+		else:
+			self.close(True)
 
 	def runRemove(self, result):
 		if result:
 			self.session.openWithCallback(self.runRemoveFinished, Ipkg, cmdList = self.cmdList)
 
 	def runRemoveFinished(self):
-		self.session.openWithCallback(self.RemoveReboot, MessageBox, _("Remove finished.") +" "+_("Do you want to reboot your STB?"), MessageBox.TYPE_YESNO)
-
-	def RemoveReboot(self, result):
-		if result is None:
-			return
-		if result is False:
-			self.close(True)
-		if result:
-			quitMainloop(3)
+		self.close(True)
 
 	def reloadPluginlist(self):
 		plugins.readPluginList(resolveFilename(SCOPE_PLUGINS))
@@ -1375,7 +1378,7 @@ class UpdatePlugin(Screen):
 				self.updating = True
 				self.activityTimer.start(100, False)
 				self.package.setText(_("Package list update"))
-				self.status.setText(_("Upgrading Dreambox... Please wait"))
+				self.status.setText(_("Upgrading STB... Please wait"))
 				self.ipkg.startCmd(IpkgComponent.CMD_UPDATE)
 			else:
 				self.package.setText(_("Your network is not working. Please try again."))
@@ -1415,8 +1418,8 @@ class UpdatePlugin(Screen):
 			self.status.setText(_("Configuring"))
 			
 		elif event == IpkgComponent.EVENT_MODIFIED:
-			if config.plugins.SoftwareManager.overwriteConfigFiles.value in ("N", "Y"):
-				self.ipkg.write(True and config.plugins.SoftwareManager.overwriteConfigFiles.value)
+			if config.plugins.softwaremanager.overwriteConfigFiles.value in ("N", "Y"):
+				self.ipkg.write(True and config.plugins.softwaremanager.overwriteConfigFiles.value)
 			else:
 				self.session.openWithCallback(
 					self.modificationCallback,
@@ -1517,7 +1520,7 @@ class IPKGMenu(Screen):
 
 	def fill_list(self):
 		self.flist = []
-		self.path = '/etc/ipkg/'
+		self.path = '/etc/opkg/'
 		if (os_path.exists(self.path) == False):
 			self.entry = False
 			return
@@ -1708,7 +1711,6 @@ class PacketManager(Screen, NumericalTextInput):
 		self.cache_file = eEnv.resolve('${libdir}/enigma2/python/Plugins/SystemPlugins/SoftwareManager/packetmanager.cache') #Path to cache directory
 		self.oktext = _("\nAfter pressing OK, please wait!")
 		self.unwanted_extensions = ('-dbg', '-dev', '-doc', 'busybox')
-		self.opkgAvail = fileExists('/usr/bin/opkg')
 
 		self.ipkg = IpkgComponent()
 		self.ipkg.addCallback(self.ipkgCallback)
@@ -1862,7 +1864,7 @@ class PacketManager(Screen, NumericalTextInput):
 				self.list_updating = False
 				if not self.Console:
 					self.Console = Console()
-				cmd = "ipkg list"
+				cmd = "opkg list"
 				self.Console.ePopen(cmd, self.IpkgList_Finished)
 		#print event, "-", param
 		pass
@@ -1885,7 +1887,7 @@ class PacketManager(Screen, NumericalTextInput):
 
 		if not self.Console:
 			self.Console = Console()
-		cmd = "ipkg list_installed"
+		cmd = "opkg list-installed"
 		self.Console.ePopen(cmd, self.IpkgListInstalled_Finished)
 
 	def IpkgListInstalled_Finished(self, result, retval, extra_args = None):
@@ -1898,13 +1900,10 @@ class PacketManager(Screen, NumericalTextInput):
 					l = len(tokens)
 					version = l > 1 and tokens[1].strip() or ""
 					self.installed_packetlist[name] = version
-		if self.opkgAvail:
-			if not self.Console:
-				self.Console = Console()
-			cmd = "opkg list-upgradable"
-			self.Console.ePopen(cmd, self.OpkgListUpgradeable_Finished)
-		else:
-			self.buildPacketList()
+		if not self.Console:
+			self.Console = Console()
+		cmd = "opkg list-upgradable"
+		self.Console.ePopen(cmd, self.OpkgListUpgradeable_Finished)
 
 	def OpkgListUpgradeable_Finished(self, result, retval, extra_args = None):
 		if result:
@@ -1920,6 +1919,8 @@ class PacketManager(Screen, NumericalTextInput):
 	
 	def buildEntryComponent(self, name, version, description, state):
 		divpng = LoadPixmap(cached=True, path=resolveFilename(SCOPE_CURRENT_SKIN, "skin_default/div-h.png"))
+		if description == "":
+			description = "No description available."
 		if state == 'installed':
 			installedpng = LoadPixmap(cached=True, path=resolveFilename(SCOPE_CURRENT_PLUGIN, "SystemPlugins/SoftwareManager/installed.png"))
 			return((name, version, _(description), state, installedpng, divpng))	
@@ -1949,16 +1950,10 @@ class PacketManager(Screen, NumericalTextInput):
 			for x in self.packetlist:
 				status = ""
 				if self.installed_packetlist.has_key(x[0]):
-					if self.opkgAvail:
-						if self.upgradeable_packages.has_key(x[0]):
-							status = "upgradeable"
-						else:
-							status = "installed"
+					if self.upgradeable_packages.has_key(x[0]):
+						status = "upgradeable"
 					else:
-						if self.installed_packetlist[x[0]] == x[1]:
-							status = "installed"
-						else:
-							status = "upgradeable"
+						status = "installed"
 				else:
 					status = "installable"
 				self.list.append(self.buildEntryComponent(x[0], x[1], x[2], status))	
@@ -2042,9 +2037,9 @@ def Plugins(path, **kwargs):
 	global plugin_path
 	plugin_path = path
 	list = [
-		PluginDescriptor(name=_("Software management"), description=_("Manage your receiver's software"), where = PluginDescriptor.WHERE_MENU, fnc=startSetup),
-		PluginDescriptor(name=_("Ipkg"), where = PluginDescriptor.WHERE_FILESCAN, fnc = filescan)
+		PluginDescriptor(name=_("Software management"), description=_("Manage your receiver's software"), where = PluginDescriptor.WHERE_MENU, needsRestart = False, fnc=startSetup),
+		PluginDescriptor(name=_("Ipkg"), where = PluginDescriptor.WHERE_FILESCAN, needsRestart = False, fnc = filescan)
 	]
 	if config.usage.setup_level.index >= 2: # expert+
-		list.append(PluginDescriptor(name=_("Software management"), description=_("Manage your receiver's software"), where = PluginDescriptor.WHERE_EXTENSIONSMENU, fnc=UpgradeMain))
+		list.append(PluginDescriptor(name=_("Software management"), description=_("Manage your receiver's software"), where = PluginDescriptor.WHERE_EXTENSIONSMENU, needsRestart = False, fnc=UpgradeMain))
 	return list

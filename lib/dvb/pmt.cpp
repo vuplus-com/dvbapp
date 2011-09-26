@@ -18,6 +18,7 @@
 #include <dvbsi++/teletext_descriptor.h>
 #include <dvbsi++/video_stream_descriptor.h>
 #include <dvbsi++/registration_descriptor.h>
+#include <dvbsi++/ac3_descriptor.h>
 
 eDVBServicePMTHandler::eDVBServicePMTHandler()
 	:m_ca_servicePtr(0), m_dvb_scan(0), m_decode_demux_num(0xFF), m_no_pat_entry_delay(eTimer::create())
@@ -44,8 +45,15 @@ void eDVBServicePMTHandler::channelStateChanged(iDVBChannel *channel)
 		&& (state == iDVBChannel::state_ok) && (!m_demux))
 	{
 		if (m_channel)
-			if (m_channel->getDemux(m_demux, (!m_use_decode_demux) ? 0 : iDVBChannel::capDecode))
+		{
+			if (m_pvr_demux_tmp)
+			{
+				m_demux = m_pvr_demux_tmp;
+				m_pvr_demux_tmp = NULL;
+			}
+			else if (m_channel->getDemux(m_demux, (!m_use_decode_demux) ? 0 : iDVBChannel::capDecode))
 				eDebug("Allocating %s-decoding a demux for now tuned-in channel failed.", m_use_decode_demux ? "" : "non-");
+		}
 		
 		serviceEvent(eventTuned);
 		
@@ -464,9 +472,28 @@ int eDVBServicePMTHandler::getProgramInfo(program &program)
 									audio.type = audioStream::atAACHE; // MPEG4-AAC
 									break;
 								case AC3_DESCRIPTOR:
-									isaudio = 1;
+								{    
+									Ac3Descriptor *ac = (Ac3Descriptor*)(*desc);
+
+									isaudio = 1; 
 									audio.type = audioStream::atAC3;
+
+									if(ac->getAc3TypeFlag())
+									{    
+
+										uint8_t ac3type = ac->getAc3Type();
+										if( ( ac3type & 0x80 ) && ( (ac3type<<5) == 0xA0 || (ac3type<<5) == 0xC0) ) // From EN-300 468 v1.7.1 Table D.1
+											audio.type = audioStream::atDDP;
+									}    
+
 									break;
+								}     
+								case ENHANCED_AC3_DESCRIPTOR:
+									isaudio = 1; 
+									audio.type = audioStream::atDDP;
+									break;
+     
+
 								case REGISTRATION_DESCRIPTOR: /* some services don't have a separate AC3 descriptor */
 								{
 									RegistrationDescriptor *d = (RegistrationDescriptor*)(*desc);
@@ -842,7 +869,10 @@ int eDVBServicePMTHandler::tuneExt(eServiceReferenceDVB &ref, int use_decode_dem
 		if (m_pvr_channel)
 		{
 			m_pvr_channel->setCueSheet(cue);
-			if (source)
+
+			if (m_pvr_channel->getDemux(m_pvr_demux_tmp, (!m_use_decode_demux) ? 0 : iDVBChannel::capDecode))
+				eDebug("Allocating %s-decoding a demux for PVR channel failed.", m_use_decode_demux ? "" : "non-");
+			else if (source)
 				m_pvr_channel->playSource(source, streaminfo_file);
 			else
 				m_pvr_channel->playFile(ref.path.c_str());

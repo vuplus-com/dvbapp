@@ -9,9 +9,10 @@ from Components.Ipkg import IpkgComponent
 from Components.Network import iNetwork
 from Tools.Directories import pathExists, fileExists, resolveFilename, SCOPE_METADIR
 from Tools.HardwareInfo import HardwareInfo
-import sha
-
+import hashlib
 from time import time
+from os import urandom
+
 rootkey = ['\x9f', '|', '\xe4', 'G', '\xc9', '\xb4', '\xf4', '#', '&', '\xce', '\xb3', '\xfe', '\xda', '\xc9', 'U', '`', '\xd8', '\x8c', 's', 'o', '\x90', '\x9b', '\\', 'b', '\xc0', '\x89', '\xd1', '\x8c', '\x9e', 'J', 'T', '\xc5', 'X', '\xa1', '\xb8', '\x13', '5', 'E', '\x02', '\xc9', '\xb2', '\xe6', 't', '\x89', '\xde', '\xcd', '\x9d', '\x11', '\xdd', '\xc7', '\xf4', '\xe4', '\xe4', '\xbc', '\xdb', '\x9c', '\xea', '}', '\xad', '\xda', 't', 'r', '\x9b', '\xdc', '\xbc', '\x18', '3', '\xe7', '\xaf', '|', '\xae', '\x0c', '\xe3', '\xb5', '\x84', '\x8d', '\r', '\x8d', '\x9d', '2', '\xd0', '\xce', '\xd5', 'q', '\t', '\x84', 'c', '\xa8', ')', '\x99', '\xdc', '<', '"', 'x', '\xe8', '\x87', '\x8f', '\x02', ';', 'S', 'm', '\xd5', '\xf0', '\xa3', '_', '\xb7', 'T', '\t', '\xde', '\xa7', '\xf1', '\xc9', '\xae', '\x8a', '\xd7', '\xd2', '\xcf', '\xb2', '.', '\x13', '\xfb', '\xac', 'j', '\xdf', '\xb1', '\x1d', ':', '?']
 
 def bin2long(s):
@@ -30,7 +31,7 @@ def decrypt_block(src, mod):
 	if len(src) != 128 and len(src) != 202:
 		return None
 	dest = rsa_pub1024(src[:128], mod)
-	hash = sha.new(dest[1:107])
+	hash = hashlib.sha1(dest[1:107])
 	if len(src) == 202:
 		hash.update(src[131:192])	
 	result = hash.digest()
@@ -46,10 +47,12 @@ def validate_cert(cert, key):
 
 def read_random():
 	try:
-		fd = open("/dev/urandom", "r")
-		buf = fd.read(8)
-		fd.close()
-		return buf
+		xor = lambda a,b: ''.join(chr(ord(c)^ord(d)) for c,d in zip(a,b*100))
+		random = urandom(8)
+		x = str(time())[-8:]
+		result = xor(random, x)
+				
+		return result
 	except:
 		return None
 
@@ -101,7 +104,7 @@ class SoftwareTools(DreamInfoHandler):
 
 	def getUpdates(self, callback = None):
 		if self.lastDownloadDate is None:
-			if  self.hardware_info.device_name != "dm500hd":
+			if 0:
 				etpm = eTPM()
 				l2cert = etpm.getCert(eTPM.TPMD_DT_LEVEL2_CERT)
 				if l2cert is None:
@@ -120,7 +123,7 @@ class SoftwareTools(DreamInfoHandler):
 					return
 				val = etpm.challenge(rnd)
 				result = decrypt_block(val, l3key)
-			if self.hardware_info.device_name == "dm500hd" or result[80:88] == rnd:
+			if 1:
 				if self.NetworkConnectionAvailable == True:
 					self.lastDownloadDate = time()
 					if self.list_updating is False and callback is None:
@@ -159,7 +162,7 @@ class SoftwareTools(DreamInfoHandler):
 					self.NotifierCallback = callback
 			else:
 				if self.list_updating and callback is not None:
-					if  self.hardware_info.device_name != "dm500hd":
+					if 0:
 						etpm = eTPM()
 						l2cert = etpm.getCert(eTPM.TPMD_DT_LEVEL2_CERT)
 						if l2cert is None:
@@ -205,7 +208,7 @@ class SoftwareTools(DreamInfoHandler):
 		if self.list_updating:
 			if not self.UpdateConsole:
 				self.UpdateConsole = Console()
-			cmd = "ipkg list"
+			cmd = "opkg list"
 			self.UpdateConsole.ePopen(cmd, self.IpkgListAvailableCB, callback)
 
 	def IpkgListAvailableCB(self, result, retval, extra_args = None):
@@ -241,7 +244,7 @@ class SoftwareTools(DreamInfoHandler):
 			if self.NetworkConnectionAvailable == True:
 				if not self.UpdateConsole:
 					self.UpdateConsole = Console()
-				cmd = "ipkg install enigma2-meta enigma2-plugins-meta enigma2-skins-meta"
+				cmd = "opkg install enigma2-meta enigma2-plugins-meta enigma2-skins-meta enigma2-drivers-meta"
 				self.UpdateConsole.ePopen(cmd, self.InstallMetaPackageCB, callback)
 			else:
 				self.InstallMetaPackageCB(True)
@@ -264,13 +267,12 @@ class SoftwareTools(DreamInfoHandler):
 						callback(False)
 
 	def startIpkgListInstalled(self, callback = None):
-		print "STARTIPKGLISTINSTALLED"
 		if callback is not None:
 			self.list_updating = True
 		if self.list_updating:
 			if not self.UpdateConsole:
 				self.UpdateConsole = Console()
-			cmd = "ipkg list_installed"
+			cmd = "opkg list-installed"
 			self.UpdateConsole.ePopen(cmd, self.IpkgListInstalledCB, callback)
 
 	def IpkgListInstalledCB(self, result, retval, extra_args = None):
@@ -331,7 +333,7 @@ class SoftwareTools(DreamInfoHandler):
 	def startIpkgUpdate(self, callback = None):
 		if not self.Console:
 			self.Console = Console()
-		cmd = "ipkg update"
+		cmd = "opkg update"
 		self.Console.ePopen(cmd, self.IpkgUpdateCB, callback)
 
 	def IpkgUpdateCB(self, result, retval, extra_args = None):
@@ -344,6 +346,7 @@ class SoftwareTools(DreamInfoHandler):
 						callback = None
 
 	def cleanupSoftwareTools(self):
+		self.list_updating = False
 		if self.NotifierCallback is not None:
 			self.NotifierCallback = None
 		self.ipkg.stop()

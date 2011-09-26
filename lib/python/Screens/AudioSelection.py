@@ -1,6 +1,6 @@
 from Screen import Screen
 from Components.ServiceEventTracker import ServiceEventTracker
-from Components.ActionMap import ActionMap
+from Components.ActionMap import NumberActionMap
 from Components.ConfigList import ConfigListScreen
 from Components.ChoiceList import ChoiceList, ChoiceEntryComponent
 from Components.config import config, ConfigSubsection, getConfigListEntry, ConfigNothing, ConfigSelection, ConfigOnOff
@@ -36,7 +36,7 @@ class AudioSelection(Screen, ConfigListScreen):
 		self.cached_subtitle_checked = False
 		self.__selected_subtitle = None
         
-		self["actions"] = ActionMap(["ColorActions", "SetupActions", "DirectionActions"],
+		self["actions"] = NumberActionMap(["ColorActions", "SetupActions", "DirectionActions"],
 		{
 			"red": self.keyRed,
 			"green": self.keyGreen,
@@ -46,6 +46,15 @@ class AudioSelection(Screen, ConfigListScreen):
 			"cancel": self.cancel,
 			"up": self.keyUp,
 			"down": self.keyDown,
+			"1": self.keyNumberGlobal,
+			"2": self.keyNumberGlobal,
+			"3": self.keyNumberGlobal,
+			"4": self.keyNumberGlobal,
+			"5": self.keyNumberGlobal,
+			"6": self.keyNumberGlobal,
+			"7": self.keyNumberGlobal,
+			"8": self.keyNumberGlobal,
+			"9": self.keyNumberGlobal,
 		}, -2)
 
 		self.settings = ConfigSubsection()
@@ -76,14 +85,18 @@ class AudioSelection(Screen, ConfigListScreen):
 
 			if n > 0:
 				self.audioChannel = service.audioChannel()
-				choicelist = [("0",_("left")), ("1",_("stereo")), ("2", _("right"))]
-				self.settings.channelmode = ConfigSelection(choices = choicelist, default = str(self.audioChannel.getCurrentChannel()))
-				self.settings.channelmode.addNotifier(self.changeMode, initial_call = False)
-				conflist.append(getConfigListEntry(_("Channel"), self.settings.channelmode))
-				self["key_green"].setBoolean(True)
+				if self.audioChannel:
+					choicelist = [("0",_("left")), ("1",_("stereo")), ("2", _("right"))]
+					self.settings.channelmode = ConfigSelection(choices = choicelist, default = str(self.audioChannel.getCurrentChannel()))
+					self.settings.channelmode.addNotifier(self.changeMode, initial_call = False)
+					conflist.append(getConfigListEntry(_("Channel"), self.settings.channelmode))
+					self["key_green"].setBoolean(True)
+				else:
+					conflist.append(('',))
+					self["key_green"].setBoolean(False)
 				selectedAudio = self.audioTracks.getCurrentTrack()
 				for x in range(n):
-					number = str(x)
+					number = str(x + 1)
 					i = audio.getTrackInfo(x)
 					languages = i.getLanguage().split('/')
 					description = i.getDescription() or _("<unknown>")
@@ -136,7 +149,7 @@ class AudioSelection(Screen, ConfigListScreen):
 					language = _("<unknown>")
 					selected = ""
 
-					if sel and x[:4] == sel[:4]:
+					if sel and x == sel:
 						selected = _("Running")
 						selectedidx = idx
 					
@@ -218,7 +231,7 @@ class AudioSelection(Screen, ConfigListScreen):
 		config.av.downmix_ac3.save()
 
 	def changeMode(self, mode):
-		if mode is not None:
+		if mode is not None and self.audioChannel:
 			self.audioChannel.selectChannel(int(mode.getValue()))
 
 	def changeAudio(self, audio):
@@ -285,11 +298,16 @@ class AudioSelection(Screen, ConfigListScreen):
 		elif self.focus == FOCUS_STREAMS:
 			self["streams"].selectNext()
 
+	def keyNumberGlobal(self, number):
+		if number <= len(self["streams"].list):
+			self["streams"].setIndex(number-1)
+			self.keyOk()
+
 	def keyOk(self):
 		if self.focus == FOCUS_STREAMS and self["streams"].list:
 			cur = self["streams"].getCurrent()
 			if self.settings.menupage.getValue() == PAGE_AUDIO and cur[0] is not None:
-				self.changeAudio(cur[2])
+				self.changeAudio(cur[0])
 				self.__updatedInfo()
 			if self.settings.menupage.getValue() == PAGE_SUBTITLES and cur[0] is not None:
 				if self.infobar.selected_subtitle == cur[0]:

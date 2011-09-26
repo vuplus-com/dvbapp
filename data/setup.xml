@@ -28,10 +28,12 @@
 			<item level="2" text="Load Length of Movies in Movielist">config.usage.load_length_of_movies_in_moviellist</item>
 			<item level="1" text="Show positioner movement">config.usage.showdish</item>
 			<item level="1" text="Enable multiple bouquets">config.usage.multibouquet</item>
+			<item level="1" text="Multi-EPG bouquet selection">config.usage.multiepg_ask_bouquet</item>
 			<item level="1" text="Change bouquets in quickzap">config.usage.quickzap_bouquet_change</item>
 			<item level="1" text="Alternative radio mode">config.usage.e1like_radio_mode</item>
 			<item level="1" text="Action on long powerbutton press">config.usage.on_long_powerpress</item>
 			<item level="1" text="Action on short powerbutton press">config.usage.on_short_powerpress</item>
+			<item level="1" text="Position of finished Timers in Timerlist">config.usage.timerlist_finished_timer_position</item>
 			<item level="0" text="Infobar timeout">config.usage.infobar_timeout</item>
 			<item level="1" text="12V output" requires="12V_Output">config.usage.output_12V</item>
 			<item level="0" text="Show event-progress in channel selection">config.usage.show_event_progress_in_servicelist</item>
