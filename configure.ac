@@ -211,6 +211,8 @@ lib/python/Plugins/SystemPlugins/ManualFancontrol/Makefile
 lib/python/Plugins/SystemPlugins/ManualFancontrol/meta/Makefile
 lib/python/Plugins/SystemPlugins/Blindscan/Makefile
 lib/python/Plugins/SystemPlugins/Blindscan/meta/Makefile
+lib/python/Plugins/SystemPlugins/RemoteControlCode/Makefile
+lib/python/Plugins/SystemPlugins/RemoteControlCode/meta/Makefile
 lib/python/Tools/Makefile
 lib/service/Makefile
 lib/components/Makefile
