@@ -161,6 +161,8 @@ lib/python/Plugins/Extensions/SocketMMI/meta/Makefile
 lib/python/Plugins/Extensions/SocketMMI/src/Makefile
 lib/python/Plugins/Extensions/TuxboxPlugins/Makefile
 lib/python/Plugins/Extensions/TuxboxPlugins/meta/Makefile
+lib/python/Plugins/Extensions/WebBrowser/Makefile
+lib/python/Plugins/Extensions/WebBrowser/meta/Makefile
 lib/python/Plugins/SystemPlugins/CleanupWizard/Makefile
 lib/python/Plugins/SystemPlugins/CleanupWizard/meta/Makefile
 lib/python/Plugins/SystemPlugins/CommonInterfaceAssignment/Makefile
@@ -211,8 +213,6 @@ lib/python/Plugins/SystemPlugins/ManualFancontrol/Makefile
 lib/python/Plugins/SystemPlugins/ManualFancontrol/meta/Makefile
 lib/python/Plugins/SystemPlugins/Blindscan/Makefile
 lib/python/Plugins/SystemPlugins/Blindscan/meta/Makefile
-lib/python/Plugins/SystemPlugins/WebBrowser/Makefile
-lib/python/Plugins/SystemPlugins/WebBrowser/meta/Makefile
 lib/python/Tools/Makefile
 lib/service/Makefile
 lib/components/Makefile
