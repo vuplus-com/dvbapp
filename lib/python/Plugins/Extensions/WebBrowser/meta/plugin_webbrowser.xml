@@ -12,7 +12,7 @@
 	  <files type="package"> <!-- without version, without .ipk -->
 		<file type="package" name="enigma2-plugin-extensions-webbrowser" />
                 <file type="package" name="python-gdata" />
-                <file type="package" name="qtwebkit-e" />
+                <file type="package" name="libqtwebkite4" />
                 <file type="package" name="vuplus-webbrowser-utils" />
                 <file type="package" name="qt4-embedded-fonts" />
                 <file type="package" name="qt4-embedded-plugin-imageformat-gif" />
