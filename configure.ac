@@ -213,6 +213,8 @@ lib/python/Plugins/SystemPlugins/Blindscan/Makefile
 lib/python/Plugins/SystemPlugins/Blindscan/meta/Makefile
 lib/python/Plugins/SystemPlugins/RemoteControlCode/Makefile
 lib/python/Plugins/SystemPlugins/RemoteControlCode/meta/Makefile
+lib/python/Plugins/SystemPlugins/WebBrowser/Makefile
+lib/python/Plugins/SystemPlugins/WebBrowser/meta/Makefile
 lib/python/Tools/Makefile
 lib/service/Makefile
 lib/components/Makefile

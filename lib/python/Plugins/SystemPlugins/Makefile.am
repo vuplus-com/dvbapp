@@ -5,7 +5,7 @@ SUBDIRS = SoftwareManager FrontprocessorUpgrade PositionerSetup Satfinder \
 	DefaultServicesScanner NFIFlash DiseqcTester CommonInterfaceAssignment \
 	CrashlogAutoSubmit CleanupWizard VideoEnhancement WirelessLan NetworkWizard \
 	TempFanControl FactoryTest Fancontrol FPGAUpgrade WirelessLanSetup ManualFancontrol \
-	Blindscan RemoteControlCode
+	Blindscan WebBrowser RemoteControlCode 
 
 install_PYTHON =	\
 	__init__.py
