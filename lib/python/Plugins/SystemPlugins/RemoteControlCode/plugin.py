@@ -87,7 +87,7 @@ class RemoteControlCode(Screen,ConfigListScreen,RemoteControlCodeInit):
 			self.restoreCode()
 			self.session.openWithCallback(self.close, MessageBox, _("FILE NOT EXIST : /proc/stb/fp/remote_code"), MessageBox.TYPE_ERROR)
 		else:
-			self.session.openWithCallback(self.MessageBoxConfirmCodeCallback, MessageBoxConfirmCode, _("If new remote control code correct, select 'yes'."), MessageBox.TYPE_YESNO, timeout = 10, default = False)
+			self.session.openWithCallback(self.MessageBoxConfirmCodeCallback, MessageBoxConfirmCode, _("The remote control code will be reset to previous setting"), MessageBox.TYPE_YESNO, timeout = 10, default = False)
 
 	def restoreCode(self):
 		for x in self["config"].list:
@@ -144,13 +144,17 @@ newwidth = wsize[0]
 self.instance.move(ePoint(orgpos.x() + (orgwidth - newwidth)/2, orgpos.y()))
 		</applet>
 	</screen>"""
+
+	def __init__(self, session, text, type = MessageBox.TYPE_YESNO, timeout = -1, close_on_any_key = False, default = True, enable_input = True, msgBoxID = None):
+		MessageBox.__init__(self,session,text,type,timeout,close_on_any_key,default,enable_input,msgBoxID)
+		if type == MessageBox.TYPE_YESNO:
+			self.list = [ (_("Keep"), 0), (_("Restore"), 1) ]
+			self["list"].setList(self.list)
+
 	def timerTick(self):
 		if self.execing:
 			self.timeout -= 1
-#			if self.origTitle is None:
-#				self.origTitle = self.instance.getTitle()
-#			self.setTitle(self.origTitle + " ( after %d second, return to previous code)" %self.timeout)
-			self["text"].setText(self.text + " (after %d second, return to previous code)" %self.timeout)
+			self["text"].setText(self.text + " in %d seconds." %self.timeout)
 			if self.timeout == 0:
 				self.timer.stop()
 				self.timerRunning = False
