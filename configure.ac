@@ -217,6 +217,8 @@ lib/python/Plugins/SystemPlugins/RemoteControlCode/Makefile
 lib/python/Plugins/SystemPlugins/RemoteControlCode/meta/Makefile
 lib/python/Plugins/SystemPlugins/OSD3DSetup/Makefile
 lib/python/Plugins/SystemPlugins/OSD3DSetup/meta/Makefile
+lib/python/Plugins/SystemPlugins/UIPositionSetup/Makefile
+lib/python/Plugins/SystemPlugins/UIPositionSetup/meta/Makefile
 lib/python/Tools/Makefile
 lib/service/Makefile
 lib/components/Makefile
