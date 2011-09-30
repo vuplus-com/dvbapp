@@ -1,6 +1,6 @@
 from Plugins.Plugin import PluginDescriptor
 
-import time, os, socket, thread
+import time, os, socket, thread, socket
 from socket import gaierror, error
 from os import path as os_path, remove as os_remove
 
@@ -37,17 +37,17 @@ from enigma import eTimer, eServiceReference, iPlayableService, fbClass, eRCInpu
 HTTPConnection.debuglevel = 1
 
 lock = False
-def player_lock():
+def wb_lock():
 	global lock
 	lock = True
 	fbClass.getInstance().unlock()
 
-def player_unlock():
+def wb_unlock():
 	global lock
 	fbClass.getInstance().lock()
 	lock = False
 
-def player_islock():
+def wb_islock():
 	global lock
 	return lock
 
@@ -134,7 +134,7 @@ class VuPlayer(Screen, InfoBarNotifications):
 	def cbDoExit(self, answer):
 		answer = answer and answer[1]
 		if answer == "y":
-			player_unlock()
+			wb_unlock()
 			self.close()
 		elif answer == "n":
 			if self.state != self.PLAYER_IDLE:
@@ -272,11 +272,11 @@ class VuPlayerLauncher:
 				session.open(MessageBox, _("Sorry, video is not available!"), MessageBox.TYPE_INFO)
 				return
 
-			player_lock()
+			wb_lock()
 			myreference = eServiceReference(4097, 0, myurl)
 			session.open(VuPlayer, myreference, service)
 		except Exception, msg:
-			player_unlock()
+			wb_unlock()
 			print "Error >>", msg
 
 class VuPlayerService:
@@ -304,6 +304,7 @@ class VuPlayerService:
 	def run(self, e = True):
 		if self.enable:
 			return
+		print "VuPlayerService start!!"
 		self.enable = e
 		self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 		self.sock.settimeout(self.socket_timeout)
@@ -313,50 +314,58 @@ class VuPlayerService:
 			try:
 				conn, addr = self.sock.accept()
 				self.parseHandle(conn, addr)
-				conn.close()
 			except socket.timeout:
 				#print "[socket timeout]"
 				pass
+		print "VuPlayerService stop!!"
 
 	def parseHandle(self, conn, addr):
 		# [http://www.youtube.com/watch?v=BpThu778qB4&feature=related]
 		data = conn.recv(self.max_buffer_size)
-		print "[%s]" % (data) 
-		tmp = data.split("?")
-		print tmp # ['http://www.youtube.com/watch', 'v=BpThu778qB4&feature=related']
-		service = self.session.nav.getCurrentlyPlayingServiceReference()
-		if len(tmp) == 2 and tmp[0] == "http://www.youtube.com/watch":
-			tmp = tmp[1].split("&")
-			print tmp # ['v=BpThu778qB4', 'feature=related']
-			if len(tmp) == 2:
-				tmp = tmp[0].split("=")
-				print tmp # ['v', 'BpThu778qB4']
-				if len(tmp) == 2 and tmp[0] == "v":
-					player = VuPlayerLauncher()
-					player.run(tmp[1], self.session, service)
-					while player_islock():
-						time.sleep(1)
-					self.session.nav.playService(service)
-					data = "ok$"
+		print "[%s]" % (data)
+		if data.startswith("http://www.youtube.com"):
+			tmp = data.split("?")
+			print tmp # ['http://www.youtube.com/watch', 'v=BpThu778qB4&feature=related']
+			service = self.session.nav.getCurrentlyPlayingServiceReference()
+			if len(tmp) == 2 and tmp[0] == "http://www.youtube.com/watch":
+				tmp = tmp[1].split("&")
+				print tmp # ['v=BpThu778qB4', 'feature=related']
+				if len(tmp) == 2:
+					tmp = tmp[0].split("=")
+					print tmp # ['v', 'BpThu778qB4']
+					if len(tmp) == 2 and tmp[0] == "v":
+						player = VuPlayerLauncher()
+						player.run(tmp[1], self.session, service)
+						while wb_islock():
+							time.sleep(1)
+						self.session.nav.playService(service)
+						data = "ok$"
+					else:
+						data = "nok$parsing fail"
 				else:
 					data = "nok$parsing fail"
 			else:
 				data = "nok$parsing fail"
-		else:
-			data = "nok$parsing fail"
+			self.sendResponse(conn, data)
+
+	def sendResponse(self, conn, data):
 		conn.send(data)
+		conn.close()
 
 class BrowserLauncher(ConfigListScreen, Screen):
 	skin=   """
-		<screen name="BrowserLauncher" position="center,center" size="300,160" title="Web Browser">
-			<ePixmap pixmap="Vu_HD/buttons/red.png" position="50,0" size="140,40" alphatest="on" />
-			<ePixmap pixmap="Vu_HD/buttons/green.png" position="170,0" size="140,40" alphatest="on" />
-			<widget source="key_red" render="Label" position="50,0" zPosition="1" size="115,30" font="Regular;20" halign="center" valign="center" transparent="1" />
-			<widget source="key_green" render="Label" position="170,0" zPosition="1" size="115,30" font="Regular;20" halign="center" valign="center" transparent="1" />
-			<widget name="config" position="0,50" size="300,70" scrollbarMode="showOnDemand" />
-			<widget name="introduction" position="0,120" size="300,40" font="Regular;20" halign="center" backgroundColor="#a08500" transparent="1" />
+		<screen name="BrowserLauncher" position="center,center" size="309,458" title="Web Browser">
+			<ePixmap pixmap="Vu_HD/buttons/red.png" position="4,0" size="40,40" alphatest="on" />
+			<ePixmap pixmap="Vu_HD/buttons/green.png" position="100,0" size="40,40" alphatest="on" />
+			<ePixmap pixmap="Vu_HD/buttons/button_off.png" position="200,0" size="40,40" alphatest="on" />
+			<widget source="key_red" render="Label" position="15,0" zPosition="1" size="50,30" font="Regular;20" halign="right" valign="center" transparent="1" />
+			<widget source="key_green" render="Label" position="120,0" zPosition="1" size="50,30" font="Regular;20" halign="right" valign="center" transparent="1" />
+			<widget name="config" position="0,50" size="309,60" scrollbarMode="showOnDemand" />
+			<ePixmap pixmap="Vu_HD/rc_wb_desc.png" position="0,110" size="309,296" alphatest="on" />
+			<widget name="info" position="0,415" size="309,50" font="Regular;18" halign="center" foregroundColor="blue" transparent="1" />
 		</screen>
 		"""
+
 	def __init__(self, session): 
 		Screen.__init__(self, session)
                 self.session = session
@@ -366,17 +375,16 @@ class BrowserLauncher(ConfigListScreen, Screen):
 		self.mouse_cond = "/proc/stb/fp/mouse"
 		self["actions"] = ActionMap(["OkCancelActions", "ShortcutActions", "WizardActions", "ColorActions", "SetupActions", ],
                 {	"red": self.keyCancel,
-			"cancel": self.keyCancel,
 			"green": self.keyGo,
+			"cancel": self.keyExit,
                 }, -2)
+		self.info = Label(_("If you want to quit the Browser,\nPress RED and EXIT."))
+		self["info"] = self.info
+		self["key_red"] = StaticText(_("Exit"))
+		self["key_green"] = StaticText(_("Start"))
 
 		self.list = []
 		ConfigListScreen.__init__(self, self.list)
-
-		self["key_red"] = StaticText(_("Exit"))
-		self["key_green"] = StaticText(_("Start"))
-		self.introduntion = Label(_(" "))
-		self["introduction"] = self.introduntion
 
 		self.devices_string = ""
 		self.mouse_choice_list = []
@@ -390,6 +398,10 @@ class BrowserLauncher(ConfigListScreen, Screen):
 		self.vu_service = VuPlayerService(self.session)
 		self.vu_service.start(timeout=5)
 
+		self.exit_wait_cond = False
+		self.timer_exit_cond = eTimer()
+		self.timer_exit_cond.callback.append(self.resetExitCond)
+
 	def enableRCMouse(self, mode): #mode=[0|1]|[False|True]
 		if os.path.exists(self.mouse_cond):
 			self.cmd("echo %d > %s" % (mode, self.mouse_cond))
@@ -401,17 +413,37 @@ class BrowserLauncher(ConfigListScreen, Screen):
 	def keyNone(self):
 		None
 
+	def doExit(self):
+		self.vu_service.stop()
+		self.cmd("killall -9 %s"%(self.browser_name))
+		self.cmd("echo 60 > /proc/sys/vm/swappiness")
+		if self.mouse.value == 0:
+			self.enableRCMouse(False) #rc-mouse off
+		fbClass.getInstance().unlock()
+		#eRCInput.getInstance().unlock()
+		self.close()
+
+	def keyExit(self):
+		if self.exit_wait_cond:
+			self.doExit()
+		if self.isProcessRunable() == False:
+			self.doExit()
+
 	def keyCancel(self):
-		#if self.lock == False:
-			self.vu_service.stop()
-			self.cmd("killall -9 %s"%(self.browser_name))
-			self.cmd("echo 60 > /proc/sys/vm/swappiness")
-			self.introduntion.setText(" ")
-			if self.mouse.value == 0:
-				self.enableRCMouse(False) #rc-mouse off
-			fbClass.getInstance().unlock()
-			#eRCInput.getInstance().unlock()
-			self.close()
+		if self.isProcessRunable() == False:
+			self.doExit()
+		self.exit_wait_cond = True
+		self.timer_exit_cond.start(5000)
+
+	def resetExitCond(self):
+		self.timer_exit_cond.stop()
+		self.exit_wait_cond = False
+
+	def isProcessRunable(self):
+		cmd = "/bin/ps -ef | grep %s | grep -v grep | awk \'{print $5}\'"%(self.browser_name)
+		for line in os.popen(cmd).readlines():
+			return True
+		return False
 
 	def makeConfig(self):
 		self.devices = eConsoleAppContainer()
@@ -515,50 +547,57 @@ class BrowserLauncher(ConfigListScreen, Screen):
 				return tmp_h
 		return ""
 
+	def startBrowser(self):
+		self.timer_start.stop()
+
+		self.lock = True
+		self.cmd("killall -9 %s"%(self.browser_name))
+		self.cmd("echo 0 > /proc/sys/vm/swappiness")
+
+		kbd_cmd = ""
+		mouse_cmd = ""
+		extra_cmd = "" 
+		browser_cmd = "%s/%s -qws" % (self.browser_root, self.browser_name)
+	
+		fbClass.getInstance().lock()
+		#eRCInput.getInstance().lock()
+
+		if self.mouse.value == 0:
+			self.enableRCMouse(True) #rc-mouse on
+			idx = self.getListIndex(self.mouse_choice_list, 0)
+			mouse_cmd = "export QWS_MOUSE_PROTO=LinuxInput:/dev/input/%s; " % (self.mouse_device_list[idx])
+		elif self.mouse.value == 1:
+			mouse_cmd = " "
+			#mouse_cmd = "export QWS_MOUSE_PROTO=Auto:/dev/input/%s; " % (m)
+		elif self.mouse.value == 2:
+			mouse_cmd = "export QWS_MOUSE_PROTO=None; "
+
+		if self.keyboard.value == 0:
+			idx = self.getListIndex(self.keyboard_choice_list, 0)
+			kbd_cmd = "export QWS_KEYBOARD=LinuxInput:/dev/input/%s; " % (self.keyboard_device_list[idx])
+		elif self.keyboard.value == 1:
+			idx = self.getListIndex(self.keyboard_choice_list, 1)
+			kbd_cmd = "export QWS_KEYBOARD=LinuxInput:/dev/input/%s; " % (self.keyboard_device_list[idx])
+		elif self.keyboard.value == 2:
+			kbd_cmd = " "
+		print "mouse cmd >>", mouse_cmd, " >> ", self.mouse.value
+		print "keyboard cmd >>", kbd_cmd, " >> ", self.keyboard.value
+
+		cmd = "%s%s%s%s" % (extra_cmd, kbd_cmd, mouse_cmd, browser_cmd)
+		print "prepared command : [%s]" % cmd
+
+		self.launcher = eConsoleAppContainer()
+		self.launcher.appClosed.append(self.callbackLauncherAppClosed)
+		self.launcher.dataAvail.append(self.callbackLauncherDataAvail)
+		self.launcher.execute(cmd)
+		print "started browser..."
+
 	def keyGo(self):
+		self.info.setText("Starting Webbrowser. Please wait...")
 		if self.lock == False:
-			self.lock = True
-			
-			self.introduntion.setText("Run web-browser.\nPlease, wait...")
-			self.cmd("echo 0 > /proc/sys/vm/swappiness")
-
-			kbd_cmd = ""
-			mouse_cmd = ""
-			extra_cmd = "" 
-			browser_cmd = "%s/%s -qws" % (self.browser_root, self.browser_name)
-
-			fbClass.getInstance().lock()
-			#eRCInput.getInstance().lock()
-
-			if self.mouse.value == 0:
-				self.enableRCMouse(True) #rc-mouse on
-				idx = self.getListIndex(self.mouse_choice_list, 0)
-				mouse_cmd = "export QWS_MOUSE_PROTO=LinuxInput:/dev/input/%s; " % (self.mouse_device_list[idx])
-			elif self.mouse.value == 1:
-				mouse_cmd = " "
-				#mouse_cmd = "export QWS_MOUSE_PROTO=Auto:/dev/input/%s; " % (m)
-			elif self.mouse.value == 2:
-				mouse_cmd = "export QWS_MOUSE_PROTO=None; "
-
-			if self.keyboard.value == 0:
-				idx = self.getListIndex(self.keyboard_choice_list, 0)
-				kbd_cmd = "export QWS_KEYBOARD=LinuxInput:/dev/input/%s; " % (self.keyboard_device_list[idx])
-			elif self.keyboard.value == 1:
-				idx = self.getListIndex(self.keyboard_choice_list, 1)
-				kbd_cmd = "export QWS_KEYBOARD=LinuxInput:/dev/input/%s; " % (self.keyboard_device_list[idx])
-			elif self.keyboard.value == 2:
-				kbd_cmd = " "
-			print "mouse cmd >>", mouse_cmd, " >> ", self.mouse.value
-			print "keyboard cmd >>", kbd_cmd, " >> ", self.keyboard.value
-
-			cmd = "%s%s%s%s" % (extra_cmd, kbd_cmd, mouse_cmd, browser_cmd)
-			print "prepared command : [%s]" % cmd
-
-			self.launcher = eConsoleAppContainer()
-			self.launcher.appClosed.append(self.callbackLauncherAppClosed)
-			self.launcher.dataAvail.append(self.callbackLauncherDataAvail)
-			self.launcher.execute(cmd)
-			print "running arora..."
+			self.timer_start = eTimer()
+			self.timer_start.callback.append(self.startBrowser)
+			self.timer_start.start(10)
 
 	def getListIndex(self, l, v):
 		idx = 0
@@ -572,15 +611,21 @@ class BrowserLauncher(ConfigListScreen, Screen):
 		print ret_data
 		if ret_data.startswith("--done--"):
 			self.lock = False
-			self.keyCancel()
-		
+			self.doExit()
+
 	def callbackLauncherAppClosed(self, retval = 1):
-		None
+		self.lock = False
+
+def sessionstart(session, **kwargs):
+	if os.path.exists("/proc/stb/fp/mouse"):
+		os.system("echo 0 > /proc/stb/fp/mouse")
 
 def main(session, **kwargs):
 	session.open(BrowserLauncher)
-                                                           
-def Plugins(**kwargs):            
-	return PluginDescriptor(name=_("Web Browser"), description="start web browser", where = PluginDescriptor.WHERE_PLUGINMENU, fnc=main)
+
+def Plugins(**kwargs):
+	return [PluginDescriptor(where = PluginDescriptor.WHERE_SESSIONSTART, needsRestart = False, fnc=sessionstart),
+		PluginDescriptor(name=_("Web Browser"), description="start web browser", where = PluginDescriptor.WHERE_PLUGINMENU, fnc=main)]
+
 
 
