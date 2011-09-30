@@ -215,8 +215,8 @@ lib/python/Plugins/SystemPlugins/Blindscan/Makefile
 lib/python/Plugins/SystemPlugins/Blindscan/meta/Makefile
 lib/python/Plugins/SystemPlugins/RemoteControlCode/Makefile
 lib/python/Plugins/SystemPlugins/RemoteControlCode/meta/Makefile
-lib/python/Plugins/SystemPlugins/OSD3DSetup/Makefile
-lib/python/Plugins/SystemPlugins/OSD3DSetup/meta/Makefile
+lib/python/Plugins/SystemPlugins/UI3DSetup/Makefile
+lib/python/Plugins/SystemPlugins/UI3DSetup/meta/Makefile
 lib/python/Plugins/SystemPlugins/UIPositionSetup/Makefile
 lib/python/Plugins/SystemPlugins/UIPositionSetup/meta/Makefile
 lib/python/Tools/Makefile

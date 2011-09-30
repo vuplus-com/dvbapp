@@ -6,14 +6,14 @@ from Components.Sources.StaticText import StaticText
 modelist = {"off": _("Off"), "auto": _("Auto"), "sidebyside": _("Side by Side"), "topandbottom": _("Top and Bottom")}
 setmodelist = {"mode1": _("Mode 1"), "mode2": _("Mode 2")}
 
-config.plugins.OSD3DSetup = ConfigSubsection()
-config.plugins.OSD3DSetup.mode = ConfigSelection(choices = modelist, default = "auto")
-config.plugins.OSD3DSetup.znorm = ConfigInteger(default = 0)
-config.plugins.OSD3DSetup.setmode = ConfigSelection(choices = setmodelist, default = "mode1")
+config.plugins.UI3DSetup = ConfigSubsection()
+config.plugins.UI3DSetup.mode = ConfigSelection(choices = modelist, default = "auto")
+config.plugins.UI3DSetup.znorm = ConfigInteger(default = 0)
+config.plugins.UI3DSetup.setmode = ConfigSelection(choices = setmodelist, default = "mode1")
 
-class OSD3DSetupScreen(Screen, ConfigListScreen):
+class UI3DSetupScreen(Screen, ConfigListScreen):
 	skin = """
-		<screen position="center,center" size="560,300" title="OSD 3D setup" >
+		<screen position="center,center" size="560,300" title="UI 3D setup" >
 			<ePixmap pixmap="Vu_HD/buttons/red.png" position="10,10" size="25,25" alphatest="on" />
 			<ePixmap pixmap="Vu_HD/buttons/green.png" position="290,10" size="25,25" alphatest="on" />
 			<widget source="key_red" render="Label" position="40,10" zPosition="1" size="140,25" font="Regular;20" halign="center" valign="center" transparent="1" />
@@ -22,7 +22,7 @@ class OSD3DSetupScreen(Screen, ConfigListScreen):
 		</screen>"""
 
 	def __init__(self, session):
-		self.skin = OSD3DSetupScreen.skin
+		self.skin = UI3DSetupScreen.skin
 		Screen.__init__(self, session)
 
 		from Components.ActionMap import ActionMap
@@ -42,9 +42,9 @@ class OSD3DSetupScreen(Screen, ConfigListScreen):
 		self.list = []
 		ConfigListScreen.__init__(self, self.list, session = self.session)
 
-		mode = config.plugins.OSD3DSetup.mode.value
-		znorm = config.plugins.OSD3DSetup.znorm.value
-		setmode = config.plugins.OSD3DSetup.setmode.value
+		mode = config.plugins.UI3DSetup.mode.value
+		znorm = config.plugins.UI3DSetup.znorm.value
+		setmode = config.plugins.UI3DSetup.setmode.value
 
 		self.mode = ConfigSelection(choices = modelist, default = mode)
 		self.znorm = ConfigSlider(default = znorm + 50, increment = 1, limits = (0, 100))
@@ -67,10 +67,10 @@ class OSD3DSetupScreen(Screen, ConfigListScreen):
 		applySettings(self.mode.value, int(self.znorm.value) - 50, self.setmode.value)
 
 	def keyGo(self):
-		config.plugins.OSD3DSetup.mode.value = self.mode.value
-		config.plugins.OSD3DSetup.znorm.value = int(self.znorm.value) - 50
-		config.plugins.OSD3DSetup.setmode.value = self.setmode.value
-		config.plugins.OSD3DSetup.save()
+		config.plugins.UI3DSetup.mode.value = self.mode.value
+		config.plugins.UI3DSetup.znorm.value = int(self.znorm.value) - 50
+		config.plugins.UI3DSetup.setmode.value = self.setmode.value
+		config.plugins.UI3DSetup.save()
 		self.close()
 
 	def keyCancel(self):
@@ -101,11 +101,11 @@ def applySettings(mode, znorm, setmode):
 		return
 
 def setConfiguredSettings():
-	applySettings(config.plugins.OSD3DSetup.mode.value, 
-		int(config.plugins.OSD3DSetup.znorm.value), config.plugins.OSD3DSetup.setmode.value)
+	applySettings(config.plugins.UI3DSetup.mode.value, 
+		int(config.plugins.UI3DSetup.znorm.value), config.plugins.UI3DSetup.setmode.value)
 
 def main(session, **kwargs):
-	session.open(OSD3DSetupScreen)
+	session.open(UI3DSetupScreen)
 
 def startup(reason, **kwargs):
 	setConfiguredSettings()
@@ -114,6 +114,6 @@ def Plugins(**kwargs):
 	from os import path
 	if path.exists("/proc/stb/fb/3dmode") or path.exists("/proc/stb/fb/primary/3d"):
 		from Plugins.Plugin import PluginDescriptor
-		return [PluginDescriptor(name = "OSD 3D setup", description = _("Adjust 3D settings"), where = PluginDescriptor.WHERE_PLUGINMENU, fnc = main),
-					PluginDescriptor(name = "OSD 3D setup", description = "", where = PluginDescriptor.WHERE_SESSIONSTART, fnc = startup)]
+		return [PluginDescriptor(name = "UI 3D setup", description = _("Adjust 3D settings"), where = PluginDescriptor.WHERE_PLUGINMENU, fnc = main),
+					PluginDescriptor(name = "UI 3D setup", description = "", where = PluginDescriptor.WHERE_SESSIONSTART, fnc = startup)]
 	return []
