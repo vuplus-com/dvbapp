@@ -490,11 +490,6 @@ void eDVBFrontend::reopenFrontend()
 	openFrontend();
 }
 
-#ifdef BUILD_VUPLUS /* ikseong */
-int frontend0_fd;
-int frontend1_fd;
-#endif
-
 int eDVBFrontend::openFrontend()
 {
 	if (m_state != stateClosed)
@@ -519,15 +514,6 @@ int eDVBFrontend::openFrontend()
 				eWarning("failed! (%s) %m", m_filename);
 				return -1;
 			}
-#ifdef BUILD_VUPLUS /* ikseong */
-			else
-			{				
-				if (m_dvbid==0)
-					frontend0_fd = m_fd;
-				else if (m_dvbid==1)
-					frontend1_fd = m_fd;
-			}
-#endif
 		}
 		else
 			eWarning("frontend %d already opened", m_dvbid);

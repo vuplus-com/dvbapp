@@ -16,27 +16,14 @@ from Components.HTMLComponent import HTMLComponent
 from Components.GUIComponent import GUIComponent
 from enigma import eListboxPythonStringContent, eListbox, gFont, eServiceCenter, eDVBResourceManager
 from enigma import eServiceReference
-from enigma import eMemtest
-from enigma import eSctest
+from sctest import eSctest
 from enigma import eDVBDB
 from Components.NimManager import nimmanager
 from enigma import eDVBCI_UI,eDVBCIInterfaces
 from Tools.Directories import resolveFilename, SCOPE_SYSETC
+from Components.Sources.StaticText import StaticText
 
-class TestResultList(HTMLComponent, GUIComponent):
-	def __init__(self, list, enableWrapAround=False, content=eListboxPythonStringContent):
-		GUIComponent.__init__(self)
-		self.list = list
-		self.l = content()
-		self.l.setList(self.list)
-		self.onSelectionChanged = [ ]
-		self.enableWrapAround = enableWrapAround
-
-	def getCurrent(self):
-		return self.l.getCurrentSelection()
-
-	GUI_WIDGET = eListbox
-
+class TestResultList(MenuList):
 	def postWidgetCreate(self, instance):
 		self.instance.setSelectionEnable(0)
 		instance.setContent(self.l)
@@ -44,61 +31,78 @@ class TestResultList(HTMLComponent, GUIComponent):
 		if self.enableWrapAround:
 			self.instance.setWrapAround(True)
 
-	def preWidgetRemove(self, instance):
-		instance.setContent(None)
-		instance.selectionChanged.get().remove(self.selectionChanged)
-
-	def selectionChanged(self):
-		for f in self.onSelectionChanged:
-			f()
-
-	def getSelectionIndex(self):
-		return self.l.getCurrentSelectionIndex()
-
-	def getSelectedIndex(self):
-		return self.l.getCurrentSelectionIndex()
-
-	def setList(self, list):
-		self.list = list
-		self.l.setList(self.list)
-
 	def updateList(self, list):
 		self.list = list
 		self.l.setList(self.list)
 
-	def moveToIndex(self, idx):
-		if self.instance is not None:
-			self.instance.moveSelectionTo(idx)
+class TuneMessageBox(MessageBox):
+	skin = """
+		<screen position="center,center" size="600,10" title="Message">
+			<widget name="text" position="65,8" size="420,0" font="Regular;22" />
+			<widget name="ErrorPixmap" pixmap="Vu_HD/icons/input_error.png" position="5,5" size="53,53" alphatest="blend" />
+			<widget name="QuestionPixmap" pixmap="Vu_HD/icons/input_question.png" position="5,5" size="53,53" alphatest="blend" />
+			<widget name="InfoPixmap" pixmap="Vu_HD/icons/input_info.png" position="5,5" size="53,53" alphatest="blend" />
+			<widget name="list" position="100,100" size="380,375" transparent="1" backgroundColor="darkgrey" />
+			<!-- Signal Quality -->
+			<eLabel text="SNR : " position="60,130" size="60,25" font="Regular;25" transparent="1" />
+			<widget source="session.FrontendStatus" render="Label" position="120,130" size="60,25" font="Regular;25"  transparent="1">
+				<convert type="FrontendInfo">SNRdB</convert>
+			</widget>
+			<!-- AGC -->
+			<eLabel text="AGC : " position="200,130" size="60,25" font="Regular;25"  transparent="1" noWrap="1" />
+			<widget source="session.FrontendStatus" render="Label" position="260,130" size="60,25" font="Regular;25"  transparent="1" noWrap="1">
+				<convert type="FrontendInfo">AGC</convert>
+			</widget>
+			<applet type="onLayoutFinish">
+# this should be factored out into some helper code, but currently demonstrates applets.
+from enigma import eSize, ePoint
 
-	def pageUp(self):
-		if self.instance is not None:
-			self.instance.moveSelection(self.instance.pageUp)
+orgwidth = self.instance.size().width()
+orgpos = self.instance.position()
+textsize = self[&quot;text&quot;].getSize()
 
-	def pageDown(self):
-		if self.instance is not None:
-			self.instance.moveSelection(self.instance.pageDown)
+# y size still must be fixed in font stuff...
+textsize = (textsize[0] + 50, textsize[1] + 50)
+offset = 0
+if self.type == self.TYPE_YESNO:
+	offset = 60
+wsizex = textsize[0] + 60
+wsizey = textsize[1] + offset
+if (280 &gt; wsizex):
+	wsizex = 280
+wsizex = wsizex + 30
+wsizey = wsizey + 30
+wsize = (wsizex, wsizey)
 
-	def up(self):
-		if self.instance is not None:
-			self.instance.moveSelection(self.instance.moveUp)
+# resize
+self.instance.resize(eSize(*wsize))
 
-	def down(self):
-		if self.instance is not None:
-			self.instance.moveSelection(self.instance.moveDown)
+# resize label
+self[&quot;text&quot;].instance.resize(eSize(*textsize))
 
-	def selectionEnabled(self, enabled):
-		if self.instance is not None:
-			self.instance.setSelectionEnable(enabled)
+# move list
+listsize = (wsizex, 50)
+self[&quot;list&quot;].instance.move(ePoint(0, textsize[1]))
+self[&quot;list&quot;].instance.resize(eSize(*listsize))
+
+# center window
+newwidth = wsize[0]
+self.instance.move(ePoint(orgpos.x() + (orgwidth - newwidth)/2, orgpos.y()))
+			</applet>
+		</screen>"""
+	def __init__(self, session, text, type = MessageBox.TYPE_YESNO):
+		MessageBox.__init__(self, session, text, type)
 
 class FactoryTest(Screen):
 	skin = """
-		<screen position="120,125" size="440,400" title="Test Menu" >
-			<widget name="testlist" position="10,0" size="340,350" />
-			<widget name="resultlist" position="370,0" size="60,350" />
-			<widget name="testdate" position="20,350" size="150,25" font="Regular;22" />
-			<widget name="testversion" position="20,375" size="150,25" font="Regular;22" />
-			<widget name="mactext" position="180,350" size="230,25" font="Regular;22" />
+		<screen name="FactoryTest" position="300,100" size="660,550" title="Test Menu" >
+			<widget name="testlist" position="10,0" size="440,455" itemHeight="35" />
+			<widget name="resultlist" position="470,0" size="60,455" itemHeight="35" />
+			<widget name="testdate" position="20,470" size="250,35" font="Regular;30" />
+			<widget name="testversion" position="20,505" size="250,35" font="Regular;30" />
+			<widget name="mactext" position="320,470" size="340,35" font="Regular;30" />
 		</screen>"""
+
 	def __init__(self, session):
 
 		self["actions"] = NumberActionMap(["OkCancelActions","WizardActions","NumberActions","ColorActions",],
@@ -124,7 +128,7 @@ class FactoryTest(Screen):
 		}, -2)
 
 		Screen.__init__(self, session)
-		TESTPROGRAM_DATE = self.getImageVersion() +" (v1.00)"
+		TESTPROGRAM_DATE = self.getImageVersion() +" (v1.10)"
 		TESTPROGRAM_VERSION = "Version 01.10"
 
 		self.model = 0
@@ -203,8 +207,9 @@ class FactoryTest(Screen):
 		self.createConfig()
 		
 		self.rlist = []
-		for x in range(self.menulength):
+		for x in range(self.menulength-1):
 			self.rlist.append((".."))
+		self.rlist.append((" "))
 		self["resultlist"] = TestResultList(self.rlist)
 
 		self.avswitch = AVSwitch()
@@ -334,10 +339,15 @@ class FactoryTest(Screen):
 			tlist.append((" 2. Front test",self.fronttestIndex))
 			self.smarttestIndex=3
 			tlist.append((" 3. Smartcard test",self.smarttestIndex))
-			self.tuner_test_first_index = current_index = 4
+			if self.model == 3:
+				self.tuner_test_first_index = current_index = 4
+			elif self.model == 4:
+				self.tuner_test_first_index = 4
+				current_index = 0
 			AspectRatio=["4:3", "16:9"]
 			ColorFormat=["CVBS","RGB","YC","CVBS","CVBS","CVBS","CVBS","CVBS"]	
 			self.tuneInfo={}
+			tunelist = []
 			for (key, val) in self.NimType.items():
 				if val["type"].startswith("DVB-S"):
 # Chang : DVB -S setting diseqc A
@@ -349,7 +359,7 @@ class FactoryTest(Screen):
 #						current_index=4
 					self.setTuneInfo(index=current_index, slot=key, type=val["type"], sat=val["sat1"], pol="H", tone=False, ratio=getRatio, color=getColorFormat, cam=False) # setTuneInfo
 #						self.setTuneInfo(current_index, key, val["type"], val["sat1"], "H", True, getRatio, getColorFormat, False) # setTuneInfo
-					tlist.append((menuname,current_index))
+					tunelist.append((menuname,current_index))
 					current_index+=1
 # Chang : DVB -S setting diseqc B
 					getRatio = AspectRatio.pop(0)
@@ -362,7 +372,7 @@ class FactoryTest(Screen):
 					else:
 						camtest = False
 					self.setTuneInfo( index=current_index, slot=key, type=val["type"], sat=val["sat2"], pol="V", tone=True, ratio=getRatio, color=getColorFormat, cam=camtest)
-					tlist.append((menuname,current_index))
+					tunelist.append((menuname,current_index))
 					current_index+=1
 # Chang : DVB -T or DVB-C
 				elif val["type"].startswith("DVB-T") or val["type"].startswith("DVB-C"):
@@ -382,9 +392,17 @@ class FactoryTest(Screen):
 						else:
 							camtest = False
 						self.setTuneInfo( index=current_index, slot=key, type=val["type"], sat=None, pol=None, tone=None, ratio=getRatio, color=getColorFormat, cam=camtest)
-						tlist.append((menuname,current_index))
+						tunelist.append((menuname,current_index))
 						current_index+=1
-			self.tuner_test_last_index = current_index-1
+			if self.model == 3:
+				tlist.extend(tunelist)
+				self.tuner_test_last_index = current_index-1
+			elif self.model == 4:
+				self.tunelist = tunelist
+				self.tuner_test_last_index = 4
+				current_index = self.tuner_test_last_index
+				tlist.append((" %d. Tuning test" % current_index,self.tuner_test_last_index))
+				current_index+=1
 			self.rs232testIndex=current_index
 			tlist.append((" %d. RS232 test" % current_index,self.rs232testIndex))
 			current_index+=1
@@ -414,7 +432,9 @@ class FactoryTest(Screen):
 	def getModelInfo(self):
 		getmodel = 0
 		if fileExists("/proc/stb/info/vumodel"):
-			info = open("/proc/stb/info/vumodel").read().strip()
+			vumodel = open("/proc/stb/info/vumodel")
+			info=vumodel.read().strip()
+			vumodel.close()
 			if info == "duo":
 				self.model = 0
 				getmodel = 1
@@ -435,8 +455,11 @@ class FactoryTest(Screen):
 				self.model = 4
 				getmodel = 1
 				print "getModelInfo : ultimo"
+
 		if getmodel == 0 and fileExists("/proc/stb/info/version"):
-			info = open("/proc/stb/info/version").read()
+			vesion = open("/proc/stb/info/version")
+			info=version.read()
+			version.close()
 			if info[:2] == "14":
 				self.model = 1
 				print "getModelInfo : solo_"
@@ -497,12 +520,14 @@ class FactoryTest(Screen):
 				day = version[10:12]
 				date = '-'.join((year, month, day))
 				break;
+		file.close()
 		return date
 
 	def getversion(self):
 		try:
 			fd = open("/proc/stb/info/version","r")
 			version = fd.read()
+			fd.close()
 			self["testversion"].setText(("Version %s"%version))
 		except:
 			self["testversion"].setText(("Version no load"))
@@ -565,7 +590,10 @@ class FactoryTest(Screen):
 		elif index==self.fronttestIndex:
 			self.Test1()
 		elif index>=self.tuner_test_first_index and index<=self.tuner_test_last_index:
-			self.TestTune(index)
+			if self.model == 0 or self.model == 1 or self.model == 2 or self.model == 3:
+				self.TestTune(index)
+			elif self.model == 4:
+				self.openTestTuneMenu()
 		elif index==self.scarttestIndex:
 			self.Test6()
 		elif index==self.rs232testIndex:
@@ -682,8 +710,10 @@ class FactoryTest(Screen):
 			self.session.openWithCallback(self.displayresult ,FrontTest)
 		elif self.model == 1:
 			self.session.openWithCallback(self.displayresult ,FrontTest_solo)
-		elif self.model == 2 or self.model == 3 or self.model == 4:
+		elif self.model == 2 or self.model == 3:
 			self.session.openWithCallback(self.displayresult ,FrontTest_uno)
+		elif  self.model == 4:
+			self.session.openWithCallback(self.displayresult ,FrontTest_ultimo)
 
 	def displayresult(self):
 		global fronttest
@@ -691,6 +721,16 @@ class FactoryTest(Screen):
 			self.rlist[self["testlist"].getCurrent()[1]]="pass"
 		else:
 			self.rlist[self["testlist"].getCurrent()[1]]="fail"
+
+	def openTestTuneMenu(self):
+		self.session.openWithCallback(self.TestTuneMenuResult ,TestTuneMenu, self.tuneInfo, self.tunelist, self.NimType)
+
+	def TestTuneMenuResult(self,result):
+		if result :
+			self.rlist[self["testlist"].getCurrent()[1]]="pass"
+		else:
+			self.rlist[self["testlist"].getCurrent()[1]]="fail"
+		self["resultlist"].updateList(self.rlist)
 
 	def TestTune(self,index):	
 		if self.oldref is None:
@@ -881,7 +921,7 @@ class FactoryTest(Screen):
 				hv == ""
 				
 		print "eSctest.getInstance().getFrontendstatus - %d"%result
-		if result == 0:
+		if result == 0 or result == -1:
 			self.tunerlock = 0
 			self.tunemsgtimer.stop()
 			self.session.nav.stopService()
@@ -910,7 +950,7 @@ class FactoryTest(Screen):
 
 	def tunemsg(self):
 		self.tuningtimer.stop()
-		self.session.openWithCallback(self.tuneback, MessageBox, _("%s ok?" %(self["testlist"].getCurrent()[0])), MessageBox.TYPE_YESNO)
+		self.session.openWithCallback(self.tuneback, TuneMessageBox, _("%s ok?" %(self["testlist"].getCurrent()[0])), MessageBox.TYPE_YESNO)
 
 	def setSourceVar(self):
 		if self.model == 0:
@@ -1013,7 +1053,7 @@ class FactoryTest(Screen):
 		self.agingtimer.start(2000,True)
 
 	def agingCheck(self):
-		result = eSctest.getInstance().getFrontendstatus(0)		
+		result = eSctest.getInstance().getFrontendstatus(0)
 		hv = "Ver"	
 		print "eSctest.getInstance().getFrontendstatus - %d"%result
 		if result == 0:
@@ -1152,28 +1192,28 @@ class FactoryTest(Screen):
 		self.getmacaddr()
 		self.testing = 0			
 	
-	def MemTest(self, which):
-		index = which
-		result = 0
-		if index==0:
-			result = eMemtest.getInstance().dramtest()
-		elif index==1:
-			result = eMemtest.getInstance().flashtest()
-			result = 0	#	temp
-		else:
-			result = eMemtest.getInstance().dramtest()
-			result = eMemtest.getInstance().flashtest()
-			result = 0	#	temp
+#	def MemTest(self, which):
+#		index = which
+#		result = 0
+#		if index==0:
+#			result = eMemtest.getInstance().dramtest()
+#		elif index==1:
+#			result = eMemtest.getInstance().flashtest()
+#			result = 0	#	temp
+#		else:
+#			result = eMemtest.getInstance().dramtest()
+#			result = eMemtest.getInstance().flashtest()
+#			result = 0	#	temp
 			
-		index = index+10
+#		index = index+10
 		
-		if result == 0:
-			print index,self.rlist[index]
-			self.rlist[index]="pass"
-		else:
-			print index,self.rlist[index]
-			self.rlist[index]="fail"
-		self["resultlist"].updateList(self.rlist)
+#		if result == 0:
+#			print index,self.rlist[index]
+#			self.rlist[index]="pass"
+#		else:
+#			print index,self.rlist[index]
+#			self.rlist[index]="fail"
+#		self["resultlist"].updateList(self.rlist)
 			
 	def scciresult(self):
 		global smartcardtest
@@ -1185,15 +1225,14 @@ class FactoryTest(Screen):
 	def Test10(self):
 		self.session.openWithCallback(self.scciresult ,SmartCardTest,stbmodel=self.model)
 
-	def Test11(self):
-		self.MemTest(1)
+#	def Test11(self):
+#		self.MemTest(1)
 		
-	def Test12(self):
-		self.MemTest(2)
+#	def Test12(self):
+#		self.MemTest(2)
 
-	def Test13(self):
-		self.MemTest(3)	
-
+#	def Test13(self):
+#		self.MemTest(3)
 
 	def Test14(self):
 		try:
@@ -1231,12 +1270,12 @@ class FactoryTest(Screen):
 ethtest = 0
 class MacConfig(Screen):
 	skin = """
-		<screen position="100,250" size="520,100" title="Mac Config" >
+		<screen name="MacConfig" position="center,center" size="520,100" title="Mac Config" >
 			<eLabel text="Mac Address " position="10,15" size="200,40" font="Regular;30" />		
-			<widget name="text" position="230,15" size="230,40" font="Regular;30" />
+			<widget name="text" position="230,15" size="230,40" font="Regular;30" halign="right"/>
 			<widget name="text1" position="470,15" size="40,40" font="Regular;30" />		
 			<eLabel text=" " position="5,55" zPosition="-1" size="510,5" backgroundColor="#02e1e8e6" />		
-			<widget name="stattext" position="30,75" size="400,25" font="Regular;20" />
+			<widget name="stattext" position="30,75" size="450,35" font="Regular;30" />
 		</screen>"""
 
 	def __init__(self, session, mactry = 1):
@@ -1268,7 +1307,9 @@ class MacConfig(Screen):
 	def getModelInfo(self):
 		getmodel = 0
 		if fileExists("/proc/stb/info/vumodel"):
-			info = open("/proc/stb/info/vumodel").read().strip()
+			vumodel = open("/proc/stb/info/vumodel")
+			info=vumodel.read().strip()
+			vumodel.close()
 			if info == "combo":
 				self.model = 2
 				getmodel = 1
@@ -1290,9 +1331,10 @@ class MacConfig(Screen):
 				getmodel = 1
 				print "getModelInfo : ultimo"
 
-
 		if getmodel == 0 and fileExists("/proc/stb/info/version"):
-			info = open("/proc/stb/info/version").read()
+			version = open("/proc/stb/info/version")
+			info=version.read()
+			version.close()
 #			print info,info[:2]
 			if info[:2] == "14":
 				self.model = 1
@@ -1450,8 +1492,8 @@ class MacConfig(Screen):
 smartcardtest = 0
 class SmartCardTest(Screen):
 	skin = """
-		<screen position="300,240" size="160,120" title="SmartCard Test" >
-			<widget name="text" position="10,10" size="140,100" font="Regular;22" />
+		<screen name="SmartCardTest" position="center,center" size="300,120" title="SmartCard Test" >
+			<widget name="text" position="10,10" size="280,100" font="Regular;30" />
 		</screen>"""
 
 	def __init__(self, session, stbmodel = 0):
@@ -1472,7 +1514,6 @@ class SmartCardTest(Screen):
 		global smartcardtest
 		smartcardtest = 0
 		self.model = stbmodel
-		self.Testmode = 1
 		self.smartcardtimer.start(100,True)
 
 	def check_smart_card(self):
@@ -1480,19 +1521,13 @@ class SmartCardTest(Screen):
 		index = self.smartcard
 		result  = 0
 		if index==0:
-			if self.Testmode==0:
-				result = eSctest.getInstance().check_smart_card("/dev/sci0")
-			else:
-				result = eSctest.getInstance().n_check_smart_card("/dev/sci0")			
+			result = eSctest.getInstance().check_smart_card("/dev/sci0")
 		elif index ==1:
-			if self.Testmode==0:
-				result = eSctest.getInstance().check_smart_card("/dev/sci1")
-			else:
-				result = eSctest.getInstance().n_check_smart_card("/dev/sci1")			
+			result = eSctest.getInstance().check_smart_card("/dev/sci1")
 		else:
 			result = -1
 
-		print result			
+		print "check smartcard : ", result
 		
 		if result == 0:
 			print 'pass'
@@ -1542,8 +1577,8 @@ fronttest = 0
 
 class FrontTest(Screen):
 	skin = """
-		<screen position="260,240" size="200,180" title="Front Test" >
-			<widget name="text" position="10,10" size="180,160" font="Regular;22" />
+		<screen name="FrontTest" position="center,center" size="300,180" title="Front Test" >
+			<widget name="text" position="10,10" size="280,160" font="Regular;30" />
 		</screen>"""
 
 	def __init__(self, session):
@@ -1626,8 +1661,8 @@ class FrontTest(Screen):
 
 class FrontTest_solo(Screen):
 	skin = """
-		<screen position="260,240" size="200,180" title="Front Test" >
-			<widget name="text" position="10,10" size="180,160" font="Regular;22" />
+		<screen name="FrontTest_solo" position="center,center" size="300,180" title="Front Test" >
+			<widget name="text" position="10,10" size="280,160" font="Regular;30" />
 		</screen>"""
 
 	def __init__(self, session):
@@ -1835,7 +1870,12 @@ class FrontTest_uno(Screen):
 			self.frontturnonoff = 0
 			eSctest.getInstance().turnoff_VFD()
 		self.fronttimer.start(1000,True)
-	
+
+class FrontTest_ultimo(FrontTest_solo):
+	skin = """
+		<screen position="center,center" size="300,180" title="Front Test" >
+                <widget name="text" position="10,10" size="280,160" font="Regular;30" />
+		</screen>"""
 
 rstest = 0
 
@@ -1843,8 +1883,8 @@ import select
 
 class RS232Test(Screen):
 	skin = """
-		<screen position="300,240" size="160,100" title="RS232 Test" >
-			<widget name="text" position="10,10" size="140,80" font="Regular;22" />
+		<screen name="RS232Test" position="center,center" size="260,100" title="RS232 Test" >
+			<widget name="text" position="10,10" size="240,80" font="Regular;30" />
 		</screen>"""
 	step=1
 	def __init__(self, session):
@@ -1873,8 +1913,14 @@ class RS232Test(Screen):
 					rstest = 0 
 			else:
 				rstest = 0
+			rs.close()
 		except:
-			print 'error'
+			try:
+				if rs:
+					rs.close()
+			except:
+				pass
+			print 'except error'
 			rstest = 0
 		if rstest == 0:
 			self.session.open( MessageBox, _("RS232 Test Failed!\nPress 'EXIT' button!"), MessageBox.TYPE_ERROR)
@@ -1887,9 +1933,19 @@ Agingresult = 0
 
 class AgingTest(Screen):
 	skin = """
-		<screen position="200,240" size="250,100" title="Aging Test" >
-			<widget name="text1" position="10,10" size="230,40" font="Regular;22" />
-			<widget name="text2" position="10,50" size="230,40" font="Regular;22" />
+		<screen position="center,center" size="350,150" title="Aging Test" >
+			<widget name="text1" position="10,10" size="330,40" font="Regular;30" />
+			<widget name="text2" position="10,60" size="330,40" font="Regular;30" />
+			<!-- Signal Quality -->
+			<eLabel text="SNR : " position="40,120" size="60,25" font="Regular;25" transparent="1" />
+			<widget source="session.FrontendStatus" render="Label" position="100,120" size="60,25" font="Regular;25"  transparent="1">
+				<convert type="FrontendInfo">SNRdB</convert>
+			</widget>
+			<!-- AGC -->
+			<eLabel text="AGC : " position="180,120" size="60,25" font="Regular;25"  transparent="1" noWrap="1" />
+			<widget source="session.FrontendStatus" render="Label" position="240,120" size="60,25" font="Regular;25"  transparent="1" noWrap="1">
+				<convert type="FrontendInfo">AGC</convert>
+			</widget>
 		</screen>"""
 	step=1
 	def __init__(self, session):
@@ -1967,6 +2023,297 @@ class AgingTest(Screen):
 		Agingresult = 1
 		self.session.nav.stopService() # try to disable foreground service
 		self.close()
+
+class TestTuneMenu(Screen):
+	skin = """
+	<screen position="350,230" size="550,300" title="Tuning Test" >
+		<widget name="testlist" position="10,0" size="440,250" itemHeight="35"/>
+		<widget name="resultlist" position="470,0" size="60,250" itemHeight="35"/>
+		<widget source="text" render="Label" position="100,270" size="450,30" font="Regular;22" />
+	</screen>"""
+
+	def __init__(self ,session ,tuneInfo, tunelist,NimType):
+		self.session = session
+		self.NimType = NimType
+		self.tuneInfo = tuneInfo
+		self.tunelist = tunelist
+		self.model = 4
+		self["actions"] = NumberActionMap(["OkCancelActions","WizardActions","NumberActions"],
+		{
+			"left": self.nothing,
+			"right":self.nothing,
+			"ok": self.TestAction,
+			"cancel": self.keyCancel,
+			"up": self.keyup,
+			"down": self.keydown,
+			"0": self.numberaction,
+			"1": self.numberaction,
+			"2": self.numberaction,
+			"3": self.numberaction,
+			"4": self.numberaction,
+			"5": self.numberaction,
+			"6": self.numberaction,
+			"7": self.numberaction,
+			"8": self.numberaction,
+			"9": self.numberaction,
+
+		}, -2)
+		Screen.__init__(self, session)
+		self.text = _("Press 'EXIT' key to finish tune test.")
+		self["text"] = StaticText(self.text)
+		self.createConfig()
+		session.nav.stopService() # try to disable foreground service
+
+		self.tunemsgtimer = eTimer()
+		self.tunemsgtimer.callback.append(self.tunemsg)
+
+		self.camstep = 1
+		self.camtimer = eTimer()
+		self.camtimer.callback.append(self.cam_state)
+
+		self.tunerlock = 0
+		self.tuningtimer = eTimer()
+		self.tuningtimer.callback.append(self.updateStatus)
+		self.setSourceVar()
+		self.avswitch = AVSwitch()
+
+	def createConfig(self):
+		self.menulength= len(self.tunelist)
+		self["testlist"] = MenuList(self.tunelist)
+		self.rlist = []
+		for x in range(self.menulength):
+			self.rlist.append((".."))
+		self["resultlist"] = TestResultList(self.rlist)
+
+	def TestAction(self):
+		print "line - ",self["testlist"].getCurrent()[1]
+		self.currentindex = index = self["testlist"].getCurrent()[1]
+		result = 0
+		self.TestTune(index)
+
+	def nothing(self):
+		print "nothing"
+
+	def keyup(self):
+		print "self.menulength = ",self.menulength
+		print "self[\"testlist\"].getCurrent()[1] = ",self["testlist"].getCurrent()[1]
+		if self["testlist"].getCurrent()[1]==0:
+			self["testlist"].moveToIndex(self.menulength-1)
+			self["resultlist"].moveToIndex(self.menulength-1)
+		else:
+			self["testlist"].up()
+			self["resultlist"].up()
+
+
+	def keydown(self):
+		print "self.menulength = ",self.menulength
+		print "self[\"testlist\"].getCurrent()[1] = ",self["testlist"].getCurrent()[1]
+		if self["testlist"].getCurrent()[1]==(self.menulength-1):
+			self["testlist"].moveToIndex(0)
+			self["resultlist"].moveToIndex(0)
+		else:
+			self["testlist"].down()
+			self["resultlist"].down()
+
+	def numberaction(self, number):
+		if number >= self.menulength:
+			return
+		index = int(number)
+		self["testlist"].moveToIndex(index)
+		self["resultlist"].moveToIndex(index)
+
+	def keyCancel(self):
+		print "testtunemenu exit"
+		if not '..' in self.rlist and not 'fail' in self.rlist:
+			self.close(True)
+		else:
+			self.close(False)
+#		if self.oldref is not None:
+#			self.session.nav.playService(self.oldref)
+
+	def TestTune(self,index):
+		ref = eServiceReference("1:0:19:1324:3EF:1:C00000:0:0:0")
+		self.session.nav.stopService() # try to disable foreground service
+		getTuneInfo=self.tuneInfo[index]
+		if getTuneInfo["cam"] is True:
+			self.camstep = 1
+			self.camtimer.start(100,True)
+		if getTuneInfo["type"].startswith("DVB-S"):
+			if getTuneInfo["pol"] == "H":
+				ref.setData(0,1)
+				ref.setData(1,0x6D3)
+				ref.setData(2,0x3)
+				ref.setData(3,0xA4)
+			else:
+				ref.setData(0,0x19)
+				ref.setData(1,0x1325)
+				ref.setData(2,0x3ef)
+				ref.setData(3,0x1)
+			if getTuneInfo["sat"] == "160": # Eutelsat W2
+				ref.setData(4,0xA00000)
+			elif getTuneInfo["sat"] == "100": # Eutelsat
+				ref.setData(4,0x64af79)
+			elif getTuneInfo["sat"] == "130": # Hotbird
+				ref.setData(4,0x820000)
+			elif getTuneInfo["sat"] == "192": # Astra
+				ref.setData(4,0xC00000)
+			elif getTuneInfo["sat"] == "620": # Intelsat 902
+				ref.setData(4,0x26c0000) # need to fix later
+			elif getTuneInfo["sat"] == "642": # Intelsat 906
+				ref.setData(4,0x282AF79) # need to fix later
+		elif getTuneInfo["type"].startswith("DVB-C"):
+			ref.setData(0,0x19)
+			ref.setData(1,0x1325)
+			ref.setData(2,0x3ef)
+			ref.setData(3,0x1)
+			ref.setData(4,-64870) # ffff029a
+		elif getTuneInfo["type"].startswith("DVB-T"):
+			ref.setData(0,0x19)
+			ref.setData(1,0x1325)
+			ref.setData(2,0x3ef)
+			ref.setData(3,0x1)
+			ref.setData(4,-286391716) # eeee025c
+		self.session.nav.playService(ref)
+		if getTuneInfo["color"]=="CVBS":
+			self.avswitch.setColorFormat(0)
+		elif getTuneInfo["color"]=="RGB":
+			self.avswitch.setColorFormat(1)
+		elif getTuneInfo["color"]=="YC":
+			self.avswitch.setColorFormat(2)
+		if getTuneInfo["ratio"] == "4:3":
+			self.avswitch.setAspectRatio(0)
+		elif getTuneInfo["ratio"] == "16:9":
+			self.avswitch.setAspectRatio(6)
+		self.tuningtimer.start(2000,True)
+		self.tunemsgtimer.start(3000, True)
+
+	def cam_state(self):
+		current_index = self.currentindex
+		if self.camstep == 1:
+			slot = 0
+			state = eDVBCI_UI.getInstance().getState(slot)
+			print '-1-stat',state
+			if state > 0:
+				self.camstep=2
+				self.camtimer.start(100,True)
+			else:
+				self.session.nav.stopService()
+				self.session.open( MessageBox, _("CAM1_NOT_INSERTED\nPress exit!"), MessageBox.TYPE_ERROR)
+				self.rlist[current_index]="fail"
+				self.tunemsgtimer.stop()
+		elif self.camstep == 2:
+			slot = 0
+			appname = eDVBCI_UI.getInstance().getAppName(slot)
+			print 'appname',appname
+			if appname is None:
+				self.session.nav.stopService()
+				self.session.open( MessageBox, _("NO_GET_APPNAME\nPress exit!"), MessageBox.TYPE_ERROR)
+				self.rlist[current_index]="fail"
+				self.tunemsgtimer.stop()
+			else:
+				self.camstep=3
+				self.camtimer.start(100,True)
+		elif self.camstep==3:
+			slot = 1
+			state = eDVBCI_UI.getInstance().getState(slot)
+			print '-2-stat',state
+			if state > 0:
+				self.camstep=4
+				self.camtimer.start(100,True)
+			else:
+				self.session.nav.stopService()
+				self.session.open( MessageBox, _("CAM2_NOT_INSERTED\nPress exit!"), MessageBox.TYPE_ERROR)
+				self.rlist[current_index]="fail"
+				self.tunemsgtimer.stop()
+		elif self.camstep == 4:
+			slot = 1
+			appname = eDVBCI_UI.getInstance().getAppName(slot)
+			print 'appname',appname
+			if appname is None:
+				self.session.nav.stopService()
+				self.session.open( MessageBox, _("NO_GET_APPNAME\nPress exit!"), MessageBox.TYPE_ERROR)
+				self.rlist[current_index]="fail"
+				self.tunemsgtimer.stop()
+			else:
+				self.setSource()
+				self.camstep = 5
+
+	def updateStatus(self):
+		current_index = self.currentindex
+		getTuneInfo=self.tuneInfo[current_index]
+		result = eSctest.getInstance().getFrontendstatus(getTuneInfo["slot"])
+		tunno = getTuneInfo["slot"]+1
+		hv = getTuneInfo["pol"]
+		if hv == "H":
+			hv = "Hor"
+		elif hv == "V":
+			hv = "Ver"
+		else :
+			hv == ""
+
+		print "eSctest.getInstance().getFrontendstatus - %d"%result
+		if result == 0 or result == -1:
+			self.tunerlock = 0
+			self.tunemsgtimer.stop()
+			self.session.nav.stopService()
+			self.avswitch.setColorFormat(0)
+			self.session.open( MessageBox, _("Tune%d %s Locking Fail..."%(tunno,hv)), MessageBox.TYPE_ERROR)
+			self.rlist[current_index]="fail"
+		else :
+			self.tunerlock = 1
+
+	def tuneback(self,yesno):
+		current_index=self.currentindex
+		self.session.nav.stopService() # try to disable foreground service
+		if yesno and self.tunerlock == 1:
+			getTuneInfo=self.tuneInfo[current_index]
+			if getTuneInfo["cam"] and self.camstep < 5: # need fix to depending about CAM exist
+				self.rlist[current_index]="fail"
+			else :
+				self.rlist[current_index]="pass"
+		else:
+			self.rlist[current_index]="fail"
+		if self.tuneInfo[current_index]["color"] == "YC":
+			self.avswitch.setColorFormat(0)
+		self.resetSource()
+		self["resultlist"].updateList(self.rlist)
+
+	def tunemsg(self):
+		self.tuningtimer.stop()
+		self.session.openWithCallback(self.tuneback, TuneMessageBox, _("%s ok?" %(self["testlist"].getCurrent()[0])), MessageBox.TYPE_YESNO)
+
+	def setSourceVar(self):
+		self.input_pad_num=len(self.NimType)-1
+		if self.input_pad_num == 0:
+			self.setTuner = 'A'
+		elif self.input_pad_num == 1:
+			self.setTuner = 'B'
+		elif self.input_pad_num == 2:
+			self.setTuner = 'C'
+
+#	ikseong - for 22000 tp
+	def setSource(self):
+# fix input source
+		inputname = ("/proc/stb/tsmux/input%d" % self.input_pad_num)
+		print "<setsource> inputname : ",inputname
+		fd=open(inputname,"w")
+		fd.write("CI0")
+		fd.close()
+# fix ci_input Tuner
+		filename = ("/proc/stb/tsmux/ci0_input")
+		fd = open(filename,'w')
+		fd.write(self.setTuner)
+		print "setTuner(CI0) : ",self.setTuner
+		fd.close()
+		print "CI loop test!!!!!!!!!!!!!!"
+
+	def resetSource(self):
+		inputname = ("/proc/stb/tsmux/input%d" % self.input_pad_num)
+		print "<resetsource> inputname : ",inputname
+		fd=open(inputname,"w")
+		fd.write(self.setTuner)
+		fd.close()
+		print "CI loop test end!!!!!!!!!!!!!!"
 		
 session = None
 
