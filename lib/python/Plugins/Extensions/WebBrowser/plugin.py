@@ -1,6 +1,6 @@
 from Plugins.Plugin import PluginDescriptor
 
-import time, os, socket, thread, socket
+import time, os, socket, thread, socket, copy
 from socket import gaierror, error
 from os import path as os_path, remove as os_remove
 
@@ -24,7 +24,7 @@ from Components.ConfigList import ConfigListScreen
 from Components.Sources.StaticText import StaticText
 from Components.ActionMap import NumberActionMap, ActionMap
 from Components.ServiceEventTracker import ServiceEventTracker
-from Components.config import config, ConfigSelection, getConfigListEntry
+from Components.config import config, ConfigSelection, getConfigListEntry, ConfigSlider
 
 from Screens.Screen import Screen
 from Screens.ChoiceBox import ChoiceBox
@@ -36,14 +36,49 @@ from enigma import eTimer, eServiceReference, iPlayableService, fbClass, eRCInpu
 
 HTTPConnection.debuglevel = 1
 
+def excute_cmd(cmd):
+	print "prepared cmd:", cmd
+	os.system(cmd)
+
+alpha_value = 0
+def change_galpha(set_const, set_value):
+	op  = "/proc/stb/fb/alpha_op"
+	val = "/proc/stb/fb/alpha_value"
+	global alpha_value
+	if os.path.exists(op) and set_const and alpha_value < 255:
+		excute_cmd("echo \"const\" > %s" % (op))
+	else:
+		excute_cmd("echo \"copypsrc\" > %s" % (op))
+
+	if os.path.exists(val) and set_value:
+		excute_cmd("echo \"%s\" > %s" % (str(hex(alpha_value)), val))
+
+def enable_rc_mouse(mode): #mode=[0|1]|[False|True]
+	mouse_cond = "/proc/stb/fp/mouse"
+	if os.path.exists(mouse_cond):
+		excute_cmd("echo %d > %s" % (mode, mouse_cond))
+
+def is_process_running(pname):
+	if pname is None or len(pname) == 0:
+		return False
+
+	cmd = "/bin/ps -ef | grep %s | grep -v grep | awk \'{print $5}\'"%(pname)
+	for line in os.popen(cmd).readlines():
+		return True
+	return False
+
 lock = False
-def wb_lock():
+def wb_lock(alpha_on=True):
 	global lock
 	lock = True
+	if alpha_on:
+		change_galpha(set_const=False, set_value=False)
 	fbClass.getInstance().unlock()
 
-def wb_unlock():
+def wb_unlock(alpha_on=True):
 	global lock
+	if alpha_on:
+		change_galpha(set_const=True, set_value=False)
 	fbClass.getInstance().lock()
 	lock = False
 
@@ -271,8 +306,6 @@ class VuPlayerLauncher:
 			if myurl is None:
 				session.open(MessageBox, _("Sorry, video is not available!"), MessageBox.TYPE_INFO)
 				return
-
-			wb_lock()
 			myreference = eServiceReference(4097, 0, myurl)
 			session.open(VuPlayer, myreference, service)
 		except Exception, msg:
@@ -323,7 +356,9 @@ class VuPlayerService:
 		# [http://www.youtube.com/watch?v=BpThu778qB4&feature=related]
 		data = conn.recv(self.max_buffer_size)
 		print "[%s]" % (data)
+		enable_rc_mouse(False)
 		if data.startswith("http://www.youtube.com"):
+			print "youtube start!!"
 			tmp = data.split("?")
 			print tmp # ['http://www.youtube.com/watch', 'v=BpThu778qB4&feature=related']
 			service = self.session.nav.getCurrentlyPlayingServiceReference()
@@ -334,6 +369,7 @@ class VuPlayerService:
 					tmp = tmp[0].split("=")
 					print tmp # ['v', 'BpThu778qB4']
 					if len(tmp) == 2 and tmp[0] == "v":
+						wb_lock()
 						player = VuPlayerLauncher()
 						player.run(tmp[1], self.session, service)
 						while wb_islock():
@@ -347,50 +383,67 @@ class VuPlayerService:
 			else:
 				data = "nok$parsing fail"
 			self.sendResponse(conn, data)
+		elif data.startswith("vk://open"):
+			print "virtual keyboard start!!"
+			from Screens.VirtualKeyBoard import VirtualKeyBoard
+			wb_lock()
+			self.vk_conn = conn
+			self.session.openWithCallback(self.cbOpenKeyboard, VirtualKeyBoard, title = (_("Enter your input data")), text = "")
 
+        def cbOpenKeyboard(self, data = None):
+		print "virtual keyboard callback!!"
+		wb_unlock()
+		self.sendResponse(self.vk_conn, data)
+		
 	def sendResponse(self, conn, data):
+		if data is None or len(data) == 0:
+			data = ""
+		enable_rc_mouse(True)
 		conn.send(data)
 		conn.close()
 
 class BrowserLauncher(ConfigListScreen, Screen):
 	skin=   """
-		<screen name="BrowserLauncher" position="center,center" size="309,458" title="Web Browser">
+		<screen name="BrowserLauncher" position="center,center" size="309,478" title="Web Browser">
 			<ePixmap pixmap="Vu_HD/buttons/red.png" position="4,0" size="40,40" alphatest="on" />
 			<ePixmap pixmap="Vu_HD/buttons/green.png" position="100,0" size="40,40" alphatest="on" />
 			<ePixmap pixmap="Vu_HD/buttons/button_off.png" position="200,0" size="40,40" alphatest="on" />
 			<widget source="key_red" render="Label" position="15,0" zPosition="1" size="50,30" font="Regular;20" halign="right" valign="center" transparent="1" />
 			<widget source="key_green" render="Label" position="120,0" zPosition="1" size="50,30" font="Regular;20" halign="right" valign="center" transparent="1" />
-			<widget name="config" position="0,50" size="309,60" scrollbarMode="showOnDemand" />
-			<ePixmap pixmap="Vu_HD/rc_wb_desc.png" position="0,110" size="309,296" alphatest="on" />
-			<widget name="info" position="0,415" size="309,50" font="Regular;18" halign="center" foregroundColor="blue" transparent="1" />
+			<widget name="config" position="0,50" size="309,80" scrollbarMode="showOnDemand" />
+			<ePixmap pixmap="Vu_HD/rc_wb_desc.png" position="0,130" size="309,296" alphatest="on" />
+			<widget name="info" position="0,435" size="309,50" font="Regular;18" halign="center" foregroundColor="blue" transparent="1" />
 		</screen>
 		"""
 
 	def __init__(self, session): 
 		Screen.__init__(self, session)
                 self.session = session
+		self.list = []
+		ConfigListScreen.__init__(self, self.list)
 
 		self.browser_root = "/usr/bin"
 		self.browser_name = "arora"
-		self.mouse_cond = "/proc/stb/fp/mouse"
+		self.conf_file = "/usr/lib/enigma2/python/Plugins/Extensions/WebBrowser/settings.conf"
 		self["actions"] = ActionMap(["OkCancelActions", "ShortcutActions", "WizardActions", "ColorActions", "SetupActions", ],
                 {	"red": self.keyCancel,
 			"green": self.keyGo,
 			"cancel": self.keyExit,
                 }, -2)
-		self.info = Label(_("If you want to quit the Browser,\nPress RED and EXIT."))
+		self.info = Label(_("If you want to quit the Browser,\nPress RED -> EXIT."))
 		self["info"] = self.info
 		self["key_red"] = StaticText(_("Exit"))
 		self["key_green"] = StaticText(_("Start"))
 
-		self.list = []
-		ConfigListScreen.__init__(self, self.list)
+		self.conf_alpha = ""
+		self.conf_mouse = ""
+		self.conf_keyboard = ""
 
-		self.devices_string = ""
-		self.mouse_choice_list = []
-		self.mouse_device_list = []
-		self.keyboard_choice_list = []
-		self.keyboard_device_list = []
+		self.usb_mouse = None
+		self.usb_keyboard = None
+		self.rc_mouse = None
+		self.rc_keyboard = None
+
 		self.makeConfig()
 		#time.sleep(2)
 
@@ -402,23 +455,18 @@ class BrowserLauncher(ConfigListScreen, Screen):
 		self.timer_exit_cond = eTimer()
 		self.timer_exit_cond.callback.append(self.resetExitCond)
 
-	def enableRCMouse(self, mode): #mode=[0|1]|[False|True]
-		if os.path.exists(self.mouse_cond):
-			self.cmd("echo %d > %s" % (mode, self.mouse_cond))
-
-	def cmd(self, cmd):
-		print "prepared cmd:", cmd
-		os.system(cmd)
+		self.test_cond = True
 
 	def keyNone(self):
 		None
 
 	def doExit(self):
+		change_galpha(set_const=False, set_value=False)
+		self.saveConfig()
 		self.vu_service.stop()
-		self.cmd("killall -9 %s"%(self.browser_name))
-		self.cmd("echo 60 > /proc/sys/vm/swappiness")
-		if self.mouse.value == 0:
-			self.enableRCMouse(False) #rc-mouse off
+		excute_cmd("killall -15 %s"%(self.browser_name))
+		excute_cmd("echo 60 > /proc/sys/vm/swappiness")
+		enable_rc_mouse(False) #rc-mouse off
 		fbClass.getInstance().unlock()
 		#eRCInput.getInstance().unlock()
 		self.close()
@@ -426,26 +474,52 @@ class BrowserLauncher(ConfigListScreen, Screen):
 	def keyExit(self):
 		if self.exit_wait_cond:
 			self.doExit()
-		if self.isProcessRunable() == False:
+		if is_process_running(self.browser_name) == False:
 			self.doExit()
 
+	def keyLeft(self):
+		if is_process_running(self.browser_name) == False:
+			ConfigListScreen.keyLeft(self)
+			global alpha_value
+			alpha_value = self.alpha.value
+			#self.saveConfig()
+
+	def keyRight(self):
+		if is_process_running(self.browser_name) == False:
+			ConfigListScreen.keyRight(self)
+			alpha_value = self.alpha.value
+			#self.saveConfig()
+
 	def keyCancel(self):
-		if self.isProcessRunable() == False:
+		if is_process_running(self.browser_name) == False:
 			self.doExit()
 		self.exit_wait_cond = True
 		self.timer_exit_cond.start(5000)
+
+	# mouse:keyboard:alpha_value
+	def saveConfig(self):
+		if is_process_running(self.browser_name) == False:
+			command = "echo \"%s:%s:%d\" > %s"%(self.mouse.value, self.keyboard.value, int(self.alpha.value), self.conf_file)
+			excute_cmd(command)
+
+	# mouse:keyboard:alpha_value
+	def loadConfig(self):
+		if os.path.exists(self.conf_file) == False:
+			return
+		config_list = open(self.conf_file).readline().strip().split(':')
+		if len(config_list) == 3:
+			self.conf_mouse 	= config_list[0]
+			self.conf_keyboard 	= config_list[1]
+			self.conf_alpha 	= config_list[2]
+		print "load config : ", config_list
 
 	def resetExitCond(self):
 		self.timer_exit_cond.stop()
 		self.exit_wait_cond = False
 
-	def isProcessRunable(self):
-		cmd = "/bin/ps -ef | grep %s | grep -v grep | awk \'{print $5}\'"%(self.browser_name)
-		for line in os.popen(cmd).readlines():
-			return True
-		return False
-
 	def makeConfig(self):
+		self.loadConfig()
+		self.devices_string = ""
 		self.devices = eConsoleAppContainer()
 		self.devices.dataAvail.append(self.callbackDevicesDataAvail)
 		self.devices.appClosed.append(self.callbakcDevicesAppClose)
@@ -455,133 +529,121 @@ class BrowserLauncher(ConfigListScreen, Screen):
 		self.devices_string = self.devices_string + ret_data
 
 	def callbakcDevicesAppClose(self, retval):
-		self.parseDeviceData(self.devices_string)
-		self.makeHandlerList()
-
-		# none : -1, rc : 0, usb : 1
-		self.mouse_choice_list.append((2, _("None")))
-		self.keyboard_choice_list.append((2, _("None")))
+		self.name_list  = []
+		self.mouse_list = None
+		self.keyboard_list = None
 		
-		print self.mouse_choice_list
-		print self.keyboard_choice_list
-		print self.mouse_device_list
-		print self.keyboard_device_list
+		self.makeHandlerList(self.devices_string)
 
-		self.mouse = ConfigSelection(default = self.mouse_choice_list[0][0], choices = self.mouse_choice_list)
-		self.keyboard = ConfigSelection(default = self.mouse_choice_list[0][0], choices = self.keyboard_choice_list)
-		
+		if self.conf_mouse == "" or self.getHandlerName(self.conf_mouse) is None:
+			self.conf_mouse = self.mouse_list[0][0]
+		if self.conf_keyboard == "" or self.getHandlerName(self.conf_keyboard) is None:
+			self.conf_keyboard = self.keyboard_list[0][0]
+		if self.conf_alpha == "":
+			self.conf_alpha = "255"
+
+		self.mouse 	= ConfigSelection(default = self.conf_mouse, choices = self.mouse_list)
+		self.keyboard 	= ConfigSelection(default = self.conf_keyboard, choices = self.keyboard_list)
+		self.alpha 	= ConfigSlider(default = int(self.conf_alpha), increment = 10, limits = (0, 255))
+
 		self.list.append(getConfigListEntry(_('Mouse'), self.mouse))		
 		self.list.append(getConfigListEntry(_('Keyboard'), self.keyboard))
+		self.list.append(getConfigListEntry(_("Alpha Value"), self.alpha))
+
 		self["config"].list = self.list
 		self["config"].l.setList(self.list)
 
-	def parseDeviceData(self, data):
+	def makeHandlerList(self, data):
 		n = ""
 		p = ""
-		h = ""
-		self.devices=[]
-		lines=data.split('\n')
+		h_list = []
+
+		event_list = []
+		lines = data.split('\n')
 		for line in lines:
-			if line == None or line == "":
-				if h != None and len(h) != 0:
-					print "find driver >> name[%s], phys[%s], handler[%s]" % (n, p, h)
-					self.devices.append([n, p, h])
-				n = ""
-				p = ""
-				h = ""
-				continue
-			if line[0] == 'N':
-				n = line[8:].strip()
-			elif line[0] == 'P':
-				p = line[8:].strip()
-			elif line[0] == 'H':
-				h = line[12:].strip()
+			print ">>", line
+			if line is not None and len(line) > 0:
+				if line[0] == 'I':
+					n = ""
+					p = ""
+					h_list = []
+				elif line[0] == 'N':
+					n = line[8:].strip()
+				elif line[0] == 'P':
+					p = line[8:].strip()
+				elif line[0] == 'H':
+					h_list = line[12:].strip().split()
+					tn = line[12:].strip().find("mouse")
+					for h in h_list:
+						event_list.append((h, _(h)))
+						self.name_list.append((h, n))
+						if n[1:].startswith("dream") and self.rc_mouse is None:
+							self.rc_mouse = copy.deepcopy(h)
+							self.rc_keyboard = copy.deepcopy(h)
+							print "detected!! rc"
+							continue
+						if h.startswith("mouse") and self.usb_mouse is None:
+							self.usb_mouse = copy.deepcopy(h)
+							print "detected!! usb mouse"
+							continue
+						if tn == -1 and self.usb_keyboard is None:
+							self.usb_keyboard = copy.deepcopy(h)
+							print "detected!! usb keyboard"
+				elif line[0] == 'B' and line[3:].startswith("ABS") and p.startswith("usb-"):
+					for h in h_list:
+						if self.usb_mouse is not None:
+							break
+						if self.usb_keyboard is not None and h == self.usb_keyboard[0]:
+							self.usb_keyboard = None
+							print "clean!! usb keyboard"
+						self.usb_mouse = copy.deepcopy(h)
+						print "detected!! usb mouse"
 
-	def makeHandlerList(self):
-		if self.devices == None or self.devices == []:
-			return False
+		tmp = copy.deepcopy(event_list)
+		if self.usb_mouse is not None:
+			tmp.insert(0, ("musb", "USB Mouse"))
+		if self.rc_mouse is not None:
+			tmp.insert(0, ("mrc", "Remote Control"))
+		self.mouse_list = tmp
 
-		mouse_pc_h = []
-		mouse_rc_h = []
-		keyboard_pc_h = []
-		keyboard_rc_h = []
-		for dev in self.devices:
-			n = dev[0]
-			p = dev[1]
-			h = dev[2]
-			if p.startswith("usb-ohci-brcm"):
-				if h.rfind("mouse") >= 0:
-					mouse_pc_h = [(1, _("USB Mouse")), self.getHandlerName(h, "mouse")]
-				else:
-					if len(keyboard_pc_h) == 0:
-						keyboard_pc_h = [(1, _("USB Keyboard")), self.getHandlerName(h, "event")]
-			else:
-				if n[1:].startswith("dreambox") and os.path.exists(self.mouse_cond) :
-					mouse_rc_h    = [(0, _("RemoteControl")), self.getHandlerName(h, "event")]
-					keyboard_rc_h = [(0, _("RemoteControl")), self.getHandlerName(h, "event")]
-		if len(mouse_rc_h) > 0:
-			self.mouse_choice_list.append(mouse_rc_h[0])
-			self.mouse_device_list.append(mouse_rc_h[1])
-		if len(mouse_pc_h) > 0:
-			self.mouse_choice_list.append(mouse_pc_h[0])
-			self.mouse_device_list.append(mouse_pc_h[1])
-
-		if len(keyboard_rc_h) > 0:
-			self.keyboard_choice_list.append(keyboard_rc_h[0])
-			self.keyboard_device_list.append(keyboard_rc_h[1])
-		if len(keyboard_pc_h) > 0:
-			self.keyboard_choice_list.append(keyboard_pc_h[0])
-			self.keyboard_device_list.append(keyboard_pc_h[1])
-		return True
-
-	def getHandlerName(self, h, s):
-		if h is None or len(h) == 0:
-			return ""
-
-		handles = h.split()                                                
-		#print "handles >> ", handles
-		for tmp_h in handles:                                                                                                    
-			#print "handle_item >> ", tmp_h
-			if tmp_h.startswith(s):          
-				#print "detected : [%s]" % tmp_h
-				return tmp_h
-		return ""
+		tmp = copy.deepcopy(event_list)
+		if self.usb_keyboard is not None:
+			tmp.insert(0, ("kusb", "USB Keyboard"))
+		if self.rc_keyboard is not None:
+			tmp.insert(0, ("krc", "Remote Control"))
+		self.keyboard_list = tmp
+		print "E:", event_list
+		print "M:", self.mouse_list
+		print "K:", self.keyboard_list
 
 	def startBrowser(self):
 		self.timer_start.stop()
 
 		self.lock = True
-		self.cmd("killall -9 %s"%(self.browser_name))
-		self.cmd("echo 0 > /proc/sys/vm/swappiness")
+		excute_cmd("killall -15 %s"%(self.browser_name))
+		excute_cmd("echo 0 > /proc/sys/vm/swappiness")
 
-		kbd_cmd = ""
-		mouse_cmd = ""
-		extra_cmd = "" 
+		kbd_cmd = " "
+		mouse_cmd = " "
+		extra_cmd = " " 
 		browser_cmd = "%s/%s -qws" % (self.browser_root, self.browser_name)
-	
-		fbClass.getInstance().lock()
-		#eRCInput.getInstance().lock()
 
-		if self.mouse.value == 0:
-			self.enableRCMouse(True) #rc-mouse on
-			idx = self.getListIndex(self.mouse_choice_list, 0)
-			mouse_cmd = "export QWS_MOUSE_PROTO=LinuxInput:/dev/input/%s; " % (self.mouse_device_list[idx])
-		elif self.mouse.value == 1:
-			mouse_cmd = " "
-			#mouse_cmd = "export QWS_MOUSE_PROTO=Auto:/dev/input/%s; " % (m)
-		elif self.mouse.value == 2:
-			mouse_cmd = "export QWS_MOUSE_PROTO=None; "
+		mouse_param = self.mouse.value
+		if self.mouse.value == "mrc":
+			mouse_param = self.rc_mouse
+		elif self.mouse.value == "musb":
+			mouse_param = self.usb_mouse
+		keyboard_param = self.keyboard.value
+		if self.keyboard.value == "krc":
+			keyboard_param = self.rc_keyboard
+		elif self.keyboard.value == "kusb":
+			keyboard_param = self.usb_keyboard
 
-		if self.keyboard.value == 0:
-			idx = self.getListIndex(self.keyboard_choice_list, 0)
-			kbd_cmd = "export QWS_KEYBOARD=LinuxInput:/dev/input/%s; " % (self.keyboard_device_list[idx])
-		elif self.keyboard.value == 1:
-			idx = self.getListIndex(self.keyboard_choice_list, 1)
-			kbd_cmd = "export QWS_KEYBOARD=LinuxInput:/dev/input/%s; " % (self.keyboard_device_list[idx])
-		elif self.keyboard.value == 2:
-			kbd_cmd = " "
-		print "mouse cmd >>", mouse_cmd, " >> ", self.mouse.value
-		print "keyboard cmd >>", kbd_cmd, " >> ", self.keyboard.value
+		if self.getHandlerName(mouse_param)[1:].startswith("dreambox"):
+			enable_rc_mouse(True) #rc-mouse on
+		if str(mouse_param).startswith("event"):
+			mouse_cmd = "export QWS_MOUSE_PROTO=LinuxInput:/dev/input/%s; " % (str(mouse_param))
+		kbd_cmd = "export QWS_KEYBOARD=LinuxInput:/dev/input/%s; " % (str(keyboard_param))
 
 		cmd = "%s%s%s%s" % (extra_cmd, kbd_cmd, mouse_cmd, browser_cmd)
 		print "prepared command : [%s]" % cmd
@@ -589,23 +651,38 @@ class BrowserLauncher(ConfigListScreen, Screen):
 		self.launcher = eConsoleAppContainer()
 		self.launcher.appClosed.append(self.callbackLauncherAppClosed)
 		self.launcher.dataAvail.append(self.callbackLauncherDataAvail)
+
+		fbClass.getInstance().lock()
+		#eRCInput.getInstance().lock()
+
+		global alpha_value
+		alpha_value = self.alpha.value
+		change_galpha(set_const=True, set_value=True)
+
 		self.launcher.execute(cmd)
 		print "started browser..."
 
 	def keyGo(self):
+		self.saveConfig()
 		self.info.setText("Starting Webbrowser. Please wait...")
 		if self.lock == False:
 			self.timer_start = eTimer()
 			self.timer_start.callback.append(self.startBrowser)
 			self.timer_start.start(10)
 
-	def getListIndex(self, l, v):
-		idx = 0
-		for i in l:
-			if i[0] == v:
-				return idx;
-			idx = idx + 1
-		return -1
+	def getHandlerName(self, v):
+		if v == "mrc":
+			v = self.rc_mouse
+		elif v == "musb":
+			v = self.usb_mouse
+		elif v == "krc":
+			v = self.rc_keyboard
+		elif v == "kusb":
+			v = self.usb_keyboard
+		for l in self.name_list:
+			if l[0] == v:
+				return l[1]
+		return None
 
 	def callbackLauncherDataAvail(self, ret_data):
 		print ret_data
@@ -617,8 +694,9 @@ class BrowserLauncher(ConfigListScreen, Screen):
 		self.lock = False
 
 def sessionstart(session, **kwargs):
-	if os.path.exists("/proc/stb/fp/mouse"):
-		os.system("echo 0 > /proc/stb/fp/mouse")
+	enable_rc_mouse(False)
+	change_galpha(set_const=False, set_value=True)
+	excute_cmd("killall -15 arora")
 
 def main(session, **kwargs):
 	session.open(BrowserLauncher)
