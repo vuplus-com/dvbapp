@@ -19,6 +19,7 @@ from httplib import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPExcept
 from Components.Button import Button
 from Components.Label import Label
 from Components.Pixmap import Pixmap
+from Components.Language import language
 from Components.Sources.List import List
 from Components.ConfigList import ConfigListScreen
 from Components.Sources.StaticText import StaticText
@@ -404,15 +405,15 @@ class VuPlayerService:
 
 class BrowserLauncher(ConfigListScreen, Screen):
 	skin=   """
-		<screen name="BrowserLauncher" position="center,center" size="309,478" title="Web Browser">
+		<screen name="BrowserLauncher" position="center,center" size="309,498" title="Web Browser">
 			<ePixmap pixmap="Vu_HD/buttons/red.png" position="4,0" size="40,40" alphatest="on" />
 			<ePixmap pixmap="Vu_HD/buttons/green.png" position="100,0" size="40,40" alphatest="on" />
 			<ePixmap pixmap="Vu_HD/buttons/button_off.png" position="200,0" size="40,40" alphatest="on" />
 			<widget source="key_red" render="Label" position="15,0" zPosition="1" size="50,30" font="Regular;20" halign="right" valign="center" transparent="1" />
 			<widget source="key_green" render="Label" position="120,0" zPosition="1" size="50,30" font="Regular;20" halign="right" valign="center" transparent="1" />
-			<widget name="config" position="0,50" size="309,80" scrollbarMode="showOnDemand" />
-			<ePixmap pixmap="Vu_HD/rc_wb_desc.png" position="0,130" size="309,296" alphatest="on" />
-			<widget name="info" position="0,435" size="309,50" font="Regular;18" halign="center" foregroundColor="blue" transparent="1" />
+			<widget name="config" position="0,50" size="309,100" scrollbarMode="showOnDemand" />
+			<ePixmap pixmap="Vu_HD/rc_wb_desc.png" position="0,150" size="309,296" alphatest="on" />
+			<widget name="info" position="0,455" size="309,50" font="Regular;18" halign="center" foregroundColor="blue" transparent="1" />
 		</screen>
 		"""
 
@@ -438,6 +439,7 @@ class BrowserLauncher(ConfigListScreen, Screen):
 		self.conf_alpha = ""
 		self.conf_mouse = ""
 		self.conf_keyboard = ""
+		self.conf_keymap = ""
 
 		self.usb_mouse = None
 		self.usb_keyboard = None
@@ -456,6 +458,7 @@ class BrowserLauncher(ConfigListScreen, Screen):
 		self.timer_exit_cond.callback.append(self.resetExitCond)
 
 		self.test_cond = True
+		self.current_lang_idx = language.getActiveLanguageIndex()
 
 	def keyNone(self):
 		None
@@ -467,6 +470,7 @@ class BrowserLauncher(ConfigListScreen, Screen):
 		excute_cmd("killall -15 %s"%(self.browser_name))
 		excute_cmd("echo 60 > /proc/sys/vm/swappiness")
 		enable_rc_mouse(False) #rc-mouse off
+		language.activateLanguageIndex(self.current_lang_idx)
 		fbClass.getInstance().unlock()
 		#eRCInput.getInstance().unlock()
 		self.close()
@@ -499,7 +503,7 @@ class BrowserLauncher(ConfigListScreen, Screen):
 	# mouse:keyboard:alpha_value
 	def saveConfig(self):
 		if is_process_running(self.browser_name) == False:
-			command = "echo \"%s:%s:%d\" > %s"%(self.mouse.value, self.keyboard.value, int(self.alpha.value), self.conf_file)
+			command = "echo \"%s:%s:%d:%s\" > %s"%(self.mouse.value, self.keyboard.value, int(self.alpha.value), self.langs.value, self.conf_file)
 			excute_cmd(command)
 
 	# mouse:keyboard:alpha_value
@@ -511,6 +515,11 @@ class BrowserLauncher(ConfigListScreen, Screen):
 			self.conf_mouse 	= config_list[0]
 			self.conf_keyboard 	= config_list[1]
 			self.conf_alpha 	= config_list[2]
+		elif len(config_list) == 4:
+			self.conf_mouse 	= config_list[0]
+			self.conf_keyboard 	= config_list[1]
+			self.conf_alpha 	= config_list[2]
+			self.conf_keymap 	= config_list[3]
 		print "load config : ", config_list
 
 	def resetExitCond(self):
@@ -537,21 +546,32 @@ class BrowserLauncher(ConfigListScreen, Screen):
 
 		if self.conf_mouse == "" or self.getHandlerName(self.conf_mouse) is None:
 			self.conf_mouse = self.mouse_list[0][0]
+		self.mouse = ConfigSelection(default = self.conf_mouse, choices = self.mouse_list)
+		self.list.append(getConfigListEntry(_('Mouse'), self.mouse))		
+
 		if self.conf_keyboard == "" or self.getHandlerName(self.conf_keyboard) is None:
 			self.conf_keyboard = self.keyboard_list[0][0]
+		self.keyboard = ConfigSelection(default = self.conf_keyboard, choices = self.keyboard_list)
+		self.list.append(getConfigListEntry(_('Keyboard'), self.keyboard))
+
 		if self.conf_alpha == "":
 			self.conf_alpha = "255"
-
-		self.mouse 	= ConfigSelection(default = self.conf_mouse, choices = self.mouse_list)
-		self.keyboard 	= ConfigSelection(default = self.conf_keyboard, choices = self.keyboard_list)
-		self.alpha 	= ConfigSlider(default = int(self.conf_alpha), increment = 10, limits = (0, 255))
-
-		self.list.append(getConfigListEntry(_('Mouse'), self.mouse))		
-		self.list.append(getConfigListEntry(_('Keyboard'), self.keyboard))
+		self.alpha = ConfigSlider(default = int(self.conf_alpha), increment = 10, limits = (0, 255))
 		self.list.append(getConfigListEntry(_("Alpha Value"), self.alpha))
+
+		if self.conf_keymap == "":
+			self.conf_keymap = self.getLanguage()
+		self.lang_list = [("en", "English"), ("de", "German")]
+		self.langs = ConfigSelection(default = self.conf_keymap, choices = self.lang_list)
+		self.list.append(getConfigListEntry(_("Language"), self.langs))
 
 		self["config"].list = self.list
 		self["config"].l.setList(self.list)
+
+	def getLanguage(self, lang=language.getLanguage()):
+		if self.current_lang_idx == 1:
+			return "de"
+		return "en"
 
 	def makeHandlerList(self, data):
 		n = ""
@@ -643,7 +663,11 @@ class BrowserLauncher(ConfigListScreen, Screen):
 			enable_rc_mouse(True) #rc-mouse on
 		if str(mouse_param).startswith("event"):
 			mouse_cmd = "export QWS_MOUSE_PROTO=LinuxInput:/dev/input/%s; " % (str(mouse_param))
-		kbd_cmd = "export QWS_KEYBOARD=LinuxInput:/dev/input/%s; " % (str(keyboard_param))
+
+		keymap_param = ""
+		if self.langs.value == "de":
+			keymap_param = ":keymap=/usr/share/keymaps/vuplus/de.qmap"
+		kbd_cmd = "export QWS_KEYBOARD=LinuxInput:/dev/input/%s%s; " % (str(keyboard_param), keymap_param)
 
 		cmd = "%s%s%s%s" % (extra_cmd, kbd_cmd, mouse_cmd, browser_cmd)
 		print "prepared command : [%s]" % cmd
@@ -666,6 +690,10 @@ class BrowserLauncher(ConfigListScreen, Screen):
 		self.saveConfig()
 		self.info.setText("Starting Webbrowser. Please wait...")
 		if self.lock == False:
+			if self.langs.value == "de":
+				language.activateLanguageIndex(1)
+			else:
+				language.activateLanguageIndex(0)
 			self.timer_start = eTimer()
 			self.timer_start.callback.append(self.startBrowser)
 			self.timer_start.start(10)
@@ -704,6 +732,5 @@ def main(session, **kwargs):
 def Plugins(**kwargs):
 	return [PluginDescriptor(where = PluginDescriptor.WHERE_SESSIONSTART, needsRestart = False, fnc=sessionstart),
 		PluginDescriptor(name=_("Web Browser"), description="start web browser", where = PluginDescriptor.WHERE_PLUGINMENU, fnc=main)]
-
 
 
