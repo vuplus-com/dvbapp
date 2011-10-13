@@ -407,10 +407,11 @@ class BrowserLauncher(ConfigListScreen, Screen):
 	skin=   """
 		<screen name="BrowserLauncher" position="center,center" size="309,498" title="Web Browser">
 			<ePixmap pixmap="Vu_HD/buttons/red.png" position="4,0" size="40,40" alphatest="on" />
-			<ePixmap pixmap="Vu_HD/buttons/green.png" position="100,0" size="40,40" alphatest="on" />
-			<ePixmap pixmap="Vu_HD/buttons/button_off.png" position="200,0" size="40,40" alphatest="on" />
-			<widget source="key_red" render="Label" position="15,0" zPosition="1" size="50,30" font="Regular;20" halign="right" valign="center" transparent="1" />
-			<widget source="key_green" render="Label" position="120,0" zPosition="1" size="50,30" font="Regular;20" halign="right" valign="center" transparent="1" />
+			<ePixmap pixmap="Vu_HD/buttons/green.png" position="154,0" size="40,40" alphatest="on" />
+
+			<widget source="key_red" render="Label" position="30,0" zPosition="1" size="125,30" font="Regular;20" halign="center" valign="center" transparent="1" />
+			<widget source="key_green" render="Label" position="180,0" zPosition="1" size="125,30" font="Regular;20" halign="center" valign="center" transparent="1" />
+
 			<widget name="config" position="0,50" size="309,100" scrollbarMode="showOnDemand" />
 			<ePixmap pixmap="Vu_HD/rc_wb_desc.png" position="0,150" size="309,296" alphatest="on" />
 			<widget name="info" position="0,455" size="309,50" font="Regular;18" halign="center" foregroundColor="blue" transparent="1" />
@@ -645,7 +646,7 @@ class BrowserLauncher(ConfigListScreen, Screen):
 
 		kbd_cmd = " "
 		mouse_cmd = " "
-		extra_cmd = " " 
+		extra_cmd = "export VU_DOWNLOAD_DIR=/tmp; " 
 		browser_cmd = "%s/%s -qws" % (self.browser_root, self.browser_name)
 
 		mouse_param = self.mouse.value

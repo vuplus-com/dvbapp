@@ -21,13 +21,14 @@ from enigma import eTimer, eDVBFrontendParametersSatellite, eComponentScan, eDVB
 class Blindscan(ConfigListScreen, Screen):
 	skin="""
 		<screen name="Blindscan" position="center,center" size="560,290" title="Blindscan">
-			<ePixmap pixmap="Vu_HD/buttons/red.png" position="5,0" size="140,40" alphatest="on" />
-			<ePixmap pixmap="Vu_HD/buttons/green.png" position="145,0" size="140,40" alphatest="on" />
-			<ePixmap pixmap="Vu_HD/buttons/button_off.png" position="285,0" size="140,40" alphatest="on" />
-			<ePixmap pixmap="Vu_HD/buttons/blue.png" position="425,0" size="140,40" alphatest="on" />
-			<widget source="key_red" render="Label" position="20,0" zPosition="1" size="115,30" font="Regular;20" halign="center" valign="center" transparent="1" />
-			<widget source="key_green" render="Label" position="160,0" zPosition="1" size="115,30" font="Regular;20" halign="center" valign="center" transparent="1" />
-			<widget source="key_blue" render="Label" position="440,0" zPosition="1" size="115,30" font="Regular;20" halign="center" valign="center" transparent="1" />
+			<ePixmap pixmap="Vu_HD/buttons/red.png" position="5,0" size="80,40" alphatest="on" />
+			<ePixmap pixmap="Vu_HD/buttons/green.png" position="186,0" size="80,40" alphatest="on" />
+			<ePixmap pixmap="Vu_HD/buttons/blue.png" position="372,0" size="80,40" alphatest="on" />
+
+			<widget source="key_red" render="Label" position="28,0" zPosition="1" size="160,30" font="Regular;20" halign="center" valign="center" transparent="1"/>
+			<widget source="key_green" render="Label" position="213,0" zPosition="1" size="160,30" font="Regular;20" halign="center" valign="center" transparent="1"/>
+			<widget source="key_blue" render="Label" position="400,0" zPosition="1" size="160,30" font="Regular;20" halign="center" valign="center" transparent="1"/>
+
 			<widget name="config" position="5,50" size="550,200" scrollbarMode="showOnDemand" />
 			<widget name="introduction" position="0,265" size="560,20" font="Regular;20" halign="center" />
 		</screen>

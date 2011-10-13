@@ -99,15 +99,13 @@ class UpgradeStatus(Screen):
 class FPGAUpgrade(Screen):
 	skin = 	"""
 		<screen position="center,center" size="560,440" title="FPGA Upgrade" >
-			<ePixmap pixmap="Vu_HD/buttons/red.png" position="0,7" size="140,40" alphatest="blend" />
-			<ePixmap pixmap="Vu_HD/buttons/green.png" position="140,7" size="140,40" alphatest="blend" />
-			<ePixmap pixmap="Vu_HD/buttons/yellow.png" position="280,7" size="140,40" alphatest="blend" />
-			<ePixmap pixmap="Vu_HD/buttons/blue.png" position="420,7" size="140,40" alphatest="blend" />
+			<ePixmap pixmap="Vu_HD/buttons/red.png" position="0,7" size="80,40" alphatest="blend" />
+			<ePixmap pixmap="Vu_HD/buttons/green.png" position="186,7" size="80,40" alphatest="blend" />
+			<ePixmap pixmap="Vu_HD/buttons/blue.png" position="372,7" size="80,40" alphatest="blend" />
 
-			<widget source="key_red" render="Label" position="20,0" zPosition="1" size="115,40" font="Regular;20" halign="center" valign="center" transparent="1" />
-			<widget source="key_green" render="Label" position="160,0" zPosition="1" size="115,40" font="Regular;20" halign="center" valign="center" transparent="1" />
-			<widget source="key_yellow" render="Label" position="300,0" zPosition="1" size="115,40" font="Regular;20" halign="center" valign="center" transparent="1" />
-			<widget source="key_blue" render="Label" position="440,0" zPosition="1" size="115,40" font="Regular;20" halign="center" valign="center" transparent="1" />
+			<widget source="key_red" render="Label" position="28,0" zPosition="1" size="160,40" font="Regular;20" halign="center" valign="center" transparent="1"/>
+			<widget source="key_green" render="Label" position="213,0" zPosition="1" size="160,40" font="Regular;20" halign="center" valign="center" transparent="1"/>
+			<widget source="key_blue" render="Label" position="400,0" zPosition="1" size="160,40" font="Regular;20" halign="center" valign="center" transparent="1"/>
 
 			<widget source="status" render="Label" position="15,45" zPosition="1" size="540,40" font="Regular;18" halign="left" valign="center" backgroundColor="#a08500" transparent="1" />
 			<widget name="file_list" position="0,100" size="555,325" scrollbarMode="showOnDemand" />
@@ -119,10 +117,9 @@ class FPGAUpgrade(Screen):
                 self.session = session 
 
 		self["key_red"] = StaticText(_("Close"))
-		self["key_green"] = StaticText(_("Ugrade"))
-		self["key_yellow"] = StaticText(_(" "))
+		self["key_green"] = StaticText(_("Upgrade"))
 		self["key_blue"] = StaticText(_("Download"))
-		#self["key_blue"] = StaticText(_(" "))
+
 		self["status"] = StaticText(_(" "))
 		self["file_list"] = FileList("/", matchingPattern = "^.*")
 
