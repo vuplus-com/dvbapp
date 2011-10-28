@@ -87,7 +87,7 @@ class RemoteControlCode(Screen,ConfigListScreen,RemoteControlCodeInit):
 			self.restoreCode()
 			self.session.openWithCallback(self.close, MessageBox, _("FILE NOT EXIST : /proc/stb/fp/remote_code"), MessageBox.TYPE_ERROR)
 		else:
-			self.session.openWithCallback(self.MessageBoxConfirmCodeCallback, MessageBoxConfirmCode, _("The remote control code will be reset to previous setting"), MessageBox.TYPE_YESNO, timeout = 10, default = False)
+			self.session.openWithCallback(self.MessageBoxConfirmCodeCallback, MessageBoxConfirmCode, _("The remote control code will be reset to previous setting"), MessageBox.TYPE_YESNO, timeout = 15, default = False)
 
 	def restoreCode(self):
 		for x in self["config"].list:
