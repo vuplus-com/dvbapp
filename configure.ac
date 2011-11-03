@@ -220,6 +220,9 @@ lib/python/Plugins/SystemPlugins/UI3DSetup/Makefile
 lib/python/Plugins/SystemPlugins/UI3DSetup/meta/Makefile
 lib/python/Plugins/SystemPlugins/UIPositionSetup/Makefile
 lib/python/Plugins/SystemPlugins/UIPositionSetup/meta/Makefile
+lib/python/Plugins/SystemPlugins/HDMICEC/Makefile
+lib/python/Plugins/SystemPlugins/HDMICEC/components/Makefile
+lib/python/Plugins/SystemPlugins/HDMICEC/meta/Makefile
 lib/python/Tools/Makefile
 lib/service/Makefile
 lib/components/Makefile

@@ -102,8 +102,10 @@ from enigma import quitMainloop, iRecordableService
 from Screens.MessageBox import MessageBox
 from time import time
 from Components.Task import job_manager
+from Components.config import ConfigYesNo,NoSave
 
 inTryQuitMainloop = False
+config.misc.DeepStandbyOn = NoSave(ConfigYesNo(default=False))
 
 class TryQuitMainloop(MessageBox):
 	def __init__(self, session, retvalue=1, timeout=-1, default_yes = True):
@@ -160,6 +162,8 @@ class TryQuitMainloop(MessageBox):
 			self.conntected=False
 			self.session.nav.record_event.remove(self.getRecordEvent)
 		if value:
+			if self.retval ==1:
+				config.misc.DeepStandbyOn.value=True
 			quitMainloop(self.retval)
 		else:
 			MessageBox.close(self, True)
