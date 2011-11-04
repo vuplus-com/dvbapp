@@ -246,6 +246,17 @@ class FactoryTest(Screen):
 		self.agingtimer = eTimer()
 		self.agingtimer.callback.append(self.agingCheck)
 		self.setSourceVar()
+		self.FanSpeedUp(255)
+
+	def FanSpeedUp(self,value):
+		if value <0:
+			value = 0
+		elif value >255:
+			value = 255
+		print "[FactoryTest, FanSpeedUp] setPWM to : %d"%value
+		f = open("/proc/stb/fp/fan_pwm", "w")
+		f.write("%x" % value)
+		f.close()
 
 	def createConfig(self):
 		tlist = []
