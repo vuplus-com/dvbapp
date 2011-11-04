@@ -105,7 +105,7 @@ class WlanSelection(Screen,HelpableScreen):
 			files = listdir(classdir)
 			if 'driver' in files:
 				if os_path.realpath(driverdir).endswith('rtw_usb_drv'):
-					return _("Realtak")+ " " + _("WLAN adapter.")
+					return _("Realtek")+ " " + _("WLAN adapter.")
 				elif os_path.realpath(driverdir).endswith('ath_pci'):
 					return _("Atheros")+ " " + _("WLAN adapter.")
 				elif os_path.realpath(driverdir).endswith('zd1211b'):
@@ -288,7 +288,7 @@ wlanconfig.method = ConfigSelection(default = "wep", choices = [
 	("wep", _("WEP")), ("wpa", _("WPA")), ("wpa2", _("WPA2")),("wpa/wpa2", _("WPA/WPA2"))])
 wlanconfig.keytype = ConfigSelection(default = "ascii", choices = [
 	("ascii", _("ASCII")), ("hex", _("HEX"))])
-wlanconfig.key = ConfigText(default = "XXXXXXXX", visible_width = 50, fixed_size = False)
+wlanconfig.key = ConfigPassword(default = "XXXXXXXX", visible_width = 50, fixed_size = False)
 wlanconfig.usegateway = ConfigSelection(default = "off", choices = [
 	("off", _("no")), ("on", _("yes"))])
 wlanconfig.ip	 = ConfigIP([0,0,0,0])
@@ -344,6 +344,7 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 		self.key_type = None
 		self.encryption_key = None
 		self.wlanscanap = None
+		self.wpaphraseconsole = None
 #		self.scanAPcount =5
 		self.scanAPcount =1
 		self.list = []
@@ -424,7 +425,8 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 		wlanconfig.keytype = ConfigSelection(default = default_tmp, choices = [
 			("ascii", _("ASCII")), ("hex", _("HEX"))])
 		default_tmp = self.encryption_key or "XXXXXXXX"
-		wlanconfig.key = ConfigText(default = default_tmp, visible_width = 50, fixed_size = False)
+#		default_tmp = "XXXXXXXX"
+		wlanconfig.key = ConfigPassword(default = default_tmp, visible_width = 50, fixed_size = False)
 		self.scanAplistTimer.start(100,True)
 
 	def readWpaSupplicantConf(self):
@@ -459,7 +461,10 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 						elif data.startswith('psk="') and len(data) > 6:
 							self.key_type = 1 # ascii
 							self.encryption_key = data[5:-2]
-						elif data.startswith('psk=') and len(data) > 4:
+						elif data.startswith('#psk="') and len(data) > 6:
+							self.key_type = 0 # hex
+							self.encryption_key = data[6:-2]
+						elif not self.encryption_key and data.startswith('psk=') and len(data) > 4:
 							self.key_type = 0 # hex
 							self.encryption_key = data[4:-1]
 						data = wpafd.readline()
@@ -505,7 +510,8 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 			self.configList.append( self.encryptEntry )
 			if wlanconfig.encrypt.value is "on" :
 				self.configList.append( self.methodEntry )
-				self.configList.append( self.keytypeEntry )
+				if wlanconfig.method.value =="wep":
+					self.configList.append( self.keytypeEntry )
 				self.configList.append( self.keyEntry )
 
 		self["config"].list = self.configList
@@ -595,22 +601,40 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 	def newConfig(self):
 		if self["config"].getCurrent() == self.usedeviceEntry or self["config"].getCurrent() == self.encryptEntry \
 			or self["config"].getCurrent() == self.usedhcpEntry or self["config"].getCurrent() == self.usegatewayEntry \
-			or self["config"].getCurrent() == self.essidEntry:
+			or self["config"].getCurrent() == self.essidEntry or self["config"].getCurrent() == self.methodEntry:
 			self.createConfig()
 
 	def saveWlanConfig(self):
-		if self["config"].getCurrent() == self.keyEntry or self["config"].getCurrent() == self.hiddenessidEntry :
-			self["config"].getCurrent()[1].onDeselect(self.session)
-		if self["config"].isChanged():
-			self.session.openWithCallback(self.checkNetworkShares, MessageBox, (_("Are you sure you want to restart your network interfaces?\n") ) )
-		else:
-			self.session.openWithCallback(self.checkNetworkShares, MessageBox, (_("Network configuration is not changed....\n\nAre you sure you want to restart your network interfaces?\n") ) )
+		try:
+			if self["config"].getCurrent() == self.keyEntry or self["config"].getCurrent() == self.hiddenessidEntry :
+				self["config"].getCurrent()[1].onDeselect(self.session)
+			if self["config"].isChanged():
+				self.session.openWithCallback(self.checkNetworkConfig, MessageBox, (_("Are you sure you want to restart your network interfaces?\n") ) )
+			else:
+				self.session.openWithCallback(self.checkNetworkConfig, MessageBox, (_("Network configuration is not changed....\n\nAre you sure you want to restart your network interfaces?\n") ) )
+		except:
+			pass
 
-	def checkNetworkShares(self,ret = False):
+	def checkNetworkConfig(self, ret = False):
 		if ret == False:
 			if self["config"].getCurrent() == self.keyEntry or self["config"].getCurrent() == self.hiddenessidEntry :
 				self["config"].getCurrent()[1].onSelect(self.session)
 			return
+		if wlanconfig.essid.value == 'Input hidden ESSID':
+			if len(wlanconfig.hiddenessid.value) == 0:
+				self.session.open(MessageBox, ("PLEASE INPUT HIDDEN ESSID"), type = MessageBox.TYPE_ERROR, timeout = 10)
+				return
+		if len(wlanconfig.key.value) == 0:
+			self.session.open(MessageBox, ("PLEASE INPUT NETWORK KEY"), type = MessageBox.TYPE_ERROR, timeout = 10)
+			return
+		self.checkNetworkShares()
+
+#	def checkNetworkShares(self,ret = False):
+#		if ret == False:
+#			if self["config"].getCurrent() == self.keyEntry or self["config"].getCurrent() == self.hiddenessidEntry :
+#				self["config"].getCurrent()[1].onSelect(self.session)
+#			return
+	def checkNetworkShares(self):
 		if not self.Console:
 			self.Console = Console()
 		cmd = "cat /proc/mounts"
@@ -637,13 +661,13 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 			num_configured_if = len(iNetwork.getConfiguredAdapters())
 			if num_configured_if >= 1:
 				if num_configured_if == 1 and self.iface in iNetwork.getConfiguredAdapters():
-					self.writeWlanConfig(False)
+					self.getWpaPhrase(False)
 				else:
-					self.session.openWithCallback(self.writeWlanConfig, MessageBox, _("A second configured interface has been found.\n\nDo you want to disable the second network interface?"), default = True)
+					self.session.openWithCallback(self.getWpaPhrase, MessageBox, _("A second configured interface has been found.\n\nDo you want to disable the second network interface?"), default = True)
 			else:
-				self.writeWlanConfig(False)
+				self.getWpaPhrase(False)
 
-	def writeWlanConfig(self,ret = False):
+	def getWpaPhrase(self,ret):
 		if ret == True:
 			configuredInterfaces = iNetwork.getConfiguredAdapters()
 			for interface in configuredInterfaces:
@@ -651,12 +675,107 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 					continue
 				iNetwork.setAdapterAttribute(interface, "up", False)
 				iNetwork.deactivateInterface(interface)
-		ret=self.writeWpasupplicantConf()
+		if wlanconfig.method.value =="wep":
+			self.writeWpasupplicantConf("wep") # passphrasekey is not None
+		else:
+			if wlanconfig.essid.value == 'Input hidden ESSID':
+				cmd = 'wpa_passphrase %s %s' % (wlanconfig.hiddenessid.value,wlanconfig.key.value)
+			else :
+				cmd = 'wpa_passphrase %s %s' % (wlanconfig.essid.value,wlanconfig.key.value)
+			print cmd
+			self.wpaphraseconsole = Console()
+			self.wpaphraseconsole.ePopen(cmd, self.parseWpaPhrase, self.writeWpasupplicantConf)
+
+	def parseWpaPhrase(self, result, retval, extra_args):
+		print "parseWpaPhrase"
+		(writewlanconfig) = extra_args
+		if self.wpaphraseconsole is not None:
+			print "retval = ",retval
+			if retval == 0:
+				self.wpaphraseconsole.killAll()
+				self.wpaphraseconsole = None
+				print "parseWpaPhrase result : "
+				print result
+				psk = None
+				for line in result.splitlines():
+					if line.find('ssid') == -1 and line.find('#psk=') != -1:
+						plainpwd	= line
+	 				elif line.find('psk=') != -1:
+						psk = line
+				if psk:
+					writewlanconfig(psk,plainpwd)
+#					writewlanconfig(None)
+				else:
+					writewlanconfig(None)
+			else:
+				writewlanconfig(None)
+
+	def writeWpasupplicantConf(self, passphrasekey=None,plainpwd=None):
+		if passphrasekey:
+			wpafd = open("/etc/wpa_supplicant.conf","w")
+			if wpafd > 0:
+				contents = "#WPA Supplicant Configuration by STB\n"
+				contents += "ctrl_interface=/var/run/wpa_supplicant\n"
+				contents += "eapol_version=1\n"
+				contents += "fast_reauth=1\n"
+
+				if wlanconfig.essid.value == 'Input hidden ESSID':
+					contents += "ap_scan=2\n"
+				else :
+					contents += "ap_scan=1\n"
+				contents += "network={\n"
+				if wlanconfig.essid.value == 'Input hidden ESSID':
+					contents += "\tssid=\""+wlanconfig.hiddenessid.value+"\"\n"
+				else :
+					contents += "\tssid=\""+wlanconfig.essid.value+"\"\n"
+				contents += "\tscan_ssid=0\n"
+				if wlanconfig.encrypt.value == "on":
+					if wlanconfig.method.value =="wep":
+						contents += "\tkey_mgmt=NONE\n"
+						contents += "\twep_key0="
+						if wlanconfig.keytype.value == "ascii":
+							contents += "\""+wlanconfig.key.value+"\"\n"
+						else:
+							contents += wlanconfig.key.value+"\n"
+					else:
+						print "plainpwd : ",plainpwd
+						print "passphrasekey : ",passphrasekey
+						if wlanconfig.method.value == "wpa":
+							contents += "\tkey_mgmt=WPA-PSK\n"
+							contents += "\tproto=WPA\n"
+							contents += "\tpairwise=CCMP TKIP\n"
+							contents += "\tgroup=CCMP TKIP\n"	
+						elif wlanconfig.method.value == "wpa2":
+							contents += "\tkey_mgmt=WPA-PSK\n"
+							contents += "\tproto=RSN\n"
+							contents += "\tpairwise=CCMP TKIP\n"
+							contents += "\tgroup=CCMP TKIP\n"
+						else:
+							contents += "\tkey_mgmt=WPA-PSK\n"
+							contents += "\tproto=WPA RSN\n"
+							contents += "\tpairwise=CCMP TKIP\n"
+							contents += "\tgroup=CCMP TKIP\n"
+						contents += plainpwd+"\n"
+						contents += passphrasekey+"\n"
+				else:
+					contents += "\tkey_mgmt=NONE\n"
+				contents += "}\n"
+				print "content = \n"+contents
+				wpafd.write(contents)
+				wpafd.close()
+				self.writeNetConfig(0)
+			else :
+				self.session.open(MessageBox, _("wpa_supplicant.conf open error."), type = MessageBox.TYPE_ERROR, timeout = 10)
+				self.writeNetConfig(-1)
+		else:
+			self.writeNetConfig(-2)
+
+	def writeNetConfig(self,ret = -1):
 		if ret == -1:
 			self.session.open(MessageBox, _("wpa_supplicant.conf open error."), type = MessageBox.TYPE_ERROR, timeout = 10)
 			return
 		elif ret == -2:
-			self.session.open(MessageBox, _("hidden ESSID empty"), type = MessageBox.TYPE_ERROR, timeout = 10)
+			self.session.open(MessageBox, _("Can NOT generate passphrase"), type = MessageBox.TYPE_ERROR, timeout = 10)
 			return
 
 		if wlanconfig.usedevice.value=="on":
@@ -680,63 +799,7 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 		self.configurationmsg = None
 		self.configurationmsg = self.session.openWithCallback(self.configFinished, MessageBox, _("Please wait for activation of your network configuration..."), type = MessageBox.TYPE_INFO, enable_input = False)
 
-	def writeWpasupplicantConf(self):
-		wpafd = open("/etc/wpa_supplicant.conf","w")
-		if wpafd > 0:
-			contents = "#WPA Supplicant Configuration by STB\n"
-			contents += "ctrl_interface=/var/run/wpa_supplicant\n"
-			contents += "eapol_version=1\n"
-			contents += "fast_reauth=1\n"
 
-			if wlanconfig.essid.value == 'Input hidden ESSID':
-				contents += "ap_scan=2\n"
-			else :
-				contents += "ap_scan=1\n"
-			contents += "network={\n"
-			if wlanconfig.essid.value == 'Input hidden ESSID':
-				if len(wlanconfig.hiddenessid.value) == 0:
-					wpafd.close()
-					return -2
-				contents += "\tssid=\""+wlanconfig.hiddenessid.value+"\"\n"
-			else :
-				contents += "\tssid=\""+wlanconfig.essid.value+"\"\n"
-			contents += "\tscan_ssid=0\n"
-			if wlanconfig.encrypt.value == "on":
-				if wlanconfig.method.value =="wep":
-					contents += "\tkey_mgmt=NONE\n"
-					contents += "\twep_key0="
-				elif wlanconfig.method.value == "wpa":
-					contents += "\tkey_mgmt=WPA-PSK\n"
-					contents += "\tproto=WPA\n"
-					contents += "\tpairwise=CCMP TKIP\n"
-					contents += "\tgroup=CCMP TKIP\n"
-					contents += "\tpsk="
-				elif wlanconfig.method.value == "wpa2":
-					contents += "\tkey_mgmt=WPA-PSK\n"
-					contents += "\tproto=RSN\n"
-					contents += "\tpairwise=CCMP TKIP\n"
-					contents += "\tgroup=CCMP TKIP\n"
-					contents += "\tpsk="
-				else:
-					contents += "\tkey_mgmt=WPA-PSK\n"
-					contents += "\tproto=WPA RSN\n"
-					contents += "\tpairwise=CCMP TKIP\n"
-					contents += "\tgroup=CCMP TKIP\n"
-					contents += "\tpsk="
-				if wlanconfig.keytype.value == "ascii":
-					contents += "\""+wlanconfig.key.value+"\"\n"
-				else:
-					contents += wlanconfig.key.value+"\n"
-			else:
-				contents += "\tkey_mgmt=NONE\n"
-			contents += "}\n"
-			print "content = \n"+contents
-			wpafd.write(contents)
-			wpafd.close()
-			return 0
-		else :
-			self.session.open(MessageBox, _("wpa_supplicant.conf open error."), type = MessageBox.TYPE_ERROR, timeout = 10)
-			return -1
 	def updateCurrentInterfaces(self,ret):
 		if ret is True:
 			iNetwork.getInterfaces(self.configurationMsgClose)
@@ -796,6 +859,7 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 		iNetwork.stopDeactivateInterfaceConsole()
 		self.stopwlanscanapConsole()
 		self.stopCheckNetworkSharesConsole()
+		self.stopWpaPhraseConsole()
 
 	def stopwlanscanapConsole(self):
 		if self.wlanscanap is not None:
@@ -808,6 +872,12 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 			if len(self.Console.appContainers):
 				for name in self.Console.appContainers.keys():
 					self.Console.kill(name)
+
+	def stopWpaPhraseConsole(self):
+		if self.wpaphraseconsole is not None:
+			if len(self.wpaphraseconsole.appContainers):
+					for name in self.wpaphraseconsole.appContainers.keys():
+						self.wpaphraseconsole.kill(name)
 
 class WlanScanAp(Screen,HelpableScreen):
 	skin = """
