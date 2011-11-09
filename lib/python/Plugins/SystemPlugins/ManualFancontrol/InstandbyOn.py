@@ -5,10 +5,21 @@ from Components.ConfigList import ConfigListScreen
 from Components.config import config, ConfigSubsection, ConfigSelection, ConfigSlider
 from Components.Harddisk import harddiskmanager
 
+def getModel():
+	file = open("/proc/stb/info/vumodel", "r")
+	modelname = file.readline().strip()
+	file.close()
+	return modelname
+
 config.plugins.manualfancontrols = ConfigSubsection()
 config.plugins.manualfancontrols.standbymode = ConfigSelection(default = "yes", choices = [
 	("no", _("no")), ("yes", _("yes"))])
-config.plugins.manualfancontrols.pwmvalue = ConfigSlider(default = 10, increment = 5, limits = (0, 255))
+
+if getModel() == "ultimo":
+	config.plugins.manualfancontrols.pwmvalue = ConfigSlider(default = 100, increment = 5, limits = (0, 255))
+else:
+	config.plugins.manualfancontrols.pwmvalue = ConfigSlider(default = 10, increment = 5, limits = (0, 255))
+
 config.plugins.manualfancontrols.checkperiod = ConfigSelection(default = "10", choices = [
 		("5", "5 " + _("seconds")), ("10", "10 " + _("seconds")), ("30", "30 " + _("seconds")),
 		("60", "1 " + _("minute")), ("120", "2 " + _("minutes")),
