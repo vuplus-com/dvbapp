@@ -46,6 +46,16 @@ AC_CHECK_LIB([xmlccwrap], [exit], [LIBXMLCCWRAP_LIBS="-lxmlccwrap"], [AC_MSG_ERR
 AC_SUBST(LIBXMLCCWRAP_LIBS)
 AC_LANG_POP
 
+AC_ARG_WITH(set-right-half-vfd-skin,
+        AC_HELP_STRING([--with-set-right-half-vfd-skin], [display right_half_vfd_icons from skin(for ultimo), yes or no]),
+        [[setrighthalfvfdskin=$withval]],
+        [[setrighthalfvfdskin=no]]
+)
+if test x"$setrighthalfvfdskin" != xno ; then
+        AC_DEFINE(SET_RIGHT_HALF_VFD_SKIN, 1,[Define when display right_half_vfd_icons from skin, for ultimo])
+fi
+AM_CONDITIONAL(SET_RIGHT_HALF_VFD_SKIN, test x"$setrighthalfvfdskin" != xno)
+
 AC_ARG_WITH(libsdl,
 	AS_HELP_STRING([--with-libsdl],[use libsdl, yes or no]),
 	[with_libsdl=$withval],[with_libsdl=no])
