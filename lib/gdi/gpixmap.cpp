@@ -396,37 +396,56 @@ void gPixmap::blit(const gPixmap &src, const eRect &_pos, const gRegion &clip, i
 			srcptr+=srcarea.left()*src.surface->bypp+srcarea.top()*src.surface->stride;
 //			nomptr+=srcarea.left()*src.surface->bypp+srcarea.top()*src.surface->stride;
 			dstptr+=area.left()*surface->bypp+area.top()*surface->stride;
-			for (int y=0; y<area.height(); y++)
+			if(src.surface->clut.colors != 0)
 			{
-				for(int x=0;x<area.width();x++)
+				for (int y=0; y<area.height(); y++)
 				{
-					index = (unsigned char)(*(srcptr+x+y*src.surface->stride));
-					pixdata = src.surface->clut.data[index];
-					gray_value = ((pixdata.r+pixdata.g +pixdata.b)/3);
-//					printf("%3d ",gray_value);
-					if(gray_value > gray_max)
-						gray_max = gray_value;
-					if(gray_value < gray_min)
-						gray_min = gray_value;
+					for(int x=0;x<area.width();x++)
+					{
+						index = (unsigned char)(*(srcptr+x+y*src.surface->stride));
+						pixdata = src.surface->clut.data[index];
+						gray_value = ((pixdata.r+pixdata.g +pixdata.b)/3);
+	//					printf("%3d ",gray_value);
+						if(gray_value > gray_max)
+							gray_max = gray_value;
+						if(gray_value < gray_min)
+							gray_min = gray_value;
+					}
+	//				printf("\n");
 				}
-//				printf("\n");
 			}
 //			printf("\n[bilt] ### gray_min : %d, gray_max : %d\n\n",gray_min,gray_max);
 			for (int y=0; y<area.height(); y++)
 			{
-				for(int x=0;x<area.width();x++)
+				if(src.surface->clut.colors != 0)
 				{
-					pixdata = src.surface->clut.data[*(srcptr+x)];
-					gray_value = ((pixdata.r+pixdata.g +pixdata.b)/3);
-					if(gray_max==gray_min)
-						*(nomptr+x)=gray_value;
-					else if(y == 0 || y == area.height()-1 || x == 0 || x == area.width()-1)
-						*(nomptr+x) = 255;
-					else
-						*(nomptr+x)=( ((gray_value - gray_min)*255)/(gray_max-gray_min) );
-//					printf("%3d ",*(nomptr+x));
+					for(int x=0;x<area.width();x++)
+					{
+						pixdata = src.surface->clut.data[*(srcptr+x)];
+						gray_value = ((pixdata.r+pixdata.g +pixdata.b)/3);
+						if(gray_max==gray_min)
+							*(nomptr+x)=gray_value;
+/*						else if(y == 0 || y == area.height()-1 || x == 0 || x == area.width()-1)
+							*(nomptr+x) = 255;*/
+						else
+							*(nomptr+x)=( ((gray_value - gray_min)*255)/(gray_max-gray_min) );
+	//					printf("%3d ",*(nomptr+x));
+					}
+	//				printf("\n");
 				}
-//				printf("\n");
+				else
+				{
+					for(int x=0;x<area.width();x++)
+					{
+/*						if(y == 0 || y == area.height()-1 || x == 0 || x == area.width()-1)
+							*(nomptr+x) = 255;
+						else
+							*(nomptr+x)=*(srcptr+x);*/
+						*(nomptr+x)=*(srcptr+x);
+//						printf("%3d ",*(nomptr+x));
+					}
+//					printf("\n");
+				}
 				if (flag & (blitAlphaTest|blitAlphaBlend))
 				{
   		      // no real alphatest yet
