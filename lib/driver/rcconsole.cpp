@@ -98,6 +98,10 @@ int eRCConsole::getKeyCompatibleCode(const eRCKey &key) const
 	return key.code;
 }
 
+#ifdef VUPLUS_USE_RCKBD	
+eRCConsole* g_ConsoleDevice;
+#endif /*VUPLUS_USE_RCKBD*/
+
 class eRCConsoleInit
 {
 	eRCConsoleDriver driver;
@@ -105,6 +109,9 @@ class eRCConsoleInit
 public:
 	eRCConsoleInit(): driver("/dev/tty0"), device(&driver)
 	{
+#ifdef VUPLUS_USE_RCKBD	
+		g_ConsoleDevice = &device;
+#endif /*VUPLUS_USE_RCKBD*/
 	}
 };
 

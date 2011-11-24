@@ -11,6 +11,32 @@
 #include <lib/base/init_num.h>
 #include <lib/driver/input_fake.h>
 
+#ifdef VUPLUS_USE_RCKBD	
+//                                /         /         /         /          /         /
+static char g_SmallAlphaMap[] = "            -=  qwertyuiop    asdfghjkl;\'   zxcvbnm,./";
+static char g_LargeAlphaMap[] = "  !@# % &*()_+  QWERTYUIOP    ASDFGHJKL:\"   ZXCVBNM<>?";
+
+#include <lib/driver/rcconsole.h>
+extern eRCConsole* g_ConsoleDevice;
+static char* g_pMap = g_SmallAlphaMap;
+inline char getAsciiCode(unsigned int code)
+{
+	switch(code)
+	{
+	case 57: return ' ';
+	case 43: return '\\';
+	}
+	
+	if(code<54)
+	{
+		if(g_pMap[code] == ' ')
+			return 0;
+		return g_pMap[code];
+	}
+	return 0;
+}
+#endif /*VUPLUS_USE_RCKBD*/
+
 void eRCDeviceInputDev::handleCode(long rccode)
 {
 	struct input_event *ev = (struct input_event *)rccode;
@@ -55,6 +81,30 @@ void eRCDeviceInputDev::handleCode(long rccode)
 			return;
 //		eDebug("passed!");
 	}
+
+#ifdef VUPLUS_USE_RCKBD
+	if(g_ConsoleDevice)
+	{
+		char code = getAsciiCode(ev->code);
+		//eDebug("getAsciiCode : [%d] [%c]", code, code);
+		switch(ev->value)
+		{
+		case 0:
+			if(ev->code == 42) { g_pMap = g_SmallAlphaMap; return; }
+			if(code) return;
+		case 1:
+			{
+				if(ev->code == 42) { g_pMap = g_LargeAlphaMap; return; }
+				if(code)
+				{
+					g_ConsoleDevice->handleCode(code);
+					return;
+				}
+			}
+			break;
+		}
+	}
+#endif /*VUPLUS_USE_RCKBD*/
 
 	switch (ev->value)
 	{
