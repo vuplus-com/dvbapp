@@ -1,16 +1,17 @@
 from Screens.Screen import Screen
 from Components.ConfigList import ConfigListScreen
-from Components.config import config, getConfigListEntry, ConfigSubsection, ConfigSelection
+from Components.config import config, getConfigListEntry, ConfigSubsection, ConfigSelection, ConfigInteger
 from Components.ActionMap import ActionMap
 from Screens.MessageBox import MessageBox
 from Components.Sources.StaticText import StaticText
 from Plugins.Plugin import PluginDescriptor
 from Tools.Directories import fileExists
-from enigma import eTimer
+from enigma import eTimer, quitMainloop
 
 config.plugins.remotecontrolcode = ConfigSubsection()
 config.plugins.remotecontrolcode.systemcode = ConfigSelection(default = "2", choices = 
 	[ ("1", "1 "), ("2", "2 "), ("3", "3 "), ("4", "4 ") ] )
+config.plugins.remotecontrolcode.replytimeout = ConfigInteger(default = 30, limits = (15,9999))
 
 class RemoteControlCodeInit:
 	def __init__(self):
@@ -39,7 +40,7 @@ class RemoteControlCodeInit:
 
 class RemoteControlCode(Screen,ConfigListScreen,RemoteControlCodeInit):
 	skin = """
-			<screen name="RemoteControlCode" position="center,center" size="560,300" title="Remote Control System Code Setting" >
+			<screen name="RemoteControlCode" position="center,center" size="560,250" title="Remote Control System Code Setting" >
 			<ePixmap pixmap="Vu_HD/buttons/red.png" position="10,10" size="25,25" alphatest="on" />
 			<ePixmap pixmap="Vu_HD/buttons/green.png" position="290,10" size="25,25" alphatest="on" />
 			<widget source="key_red" render="Label" position="40,10" zPosition="1" size="140,25" font="Regular;20" halign="center" valign="center" transparent="1" />
@@ -60,7 +61,12 @@ class RemoteControlCode(Screen,ConfigListScreen,RemoteControlCodeInit):
 		self.list = []
 		ConfigListScreen.__init__(self, self.list,session = self.session)
 		self["key_red"] = StaticText(_("Cancel"))
-		self["key_green"] = StaticText(_("Save"))
+		self["key_green"] = StaticText(_("Ok"))
+		self.replytext_1 ="The remote control code will be reset to previous setting, set your R/C's code and select 'keep'"
+		self.replytext_2 ="\n\n<Code set manual>"
+		self.replytext_2 +="\n1. Press Digit 2 and Digit 7 simultaneously for 3 seconds. After 3 seconds LED turns on. "
+		self.replytext_2 +="\n2. Press the <HELP> key. LED is blinked and turns on."
+		self.replytext_2 +="\n3. Enter a 4 digit code(ex. code 2 is '0002')"
 		self.createSetup()
 		self.onLayoutFinish.append(self.checkModel)
 		self.checkModelTimer = eTimer()
@@ -76,7 +82,9 @@ class RemoteControlCode(Screen,ConfigListScreen,RemoteControlCodeInit):
 	def createSetup(self):
 		self.list = []
 		self.rcsctype = getConfigListEntry(_("Remote Control System Code"), config.plugins.remotecontrolcode.systemcode)
+		self.replytimeout = getConfigListEntry(_("Reply timeout"), config.plugins.remotecontrolcode.replytimeout)
 		self.list.append( self.rcsctype )
+		self.list.append( self.replytimeout )
 		self["config"].list = self.list
 		self["config"].l.setList(self.list)
 
@@ -87,7 +95,8 @@ class RemoteControlCode(Screen,ConfigListScreen,RemoteControlCodeInit):
 			self.restoreCode()
 			self.session.openWithCallback(self.close, MessageBox, _("FILE NOT EXIST : /proc/stb/fp/remote_code"), MessageBox.TYPE_ERROR)
 		else:
-			self.session.openWithCallback(self.MessageBoxConfirmCodeCallback, MessageBoxConfirmCode, _("The remote control code will be reset to previous setting"), MessageBox.TYPE_YESNO, timeout = 15, default = False)
+			timeout = config.plugins.remotecontrolcode.replytimeout.value
+			self.session.openWithCallback(self.MessageBoxConfirmCodeCallback, MessageBoxConfirmCode, self.replytext_1,self.replytext_2 ,MessageBox.TYPE_YESNO, timeout = timeout, default = False)
 
 	def restoreCode(self):
 		for x in self["config"].list:
@@ -95,10 +104,14 @@ class RemoteControlCode(Screen,ConfigListScreen,RemoteControlCodeInit):
 
 	def MessageBoxConfirmCodeCallback(self,ret):
 		if ret:
-			ConfigListScreen.keySave(self)
+			self.saveAll()
+			self.session.openWithCallback(self.restartCallback, MessageBox, _("GUI restart now, press 'OK' button."), MessageBox.TYPE_INFO)
 		else:
 			self.restoreCode()
 			self.setSystemCode(int(config.plugins.remotecontrolcode.systemcode.value))
+
+	def restartCallback(self,result):
+		quitMainloop(3)
 
 class MessageBoxConfirmCode(MessageBox):
 	skin = """
@@ -113,6 +126,7 @@ class MessageBoxConfirmCode(MessageBox):
 from enigma import eSize, ePoint
 
 orgwidth = self.instance.size().width()
+orgheight = self.instance.size().height()
 orgpos = self.instance.position()
 textsize = self[&quot;text&quot;].getSize()
 
@@ -141,12 +155,15 @@ self[&quot;list&quot;].instance.resize(eSize(*listsize))
 
 # center window
 newwidth = wsize[0]
-self.instance.move(ePoint(orgpos.x() + (orgwidth - newwidth)/2, orgpos.y()))
+newheight = wsize[1]
+self.instance.move(ePoint(orgpos.x() + (orgwidth - newwidth)/2, orgpos.y() + (orgheight - newheight)/2))
 		</applet>
 	</screen>"""
 
-	def __init__(self, session, text, type = MessageBox.TYPE_YESNO, timeout = -1, close_on_any_key = False, default = True, enable_input = True, msgBoxID = None):
-		MessageBox.__init__(self,session,text,type,timeout,close_on_any_key,default,enable_input,msgBoxID)
+	def __init__(self, session, replytext_1="", replytext_2="", type = MessageBox.TYPE_YESNO, timeout = -1, close_on_any_key = False, default = True, enable_input = True, msgBoxID = None):
+		self.replytext_1 = replytext_1
+		self.replytext_2 = replytext_2
+		MessageBox.__init__(self,session,self.replytext_1 + "\n" + self.replytext_2,type,timeout,close_on_any_key,default,enable_input,msgBoxID)
 		if type == MessageBox.TYPE_YESNO:
 			self.list = [ (_("Keep"), 0), (_("Restore"), 1) ]
 			self["list"].setList(self.list)
@@ -154,7 +171,7 @@ self.instance.move(ePoint(orgpos.x() + (orgwidth - newwidth)/2, orgpos.y()))
 	def timerTick(self):
 		if self.execing:
 			self.timeout -= 1
-			self["text"].setText(self.text + " in %d seconds." %self.timeout)
+			self["text"].setText(self.replytext_1 + " in %d seconds."%self.timeout + self.replytext_2)
 			if self.timeout == 0:
 				self.timer.stop()
 				self.timerRunning = False
