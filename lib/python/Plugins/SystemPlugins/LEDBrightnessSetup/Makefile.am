@@ -4,6 +4,4 @@ SUBDIRS = meta
 
 install_PYTHON =	\
 	__init__.py \
-	plugin.py \
-	_ledsetup.so \
-	ledsetup.py
+	plugin.py
