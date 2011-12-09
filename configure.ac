@@ -244,6 +244,8 @@ lib/python/Plugins/SystemPlugins/HDMICEC/components/Makefile
 lib/python/Plugins/SystemPlugins/HDMICEC/meta/Makefile
 lib/python/Plugins/SystemPlugins/LEDBrightnessSetup/Makefile
 lib/python/Plugins/SystemPlugins/LEDBrightnessSetup/meta/Makefile
+lib/python/Plugins/SystemPlugins/FirmwareUpgrade/Makefile
+lib/python/Plugins/SystemPlugins/FirmwareUpgrade/meta/Makefile
 lib/python/Tools/Makefile
 lib/service/Makefile
 lib/components/Makefile
