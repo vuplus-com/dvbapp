@@ -124,7 +124,7 @@ void eDBoxLCD::setInverted(unsigned char inv)
 	update();
 }
 
-int eDBoxLCD::setLED(int value, int option)
+void eDBoxLCD::setLED(int value, int option)
 {
 	switch(option)
 	{
@@ -138,7 +138,12 @@ int eDBoxLCD::setLED(int value, int option)
 			ioctl(lcdfd, LED_IOCTL_BLINKING_TIME, (unsigned char)value);
 			break;
 	}
-	return 0;
+}
+
+void eDBoxLCD::setLEDDefault(int normal, int deepstandby, int blinktime)
+{
+	int value = (blinktime << 16) + (deepstandby << 8) + normal;
+	ioctl(lcdfd, LED_IOCTL_SET_DEFAULT, value);
 }
 
 int eDBoxLCD::setLCDContrast(int contrast)

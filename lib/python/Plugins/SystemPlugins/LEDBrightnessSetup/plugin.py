@@ -12,7 +12,6 @@ from enigma import eDBoxLCD
 
 config.plugins.brightnesssetup = ConfigSubsection()
 config.plugins.brightnesssetup.brightness = ConfigSlider(default = 1, increment = 1, limits = (0,15))
-config.plugins.brightnesssetup.brightnessstandby = ConfigSlider(default = 1, increment = 1, limits = (0,15))
 config.plugins.brightnesssetup.brightnessdeepstandby = ConfigSlider(default = 5, increment = 1, limits = (0,15))
 config.plugins.brightnesssetup.blinkingtime = ConfigSlider(default = 5, increment = 1, limits = (0,15))
 
@@ -24,25 +23,12 @@ class LEDOption:
 class LEDBrightnessSetupStandby:
 	def __init__(self):
 		self.initLEDSetup()
-		config.misc.standbyCounter.addNotifier(self.standbyBegin, initial_call = False)
-
-	def standbyBegin(self, configElement):
-		from Screens.Standby import inStandby
-		inStandby.onClose.append(self.StandbyEnd)
-		brightness = int(config.plugins.brightnesssetup.brightnessstandby.value)
-		eDBoxLCD.getInstance().setLED(brightness ,LEDOption.BRIGHTNESS)
-
-	def StandbyEnd(self):
-		brightness = int(config.plugins.brightnesssetup.brightness.value)
-		eDBoxLCD.getInstance().setLED(brightness ,LEDOption.BRIGHTNESS)
 
 	def initLEDSetup(self):
 		brightness = int(config.plugins.brightnesssetup.brightness.value)
 		brightnessstandby = int(config.plugins.brightnesssetup.brightnessdeepstandby.value)
 		blinkingtime = int(config.plugins.brightnesssetup.blinkingtime.value)
-		eDBoxLCD.getInstance().setLED(brightness ,LEDOption.BRIGHTNESS)
-		eDBoxLCD.getInstance().setLED(brightnessstandby ,LEDOption.DEEPSTANDBY)
-		eDBoxLCD.getInstance().setLED(blinkingtime ,LEDOption.BLINKINGTIME)
+		eDBoxLCD.getInstance().setLEDDefault(brightness, brightnessstandby, blinkingtime)
 
 class LEDBrightnessSetup(Screen,ConfigListScreen):
 	skin = """
@@ -84,8 +70,6 @@ class LEDBrightnessSetup(Screen,ConfigListScreen):
 	def displayText(self):
 		if self["config"].getCurrent() == self.brightness:
 			self["current_entry"].setText("Touch LED Brightness at Normal state")
-		elif self["config"].getCurrent() == self.brightness_standby:
-			self["current_entry"].setText("Touch LED Brightness at Standby")
 		elif self["config"].getCurrent() == self.brightness_deepstandby:
 			self["current_entry"].setText("Touch LED Brightness at Deep Standby")
 		elif self["config"].getCurrent() == self.blinkingtime:
@@ -114,11 +98,9 @@ class LEDBrightnessSetup(Screen,ConfigListScreen):
 	def createSetup(self):
 		self.list = []
 		self.brightness = getConfigListEntry(_("Normal state"), config.plugins.brightnesssetup.brightness)
-		self.brightness_standby = getConfigListEntry(_("Standby"), config.plugins.brightnesssetup.brightnessstandby)
 		self.brightness_deepstandby = getConfigListEntry(_("Deep Standby"), config.plugins.brightnesssetup.brightnessdeepstandby)
 		self.blinkingtime = getConfigListEntry(_("Blinking time"), config.plugins.brightnesssetup.blinkingtime)
 		self.list.append( self.brightness )
-		self.list.append( self.brightness_standby )
 		self.list.append( self.brightness_deepstandby )
 		self.list.append( self.blinkingtime )
 		self["config"].list = self.list
@@ -154,7 +136,6 @@ class LEDBrightnessSetup(Screen,ConfigListScreen):
 
 	def keyDefault(self):
 		config.plugins.brightnesssetup.brightness.setValue(1)
-		config.plugins.brightnesssetup.brightnessstandby.setValue(1)
 		config.plugins.brightnesssetup.brightnessdeepstandby.setValue(5)
 		config.plugins.brightnesssetup.blinkingtime.setValue(5)
 		for entry in self["config"].getList():

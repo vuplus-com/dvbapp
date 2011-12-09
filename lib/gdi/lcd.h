@@ -15,6 +15,7 @@ enum op { LED_BRIGHTNESS = 0, LED_DEEPSTANDBY, LED_BLINKINGTIME };
 #define LED_IOCTL_BRIGHTNESS_NORMAL 0X10
 #define LED_IOCTL_BRIGHTNESS_DEEPSTANDBY 0X11
 #define LED_IOCTL_BLINKING_TIME 0X12
+#define LED_IOCTL_SET_DEFAULT 0X13
 
 class eLCD
 {
@@ -60,7 +61,8 @@ public:
 	~eDBoxLCD();
 #endif
 	static eDBoxLCD *getInstance();
-	int setLED(int value, int option);
+	void setLED(int value, int option);
+	void setLEDDefault(int normal, int deepstandby, int blinktime);
 	int setLCDContrast(int contrast);
 	int setLCDBrightness(int brightness);
 	void setInverted( unsigned char );
