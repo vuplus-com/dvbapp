@@ -599,26 +599,28 @@ class BrowserLauncher(ConfigListScreen, Screen):
 						event_list.append((h, _(h)))
 						self.name_list.append((h, n))
 						if n[1:].startswith("dream") and self.rc_mouse is None:
-							self.rc_mouse = copy.deepcopy(h)
-							self.rc_keyboard = copy.deepcopy(h)
-							print "detected!! rc"
+							for thl in h.split(" "):
+								if thl.startswith("event"):
+									self.rc_mouse = copy.deepcopy(h)
+									self.rc_keyboard = copy.deepcopy(h)
+									print "detected!! rc:", h
 							continue
 						if h.startswith("mouse") and self.usb_mouse is None:
 							self.usb_mouse = copy.deepcopy(h)
-							print "detected!! usb mouse"
+							print "detected!! usb mouse:",h
 							continue
 						if tn == -1 and self.usb_keyboard is None:
 							self.usb_keyboard = copy.deepcopy(h)
-							print "detected!! usb keyboard"
+							print "detected!! usb keyboard:",h
 				elif line[0] == 'B' and line[3:].startswith("ABS") and p.startswith("usb-"):
 					for h in h_list:
 						if self.usb_mouse is not None:
 							break
 						if self.usb_keyboard is not None and h == self.usb_keyboard[0]:
 							self.usb_keyboard = None
-							print "clean!! usb keyboard"
+							print "clean!! usb keyboard:",h
 						self.usb_mouse = copy.deepcopy(h)
-						print "detected!! usb mouse"
+						print "detected!! usb mouse:",h
 
 		tmp = copy.deepcopy(event_list)
 		if self.usb_mouse is not None:
