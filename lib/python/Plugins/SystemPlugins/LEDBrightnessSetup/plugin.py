@@ -9,7 +9,6 @@ from Screens.MessageBox import MessageBox
 from Tools.Directories import fileExists
 from enigma import eTimer
 from enigma import eDBoxLCD
-from ledsetup import LEDUpdate
 
 config.plugins.brightnesssetup = ConfigSubsection()
 config.plugins.brightnesssetup.brightness = ConfigSlider(default = 1, increment = 1, limits = (0,15))
