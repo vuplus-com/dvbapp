@@ -5,7 +5,8 @@ SUBDIRS = SoftwareManager FrontprocessorUpgrade PositionerSetup Satfinder \
 	DefaultServicesScanner NFIFlash DiseqcTester CommonInterfaceAssignment \
 	CrashlogAutoSubmit CleanupWizard VideoEnhancement WirelessLan NetworkWizard \
 	TempFanControl FactoryTest Fancontrol FPGAUpgrade WirelessLanSetup ManualFancontrol \
-	Blindscan RemoteControlCode UI3DSetup UIPositionSetup HDMICEC LEDBrightnessSetup FirmwareUpgrade
+	Blindscan RemoteControlCode UI3DSetup UIPositionSetup HDMICEC LEDBrightnessSetup \
+	FirmwareUpgrade CrashReport
 
 install_PYTHON =	\
 	__init__.py
