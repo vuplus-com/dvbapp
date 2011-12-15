@@ -203,9 +203,20 @@ class Harddisk:
 		res = system(cmd)
 		return (res >> 8)
 
+        def checkPartionPath(self, path):
+                import time, os
+                for i in range(1,10):
+                        if os.path.exists(path):
+                                return True
+                        time.sleep(1)
+                return False
+
 	def createPartition(self):
 		cmd = 'printf "8,\n;0,0\n;0,0\n;0,0\ny\n" | sfdisk -f -uS ' + self.disk_path
 		res = system(cmd)
+		if not self.checkPartionPath(self.partitionPath("1")):
+			print "no exist : ", self.partitionPath("1")
+			return 1
 		return (res >> 8)
 
 	def mkfs(self):
