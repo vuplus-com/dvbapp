@@ -426,7 +426,9 @@ class BrowserLauncher(ConfigListScreen, Screen):
 
 		self.browser_root = "/usr/bin"
 		self.browser_name = "arora"
-		self.conf_file = "/usr/lib/enigma2/python/Plugins/Extensions/WebBrowser/settings.conf"
+
+		from Tools.Directories import resolveFilename, SCOPE_PLUGINS
+		self.conf_file = resolveFilename(SCOPE_PLUGINS, "Extensions/WebBrowser/settings.conf")
 		self["actions"] = ActionMap(["OkCancelActions", "ShortcutActions", "WizardActions", "ColorActions", "SetupActions", ],
                 {	"red": self.keyCancel,
 			"green": self.keyGo,
@@ -549,30 +551,29 @@ class BrowserLauncher(ConfigListScreen, Screen):
 			self.conf_mouse = self.mouse_list[0][0]
 		self.mouse = ConfigSelection(default = self.conf_mouse, choices = self.mouse_list)
 		self.list.append(getConfigListEntry(_('Mouse'), self.mouse))		
-
+		
 		if self.conf_keyboard == "" or self.getHandlerName(self.conf_keyboard) is None:
 			self.conf_keyboard = self.keyboard_list[0][0]
 		self.keyboard = ConfigSelection(default = self.conf_keyboard, choices = self.keyboard_list)
 		self.list.append(getConfigListEntry(_('Keyboard'), self.keyboard))
 
+		if self.conf_keymap == "":
+			self.conf_keymap = self.getLanguage()
+		self.lang_list = [("rc_en", "English(RC)"), ("rc_ch", "German(RC)"), ("en", "English"), ("ch", "German")]
+		self.langs = ConfigSelection(default = self.conf_keymap, choices = self.lang_list)
+		self.list.append(getConfigListEntry(_("    - Type"), self.langs))
+
 		if self.conf_alpha == "":
 			self.conf_alpha = "255"
 		self.alpha = ConfigSlider(default = int(self.conf_alpha), increment = 10, limits = (0, 255))
 		self.list.append(getConfigListEntry(_("Alpha Value"), self.alpha))
-
-		if self.conf_keymap == "":
-			self.conf_keymap = self.getLanguage()
-		self.lang_list = [("en", "English"), ("de", "German")]
-		self.langs = ConfigSelection(default = self.conf_keymap, choices = self.lang_list)
-		self.list.append(getConfigListEntry(_("Language"), self.langs))
-
 		self["config"].list = self.list
 		self["config"].l.setList(self.list)
 
 	def getLanguage(self, lang=language.getLanguage()):
 		if self.current_lang_idx == 1:
-			return "de"
-		return "en"
+			return "rc_ch"
+		return "rc_en"
 
 	def makeHandlerList(self, data):
 		n = ""
@@ -668,8 +669,13 @@ class BrowserLauncher(ConfigListScreen, Screen):
 			mouse_cmd = "export QWS_MOUSE_PROTO=LinuxInput:/dev/input/%s; " % (str(mouse_param))
 
 		keymap_param = ""
-		if self.langs.value == "de":
+		if self.langs.value == "ch":
+			keymap_param = ":keymap=/usr/share/keymaps/vuplus/ch.qmap"
+		elif self.langs.value == "rc_ch":
 			keymap_param = ":keymap=/usr/share/keymaps/vuplus/de.qmap"
+		elif self.langs.value == "rc_en":
+			keymap_param = ":keymap=/usr/share/keymaps/vuplus/us.qmap"
+
 		kbd_cmd = "export QWS_KEYBOARD=LinuxInput:/dev/input/%s%s; " % (str(keyboard_param), keymap_param)
 
 		cmd = "%s%s%s%s" % (extra_cmd, kbd_cmd, mouse_cmd, browser_cmd)
@@ -693,7 +699,7 @@ class BrowserLauncher(ConfigListScreen, Screen):
 		self.saveConfig()
 		self.info.setText("Starting Webbrowser. Please wait...")
 		if self.lock == False:
-			if self.langs.value == "de":
+			if self.langs.value == "ch" or self.langs.value == "rc_ch":
 				language.activateLanguageIndex(1)
 			else:
 				language.activateLanguageIndex(0)

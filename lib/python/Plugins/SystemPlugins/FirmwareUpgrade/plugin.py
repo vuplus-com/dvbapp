@@ -102,7 +102,7 @@ class UpgradeStatus(Screen):
 			self.cbConfirmExit(False)
 			return
 		status = self.FU.getStatus()
-		if self.old_status > status:
+		if self.old_status > status and status != -1:
 			self.session.open(MessageBox, _("Fail to upgrade!! Retry!!"), MessageBox.TYPE_INFO, timeout = 10)
 		self.slider.setValue(status)
 		self["status"].setText(_("%d / 100" % (status)))
@@ -143,7 +143,7 @@ class Filebrowser(Screen):
 	skin = 	"""
 		<screen position="center,center" size="500,260" title="File Browser" >
 			<ePixmap pixmap="Vu_HD/buttons/blue.png" position="5,7" size="80,40" alphatest="blend" />
-			<widget source="key_blue" render="Label" position="40,0" zPosition="1" size="180,40" font="Regular;20" halign="left" valign="center" transparent="1"/>
+			<widget source="key_blue" render="Label" position="40,0" zPosition="1" size="300,40" font="Regular;20" halign="left" valign="center" transparent="1"/>
 			<widget name="file_list" position="0,50" size="500,160" scrollbarMode="showOnDemand" />
 
 			<widget source="status" render="Label" position="0,220" zPosition="1" size="500,40" font="Regular;18" halign="center" valign="center" backgroundColor="#a08500" transparent="1" />
@@ -154,7 +154,7 @@ class Filebrowser(Screen):
 		Screen.__init__(self, session)
                 self.session = session 
 		
-		self["key_blue"] = StaticText(_("Download"))
+		self["key_blue"] = StaticText(_("Download  the  firmware (latest)"))
 
 		self["status"]    = StaticText(_(" "))
 		self["file_list"] = FileList("/", matchingPattern = "^.*")
@@ -237,7 +237,7 @@ class Filebrowser(Screen):
 	# tf  : target file name(string)
 	# bd  : target base directory(string)
 	# cbfunc(string) : callback function(function)
-	def doDownload(self, uri, tf, bd='/tmp', cbfunc=None):
+	def doDownload(self, uri, tf, bd='/tmp', cbfunc=None, errmsg="Fail to download."):
 		tar = bd + "/" + tf
 		#print "[FirmwareUpgrade] - Download Info : [%s][%s]" % (uri, tar)
 		def doHook(blockNumber, blockSize, totalSize) :
@@ -247,13 +247,17 @@ class Filebrowser(Screen):
 		try:
 			opener.open(uri)
 		except:
-			self.session.open(MessageBox, _("File not found in this URL:\n%s"%(uri)), MessageBox.TYPE_INFO, timeout = 10)
+			#self.session.open(MessageBox, _("File not found in this URL:\n%s"%(uri)), MessageBox.TYPE_INFO, timeout = 10)
+			print "[FirmwareUpgrade] - Fail to download. URL :",uri
+			self.session.open(MessageBox, _(errmsg), MessageBox.TYPE_INFO, timeout = 10)
 			del opener
 			return False
 		try :
 			f, h = urlretrieve(uri, tar, doHook)
 		except IOError, msg:
-			self.session.open(MessageBox, _(str(msg)), MessageBox.TYPE_INFO, timeout = 10)
+			#self.session.open(MessageBox, _(str(msg)), MessageBox.TYPE_INFO, timeout = 10)
+			print "[FirmwareUpgrade] - Fail to download. ERR_MSG :",str(msg)
+			self.session.open(MessageBox, _(errmsg), MessageBox.TYPE_INFO, timeout = 10)
 			del opener
 			return False
 		del opener
@@ -298,12 +302,12 @@ class Filebrowser(Screen):
 		os.system("rm -f /tmp/" + root_file)
 
 		# md5
-		if not self.doDownload(self.guri+".md5", self.gbin+".md5", cbfunc=cbDownloadDone):
+		if not self.doDownload(self.guri+".md5", self.gbin+".md5", cbfunc=cbDownloadDone, errmsg="Can't download the checksum file."):
 			self.resetGUI()
 			self.downloadLock = False
 			return
 		# data
-		if not self.doDownload(self.guri, self.gbin, cbfunc=cbDownloadDone):
+		if not self.doDownload(self.guri, self.gbin, cbfunc=cbDownloadDone, errmsg="Can't download the firmware file."):
 			self.resetGUI()
 			self.downloadLock = False
 			return
