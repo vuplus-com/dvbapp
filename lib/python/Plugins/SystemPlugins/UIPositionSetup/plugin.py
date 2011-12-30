@@ -20,29 +20,28 @@ class UIPositionSetupInit:
 		self.setPosition(int(config.plugins.UIPositionSetup.dst_left.value), int(config.plugins.UIPositionSetup.dst_width.value), int(config.plugins.UIPositionSetup.dst_top.value), int(config.plugins.UIPositionSetup.dst_height.value))
 
 	def setPosition(self,dst_left, dst_width, dst_top, dst_height):
-		if dst_left + dst_width > 720:
-			dst_width = 720 - dst_left
-		if dst_top + dst_height > 576:
-			dst_height = 576 - dst_top
-		print "[UIPositionSetup] write dst_left : ",dst_left
-		print "[UIPositionSetup] write dst_width : ",dst_width
-		print "[UIPositionSetup] write dst_top : ",dst_top
-		print "[UIPositionSetup] write dst_height : ",dst_height
-		try:
-			file = open("/proc/stb/fb/dst_left", "w")
-			file.write('%X' % dst_left)
-			file.close()
-			file = open("/proc/stb/fb/dst_width", "w")
-			file.write('%X' % dst_width)
-			file.close()
-			file = open("/proc/stb/fb/dst_top", "w")
-			file.write('%X' % dst_top)
-			file.close()
-			file = open("/proc/stb/fb/dst_height", "w")
-			file.write('%X' % dst_height)
-			file.close()
-		except:
+		if dst_left + dst_width > 720 or dst_top + dst_height > 576 :
 			return
+		else:
+			print "[UIPositionSetup] write dst_left : ",dst_left
+			print "[UIPositionSetup] write dst_width : ",dst_width
+			print "[UIPositionSetup] write dst_top : ",dst_top
+			print "[UIPositionSetup] write dst_height : ",dst_height
+			try:
+				file = open("/proc/stb/fb/dst_left", "w")
+				file.write('%X' % dst_left)
+				file.close()
+				file = open("/proc/stb/fb/dst_width", "w")
+				file.write('%X' % dst_width)
+				file.close()
+				file = open("/proc/stb/fb/dst_top", "w")
+				file.write('%X' % dst_top)
+				file.close()
+				file = open("/proc/stb/fb/dst_height", "w")
+				file.write('%X' % dst_height)
+				file.close()
+			except:
+				return
 
 uipositionsetupinit = UIPositionSetupInit()
 
@@ -90,20 +89,49 @@ class UIPositionSetup(Screen, ConfigListScreen, UIPositionSetupInit):
 		self.dst_top = ConfigSlider(default = top, increment = 5, limits = (0, 576))
 		self.dst_height = ConfigSlider(default = height, increment = 5, limits = (0, 576))
 
-		self.list.append(getConfigListEntry(_("left"), self.dst_left))
-		self.list.append(getConfigListEntry(_("width"), self.dst_width))
-		self.list.append(getConfigListEntry(_("top"), self.dst_top))
-		self.list.append(getConfigListEntry(_("height"), self.dst_height))
+		self.dst_left_entry = getConfigListEntry(_("left"), self.dst_left)
+		self.dst_width_entry = getConfigListEntry(_("width"), self.dst_width)
+		self.dst_top_entry = getConfigListEntry(_("top"), self.dst_top)
+		self.dst_height_entry = getConfigListEntry(_("height"), self.dst_height)
+
+		self.list.append(self.dst_left_entry)
+		self.list.append(self.dst_width_entry)
+		self.list.append(self.dst_top_entry)
+		self.list.append(self.dst_height_entry)
 
 		self["config"].list = self.list
 		self["config"].l.setList(self.list)
 
+	def resetDisplay(self):
+		for entry in self["config"].getList():
+			self["config"].l.invalidateEntry(self["config"].getList().index(entry))
+
+	def adjustBorder(self):
+		if self["config"].getCurrent() == self.dst_left_entry:
+			if self.dst_left.value + self.dst_width.value >720:
+				self.dst_width.setValue(720-self.dst_left.value)
+				self.resetDisplay()
+		elif self["config"].getCurrent() == self.dst_width_entry:
+			if self.dst_left.value + self.dst_width.value >720:
+				self.dst_left.setValue(720-self.dst_width.value)
+				self.resetDisplay()
+		elif self["config"].getCurrent() == self.dst_top_entry:
+			if self.dst_top.value + self.dst_height.value >576:
+				self.dst_height.setValue(576-self.dst_top.value)
+				self.resetDisplay()
+		elif self["config"].getCurrent() == self.dst_height_entry:
+			if self.dst_top.value + self.dst_height.value >576:
+				self.dst_top.setValue(576-self.dst_height.value)
+				self.resetDisplay()
+
 	def keyLeft(self):
 		ConfigListScreen.keyLeft(self)
+		self.adjustBorder()
 		self.setPosition(int(self.dst_left.value), int(self.dst_width.value), int(self.dst_top.value), int(self.dst_height.value))
 
 	def keyRight(self):
 		ConfigListScreen.keyRight(self)
+		self.adjustBorder()
 		self.setPosition(int(self.dst_left.value), int(self.dst_width.value), int(self.dst_top.value), int(self.dst_height.value))
 
 	def keyOk(self):
