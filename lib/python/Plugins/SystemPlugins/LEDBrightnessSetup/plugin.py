@@ -8,7 +8,7 @@ from Plugins.Plugin import PluginDescriptor
 from Screens.MessageBox import MessageBox
 from Tools.Directories import fileExists
 from enigma import eTimer
-from enigma import eDBoxLCD
+import fcntl
 
 config.plugins.brightnesssetup = ConfigSubsection()
 config.plugins.brightnesssetup.brightness = ConfigSlider(default = 1, increment = 1, limits = (0,15))
@@ -20,15 +20,41 @@ class LEDOption:
 	DEEPSTANDBY = 1
 	BLINKINGTIME = 2
 
-class LEDBrightnessSetupStandby:
+class LEDSetup:
+	LED_IOCTL_BRIGHTNESS_NORMAL = 0X10
+	LED_IOCTL_BRIGHTNESS_DEEPSTANDBY = 0X11
+	LED_IOCTL_BLINKING_TIME = 0X12
+	LED_IOCTL_SET_DEFAULT = 0X13
+
 	def __init__(self):
+		self.led_fd = open("/dev/dbox/oled0",'rw')
 		self.initLEDSetup()
 
 	def initLEDSetup(self):
 		brightness = int(config.plugins.brightnesssetup.brightness.value)
 		brightnessstandby = int(config.plugins.brightnesssetup.brightnessdeepstandby.value)
 		blinkingtime = int(config.plugins.brightnesssetup.blinkingtime.value)
-		eDBoxLCD.getInstance().setLEDDefault(brightness, brightnessstandby, blinkingtime)
+		self.setLEDDefault(brightness, brightnessstandby, blinkingtime)
+
+	def setLEDDefault(self, brightness = 1, brightnessstandby = 5, blinkingtime = 5):
+		default_value = (blinkingtime<<16) + (brightnessstandby<<8) + brightness
+		fcntl.ioctl(self.led_fd , self.LED_IOCTL_SET_DEFAULT, default_value)
+
+	def setLED(self, value, option):
+		if option == LEDOption.BRIGHTNESS:
+			cmd = self.LED_IOCTL_BRIGHTNESS_NORMAL
+		elif option == LEDOption.DEEPSTANDBY:
+			cmd = self.LED_IOCTL_BRIGHTNESS_DEEPSTANDBY
+		elif option == LEDOption.BLINKINGTIME:
+			cmd = self.LED_IOCTL_BLINKING_TIME
+		else:
+			return
+		fcntl.ioctl(self.led_fd, cmd, value)
+
+	def __del__(self):
+		self.led_fd.close()
+
+ledsetup = LEDSetup()
 
 class LEDBrightnessSetup(Screen,ConfigListScreen):
 	skin = """
@@ -108,10 +134,10 @@ class LEDBrightnessSetup(Screen,ConfigListScreen):
 
 	def setCurrentValue(self):
 		if self["config"].getCurrent() == self.blinkingtime:
-			eDBoxLCD.getInstance().setLED(1 ,LEDOption.BRIGHTNESS)
-			eDBoxLCD.getInstance().setLED(self["config"].getCurrent()[1].value ,LEDOption.BLINKINGTIME)
+			ledsetup.setLED(1 ,LEDOption.BRIGHTNESS)
+			ledsetup.setLED(self["config"].getCurrent()[1].value ,LEDOption.BLINKINGTIME)
 		else:
-			eDBoxLCD.getInstance().setLED(self["config"].getCurrent()[1].value ,LEDOption.BRIGHTNESS)
+			ledsetup.setLED(self["config"].getCurrent()[1].value ,LEDOption.BRIGHTNESS)
 
 	def keyLeft(self):
 		ConfigListScreen.keyLeft(self)
@@ -125,9 +151,9 @@ class LEDBrightnessSetup(Screen,ConfigListScreen):
 		brightness = config.plugins.brightnesssetup.brightness.value
 		brightnessstandby = config.plugins.brightnesssetup.brightnessdeepstandby.value
 		blinkingtime = config.plugins.brightnesssetup.blinkingtime.value
-		eDBoxLCD.getInstance().setLED(brightness ,LEDOption.BRIGHTNESS)
-		eDBoxLCD.getInstance().setLED(brightnessstandby ,LEDOption.DEEPSTANDBY)
-		eDBoxLCD.getInstance().setLED(blinkingtime ,LEDOption.BLINKINGTIME)
+		ledsetup.setLED(brightness ,LEDOption.BRIGHTNESS)
+		ledsetup.setLED(brightnessstandby ,LEDOption.DEEPSTANDBY)
+		ledsetup.setLED(blinkingtime ,LEDOption.BLINKINGTIME)
 
 	def keySave(self):
 		if self["config"].isChanged():
@@ -140,6 +166,12 @@ class LEDBrightnessSetup(Screen,ConfigListScreen):
 		config.plugins.brightnesssetup.blinkingtime.setValue(5)
 		for entry in self["config"].getList():
 			self["config"].l.invalidateEntry(self["config"].getList().index(entry))
+
+		if self["config"].getCurrent() == self.blinkingtime:
+			self.setCurrentValue()
+		else:
+			ledsetup.setLED(5 ,LEDOption.BLINKINGTIME)
+			ledsetup.setLED(self["config"].getCurrent()[1].value ,LEDOption.BRIGHTNESS)
 
 	def cancelConfirm(self, result):
 		if not result:
@@ -155,4 +187,3 @@ def main(session, **kwargs):
 def Plugins(**kwargs):
 	return [PluginDescriptor(name=_("LED Brightness Setup"), description="Setup LED brightness and blink interval", where = PluginDescriptor.WHERE_PLUGINMENU, needsRestart = False, fnc=main)]
 
-ledbrightnesssetupstandby = LEDBrightnessSetupStandby()
