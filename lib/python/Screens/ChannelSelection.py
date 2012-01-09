@@ -1074,7 +1074,13 @@ class ChannelSelectionBase(Screen):
 			self.servicelist.moveToChar(charstr[0])
 
 	def keyAsciiCode(self):
-		unichar = unichr(getPrevAsciiCode())
+		#unichar = unichr(getPrevAsciiCode())
+		from Components.config import getCharValue
+		unichar = getCharValue(getPrevAsciiCode())
+		if unichar is None:
+			return
+		if len(str(unichar)) > 1:
+			return
 		charstr = unichar.encode("utf-8")
 		if len(charstr) == 1:
 			self.servicelist.moveToChar(charstr[0])

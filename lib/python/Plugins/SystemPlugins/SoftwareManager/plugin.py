@@ -1581,8 +1581,9 @@ class IPKGSource(Screen):
 		else:
 			self["text"] = Input(text, maxSize=False, visible_width = 55, type=Input.TEXT)
 
-		self["actions"] = NumberActionMap(["WizardActions", "InputActions", "TextEntryActions", "KeyboardInputActions","ShortcutActions"], 
+		self["actions"] = NumberActionMap(["WizardActions", "InputActions", "TextEntryActions", "KeyboardInputActions","ShortcutActions", "InputAsciiActions"], 
 		{
+			"gotAsciiCode": self.gotAsciiCode,
 			"ok": self.go,
 			"back": self.close,
 			"red": self.close,
@@ -1606,6 +1607,9 @@ class IPKGSource(Screen):
 		}, -1)
 
 		self.onLayoutFinish.append(self.layoutFinished)
+
+	def gotAsciiCode(self):
+		self["text"].handleAscii(getPrevAsciiCode())
 
 	def layoutFinished(self):
 		self.setWindowTitle()
@@ -1728,7 +1732,13 @@ class PacketManager(Screen, NumericalTextInput):
 				self.setNextIdx(keyvalue[0])
 		
 	def keyGotAscii(self):
-		keyvalue = unichr(getPrevAsciiCode()).encode("utf-8")
+		from Components.config import getCharValue
+		unichar = getCharValue(getPrevAsciiCode())
+		if unichar is None:
+			return
+		if len(str(unichar)) > 1:
+			return
+		keyvalue = unichar.encode("utf-8")
 		if len(keyvalue) == 1:
 			self.setNextIdx(keyvalue[0])
 		

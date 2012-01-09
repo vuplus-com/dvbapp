@@ -232,19 +232,21 @@ class VirtualKeyBoard(Screen):
 		if self.shiftMode:
 			self.k_list = self.shiftkeys_list
 			for keys in self.k_list:
-				if selectedKey < 12 and selectedKey > -1:
+				keyslen = len(keys)
+				if selectedKey < keyslen and selectedKey > -1:
 					list.append(VirtualKeyBoardEntryComponent(keys, selectedKey,True))
 				else:
 					list.append(VirtualKeyBoardEntryComponent(keys, -1,True))
-				selectedKey -= 12
+				selectedKey -= keyslen
 		else:
 			self.k_list = self.keys_list
 			for keys in self.k_list:
-				if selectedKey < 12 and selectedKey > -1:
+				keyslen = len(keys)
+				if selectedKey < keyslen and selectedKey > -1:
 					list.append(VirtualKeyBoardEntryComponent(keys, selectedKey))
 				else:
 					list.append(VirtualKeyBoardEntryComponent(keys, -1))
-				selectedKey -= 12
+				selectedKey -= keyslen
 		
 		self["list"].setList(list)
 	
@@ -263,12 +265,13 @@ class VirtualKeyBoard(Screen):
 		text = None
 
 		for x in list:
-			if selectedKey < 12:
+			xlen = len(x)
+			if selectedKey < xlen:
 				if selectedKey < len(x):
 					text = x[selectedKey]
 				break
 			else:
-				selectedKey -= 12
+				selectedKey -= xlen
 
 		if text is None:
 			return
@@ -375,7 +378,11 @@ class VirtualKeyBoard(Screen):
 		return False
 
 	def keyGotAscii(self):
-		char = str(unichr(getPrevAsciiCode()).encode('utf-8'))
+		#char = str(unichr(getPrevAsciiCode()).encode('utf-8'))
+		from Components.config import getCharValue
+		char = getCharValue(getPrevAsciiCode())
+		if len(str(char)) == 1:
+			char = char.encode("utf-8")
 		if self.inShiftKeyList(char):
 			self.shiftMode = True
 			list = self.shiftkeys_list
