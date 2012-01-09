@@ -8,32 +8,32 @@ from Plugins.Plugin import PluginDescriptor
 from Tools.Directories import resolveFilename, SCOPE_PLUGINS, fileExists
 from Screens.MessageBox import MessageBox
 from enigma import eTimer
-import genuinevuplus
+import vuplusauthenticity
 import os
 import socket
 import urllib2
 
 default_email_address = "Please input your E-mail address"
-config.plugins.genuinevuplus = ConfigSubsection()
-config.plugins.genuinevuplus.sn_a = NoSave(ConfigSelection(default = "MA", choices = [ ("MA", _("MA")), ("MB", _("MB")), ("MC", _("MC")), ("MD", _("MD")), ("ME", _("ME")), ("MF", _("MF")), ("MG", _("MG")), ("MH", _("MH"))] ))
-config.plugins.genuinevuplus.sn_b = NoSave(ConfigInteger(default = 0,  limits = (1, 999999999)))
-config.plugins.genuinevuplus.email = NoSave(ConfigText(default = default_email_address, visible_width = 50, fixed_size = False))
+config.plugins.vuplusauthenticity = ConfigSubsection()
+config.plugins.vuplusauthenticity.sn_a = NoSave(ConfigSelection(default = "MA", choices = [ ("MA", _("MA")), ("MB", _("MB")), ("MC", _("MC")), ("MD", _("MD")), ("ME", _("ME")), ("MF", _("MF")), ("MG", _("MG")), ("MH", _("MH"))] ))
+config.plugins.vuplusauthenticity.sn_b = NoSave(ConfigInteger(default = 0,  limits = (1, 999999999)))
+config.plugins.vuplusauthenticity.email = NoSave(ConfigText(default = default_email_address, visible_width = 50, fixed_size = False))
 
 GENUINE_MESSAGES={
-		-6 : "The server responded with an error message.",
-		-5 : " Connect to server failed, \nplease check your network configuration and retry.",
-		-4 : "UNEXPECTED ERROR.",
-		-3 : "INVALID SERIAL NUMBER.",
+		-6 : "UNEXPECTED ERROR(2).",
+		-5 : "INVALID SERIAL NUMBER.",
+		-4 : " Connect to server failed, \nplease check your network configuration and retry.",
+		-3 : "UNEXPECTED ERROR(1).",
 		-2 : "DEVICE OPEN ERROR.",
 		-1 : "AUTHENTICATION FAILED.",
 		0 : "AUTHENTICATION SUCCESS."
 }
 
-class GenuineVuplus(Screen, ConfigListScreen):
+class VuplusAuthenticity(Screen, ConfigListScreen):
 	def __init__(self,session):
 		if session.desktop.size().width() > 720:
 			self.skin = """
-			<screen name="GenuineVuplus" position="center,center" size="800,370" title="Genuine Vuplus">
+			<screen name="VuplusAuthenticity" position="center,center" size="800,370" title="Return the Love Event (only for genuine box)">
 			<ePixmap pixmap="Vu_HD/buttons/red.png" position="250,15" size="25,25" alphatest="on" />
 			<ePixmap pixmap="Vu_HD/buttons/green.png" position="435,15" size="25,25" alphatest="on" />
 			<widget source="key_red" render="Label" position="265,15" zPosition="1" size="140,25" font="Regular;24" halign="center" valign="center" transparent="1" />
@@ -44,7 +44,7 @@ class GenuineVuplus(Screen, ConfigListScreen):
 			</screen>"""
 
 		else:
-			self.skin="""<screen name="GenuineVuplus" position="center,center" size="600,320" title="Genuine Vuplus">
+			self.skin="""<screen name="VuplusAuthenticity" position="center,center" size="600,320" title="Genuine Vuplus">
 			<ePixmap pixmap="Vu_HD/buttons/red.png" position="170,15" size="25,25" alphatest="on" />
 			<ePixmap pixmap="Vu_HD/buttons/green.png" position="355,15" size="25,25" alphatest="on" />
 			<widget source="key_red" render="Label" position="185,15" zPosition="1" size="140,25" font="Regular;24" halign="center" valign="center" transparent="1" />
@@ -73,8 +73,8 @@ class GenuineVuplus(Screen, ConfigListScreen):
 		self.onLayoutFinish.append(self.checkKernelVer)
 		self.checkTimer = eTimer()
 		self.checkTimer.callback.append(self.invalidKVer)
-		self.connectToServerTimer = eTimer()
-		self.connectToServerTimer.callback.append(self.connectToServer)
+		self.requestauth_timer = eTimer()
+		self.requestauth_timer.callback.append(self.requestauth)
 
 	def checkKernelVer(self):
 		KVer = os.uname()[2]
@@ -86,9 +86,9 @@ class GenuineVuplus(Screen, ConfigListScreen):
 
 	def createSetup(self):
 		self.list = []
-		self.sn_aEntry = getConfigListEntry(_("1-1. Serial Number (The first two letters of SN)"), config.plugins.genuinevuplus.sn_a)
-		self.sn_bEntry = getConfigListEntry(_("1-2. Serial Number (The remaining numbers of SN)"), config.plugins.genuinevuplus.sn_b)
-		self.emailEntry = getConfigListEntry(_("2. Contact"), config.plugins.genuinevuplus.email)
+		self.sn_aEntry = getConfigListEntry(_("1-1. Serial Number (The first two letters of SN)"), config.plugins.vuplusauthenticity.sn_a)
+		self.sn_bEntry = getConfigListEntry(_("1-2. Serial Number (The remaining numbers of SN)"), config.plugins.vuplusauthenticity.sn_b)
+		self.emailEntry = getConfigListEntry(_("2. Contact"), config.plugins.vuplusauthenticity.email)
 		self.list.append( self.sn_aEntry )
 		self.list.append( self.sn_bEntry )
 		self.list.append( self.emailEntry )
@@ -96,7 +96,7 @@ class GenuineVuplus(Screen, ConfigListScreen):
 		self["config"].l.setList(self.list)
 
 	def confirmValidSN(self):
-		sn = str(config.plugins.genuinevuplus.sn_b.value)
+		sn = str(config.plugins.vuplusauthenticity.sn_b.value)
 		if len(sn) > 9:
 			return False
 		elif sn == '0':
@@ -120,19 +120,14 @@ class GenuineVuplus(Screen, ConfigListScreen):
 
 	def Start(self):
 		self["text1"].setText("WAITING......")
-		if(not self.confirmValidSN()):
-			self.displayResult(-3)
+		msg = "Please note that you agree to send software information of the box by applying the event.\nThe collected data will be used in a form that does not personally identify you."
+		self.session.openWithCallback(self.userConfirmCallback, MessageBoxGenuine, _(msg), MessageBox.TYPE_YESNO)
+
+	def userConfirmCallback(self,ret):
+		if ret:
+			self.requestauth_timer.start(0,True)
 		else:
-			try:
-				ret=genuinevuplus.requestauth()
-			except :
-				self.displayResult(-4)
-			if ret == 0 or ret == -1:
-#				self.connectToServer(ret)
-				self.genuine = ret
-				self.connectToServerTimer.start(0,True)
-			elif ret == -2:
-				self.displayResult(-2)
+			self["text1"].setText("Press green button to start")
 
 	def getModel(self):
 		if fileExists("/proc/stb/info/vumodel"):
@@ -143,62 +138,80 @@ class GenuineVuplus(Screen, ConfigListScreen):
 		else:
 			return "unknown"
 
-	def connectToServer(self):
-		sn_b = str(config.plugins.genuinevuplus.sn_b.value)
-		for n in range(9-len(sn_b)):
-			sn_b = '0'+sn_b
-		serial_number = config.plugins.genuinevuplus.sn_a.value + sn_b
-
-		model =self.getModel()
-
-		email = config.plugins.genuinevuplus.email.value
-		if len(email) == 0 or email == default_email_address:
-			email = 'none'
-
-		URL = "http://code.vuplus.com/genuine.php?serial=%s&yn=%s&model=%s&email=%s"%(serial_number, self.genuine == 0 and 'y' or self.genuine == -1 and 'n' or 'n' ,model, email)
-#		print URL
-		response = None
-		retry = 0
-		while 1:
-			try:
-				timeout = 10
-				socket.setdefaulttimeout(timeout)
-				response = urllib2.urlopen(URL)
-				break
-			except urllib2.URLError, e:
-				if hasattr(e, 'reason'):
-					print '[Genuine vuplus] Failed to reach a server.'
-					print '[Genuine vuplus] Reason : ', e.reason
-				elif hasattr(e, 'code'):
-					print '[Genuine vuplus] The server could not fullfill the request.'
-					print '[Genuine vuplus] Error code: ', e.code
-				if retry == 0:
-					print "[Genuine vuplus] retry..."
-					retry = 1
-				else:
-					break
-			except socket.timeout:
-				print "[Genuine vuplus] Socket time out."
-				if retry == 0:
-					print "[Genuine vuplus] retry..."
-					retry = 1
-				else:
-					break
-
-		if response is not None:
-			if response.read() == 'YES':
-				self.displayResult(self.genuine)
-			else:
-				self.displayResult(-6)
-		else:
+	def requestauth(self):
+		if(not self.confirmValidSN()):
 			self.displayResult(-5)
+			return
+		sn_b = str(config.plugins.vuplusauthenticity.sn_b.value)
+		while(len(sn_b)<9):
+			sn_b = '0'+sn_b
+		serial_number = config.plugins.vuplusauthenticity.sn_a.value + sn_b
+		model =self.getModel()
+		email = config.plugins.vuplusauthenticity.email.value
+		if len(email) == 0 or email == default_email_address:
+			email = "none"
+		try:
+			ret=vuplusauthenticity.requestauth(serial_number, model, email)
+			self.displayResult(ret)
+		except :
+			self.displayResult(-6)
 
 	def keyExit(self):
 		self.close()
 
+class MessageBoxGenuine(MessageBox):
+	skin = """
+		<screen position="center,center" size="600,10" title="Message">
+		<widget name="text" position="65,8" size="420,0" font="Regular;22" />
+		<widget name="ErrorPixmap" pixmap="Vu_HD/icons/input_error.png" position="5,5" size="53,53" alphatest="blend" />
+		<widget name="QuestionPixmap" pixmap="Vu_HD/icons/input_question.png" position="5,5" size="53,53" alphatest="blend" />
+		<widget name="InfoPixmap" pixmap="Vu_HD/icons/input_info.png" position="5,5" size="53,53" alphatest="blend" />
+		<widget name="list" position="100,100" size="380,375" transparent="1" backgroundColor="darkgrey" />
+		<applet type="onLayoutFinish">
+# this should be factored out into some helper code, but currently demonstrates applets.
+from enigma import eSize, ePoint
+
+orgwidth = self.instance.size().width()
+orgpos = self.instance.position()
+textsize = self[&quot;text&quot;].getSize()
+
+# y size still must be fixed in font stuff...
+textsize = (textsize[0] + 50, textsize[1] + 50)
+offset = 0
+if self.type == self.TYPE_YESNO:
+	offset = 60
+wsizex = textsize[0] + 60
+wsizey = textsize[1] + offset
+if (280 &gt; wsizex):
+	wsizex = 280
+wsize = (wsizex, wsizey)
+
+
+# resize
+self.instance.resize(eSize(*wsize))
+
+# resize label
+self[&quot;text&quot;].instance.resize(eSize(*textsize))
+
+# move list
+listsize = (wsizex, 50)
+self[&quot;list&quot;].instance.move(ePoint(0, textsize[1]))
+self[&quot;list&quot;].instance.resize(eSize(*listsize))
+
+# center window
+newwidth = wsize[0]
+self.instance.move(ePoint(orgpos.x() + (orgwidth - newwidth)/2, orgpos.y()))
+		</applet>
+	</screen>"""
+	def __init__(self, session, text, type = MessageBox.TYPE_YESNO, timeout = -1, close_on_any_key = False, default = True, enable_input = True, msgBoxID = None):
+		MessageBox.__init__(self,session, text, type, timeout, close_on_any_key, default, enable_input,msgBoxID)
+		if type == MessageBox.TYPE_YESNO:
+			self.list = [ (_("Agree"), 0), (_("Exit"), 1) ]
+			self["list"].setList(self.list)
+
 def main(session, **kwargs):
-	session.open(GenuineVuplus)
+	session.open(VuplusAuthenticity)
 
 def Plugins(**kwargs):
-	return [PluginDescriptor(name=_("Genuine Vuplus"), description="Support for verifying the authenticity of your Vu+.", where = PluginDescriptor.WHERE_PLUGINMENU, needsRestart = False, fnc=main)]
+	return [PluginDescriptor(name=_("Return the Love Event"), description="Don't lose the chance to get the gift.", where = PluginDescriptor.WHERE_PLUGINMENU, needsRestart = False, fnc=main)]
 
