@@ -41,11 +41,11 @@ int getType(int code)
 	case 105: // left
 	case 106: // right
 	case 108: // down
+	case 113: // mute
 	case 114: // volume down
 	case 115: // vulume up
 	case 116: // power
 	case 128: // stop
-	case 133: // mute
 	case 138: // help
 	case 139: // menu
 	case 163: // FF
