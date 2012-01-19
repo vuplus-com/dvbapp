@@ -278,10 +278,13 @@ def autosubmit(reason, **kwargs):
 	loadConfig()
 	import os
 	def isExistCrashlog(d='/media/hdd'):
-	    for f in os.listdir(d):
-		if f.startswith("enigma2_crash_") and f.endswith(".log"):
-			return True
-	    return False
+		try:
+			for f in os.listdir(d):
+				if f.startswith("enigma2_crash_") and f.endswith(".log"):
+					return True
+		except:
+			pass
+	    	return False
 
 	def cbDataAvail(ret_data):
 		print ret_data

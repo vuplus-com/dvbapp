@@ -453,17 +453,20 @@ class Blindscan(ConfigListScreen, Screen):
 						"PILOT_OFF" : parm.Pilot_Off}
 					pol = {	"HORIZONTAL" : parm.Polarisation_Horizontal,
 						"VERTICAL" : parm.Polarisation_Vertical}
-					parm.orbital_position = self.orb_position
-					parm.polarisation = pol[data[1]]
-					parm.frequency = int(data[2])
-					parm.symbol_rate = int(data[3])
-					parm.system = sys[data[4]]
-					parm.inversion = inv[data[5]]
-					parm.pilot = pilot[data[6]]
-					parm.fec = fec[data[7]]
-					parm.modulation = qam[data[8]]
-					parm.rolloff = roll[data[9]]
-					self.tmp_tplist.append(parm)
+					try :
+						parm.orbital_position = self.orb_position
+						parm.polarisation = pol[data[1]]
+						parm.frequency = int(data[2])
+						parm.symbol_rate = int(data[3])
+						parm.system = sys[data[4]]
+						parm.inversion = inv[data[5]]
+						parm.pilot = pilot[data[6]]
+						parm.fec = fec[data[7]]
+						parm.modulation = qam[data[8]]
+						parm.rolloff = roll[data[9]]
+						self.tmp_tplist.append(parm)
+					except:
+						pass
 		self.blindscan_session.close(True)
 
 	def blindscanContainerAvail(self, str):

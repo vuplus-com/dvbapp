@@ -19,10 +19,13 @@ def getLogList(d):
     l = []
     if d is None or d == "":
         return l
-    for f in os.listdir(d):
-        if f.startswith("enigma2_crash_") and f.endswith(".log"):
-            print "[CrashReport] found : ", os.path.basename(f)
-            l.append(d + '/' + f)
+    try:
+        for f in os.listdir(d):
+            if f.startswith("enigma2_crash_") and f.endswith(".log"):
+                print "[CrashReport] found : ", os.path.basename(f)
+                l.append(d + '/' + f)
+    except:
+        pass
     return l
 
 def sendEmail(F, T, M, S="", FL=[]):
