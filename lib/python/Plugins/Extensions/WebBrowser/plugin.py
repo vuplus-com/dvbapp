@@ -366,7 +366,7 @@ class VuPlayerService:
 			if len(tmp) == 2 and tmp[0] == "http://www.youtube.com/watch":
 				tmp = tmp[1].split("&")
 				print tmp # ['v=BpThu778qB4', 'feature=related']
-				if len(tmp) == 2:
+				if len(tmp) > 2:
 					tmp = tmp[0].split("=")
 					print tmp # ['v', 'BpThu778qB4']
 					if len(tmp) == 2 and tmp[0] == "v":
