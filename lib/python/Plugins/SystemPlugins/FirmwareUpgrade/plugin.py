@@ -16,7 +16,7 @@ from Components.Slider import Slider
 from Screens.Screen import Screen
 from Screens.MessageBox import MessageBox
 
-from enigma import ePoint, eConsoleAppContainer, eTimer
+from enigma import ePoint, eConsoleAppContainer, eTimer, getDesktop
 from Tools.Directories import resolveFilename, SCOPE_PLUGINS
 
 fwlist = None
@@ -210,6 +210,7 @@ class FirmwareUpgradeManager:
 		return str(self.fu.errmsg)
 
 class UpgradeStatus(Screen):
+	'''
 	skin = 	"""
 		<screen position="center,center" size="450,100" title=" ">
 			<widget name="name" position="10,0" size="430,20" font="Regular;18" halign="left" valign="bottom"/>
@@ -218,6 +219,17 @@ class UpgradeStatus(Screen):
 			<widget source="info" render="Label" position="10,70" zPosition="1" size="430,30" font="Regular;22" halign="center" valign="center" backgroundColor="#a08500" transparent="1"/>
 		</screen>
 		"""
+	'''
+	size = getDesktop(0).size()
+	position_params = size.width() > 750 and (' ') or ('backgroundColor=\"blue\"')
+	skin = 	"""
+		<screen position="center,center" size="450,130" title="FPGA Upgrade">
+			<widget name="name" position="10,0" size="430,20" font="Regular;18" halign="left" valign="bottom"/>
+			<widget name="slider" position="10,25" size="430,30" borderWidth="2" borderColor="#cccccc"/>
+			<widget name="status" position="10,25" zPosition="1" size="430,30" font="Regular;18" halign="center" valign="center" foregroundColor="blue" %s transparent="1"/>
+			<widget source="info" render="Label" position="10,70" zPosition="1" size="430,60" font="Regular;22" halign="center" valign="center" backgroundColor="#a08500" transparent="1"/>
+		</screen>
+		""" % position_params
 
 	def __init__(self, session, parent, firmware, datafile, device):
 		Screen.__init__(self,session)

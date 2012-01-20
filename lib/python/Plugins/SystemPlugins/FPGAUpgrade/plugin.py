@@ -1,6 +1,6 @@
 import os, fcntl, thread
 
-from enigma import eTimer
+from enigma import eTimer, getDesktop
 
 from urllib import urlretrieve
 import urllib
@@ -122,14 +122,17 @@ class FPGAUpgradeManager:
 		return str(self.fu.errmsg)
 
 class UpgradeStatus(Screen):
+	size = getDesktop(0).size()
+	position_params = size.width() > 750 and (' ') or ('backgroundColor=\"blue\"')
 	skin = 	"""
 		<screen position="center,center" size="450,130" title="FPGA Upgrade">
 			<widget name="name" position="10,0" size="430,20" font="Regular;18" halign="left" valign="bottom"/>
-			<widget name="slider" position="10,25" size="430,30" backgroundColor="white"/>
-			<widget name="status" position="10,25" zPosition="1" size="430,30" font="Regular;18" halign="center" valign="center" foregroundColor="black" backgroundColor="black" transparent="1"/>
+			<widget name="slider" position="10,25" size="430,30" borderWidth="2" borderColor="#cccccc"/>
+			<widget name="status" position="10,25" zPosition="1" size="430,30" font="Regular;18" halign="center" valign="center" foregroundColor="blue" %s transparent="1"/>
 			<widget source="info" render="Label" position="10,70" zPosition="1" size="430,60" font="Regular;22" halign="center" valign="center" backgroundColor="#a08500" transparent="1"/>
 		</screen>
-		"""
+		""" % position_params
+
 	def __init__(self, session, parent, timeout = 20):
 		Screen.__init__(self,session)
 		self.session = session
@@ -208,8 +211,10 @@ class UpgradeStatus(Screen):
 			self.close()
 		
 class FPGAUpgrade(Screen):
+	size = getDesktop(0).size()
+	position_params = size.width() > 750 and ('center', 440) or ('120', 420)
 	skin = 	"""
-		<screen position="center,center" size="560,440" title="FPGA Upgrade" >
+		<screen position="center,%s" size="560,%d" title="FPGA Upgrade" >
 			<ePixmap pixmap="Vu_HD/buttons/red.png" position="0,7" size="80,40" alphatest="blend" />
 			<ePixmap pixmap="Vu_HD/buttons/green.png" position="186,7" size="80,40" alphatest="blend" />
 			<ePixmap pixmap="Vu_HD/buttons/blue.png" position="372,7" size="80,40" alphatest="blend" />
@@ -221,7 +226,7 @@ class FPGAUpgrade(Screen):
 			<widget source="status" render="Label" position="15,45" zPosition="1" size="540,40" font="Regular;18" halign="left" valign="center" backgroundColor="#a08500" transparent="1" />
 			<widget name="file_list" position="0,100" size="555,325" scrollbarMode="showOnDemand" />
                 </screen>
-		"""
+		""" % position_params 
 
 	def __init__(self, session): 
 		Screen.__init__(self, session)
