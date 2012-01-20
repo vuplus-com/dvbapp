@@ -120,7 +120,7 @@ class MessageBoxConfirmCode(MessageBox):
 		<widget name="ErrorPixmap" pixmap="Vu_HD/icons/input_error.png" position="5,5" size="53,53" alphatest="blend" />
 		<widget name="QuestionPixmap" pixmap="Vu_HD/icons/input_question.png" position="5,5" size="53,53" alphatest="blend" />
 		<widget name="InfoPixmap" pixmap="Vu_HD/icons/input_info.png" position="5,5" size="53,53" alphatest="blend" />
-		<widget name="list" position="100,100" size="380,375" transparent="1" backgroundColor="darkgrey" />
+		<widget name="list" position="100,100" size="380,375" transparent="1" backgroundColor="#279e9fa4" />
 		<applet type="onLayoutFinish">
 # this should be factored out into some helper code, but currently demonstrates applets.
 from enigma import eSize, ePoint
