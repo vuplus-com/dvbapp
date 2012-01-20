@@ -44,7 +44,7 @@ class VuplusAuthenticity(Screen, ConfigListScreen):
 			</screen>"""
 
 		else:
-			self.skin="""<screen name="VuplusAuthenticity" position="center,center" size="600,320" title="Genuine Vuplus">
+			self.skin="""<screen name="VuplusAuthenticity" position="center,center" size="600,320" title="Return the Love Event (only for genuine box)">
 			<ePixmap pixmap="Vu_HD/buttons/red.png" position="170,15" size="25,25" alphatest="on" />
 			<ePixmap pixmap="Vu_HD/buttons/green.png" position="355,15" size="25,25" alphatest="on" />
 			<widget source="key_red" render="Label" position="185,15" zPosition="1" size="140,25" font="Regular;24" halign="center" valign="center" transparent="1" />

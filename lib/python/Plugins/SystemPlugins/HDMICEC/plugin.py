@@ -27,8 +27,10 @@ from os import system
 from Components.InputDevice import iInputDevices
 
 class HdmiCecPlugin(Screen,ConfigListScreen):
-	skin = """
-		<screen name="HDMICEC" position="center,center" size="700,400" title="HDMI-CEC Plugin" >
+	def __init__(self, session):
+		if session.desktop.size().width() > 720:
+			self.skin = """
+			<screen name="HDMICEC" position="center,center" size="700,400" title="HDMI-CEC Plugin" >
 			<ePixmap pixmap="skin_default/buttons/red.png" position="0,0" size="140,40" alphatest="on" />
 			<ePixmap pixmap="skin_default/buttons/green.png" position="140,0" size="140,40" alphatest="on" />
 			<ePixmap pixmap="skin_default/buttons/yellow.png" position="280,0" size="140,40" alphatest="on" />
@@ -38,11 +40,21 @@ class HdmiCecPlugin(Screen,ConfigListScreen):
 			<widget source="key_yellow" render="Label" position="280,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" foregroundColor="#ececec" backgroundColor="#1f771f" transparent="1" />
 			<widget source="key_blue" render="Label" position="420,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" foregroundColor="#ececec" backgroundColor="#1f771f" transparent="1" />
 			<widget name="config" zPosition="2" position="5,50" size="650,300" scrollbarMode="showOnDemand" transparent="1" />
-		</screen>"""
-	def __init__(self, session):
+			</screen>"""
+		else:
+			self.skin = """
+			<screen name="HDMICEC" position="center,center" size="600,320" title="HDMI-CEC Plugin" >
+			<ePixmap pixmap="skin_default/buttons/red.png" position="10,0" size="140,40" alphatest="on" />
+			<ePixmap pixmap="skin_default/buttons/green.png" position="150,0" size="140,40" alphatest="on" />
+			<ePixmap pixmap="skin_default/buttons/yellow.png" position="290,0" size="140,40" alphatest="on" />
+			<ePixmap pixmap="skin_default/buttons/blue.png" position="430,0" size="140,40" alphatest="on" />
+			<widget source="key_red" render="Label" position="10,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" foregroundColor="#ececec" backgroundColor="#9f1313" transparent="1" />
+			<widget source="key_green" render="Label" position="150,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" foregroundColor="#ececec" backgroundColor="#1f771f" transparent="1" />
+			<widget source="key_yellow" render="Label" position="290,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" foregroundColor="#ececec" backgroundColor="#1f771f" transparent="1" />
+			<widget source="key_blue" render="Label" position="430,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" foregroundColor="#ececec" backgroundColor="#1f771f" transparent="1" />
+			<widget name="config" zPosition="2" position="10,50" size="580,270" scrollbarMode="showOnDemand" transparent="1" />
+			</screen>"""
 		Screen.__init__(self, session)
-		
-		
 		config.hdmicec.input_address = ConfigText(default = "0", visible_width = 50, fixed_size = False)
 		config.hdmicec.input_value1 = ConfigText(default = "0", visible_width = 50, fixed_size = False)
 		config.hdmicec.input_value2 = ConfigText(default = "", visible_width = 50, fixed_size = False)
