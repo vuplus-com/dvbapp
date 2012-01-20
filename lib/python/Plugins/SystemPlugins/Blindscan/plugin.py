@@ -16,11 +16,13 @@ from Components.config import config, ConfigSubsection, ConfigSelection, ConfigY
 from Tools.HardwareInfo import HardwareInfo
 from Tools.Directories import resolveFilename, SCOPE_DEFAULTPARTITIONMOUNTDIR, SCOPE_DEFAULTDIR, SCOPE_DEFAULTPARTITION
 
-from enigma import eTimer, eDVBFrontendParametersSatellite, eComponentScan, eDVBSatelliteEquipmentControl, eDVBFrontendParametersTerrestrial, eDVBFrontendParametersCable, eConsoleAppContainer, eDVBResourceManager
+from enigma import eTimer, eDVBFrontendParametersSatellite, eComponentScan, eDVBSatelliteEquipmentControl, eDVBFrontendParametersTerrestrial, eDVBFrontendParametersCable, eConsoleAppContainer, eDVBResourceManager, getDesktop
 
 class Blindscan(ConfigListScreen, Screen):
-	skin="""
-		<screen name="Blindscan" position="center,center" size="560,370" title="Blindscan">
+	size = getDesktop(0).size()
+	position_params = size.width() > 750 and ('center') or ('140')
+	skin = 	"""
+		<screen name="Blindscan" position="center,%s" size="560,370" title="Blindscan">
 			<ePixmap pixmap="Vu_HD/buttons/red.png" position="5,0" size="80,40" alphatest="on" />
 			<ePixmap pixmap="Vu_HD/buttons/green.png" position="186,0" size="80,40" alphatest="on" />
 			<ePixmap pixmap="Vu_HD/buttons/blue.png" position="372,0" size="80,40" alphatest="on" />
@@ -32,7 +34,8 @@ class Blindscan(ConfigListScreen, Screen):
 			<widget name="config" position="5,50" size="550,280" scrollbarMode="showOnDemand" />
 			<widget name="introduction" position="0,345" size="560,20" font="Regular;20" halign="center" />
 		</screen>
-		"""
+		""" % position_params
+
 	def __init__(self, session): 
 		Screen.__init__(self, session)
 

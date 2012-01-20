@@ -15,7 +15,7 @@ from Screens.VirtualKeyBoard import VirtualKeyBoard
 from Screens.ChoiceBox import ChoiceBox
 from Screens.MessageBox import MessageBox
 
-from enigma import ePoint, eConsoleAppContainer
+from enigma import ePoint, eConsoleAppContainer, getDesktop
 
 from Tools.Directories import resolveFilename, SCOPE_PLUGINS
 
@@ -79,7 +79,8 @@ def loadConfig():
 		g_default_machineinfo = False
 
 class CrashlogReportConfiguration(Screen, ConfigListScreen):
-	skin = 	"""
+	skin_list = {}
+	skin_list["hd"] = """
 		<screen name="CrashlogReportSetting" position="209,48" size="865,623" title="CrashlogReport Setting" flags="wfNoBorder" backgroundColor="transparent">	
 			<ePixmap pixmap="Vu_HD/Bg_EPG_list.png" zPosition="-1" position="0,0" size="865,623" alphatest="on" />
 			<ePixmap pixmap="Vu_HD/menu/ico_title_Setup.png" position="32,41" size="40,40" alphatest="blend"  transparent="1" />
@@ -100,6 +101,23 @@ class CrashlogReportConfiguration(Screen, ConfigListScreen):
 			<widget name="HelpWindow" pixmap="Vu_HD/vkey_icon.png" position="310,400" zPosition="1" size="1,1" transparent="1" alphatest="on" />
 		</screen>
 		"""
+	skin_list["sd"] = """
+		<screen name="CrashlogReportSetting" position="center,120" size="560,420" title="CrashlogReport Settings" >
+			<ePixmap pixmap="750S/buttons/red.png" position="0,0" size="140,40" alphatest="on" />
+			<ePixmap pixmap="750S/buttons/green.png" position="140,0" size="140,40" alphatest="on" />
+			<widget source="key_red" render="Label" position="20,0" zPosition="1" size="115,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />
+			<widget source="key_green" render="Label" position="160,0" zPosition="1" size="115,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
+			<widget name="config" zPosition="2" position="5,50" size="550,300" scrollbarMode="showOnDemand" transparent="1" />
+			<ePixmap pixmap="750S/div-h.png" position="0,360" zPosition="10" size="560,2" transparent="1" alphatest="on" />
+			<widget source="status" render="Label" position="10,370" size="540,40" zPosition="10" font="Regular;20" halign="center" valign="center" backgroundColor="#25062748" transparent="1"/>
+			<widget name="VKeyIcon" pixmap="750S/buttons/key_text.png" position="10,390" zPosition="10" size="35,25" transparent="1" alphatest="on" />
+			<widget name="HelpWindow" pixmap="750S/vkey_icon.png" position="160,300" zPosition="1" size="1,1" transparent="1" alphatest="on" />
+		</screen>
+		"""
+
+	size = getDesktop(0).size()
+	skin = skin_list[size.width() > 750 and "hd" or "sd"]
+
 	def __init__(self, session):
 		Screen.__init__(self, session)
 		self.session = session
