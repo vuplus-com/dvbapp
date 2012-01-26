@@ -15,7 +15,7 @@ import urllib2
 
 default_email_address = "Please input your E-mail address"
 config.plugins.vuplusauthenticity = ConfigSubsection()
-config.plugins.vuplusauthenticity.sn_a = NoSave(ConfigSelection(default = "MA", choices = [ ("MA", _("MA")), ("MB", _("MB")), ("MC", _("MC")), ("MD", _("MD")), ("ME", _("ME")), ("MF", _("MF")), ("MG", _("MG")), ("MH", _("MH"))] ))
+config.plugins.vuplusauthenticity.sn_a = NoSave(ConfigSelection(default = "MSA", choices = [ ("MSA", _("MSA")), ("MA", _("MA")), ("MB", _("MB")), ("MC", _("MC")), ("MD", _("MD")), ("ME", _("ME")), ("MF", _("MF")), ("MG", _("MG")), ("MH", _("MH"))] ))
 config.plugins.vuplusauthenticity.sn_b = NoSave(ConfigInteger(default = 0,  limits = (1, 999999999)))
 config.plugins.vuplusauthenticity.email = NoSave(ConfigText(default = default_email_address, visible_width = 50, fixed_size = False))
 
@@ -86,7 +86,7 @@ class VuplusAuthenticity(Screen, ConfigListScreen):
 
 	def createSetup(self):
 		self.list = []
-		self.sn_aEntry = getConfigListEntry(_("1-1. Serial Number (The first two letters of SN)"), config.plugins.vuplusauthenticity.sn_a)
+		self.sn_aEntry = getConfigListEntry(_("1-1. Serial Number (The first two or three letters of SN)"), config.plugins.vuplusauthenticity.sn_a)
 		self.sn_bEntry = getConfigListEntry(_("1-2. Serial Number (The remaining numbers of SN)"), config.plugins.vuplusauthenticity.sn_b)
 		self.emailEntry = getConfigListEntry(_("2. Contact"), config.plugins.vuplusauthenticity.email)
 		self.list.append( self.sn_aEntry )
