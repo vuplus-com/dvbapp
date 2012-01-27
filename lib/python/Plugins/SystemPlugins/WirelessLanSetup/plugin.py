@@ -29,37 +29,22 @@ from Tools.Directories import fileExists
 import time
 
 class WlanSelection(Screen,HelpableScreen):
-	def __init__(self, session):
-		if session.desktop.size().width() > 720:
-			self.skin = """
-			<screen name="WlanSelection" position="209,48" size="865,623" title="Wireless Network Configuration..." flags="wfNoBorder" backgroundColor="transparent">
-			<ePixmap pixmap="Vu_HD/Bg_EPG_view.png" zPosition="-1" position="0,0" size="865,623" alphatest="on" />
-			<ePixmap pixmap="Vu_HD/menu/ico_title_Setup.png" position="32,41" size="40,40" alphatest="blend"  transparent="1" />
-			<eLabel text="Wireless Network Adapter Selection..." position="90,50" size="600,32" font="Semiboldit;32" foregroundColor="#5d5d5d" backgroundColor="#27b5b9bd" transparent="1" />
-			<ePixmap pixmap="Vu_HD/icons/clock.png" position="750,55" zPosition="1" size="20,20" alphatest="blend" />
-			<widget source="global.CurrentTime" render="Label" position="770,57" zPosition="1" size="50,20" font="Regular;20" foregroundColor="#1c1c1c" backgroundColor="#27d9dee2" halign="right" transparent="1">
-				<convert type="ClockToText">Format:%H:%M</convert>
-			</widget>
-			<ePixmap pixmap="Vu_HD/buttons/red.png" position="45,98" size="25,25" alphatest="blend" />
-			<ePixmap pixmap="Vu_HD/buttons/green.png" position="240,98" size="25,25" alphatest="blend" />
-			<widget source="key_red" render="Label" position="66,97" zPosition="1" size="150,25" font="Regular;20" halign="center" valign="center" backgroundColor="darkgrey" foregroundColor="#1c1c1c" transparent="1" />
-			<widget source="key_green" render="Label" position="268,97" zPosition="1" size="150,25" font="Regular;20" halign="center" valign="center" backgroundColor="darkgrey" foregroundColor="#1c1c1c" transparent="1" />
-			<ePixmap pixmap="Vu_HD/border_menu.png" position="120,140" zPosition="-1" size="342,358" transparent="1" alphatest="blend" />
-			<widget name="menulist" position="130,150" size="322,338" transparent="1" backgroundColor="#27d9dee2" zPosition="10" scrollbarMode="showOnDemand" />
-			<widget source="description" render="Label" position="500,140" size="280,360" font="Regular;19" halign="center" valign="center" backgroundColor="#c5c9cc" transparent="1"/>
-			</screen>"""
-		else:
-			self.skin = """
-			<screen name="WlanSelection" position="110,120" size="500,400" title="Wireless Network Adapter Selection..." >
-			<ePixmap pixmap="750S/div-h.png" position="0,350" zPosition="1" size="560,2" />
-			<ePixmap pixmap="750S/border_menu_a.png" position="10,10" zPosition="1" size="250,300" transparent="1" alphatest="on" />
-			<ePixmap pixmap="750S/buttons/red.png" position="10,360" size="140,40" alphatest="on" />
-			<widget source="key_red" render="Label" position="30,360" zPosition="1" size="115,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />
-			<ePixmap pixmap="750S/buttons/green.png" position="360,360" size="140,40" alphatest="on" />
-			<widget source="key_green" render="Label" position="380,360" zPosition="1" size="115,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
-			<widget name="menulist" position="20,20" size="230,260" selectionPixmap="750S/buttons/Selected_bar_230x23px.png" transparent="1" backgroundColor="#371e1c1a" zPosition="10" scrollbarMode="showOnDemand" />
+	skin = 	"""
+		<screen position="center,center" size="510,400" title="Wireless Network Adapter Selection..." >
+			<ePixmap pixmap="skin_default/div-h.png" position="0,350" zPosition="1" size="560,2" />
+			<ePixmap pixmap="skin_default/border_menu.png" position="10,10" zPosition="1" size="250,300" transparent="1" alphatest="on" />
+
+			<ePixmap pixmap="skin_default/buttons/red.png" position="10,360" size="140,40" alphatest="on" />
+			<ePixmap pixmap="skin_default/buttons/green.png" position="360,360" size="140,40" alphatest="on" />
+
+			<widget source="key_red" render="Label" position="10,360" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" foregroundColor="#ffffff" transparent="1" />
+			<widget source="key_green" render="Label" position="360,360" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" foregroundColor="#ffffff" transparent="1" />
+
+			<widget name="menulist" position="20,20" size="230,260" transparent="1" backgroundColor="#371e1c1a" zPosition="10" scrollbarMode="showOnDemand" />
 			<widget source="description" render="Label" position="305,10" size="195,300" font="Regular;19" halign="center" valign="center" />
-			</screen>"""
+		</screen>
+		"""
+	def __init__(self, session):
 		Screen.__init__(self,session)
 		HelpableScreen.__init__(self)
 		self.mainmenu = self.getWlandevice()
@@ -137,37 +122,22 @@ class WlanSelection(Screen,HelpableScreen):
 		iNetwork.stopGetInterfacesConsole()
 
 class WlanSetup(Screen,HelpableScreen):
-	def __init__(self, session, ifaces):
-		if session.desktop.size().width() > 720:
-			self.skin = """
-			<screen name="WlanSetup" position="209,48" size="865,623" title="Wireless Network Configuration..." flags="wfNoBorder" backgroundColor="transparent">	
-			<ePixmap pixmap="Vu_HD/Bg_EPG_view.png" zPosition="-1" position="0,0" size="865,623" alphatest="on" />
-			<ePixmap pixmap="Vu_HD/menu/ico_title_Setup.png" position="32,41" size="40,40" alphatest="blend"  transparent="1" />
-			<eLabel text="Wireless Network Setup Menu..." position="90,50" size="600,32" font="Semiboldit;32" foregroundColor="#5d5d5d" backgroundColor="#27b5b9bd" transparent="1" />
-			<ePixmap pixmap="Vu_HD/icons/clock.png" position="750,55" zPosition="1" size="20,20" alphatest="blend" />
-			<widget source="global.CurrentTime" render="Label" position="770,57" zPosition="1" size="50,20" font="Regular;20" foregroundColor="#1c1c1c" backgroundColor="#27d9dee2" halign="right" transparent="1">
-				<convert type="ClockToText">Format:%H:%M</convert>
-			</widget>
-			<ePixmap pixmap="Vu_HD/buttons/red.png" position="45,98" size="25,25" alphatest="blend" />
-			<ePixmap pixmap="Vu_HD/buttons/green.png" position="240,98" size="25,25" alphatest="blend" />
-			<widget source="key_red" render="Label" position="66,97" zPosition="1" size="150,25" font="Regular;20" halign="center" valign="center" backgroundColor="darkgrey" foregroundColor="#1c1c1c" transparent="1" />
-			<widget source="key_green" render="Label" position="268,97" zPosition="1" size="150,25" font="Regular;20" halign="center" valign="center" backgroundColor="darkgrey" foregroundColor="#1c1c1c" transparent="1" />
-			<ePixmap pixmap="Vu_HD/border_menu.png" position="120,140" zPosition="-1" size="342,358" transparent="1" alphatest="blend" />
-			<widget name="menulist" position="130,150" size="322,338" transparent="1" backgroundColor="#27d9dee2" zPosition="10" scrollbarMode="showOnDemand" />
-			<widget source="description" render="Label" position="500,140" size="280,360" font="Regular;19" halign="center" valign="center" backgroundColor="#c5c9cc" transparent="1"/>
-			</screen>"""
-		else:
-			self.skin = """
-			<screen name="WlanSetup" position="110,120" size="500,400" title="Wireless Network Setup Menu..." >
-			<ePixmap pixmap="750S/div-h.png" position="0,350" zPosition="1" size="560,2" />
-			<ePixmap pixmap="750S/border_menu_a.png" position="10,10" zPosition="1" size="250,300" transparent="1" alphatest="on" />
-			<ePixmap pixmap="750S/buttons/red.png" position="10,360" size="140,40" alphatest="on" />
-			<widget source="key_red" render="Label" position="30,360" zPosition="1" size="115,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />
-			<ePixmap pixmap="750S/buttons/green.png" position="360,360" size="140,40" alphatest="on" />
-			<widget source="key_green" render="Label" position="380,360" zPosition="1" size="115,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
-			<widget name="menulist" position="20,20" size="230,260" selectionPixmap="750S/buttons/Selected_bar_230x23px.png" backgroundColor="#371e1c1a" zPosition="10" scrollbarMode="showOnDemand" />
+	skin = 	"""
+		<screen position="center,center" size="510,400" title="Wireless Network Setup Menu..." >
+			<ePixmap pixmap="skin_default/div-h.png" position="0,350" zPosition="1" size="560,2" />
+			<ePixmap pixmap="skin_default/border_menu.png" position="10,10" zPosition="1" size="250,300" transparent="1" alphatest="on" />
+
+			<ePixmap pixmap="skin_default/buttons/red.png" position="10,360" size="140,40" alphatest="on" />
+			<ePixmap pixmap="skin_default/buttons/green.png" position="360,360" size="140,40" alphatest="on" />
+
+			<widget source="key_red" render="Label" position="10,360" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" foregroundColor="#ffffff" transparent="1" />
+			<widget source="key_green" render="Label" position="360,360" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" foregroundColor="#ffffff" transparent="1" />
+
+			<widget name="menulist" position="20,20" size="230,260" transparent="1" backgroundColor="#371e1c1a" zPosition="10" scrollbarMode="showOnDemand" />
 			<widget source="description" render="Label" position="305,10" size="195,300" font="Regular;19" halign="center" valign="center" />
-			</screen>"""
+		</screen>
+		"""
+	def __init__(self, session, ifaces):
 		Screen.__init__(self, session)
 		HelpableScreen.__init__(self)
 		self.session = session
@@ -322,47 +292,25 @@ wlanconfig.gateway = ConfigIP([0,0,0,0])
 
 selectap = None	
 class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
-	def __init__(self, session, iface):
-		if session.desktop.size().width() > 720:
-			self.skin = """
-			<screen name="WlanConfig" position="209,48" size="865,623" title="Wireless Network Configuration..." flags="wfNoBorder" backgroundColor="transparent">	
-			<ePixmap pixmap="Vu_HD/Bg_EPG_view.png" zPosition="-1" position="0,0" size="865,623" alphatest="on" />
-			<ePixmap pixmap="Vu_HD/menu/ico_title_Setup.png" position="32,41" size="40,40" alphatest="blend"  transparent="1" />
-			<eLabel text="Wireless Network Configuration..." position="90,50" size="600,32" font="Semiboldit;32" foregroundColor="#5d5d5d" backgroundColor="#27b5b9bd" transparent="1" />
-			<ePixmap pixmap="Vu_HD/icons/clock.png" position="750,55" zPosition="1" size="20,20" alphatest="blend" />
-			<widget source="global.CurrentTime" render="Label" position="770,57" zPosition="1" size="50,20" font="Regular;20" foregroundColor="#1c1c1c" backgroundColor="#27d9dee2" halign="right" transparent="1">
-				<convert type="ClockToText">Format:%H:%M</convert>
-			</widget>
-			<ePixmap pixmap="Vu_HD/buttons/red.png" position="45,98" size="25,25" alphatest="blend" />
-			<ePixmap pixmap="Vu_HD/buttons/green.png" position="240,98" size="25,25" alphatest="blend" />
-			<widget source="key_red" render="Label" position="66,97" zPosition="1" size="150,25" font="Regular;20" halign="center" valign="center" backgroundColor="darkgrey" foregroundColor="#1c1c1c" transparent="1" />
-			<widget source="key_green" render="Label" position="268,97" zPosition="1" size="150,25" font="Regular;20" halign="center" valign="center" backgroundColor="darkgrey" foregroundColor="#1c1c1c" transparent="1" />
-			<ePixmap pixmap="Vu_HD/border_menu.png" position="120,140" zPosition="-1" size="342,358" transparent="1" alphatest="blend" />
-			<widget name="config" position="130,150" size="322,338" transparent="1" backgroundColor="#27d9dee2" zPosition="10" scrollbarMode="showOnDemand" />
-			<widget name="menulist" position="20,80" size="230,230" selectionPixmap="750S/buttons/Selected_bar_230x23px.png" transparent="1" backgroundColor="#371e1c1a" zPosition="10" scrollbarMode="showOnDemand" />
-			<eLabel text="IP Address : " position="500,160" size="200,26" font="Semiboldit;22" foregroundColor="#5d5d5d" backgroundColor="#27b5b9bd" transparent="1" />		
-			<widget source="ipaddress" render="Label" position="530,190" zPosition="1" size="150,26" font="Regular;20" halign="center" valign="center" backgroundColor="#27b5b9bd" foregroundColor="#1c1c1c" transparent="1" />		
-			<eLabel text="NetMask : " position="500,220" size="200,26" font="Semiboldit;22" foregroundColor="#5d5d5d" backgroundColor="#27b5b9bd" transparent="1" />		
-			<widget source="netmask" render="Label" position="530,250" zPosition="1" size="150,26" font="Regular;20" halign="center" valign="center" backgroundColor="#27b5b9bd" foregroundColor="#1c1c1c" transparent="1" />		
-			<eLabel text="Gateway : " position="500,280" size="200,26" font="Semiboldit;22" foregroundColor="#5d5d5d" backgroundColor="#27b5b9bd" transparent="1" />		
-			<widget source="gateway" render="Label" position="530,310" zPosition="1" size="150,26" font="Regular;20" halign="center" valign="center" backgroundColor="#27b5b9bd" foregroundColor="#1c1c1c" transparent="1" />		
-			</screen>"""
-		else:
-			self.skin = """
-			<screen name="WlanConfig" position="110,120" size="500,400" title="Wireless Network Configuration..." >
-			<ePixmap pixmap="750S/buttons/red.png" position="0,355" size="140,40" alphatest="on" />
-			<ePixmap pixmap="750S/buttons/green.png" position="360,355" size="140,40" alphatest="on" />
-			<widget source="key_red" render="Label" position="20,355" zPosition="1" size="115,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />
-			<widget source="key_green" render="Label" position="380,355" zPosition="1" size="115,40" font="Regular;20" halign="center" valign="center" backgroundColor="#18188b" transparent="1" />
-			<widget name="config" position="10,10" backgroundColor="#371e1c1a" size="480,210" scrollbarMode="showOnDemand" />
-			<ePixmap pixmap="750S/div-h.png" position="0,225" zPosition="1" size="550,2" />
+	skin = 	"""
+		<screen position="center,center" size="510,400" title="Wireless Network Configuration..." >
+			<ePixmap pixmap="skin_default/buttons/red.png" position="10,360" size="140,40" alphatest="on" />
+			<ePixmap pixmap="skin_default/buttons/green.png" position="360,360" size="140,40" alphatest="on" />
+
+			<widget source="key_red" render="Label" position="10,360" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" foregroundColor="#ffffff" transparent="1" />
+			<widget source="key_green" render="Label" position="360,360" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" foregroundColor="#ffffff" transparent="1" />
+
+			<widget name="config" position="10,10" backgroundColor="#371e1c1a" transparent="1" size="480,210" scrollbarMode="showOnDemand" />
+			<ePixmap pixmap="skin_default/div-h.png" position="0,225" zPosition="1" size="550,2" />
 			<eLabel text="IP Address : " position="100,250" size="190,21" font="Regular;19" />
 			<widget source="ipaddress" render="Label" position="300,250" zPosition="1" size="150,26" font="Regular;20" halign="center" valign="center" />
 			<eLabel text="NetMask : " position="100,275" size="190,21" font="Regular;19" />
 			<widget source="netmask" render="Label" position="300,275" zPosition="1" size="150,26" font="Regular;20" halign="center" valign="center" />	
 			<eLabel text="Gateway : " position="100,300" size="190,21" font="Regular;19" />
 			<widget source="gateway" render="Label" position="300,300" zPosition="1" size="150,26" font="Regular;20" halign="center" valign="center" />
-			</screen>"""
+		</screen>
+		"""
+	def __init__(self, session, iface):
 		Screen.__init__(self,session)
 		self.session = session
 		self["key_red"] = StaticText(_("Close"))
@@ -922,51 +870,30 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 						self.wpaphraseconsole.kill(name)
 
 class WlanScanAp(Screen,HelpableScreen):
-	def __init__(self, session, iface):
-		if session.desktop.size().width() > 720:
-			self.skin = """
-			<screen name="WlanScanAp" position="209,48" size="865,623" title="Wireless Network Configuration..." flags="wfNoBorder" backgroundColor="transparent">
-			<ePixmap pixmap="Vu_HD/Bg_EPG_view.png" zPosition="-1" position="0,0" size="865,623" alphatest="on" />
-			<ePixmap pixmap="Vu_HD/menu/ico_title_Setup.png" position="32,41" size="40,40" alphatest="blend"  transparent="1" />
-			<eLabel text="Wireless Network AP Scan..." position="90,50" size="600,32" font="Semiboldit;32" foregroundColor="#5d5d5d" backgroundColor="#27b5b9bd" transparent="1" />
-			<ePixmap pixmap="Vu_HD/icons/clock.png" position="750,55" zPosition="1" size="20,20" alphatest="blend" />
-			<widget source="global.CurrentTime" render="Label" position="770,57" zPosition="1" size="50,20" font="Regular;20" foregroundColor="#1c1c1c" backgroundColor="#27d9dee2" halign="right" transparent="1">
-				<convert type="ClockToText">Format:%H:%M</convert>
-			</widget>
-			<ePixmap pixmap="Vu_HD/buttons/red.png" position="45,98" size="25,25" alphatest="blend" />
-			<ePixmap pixmap="Vu_HD/buttons/green.png" position="240,98" size="25,25" alphatest="blend" />
-			<ePixmap pixmap="Vu_HD/buttons/blue.png" position="630,98" size="25,25" alphatest="blend" />
-			<widget source="key_red" render="Label" position="66,97" zPosition="1" size="150,25" font="Regular;20" halign="center" valign="center" backgroundColor="darkgrey" foregroundColor="#1c1c1c" transparent="1" />
-			<widget source="key_green" render="Label" position="268,97" zPosition="1" size="150,25" font="Regular;20" halign="center" valign="center" backgroundColor="darkgrey" foregroundColor="#1c1c1c" transparent="1" />
-			<widget source="key_blue" render="Label" position="665,97" zPosition="1" size="150,25" font="Regular;20" halign="center" valign="center" backgroundColor="darkgrey" foregroundColor="#1c1c1c" transparent="1" />
-			<ePixmap pixmap="Vu_HD/border_menu.png" position="120,140" zPosition="-1" size="342,358" transparent="1" alphatest="blend" />
-			<widget name="menulist" position="130,150" size="322,338" transparent="1" backgroundColor="#27d9dee2" zPosition="10" scrollbarMode="showOnDemand" />
-			<widget source="Address" render="Label" position="490,220" zPosition="1" size="300,30" font="Regular;20" halign="center" valign="center" backgroundColor="#27b5b9bd" foregroundColor="#1c1c1c" transparent="1" />
-			<widget source="ESSID" render="Label" position="490,250" zPosition="1" size="300,30" font="Regular;20" halign="center" valign="center" backgroundColor="#27b5b9bd" foregroundColor="#1c1c1c" transparent="1" />
-			<widget source="Protocol" render="Label" position="490,280" zPosition="1" size="300,30" font="Regular;20" halign="center" valign="center" backgroundColor="#27b5b9bd" foregroundColor="#1c1c1c" transparent="1" />	
-			<widget source="Frequency" render="Label" position="490,310" zPosition="1" size="300,30" font="Regular;20" halign="center" valign="center" backgroundColor="#27b5b9bd" foregroundColor="#1c1c1c" transparent="1" />
-			<widget source="Encryption key" render="Label" position="490,340" zPosition="1" size="300,30" font="Regular;20" halign="center" valign="center" backgroundColor="#27b5b9bd" foregroundColor="#1c1c1c" transparent="1" />
-			<widget source="BitRate" render="Label" position="490,370" zPosition="1" size="300,60" font="Regular;20" halign="center" valign="center" backgroundColor="#27b5b9bd" foregroundColor="#1c1c1c" transparent="1" />
-			</screen>"""
-		else:
-			self.skin = """
-			<screen name="WlanScanAp" position="110,120" size="500,400" title="Wireless Network AP Scan..." >
-			<ePixmap pixmap="750S/div-h.png" position="0,350" zPosition="1" size="560,2" />
-			<ePixmap pixmap="750S/border_menu_a.png" position="10,10" zPosition="1" size="250,300" transparent="1" alphatest="on" />
-			<ePixmap pixmap="750S/buttons/red.png" position="10,360" size="140,40" alphatest="on" />
-			<ePixmap pixmap="750S/buttons/green.png" position="185,360" size="140,40" alphatest="on" />
-			<ePixmap pixmap="750S/buttons/blue.png" position="360,360" size="140,40" alphatest="on" />
-			<widget source="key_red" render="Label" position="30,360" zPosition="1" size="115,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />
-			<widget source="key_green" render="Label" position="205,360" zPosition="1" size="115,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
-			<widget source="key_blue" render="Label" position="380,360" zPosition="1" size="115,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
-			<widget name="menulist" position="20,20" size="230,260" selectionPixmap="750S/buttons/Selected_bar_230x23px.png" backgroundColor="#371e1c1a" zPosition="10" scrollbarMode="showOnDemand" />
+	skin = 	"""
+		<screen position="center,center" size="510,400" title="Wireless Network AP Scan..." >
+			<ePixmap pixmap="skin_default/div-h.png" position="0,350" zPosition="1" size="560,2" />
+			<ePixmap pixmap="skin_default/border_menu.png" position="10,10" zPosition="1" size="250,300" transparent="1" alphatest="on" />
+
+			<ePixmap pixmap="skin_default/buttons/red.png" position="10,360" size="140,40" alphatest="on" />
+			<ePixmap pixmap="skin_default/buttons/green.png" position="185,360" size="140,40" alphatest="on" />
+			<ePixmap pixmap="skin_default/buttons/blue.png" position="360,360" size="140,40" alphatest="on" />
+
+			<widget source="key_red" render="Label" position="10,360" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" foregroundColor="#ffffff" transparent="1" />
+			<widget source="key_green" render="Label" position="185,360" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" foregroundColor="#ffffff" transparent="1" />
+			<widget source="key_blue" render="Label" position="360,360" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#18188b" foregroundColor="#ffffff" transparent="1" />
+
+			<widget name="menulist" position="20,20" size="230,260" backgroundColor="#371e1c1a" transparent="1" zPosition="10" scrollbarMode="showOnDemand" />
+
 			<widget source="Address" render="Label" position="265,70" zPosition="1" size="240,30" font="Regular;18" halign="center" valign="center" />
 			<widget source="ESSID" render="Label" position="265,100" zPosition="1" size="240,30" font="Regular;18" halign="center" valign="center" />
 			<widget source="Protocol" render="Label" position="265,130" zPosition="1" size="240,30" font="Regular;18" halign="center" valign="center" />
-			<widget source="Frequency" render="Label" position="265,160" zPosition="1" size="240,30" font="Regular;18" halign="center" valign="center" />
-			<widget source="Encryption key" render="Label" position="265,190" zPosition="1" size="240,30" font="Regular;18" halign="center" valign="center" />
+			<widget source="Frequency" render="Label" position="265,160" zPosition="1" size="240,40" font="Regular;18" halign="center" valign="center" />
+			<widget source="Encryption key" render="Label" position="265,200" zPosition="1" size="240,30" font="Regular;18" halign="center" valign="center" />
 			<widget source="BitRate" render="Label" position="265,220" zPosition="1" size="240,60" font="Regular;18" halign="center" valign="center" />
-			</screen>"""
+		</screen>
+		"""
+	def __init__(self, session, iface):
 		Screen.__init__(self,session)
 		HelpableScreen.__init__(self)
 		self.session = session
@@ -1560,28 +1487,15 @@ class NetworkAdapterTest(Screen):
 		callback(self.apState)
 		
 class Wlanstatus(Screen):
+	skin =  """
+		<screen position="center,center" size="510,400" title="Wireless Network Status..." >
+			<widget source="status" render="Label" position="5,15" size="500,350" font="Regular;18" zPosition="1" />
+
+			<ePixmap pixmap="skin_default/buttons/red.png" position="185,360" size="140,40" alphatest="on" />
+			<widget source="key_red" render="Label" position="185,360" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" foregroundColor="#ffffff" transparent="1" />
+		</screen>
+		"""
 	def __init__(self, session,iface):
-		if session.desktop.size().width() > 720:
-			self.skin = """
-			<screen name="Wlanstatus" position="209,48" size="865,623" title="Wireless Network Configuration..." flags="wfNoBorder" backgroundColor="transparent">
-				<ePixmap pixmap="Vu_HD/Bg_EPG_view.png" zPosition="-1" position="0,0" size="865,623" alphatest="on" />
-				<ePixmap pixmap="Vu_HD/menu/ico_title_Setup.png" position="32,41" size="40,40" alphatest="blend"  transparent="1" />
-				<eLabel text="Wireless Network Status..." position="90,50" size="600,32" font="Semiboldit;32" foregroundColor="#5d5d5d" backgroundColor="#27b5b9bd" transparent="1" />
-				<ePixmap pixmap="Vu_HD/icons/clock.png" position="750,55" zPosition="1" size="20,20" alphatest="blend" />
-				<widget source="global.CurrentTime" render="Label" position="770,57" zPosition="1" size="50,20" font="Regular;20" foregroundColor="#1c1c1c" backgroundColor="#27d9dee2" halign="right" transparent="1">
-					<convert type="ClockToText">Format:%H:%M</convert>
-				</widget>
-				<ePixmap pixmap="Vu_HD/buttons/red.png" position="45,98" size="25,25" alphatest="blend" />
-				<widget source="key_red" render="Label" position="66,97" zPosition="1" size="150,25" font="Regular;20" halign="center" valign="center" backgroundColor="darkgrey" foregroundColor="#1c1c1c" transparent="1" />
-				<widget source="status" render="Label" position="110,200" size="650,400" transparent="1" font="Regular;20" foregroundColor="#1c1c1c" backgroundColor="#27d9dee2" zPosition="1" />
-			</screen>"""
-		else:
-			self.skin =  """
-			<screen name="Wlanstatus" position="center,center" size="400,350" title="Wireless Network Status..." >
-				<ePixmap pixmap="750S/buttons/red.png" position="0,300" size="140,40" alphatest="on" />
-				<widget source="key_red" render="Label" position="20,300" zPosition="1" size="115,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />
-				<widget source="status" render="Label" position="10,10" size="380,290" font="Regular;20" zPosition="1" />
-			</screen>"""
 		Screen.__init__(self,session)
 		self.session = session
 		self.iface = iface
