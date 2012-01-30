@@ -17,6 +17,7 @@ default_email_address = "Please input your E-mail address"
 config.plugins.vuplusauthenticity = ConfigSubsection()
 config.plugins.vuplusauthenticity.sn_a = NoSave(ConfigSelection(default = "MSA", choices = [ ("MSA", _("MSA")), ("MA", _("MA")), ("MB", _("MB")), ("MC", _("MC")), ("MD", _("MD")), ("ME", _("ME")), ("MF", _("MF")), ("MG", _("MG")), ("MH", _("MH"))] ))
 config.plugins.vuplusauthenticity.sn_b = NoSave(ConfigInteger(default = 0,  limits = (1, 999999999)))
+config.plugins.vuplusauthenticity.sn_b_msa = NoSave(ConfigInteger(default = 0,  limits = (1, 9999999)))
 config.plugins.vuplusauthenticity.email = NoSave(ConfigText(default = default_email_address, visible_width = 50, fixed_size = False))
 
 GENUINE_MESSAGES={
@@ -87,7 +88,10 @@ class VuplusAuthenticity(Screen, ConfigListScreen):
 	def createSetup(self):
 		self.list = []
 		self.sn_aEntry = getConfigListEntry(_("1-1. Serial Number (The first two or three letters of SN)"), config.plugins.vuplusauthenticity.sn_a)
-		self.sn_bEntry = getConfigListEntry(_("1-2. Serial Number (The remaining numbers of SN)"), config.plugins.vuplusauthenticity.sn_b)
+		if config.plugins.vuplusauthenticity.sn_a.value == "MSA":
+			self.sn_bEntry = getConfigListEntry(_("1-2. Serial Number (The remaining numbers of SN)"), config.plugins.vuplusauthenticity.sn_b_msa)
+		else:
+			self.sn_bEntry = getConfigListEntry(_("1-2. Serial Number (The remaining numbers of SN)"), config.plugins.vuplusauthenticity.sn_b)
 		self.emailEntry = getConfigListEntry(_("2. Contact"), config.plugins.vuplusauthenticity.email)
 		self.list.append( self.sn_aEntry )
 		self.list.append( self.sn_bEntry )
@@ -96,22 +100,27 @@ class VuplusAuthenticity(Screen, ConfigListScreen):
 		self["config"].l.setList(self.list)
 
 	def confirmValidSN(self):
-		sn = str(config.plugins.vuplusauthenticity.sn_b.value)
-		if len(sn) > 9:
-			return False
-		elif sn == '0':
+		if config.plugins.vuplusauthenticity.sn_a.value == 'MSA':
+			sn_length = 7
+			sn = str(config.plugins.vuplusauthenticity.sn_b_msa.value)
+		else:
+			sn_length = 9
+			sn = str(config.plugins.vuplusauthenticity.sn_b.value)
+		if len(sn) > sn_length or sn == '0':
 			return False
 		else:
-			while(len(sn)<9):
+			while(len(sn)<sn_length):
 				sn = '0'+sn
-			if int(sn[:2]) not in range(28):
-				return False
-			elif int(sn[2:4]) not in range(1,53):
-				return False
-			elif int(sn[-5:]) == 0:
-				return False
+			if sn_length == 9:
+				if int(sn[:2]) not in range(28) or int(sn[2:4]) not in range(1,53) or int(sn[-5:]) == 0:
+					return False
+				else:
+					return True
 			else:
-				return True
+				if int(sn[:2]) not in range(1,53) or int(sn[-5:]) == 0:
+					return False
+				else:
+					return True
 
 	def displayResult(self, ret = -5):
 		global GENUINE_MESSAGES
@@ -142,8 +151,13 @@ class VuplusAuthenticity(Screen, ConfigListScreen):
 		if(not self.confirmValidSN()):
 			self.displayResult(-5)
 			return
-		sn_b = str(config.plugins.vuplusauthenticity.sn_b.value)
-		while(len(sn_b)<9):
+		if config.plugins.vuplusauthenticity.sn_a.value == 'MSA':
+			sn_length = 7
+			sn_b = str(config.plugins.vuplusauthenticity.sn_b_msa.value)
+		else:
+			sn_length = 9
+			sn_b = str(config.plugins.vuplusauthenticity.sn_b.value)
+		while(len(sn_b)<sn_length):
 			sn_b = '0'+sn_b
 		serial_number = config.plugins.vuplusauthenticity.sn_a.value + sn_b
 		model =self.getModel()
@@ -155,6 +169,14 @@ class VuplusAuthenticity(Screen, ConfigListScreen):
 			self.displayResult(ret)
 		except :
 			self.displayResult(-6)
+
+	def keyLeft(self):
+		ConfigListScreen.keyLeft(self)
+		self.createSetup()
+
+	def keyRight(self):
+		ConfigListScreen.keyRight(self)
+		self.createSetup()
 
 	def keyExit(self):
 		self.close()
