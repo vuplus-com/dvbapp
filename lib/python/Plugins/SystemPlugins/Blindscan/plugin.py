@@ -19,22 +19,20 @@ from Tools.Directories import resolveFilename, SCOPE_DEFAULTPARTITIONMOUNTDIR, S
 from enigma import eTimer, eDVBFrontendParametersSatellite, eComponentScan, eDVBSatelliteEquipmentControl, eDVBFrontendParametersTerrestrial, eDVBFrontendParametersCable, eConsoleAppContainer, eDVBResourceManager, getDesktop
 
 class Blindscan(ConfigListScreen, Screen):
-	size = getDesktop(0).size()
-	position_params = size.width() > 750 and ('center') or ('140')
 	skin = 	"""
-		<screen name="Blindscan" position="center,%s" size="560,370" title="Blindscan">
-			<ePixmap pixmap="Vu_HD/buttons/red.png" position="5,0" size="80,40" alphatest="on" />
-			<ePixmap pixmap="Vu_HD/buttons/green.png" position="186,0" size="80,40" alphatest="on" />
-			<ePixmap pixmap="Vu_HD/buttons/blue.png" position="372,0" size="80,40" alphatest="on" />
+		<screen position="center,center" size="560,390" title="Blindscan">
+			<ePixmap pixmap="skin_default/buttons/red.png" position="40,10" size="140,40" alphatest="on" />
+			<ePixmap pixmap="skin_default/buttons/green.png" position="210,10" size="140,40" alphatest="on" />
+			<ePixmap pixmap="skin_default/buttons/blue.png" position="380,10" size="140,40" alphatest="on" />
 
-			<widget source="key_red" render="Label" position="28,0" zPosition="1" size="160,30" font="Regular;20" halign="center" valign="center" transparent="1"/>
-			<widget source="key_green" render="Label" position="213,0" zPosition="1" size="160,30" font="Regular;20" halign="center" valign="center" transparent="1"/>
-			<widget source="key_blue" render="Label" position="400,0" zPosition="1" size="160,30" font="Regular;20" halign="center" valign="center" transparent="1"/>
+			<widget source="key_red" render="Label" position="40,10" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" foregroundColor="#ffffff" transparent="1"/>
+			<widget source="key_green" render="Label" position="210,10" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" foregroundColor="#ffffff" transparent="1"/>
+			<widget source="key_blue" render="Label" position="380,10" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#18188b" foregroundColor="#ffffff" transparent="1"/>
 
-			<widget name="config" position="5,50" size="550,280" scrollbarMode="showOnDemand" />
-			<widget name="introduction" position="0,345" size="560,20" font="Regular;20" halign="center" />
+			<widget name="config" position="5,70" size="550,280" scrollbarMode="showOnDemand" />
+			<widget name="introduction" position="0,365" size="560,20" font="Regular;20" halign="center" />
 		</screen>
-		""" % position_params
+		"""
 
 	def __init__(self, session): 
 		Screen.__init__(self, session)

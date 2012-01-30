@@ -57,17 +57,20 @@ class LEDSetup:
 ledsetup = LEDSetup()
 
 class LEDBrightnessSetup(Screen,ConfigListScreen):
-	skin = """
-			<screen name="LEDBrightnessSetup" position="center,center" size="560,300" title="LED Brightness Setup">
-			<ePixmap pixmap="Vu_HD/buttons/red.png" position="10,10" size="25,25" alphatest="on" />
-			<ePixmap pixmap="Vu_HD/buttons/green.png" position="195,10" size="25,25" alphatest="on" />
-			<ePixmap pixmap="Vu_HD/buttons/yellow.png" position="380,10" size="25,25" alphatest="on" />
-			<widget source="key_red" render="Label" position="30,10" zPosition="1" size="140,25" font="Regular;20" halign="center" valign="center" transparent="1" />
-			<widget source="key_green" render="Label" position="215,10" zPosition="1" size="140,25" font="Regular;20" halign="center" valign="center" transparent="1" />
-			<widget source="key_yellow" render="Label" position="400,10" zPosition="1" size="140,25" font="Regular;20" halign="center" valign="center" transparent="1" />
-			<widget name="config" zPosition="2" position="5,50" size="550,200" scrollbarMode="showOnDemand" transparent="1"/>
+	skin = 	"""
+		<screen position="center,center" size="560,300" title="LED Brightness Setup">
+			<ePixmap pixmap="skin_default/buttons/red.png" position="40,10" size="140,40" alphatest="on" />
+			<ePixmap pixmap="skin_default/buttons/green.png" position="210,10" size="140,40" alphatest="on" />
+			<ePixmap pixmap="skin_default/buttons/yellow.png" position="380,10" size="140,40" alphatest="on" />
+
+			<widget source="key_red" render="Label" position="40,10" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" foregroundColor="#ffffff" transparent="1" />
+			<widget source="key_green" render="Label" position="210,10" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" foregroundColor="#ffffff" transparent="1" />
+			<widget source="key_yellow" render="Label" position="380,10" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#a08500" foregroundColor="#ffffff" transparent="1" />
+
+			<widget name="config" zPosition="2" position="5,70" size="550,200" scrollbarMode="showOnDemand" transparent="1"/>
 			<widget name="current_entry" position="130,240" size="300,30" font="Regular;18" halign="center" valign="center"/>
-			</screen>"""
+		</screen>
+		"""
 
 	def __init__(self,session):
 		Screen.__init__(self,session)

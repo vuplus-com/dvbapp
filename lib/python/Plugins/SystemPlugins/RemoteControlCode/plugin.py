@@ -39,14 +39,17 @@ class RemoteControlCodeInit:
 			return False
 
 class RemoteControlCode(Screen,ConfigListScreen,RemoteControlCodeInit):
-	skin = """
-			<screen name="RemoteControlCode" position="center,center" size="560,250" title="Remote Control System Code Setting" >
-			<ePixmap pixmap="Vu_HD/buttons/red.png" position="10,10" size="25,25" alphatest="on" />
-			<ePixmap pixmap="Vu_HD/buttons/green.png" position="290,10" size="25,25" alphatest="on" />
-			<widget source="key_red" render="Label" position="40,10" zPosition="1" size="140,25" font="Regular;20" halign="center" valign="center" transparent="1" />
-			<widget source="key_green" render="Label" position="320,10" zPosition="1" size="140,25" font="Regular;20" halign="center" valign="center" transparent="1" />
-			<widget name="config" zPosition="2" position="5,50" size="550,200" scrollbarMode="showOnDemand" transparent="1" />
-			</screen>"""
+	skin = 	"""
+		<screen position="center,center" size="560,250" title="Remote Control System Code Setting" >
+			<ePixmap pixmap="skin_default/buttons/red.png" position="110,10" size="140,40" alphatest="on" />
+			<ePixmap pixmap="skin_default/buttons/green.png" position="310,10" size="140,40" alphatest="on" />
+
+			<widget source="key_red" render="Label" position="110,10" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" foregroundColor="#ffffff" transparent="1" />
+			<widget source="key_green" render="Label" position="310,10" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" foregroundColor="#ffffff" transparent="1" />
+
+			<widget name="config" zPosition="2" position="5,70" size="550,200" scrollbarMode="showOnDemand" transparent="1" />
+		</screen>
+		"""
 
 	def __init__(self,session):
 		Screen.__init__(self,session)
@@ -114,21 +117,21 @@ class RemoteControlCode(Screen,ConfigListScreen,RemoteControlCodeInit):
 		quitMainloop(3)
 
 class MessageBoxConfirmCode(MessageBox):
-	skin = """
-		<screen position="center,center" size="600,10" title="Message">
-		<widget name="text" position="65,8" size="420,0" font="Regular;22" />
-		<widget name="ErrorPixmap" pixmap="Vu_HD/icons/input_error.png" position="5,5" size="53,53" alphatest="blend" />
-		<widget name="QuestionPixmap" pixmap="Vu_HD/icons/input_question.png" position="5,5" size="53,53" alphatest="blend" />
-		<widget name="InfoPixmap" pixmap="Vu_HD/icons/input_info.png" position="5,5" size="53,53" alphatest="blend" />
-		<widget name="list" position="100,100" size="380,375" transparent="1" backgroundColor="#279e9fa4" />
-		<applet type="onLayoutFinish">
+	skin = 	"""
+		<screen position="center,center" size="620,10" title="Message">
+			<widget name="text" position="65,8" size="420,0" font="Regular;20" />
+			<widget name="ErrorPixmap" pixmap="skin_default/icons/input_error.png" position="5,5" size="53,53" alphatest="blend" />
+			<widget name="QuestionPixmap" pixmap="skin_default/icons/input_question.png" position="5,5" size="53,53" alphatest="blend" />
+			<widget name="InfoPixmap" pixmap="skin_default/icons/input_info.png" position="5,5" size="53,53" alphatest="blend" />
+			<widget name="list" position="100,100" size="380,375" transparent="1" />
+			<applet type="onLayoutFinish">
 # this should be factored out into some helper code, but currently demonstrates applets.
 from enigma import eSize, ePoint
 
-orgwidth = self.instance.size().width()
+orgwidth  = self.instance.size().width()
 orgheight = self.instance.size().height()
-orgpos = self.instance.position()
-textsize = self[&quot;text&quot;].getSize()
+orgpos    = self.instance.position()
+textsize  = self[&quot;text&quot;].getSize()
 
 # y size still must be fixed in font stuff...
 textsize = (textsize[0] + 50, textsize[1] + 50)
@@ -140,7 +143,6 @@ wsizey = textsize[1] + offset
 if (280 &gt; wsizex):
 	wsizex = 280
 wsize = (wsizex, wsizey)
-
 
 # resize
 self.instance.resize(eSize(*wsize))
@@ -157,8 +159,9 @@ self[&quot;list&quot;].instance.resize(eSize(*listsize))
 newwidth = wsize[0]
 newheight = wsize[1]
 self.instance.move(ePoint(orgpos.x() + (orgwidth - newwidth)/2, orgpos.y() + (orgheight - newheight)/2))
-		</applet>
-	</screen>"""
+			</applet>
+		</screen>
+		"""
 
 	def __init__(self, session, replytext_1="", replytext_2="", type = MessageBox.TYPE_YESNO, timeout = -1, close_on_any_key = False, default = True, enable_input = True, msgBoxID = None):
 		self.replytext_1 = replytext_1

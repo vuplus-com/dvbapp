@@ -16,9 +16,15 @@ from urllib import quote, unquote_plus, unquote
 from urllib2 import Request, URLError, urlopen as urlopen2
 from httplib import HTTPConnection, CannotSendRequest, BadStatusLine, HTTPException
 
+from Screens.Screen import Screen
+from Screens.ChoiceBox import ChoiceBox
+from Screens.MessageBox import MessageBox
+from Screens.DefaultWizard import DefaultWizard
+from Screens.InfoBarGenerics import InfoBarNotifications
+
 from Components.Button import Button
 from Components.Label import Label
-from Components.Pixmap import Pixmap
+from Components.Pixmap import Pixmap, MovingPixmap
 from Components.Language import language
 from Components.Sources.List import List
 from Components.ConfigList import ConfigListScreen
@@ -27,13 +33,10 @@ from Components.ActionMap import NumberActionMap, ActionMap
 from Components.ServiceEventTracker import ServiceEventTracker
 from Components.config import config, ConfigSelection, getConfigListEntry, ConfigSlider
 
-from Screens.Screen import Screen
-from Screens.ChoiceBox import ChoiceBox
-from Screens.MessageBox import MessageBox
-from Screens.DefaultWizard import DefaultWizard
-from Screens.InfoBarGenerics import InfoBarNotifications
+from Tools.Directories import resolveFilename, SCOPE_PLUGINS
+from Tools.LoadPixmap import LoadPixmap
 
-from enigma import eTimer, eServiceReference, iPlayableService, fbClass, eRCInput, eConsoleAppContainer, getDesktop
+from enigma import eTimer, eServiceReference, iPlayableService, fbClass, eRCInput, eConsoleAppContainer, getDesktop, ePicLoad
 
 HTTPConnection.debuglevel = 1
 
@@ -89,11 +92,13 @@ def wb_islock():
 
 class VuPlayer(Screen, InfoBarNotifications):
 	size = getDesktop(0).size()
-	position_params = size.width() > 750 and (620) or (480)
+	wb_bgr = resolveFilename(SCOPE_PLUGINS, "Extensions/WebBrowser/mp_wb_background.png")
+	wb_btn = resolveFilename(SCOPE_PLUGINS, "Extensions/WebBrowser/mp_wb_buttons.png")
+	position_params = size.width() > 750 and (620, wb_bgr, wb_btn) or (480, wb_bgr, wb_btn)
 	skin = 	"""
 		<screen name="VuPlayer" flags="wfNoBorder" position="center,%d" size="455,53" title="VuPlayer" backgroundColor="transparent">
-			<ePixmap pixmap="Vu_HD/mp_wb_background.png" position="0,0" zPosition="-1" size="455,53" />
-			<ePixmap pixmap="Vu_HD/icons/mp_wb_buttons.png" position="40,23" size="30,13" alphatest="on" />
+			<ePixmap pixmap="%s" position="0,0" zPosition="-1" size="455,53" />
+			<ePixmap pixmap="%s" position="40,23" size="30,13" alphatest="on" />
 
 			<widget source="session.CurrentService" render="PositionGauge" position="80,25" size="220,10" zPosition="2" pointer="skin_default/position_pointer.png:540,0" transparent="1" foregroundColor="#20224f">
 				<convert type="ServicePosition">Gauge</convert>
@@ -407,24 +412,24 @@ class VuPlayerService:
 		conn.close()
 
 class BrowserLauncher(ConfigListScreen, Screen):
-	size = getDesktop(0).size()
-	position_params = size.width() > 750 and (309,498, 0,150, 0,455) or (618,320, 312,5, 0,180)
 	skin=   """
-		<screen name="BrowserLauncher" position="center,center" size="%d,%d" title="Web Browser">
-			<ePixmap pixmap="Vu_HD/buttons/red.png" position="4,0" size="40,40" alphatest="on" />
-			<ePixmap pixmap="Vu_HD/buttons/green.png" position="154,0" size="40,40" alphatest="on" />
+		<screen position="center,center" size="623,300" title="Web Browser">
+			<ePixmap pixmap="skin_default/buttons/red.png" position="10,0" size="140,40" alphatest="on" />
+			<ePixmap pixmap="skin_default/buttons/green.png" position="158,0" size="140,40" alphatest="on" />
 
-			<widget source="key_red" render="Label" position="30,0" zPosition="1" size="125,30" font="Regular;20" halign="center" valign="center" transparent="1" />
-			<widget source="key_green" render="Label" position="180,0" zPosition="1" size="125,30" font="Regular;20" halign="center" valign="center" transparent="1" />
+			<widget source="key_red" render="Label" position="10,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" foregroundColor="#ffffff" transparent="1" />
+			<widget source="key_green" render="Label" position="158,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" foregroundColor="#ffffff" transparent="1" />
 
 			<widget name="config" position="0,50" size="309,100" scrollbarMode="showOnDemand" />
-			<ePixmap pixmap="Vu_HD/rc_wb_desc.png" position="%d,%d" size="309,296" alphatest="on" />
-			<widget name="info" position="%d,%d" size="309,50" font="Regular;18" halign="center" foregroundColor="blue" transparent="1" />
+			<ePixmap pixmap="rc_wb_desc.png" position="312,5" size="309,296" alphatest="on" />
+			<widget name="info" position="0,180" size="309,50" font="Regular;18" halign="center" foregroundColor="#a08500" transparent="1" />
 		</screen>
-		""" % position_params
+		"""
 
 	def __init__(self, session): 
 		Screen.__init__(self, session)
+		
+
                 self.session = session
 		self.list = []
 		ConfigListScreen.__init__(self, self.list)

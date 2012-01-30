@@ -31,29 +31,20 @@ GENUINE_MESSAGES={
 }
 
 class VuplusAuthenticity(Screen, ConfigListScreen):
-	def __init__(self,session):
-		if session.desktop.size().width() > 720:
-			self.skin = """
-			<screen name="VuplusAuthenticity" position="center,center" size="800,370" title="Return the Love Event (only for genuine box)">
-			<ePixmap pixmap="Vu_HD/buttons/red.png" position="250,15" size="25,25" alphatest="on" />
-			<ePixmap pixmap="Vu_HD/buttons/green.png" position="435,15" size="25,25" alphatest="on" />
-			<widget source="key_red" render="Label" position="265,15" zPosition="1" size="140,25" font="Regular;24" halign="center" valign="center" transparent="1" />
-			<widget source="key_green" render="Label" position="450,15" zPosition="1" size="140,25" font="Regular;24" halign="center" valign="center" transparent="1" />
-			<widget name="config" zPosition="2" position="80,70" size="640,80" scrollbarMode="showOnDemand" transparent="1" />
-			<widget name="text1" position="0,165" size="800,90" font="Regular;32" halign="center" valign="center"/>
-			<widget name="text2" position="100,260" size="600,110" font="Regular;24" halign="center" valign="center"/>
-			</screen>"""
+	skin = 	"""
+		<screen name="VuplusAuthenticity" position="center,center" size="600,320" title="Return the Love Event (only for genuine box)">
+			<ePixmap pixmap="skin_default/buttons/red.png" position="140,15" size="140,40" alphatest="on" />
+			<ePixmap pixmap="skin_default/buttons/green.png" position="320,15" size="140,40" alphatest="on" />
 
-		else:
-			self.skin="""<screen name="VuplusAuthenticity" position="center,center" size="600,320" title="Return the Love Event (only for genuine box)">
-			<ePixmap pixmap="Vu_HD/buttons/red.png" position="170,15" size="25,25" alphatest="on" />
-			<ePixmap pixmap="Vu_HD/buttons/green.png" position="355,15" size="25,25" alphatest="on" />
-			<widget source="key_red" render="Label" position="185,15" zPosition="1" size="140,25" font="Regular;24" halign="center" valign="center" transparent="1" />
-			<widget source="key_green" render="Label" position="370,15" zPosition="1" size="140,25" font="Regular;24" halign="center" valign="center" transparent="1" />
+			<widget source="key_red" render="Label" position="140,15" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" foregroundColor="#ffffff" transparent="1" />
+			<widget source="key_green" render="Label" position="320,15" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" foregroundColor="#ffffff" transparent="1" />
+
 			<widget name="config" zPosition="2" position="10,70" size="580,80" scrollbarMode="showOnDemand" transparent="1" />
 			<widget name="text1" position="10,160" size="580,50" font="Regular;32" halign="center" valign="center"/>
 			<widget name="text2" position="10,220" size="580,100" font="Regular;18" halign="center" valign="center"/>
-			</screen>"""
+		</screen>
+		"""
+	def __init__(self,session):
 		Screen.__init__(self,session)
 		self.session = session
 		self["shortcuts"] = ActionMap(["ShortcutActions", "SetupActions" ],
@@ -183,12 +174,12 @@ class VuplusAuthenticity(Screen, ConfigListScreen):
 
 class MessageBoxGenuine(MessageBox):
 	skin = """
-		<screen position="center,center" size="600,10" title="Message">
+		<screen name="MessageBoxGenuine" position="center,center" size="600,10" title="Message">
 		<widget name="text" position="65,8" size="420,0" font="Regular;22" />
 		<widget name="ErrorPixmap" pixmap="Vu_HD/icons/input_error.png" position="5,5" size="53,53" alphatest="blend" />
 		<widget name="QuestionPixmap" pixmap="Vu_HD/icons/input_question.png" position="5,5" size="53,53" alphatest="blend" />
 		<widget name="InfoPixmap" pixmap="Vu_HD/icons/input_info.png" position="5,5" size="53,53" alphatest="blend" />
-		<widget name="list" position="100,100" size="380,375" transparent="1" backgroundColor="darkgrey" />
+		<widget name="list" position="100,100" size="380,375" transparent="1" />
 		<applet type="onLayoutFinish">
 # this should be factored out into some helper code, but currently demonstrates applets.
 from enigma import eSize, ePoint

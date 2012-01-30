@@ -46,19 +46,22 @@ class UIPositionSetupInit:
 uipositionsetupinit = UIPositionSetupInit()
 
 class UIPositionSetup(Screen, ConfigListScreen, UIPositionSetupInit):
+	skin = 	"""
+		<screen position="0,0" size="%d,%d" title="Screen Position Setup" backgroundColor="#27d8dee2" >
+			<ePixmap pixmap="skin_default/buttons/red.png" position="%d,%d" size="140,40" alphatest="on" />
+			<ePixmap pixmap="skin_default/buttons/green.png" position="%d,%d" size="140,40" alphatest="on" />"
+
+			<widget source="key_red" render="Label" position="%d,%d" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" foregroundColor="#ffffff" transparent="1" />
+			<widget source="key_green" render="Label" position="%d,%d" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" foregroundColor="#ffffff" transparent="1" />
+
+			<widget name="config" zPosition="2" position="%d,%d" size="500,200" scrollbarMode="showOnDemand" foregroundColor="#1c1c1c" transparent="1" />
+		</screen>
+		"""
 	def __init__(self,session):
-		size_w = session.desktop.size().width()
-		size_h = session.desktop.size().height()
-		xpos = (size_w-500)/2
-		ypos = (size_h-300)/2
-		self.skin=""
-		self.skin += "<screen position=\"0,0\" size=\"" + str(size_w) + "," + str(size_h) + "\" title=\"Screen Position Setup\" backgroundColor=\"#27d8dee2\">"
-		self.skin += "<ePixmap pixmap=\"Vu_HD/buttons/red.png\" position=\""+str(xpos+10) + "," + str(ypos+10) + "\" size=\"25,25\" alphatest=\"on\" />"
-		self.skin += "<ePixmap pixmap=\"Vu_HD/buttons/green.png\" position=\""+str(xpos+290) + "," + str(ypos+10) + "\" size=\"25,25\" alphatest=\"on\" />"
-		self.skin += "<widget source=\"key_red\" render=\"Label\" position=\""+str(xpos+40) + "," + str(ypos+10) + "\" zPosition=\"1\" size=\"140,25\" font=\"Regular;20\" halign=\"center\" valign=\"center\" foregroundColor=\"#1c1c1c\" transparent=\"1\" />"
-		self.skin += "<widget source=\"key_green\" render=\"Label\" position=\""+str(xpos+320) + "," + str(ypos+10) + "\" zPosition=\"1\" size=\"140,25\" font=\"Regular;20\" halign=\"center\" valign=\"center\" foregroundColor=\"#1c1c1c\" transparent=\"1\" />"
-		self.skin += "<widget name=\"config\" zPosition=\"2\" position=\""+str(xpos+5) + "," + str(ypos+50) + "\" size=\"550,200\" scrollbarMode=\"showOnDemand\" foregroundColor=\"#1c1c1c\" transparent=\"1\" />"
-		self.skin += "</screen>"
+		w,h   = session.desktop.size().width(), session.desktop.size().height()
+		cw,ch = w/2, h/2
+		#                             btn_red        btn_green     lb_red         lb_green      config
+		self.skin = self.skin % (w,h, cw-190,ch-110, cw+50,ch-110, cw-190,ch-110, cw+50,ch-110, cw-250,ch-50)
 
 		Screen.__init__(self,session)
 		self.session = session
@@ -71,6 +74,7 @@ class UIPositionSetup(Screen, ConfigListScreen, UIPositionSetupInit):
 		}, -2)
 		self.list = []
 		ConfigListScreen.__init__(self, self.list,session = self.session)
+
 		self["key_red"] = StaticText(_("Cancel"))
 		self["key_green"] = StaticText(_("Save"))
 		self["current"] = StaticText(_(" "))
@@ -79,19 +83,19 @@ class UIPositionSetup(Screen, ConfigListScreen, UIPositionSetupInit):
 	def createSetup(self):
 		self.list = []
 
-		left = config.plugins.UIPositionSetup.dst_left.value
-		width = config.plugins.UIPositionSetup.dst_width.value
-		top = config.plugins.UIPositionSetup.dst_top.value
+		left   = config.plugins.UIPositionSetup.dst_left.value
+		width  = config.plugins.UIPositionSetup.dst_width.value
+		top    = config.plugins.UIPositionSetup.dst_top.value
 		height = config.plugins.UIPositionSetup.dst_height.value
 
-		self.dst_left = ConfigSlider(default = left, increment = 5, limits = (0, 720))
-		self.dst_width = ConfigSlider(default = width, increment = 5, limits = (0, 720))
-		self.dst_top = ConfigSlider(default = top, increment = 5, limits = (0, 576))
+		self.dst_left   = ConfigSlider(default = left, increment = 5, limits = (0, 720))
+		self.dst_width  = ConfigSlider(default = width, increment = 5, limits = (0, 720))
+		self.dst_top    = ConfigSlider(default = top, increment = 5, limits = (0, 576))
 		self.dst_height = ConfigSlider(default = height, increment = 5, limits = (0, 576))
 
-		self.dst_left_entry = getConfigListEntry(_("left"), self.dst_left)
-		self.dst_width_entry = getConfigListEntry(_("width"), self.dst_width)
-		self.dst_top_entry = getConfigListEntry(_("top"), self.dst_top)
+		self.dst_left_entry   = getConfigListEntry(_("left"), self.dst_left)
+		self.dst_width_entry  = getConfigListEntry(_("width"), self.dst_width)
+		self.dst_top_entry    = getConfigListEntry(_("top"), self.dst_top)
 		self.dst_height_entry = getConfigListEntry(_("height"), self.dst_height)
 
 		self.list.append(self.dst_left_entry)

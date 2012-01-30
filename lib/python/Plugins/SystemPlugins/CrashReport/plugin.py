@@ -79,44 +79,21 @@ def loadConfig():
 		g_default_machineinfo = False
 
 class CrashlogReportConfiguration(Screen, ConfigListScreen):
-	skin_list = {}
-	skin_list["hd"] = """
-		<screen name="CrashlogReportSetting" position="209,48" size="865,623" title="CrashlogReport Setting" flags="wfNoBorder" backgroundColor="transparent">	
-			<ePixmap pixmap="Vu_HD/Bg_EPG_list.png" zPosition="-1" position="0,0" size="865,623" alphatest="on" />
-			<ePixmap pixmap="Vu_HD/menu/ico_title_Setup.png" position="32,41" size="40,40" alphatest="blend"  transparent="1" />
-			<eLabel text="CrashlogReport Setting" position="90,50" size="600,32" font="Semiboldit;32" foregroundColor="#5d5d5d" backgroundColor="#27b5b9bd" transparent="1" />
-			<ePixmap pixmap="Vu_HD/icons/clock.png" position="750,55" zPosition="1" size="20,20" alphatest="blend" />
-			<widget source="global.CurrentTime" render="Label" position="770,57" zPosition="1" size="50,20" font="Regular;20" foregroundColor="#1c1c1c" halign="right" backgroundColor="#27d9dee2" transparent="1">
-				<convert type="ClockToText">Format:%H:%M</convert>
-			</widget>
-			<ePixmap pixmap="Vu_HD/buttons/red.png" position="45,98" size="25,25" alphatest="blend" />
-			<ePixmap pixmap="Vu_HD/buttons/green.png" position="240,98" size="25,25" alphatest="blend" />
-			<ePixmap pixmap="Vu_HD/buttons/button_off.png" position="435,98" size="25,25" alphatest="blend" />
-			<ePixmap pixmap="Vu_HD/buttons/button_off.png" position="630,98" size="25,25" alphatest="blend" />
-			<widget source="key_red" render="Label" position="66,97" zPosition="1" size="150,25" font="Regular;20" halign="center" valign="center" backgroundColor="darkgrey" foregroundColor="#1c1c1c" transparent="1" />
-			<widget source="key_green" render="Label" position="268,97" zPosition="1" size="150,25" font="Regular;20" halign="center" valign="center" backgroundColor="darkgrey" foregroundColor="#1c1c1c" transparent="1" />
-			<widget name="config" zPosition="2" position="50,130" itemHeight="36" size="750,324" scrollbarMode="showOnDemand" transparent="1" />
-			<widget source="status" render="Label" position="160,525" size="540,60" zPosition="10" foregroundColor="#3c3c3c" backgroundColor="#27aeaeae" font="Regular;20" halign="center" valign="center" transparent="1"/>
-			<widget name="VKeyIcon" pixmap="Vu_HD/buttons/key_text.png" position="500,350" zPosition="10" size="35,25" transparent="1" alphatest="on" />
-			<widget name="HelpWindow" pixmap="Vu_HD/vkey_icon.png" position="310,400" zPosition="1" size="1,1" transparent="1" alphatest="on" />
-		</screen>
-		"""
-	skin_list["sd"] = """
-		<screen name="CrashlogReportSetting" position="center,120" size="560,420" title="CrashlogReport Settings" >
-			<ePixmap pixmap="750S/buttons/red.png" position="0,0" size="140,40" alphatest="on" />
-			<ePixmap pixmap="750S/buttons/green.png" position="140,0" size="140,40" alphatest="on" />
-			<widget source="key_red" render="Label" position="20,0" zPosition="1" size="115,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" transparent="1" />
-			<widget source="key_green" render="Label" position="160,0" zPosition="1" size="115,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" transparent="1" />
-			<widget name="config" zPosition="2" position="5,50" size="550,300" scrollbarMode="showOnDemand" transparent="1" />
-			<ePixmap pixmap="750S/div-h.png" position="0,360" zPosition="10" size="560,2" transparent="1" alphatest="on" />
-			<widget source="status" render="Label" position="10,370" size="540,40" zPosition="10" font="Regular;20" halign="center" valign="center" backgroundColor="#25062748" transparent="1"/>
-			<widget name="VKeyIcon" pixmap="750S/buttons/key_text.png" position="10,390" zPosition="10" size="35,25" transparent="1" alphatest="on" />
-			<widget name="HelpWindow" pixmap="750S/vkey_icon.png" position="160,300" zPosition="1" size="1,1" transparent="1" alphatest="on" />
-		</screen>
-		"""
+	skin = 	"""
+		<screen position="center,120" size="560,420" title="CrashlogReport Settings" >
+			<ePixmap pixmap="skin_default/buttons/red.png" position="110,10" size="140,40" alphatest="on" />
+			<ePixmap pixmap="skin_default/buttons/green.png" position="310,10" size="140,40" alphatest="on" />
 
-	size = getDesktop(0).size()
-	skin = skin_list[size.width() > 750 and "hd" or "sd"]
+			<widget source="key_red" render="Label" position="110,10" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" foregroundColor="#ffffff" transparent="1" />
+			<widget source="key_green" render="Label" position="310,10" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" foregroundColor="#ffffff" transparent="1" />
+
+			<widget name="config" zPosition="2" position="5,70" size="550,300" scrollbarMode="showOnDemand" transparent="1" />
+			<ePixmap pixmap="skin_default/div-h.png" position="0,360" zPosition="10" size="560,2" transparent="1" alphatest="on" />
+			<widget source="status" render="Label" position="10,370" size="540,40" zPosition="10" font="Regular;20" halign="center" valign="center" backgroundColor="#25062748" transparent="1"/>
+			<widget name="VKeyIcon" pixmap="skin_default/buttons/key_text.png" position="10,390" zPosition="10" size="35,25" transparent="1" alphatest="on" />
+			<widget name="HelpWindow" pixmap="skin_default/vkey_icon.png" position="160,350" zPosition="1" size="1,1" transparent="1" alphatest="on" />
+		</screen>
+		"""
 
 	def __init__(self, session):
 		Screen.__init__(self, session)

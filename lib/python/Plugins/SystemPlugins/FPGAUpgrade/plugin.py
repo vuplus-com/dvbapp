@@ -122,16 +122,14 @@ class FPGAUpgradeManager:
 		return str(self.fu.errmsg)
 
 class UpgradeStatus(Screen):
-	size = getDesktop(0).size()
-	position_params = size.width() > 750 and (' ') or ('backgroundColor=\"blue\"')
 	skin = 	"""
-		<screen position="center,center" size="450,130" title="FPGA Upgrade">
+		<screen position="center,center" size="450,130" title=" ">
 			<widget name="name" position="10,0" size="430,20" font="Regular;18" halign="left" valign="bottom"/>
 			<widget name="slider" position="10,25" size="430,30" borderWidth="2" borderColor="#cccccc"/>
-			<widget name="status" position="10,25" zPosition="1" size="430,30" font="Regular;18" halign="center" valign="center" foregroundColor="blue" %s transparent="1"/>
-			<widget source="info" render="Label" position="10,70" zPosition="1" size="430,60" font="Regular;22" halign="center" valign="center" backgroundColor="#a08500" transparent="1"/>
+			<widget name="status" position="10,25" zPosition="1" size="430,30" font="Regular;18" halign="center" valign="center" foregroundColor="#9f1313" transparent="1"/>
+			<widget source="info" render="Label" position="10,70" zPosition="1" size="430,60" font="Regular;22" halign="center" valign="center" transparent="1"/>
 		</screen>
-		""" % position_params
+		"""
 
 	def __init__(self, session, parent, timeout = 20):
 		Screen.__init__(self,session)
@@ -157,6 +155,8 @@ class UpgradeStatus(Screen):
 		self.slider = Slider(0, 100)
 		self["slider"] = self.slider
 		
+		self.setTitle("FPGA Upgrade Status")
+
 		self.parent = parent
 		self.timer_check_progress = eTimer()
 		self.timer_check_progress.callback.append(self.callbackDoCheckProgress)
@@ -211,22 +211,20 @@ class UpgradeStatus(Screen):
 			self.close()
 		
 class FPGAUpgrade(Screen):
-	size = getDesktop(0).size()
-	position_params = size.width() > 750 and ('center', 440) or ('120', 420)
 	skin = 	"""
-		<screen position="center,%s" size="560,%d" title="FPGA Upgrade" >
-			<ePixmap pixmap="Vu_HD/buttons/red.png" position="0,7" size="80,40" alphatest="blend" />
-			<ePixmap pixmap="Vu_HD/buttons/green.png" position="186,7" size="80,40" alphatest="blend" />
-			<ePixmap pixmap="Vu_HD/buttons/blue.png" position="372,7" size="80,40" alphatest="blend" />
+		<screen position="center,center" size="560,430" title="FPGA Upgrade" >
+			<ePixmap pixmap="skin_default/buttons/red.png" position="40,10" size="140,40" alphatest="blend" />
+			<ePixmap pixmap="skin_default/buttons/green.png" position="210,10" size="140,40" alphatest="blend" />
+			<ePixmap pixmap="skin_default/buttons/blue.png" position="380,10" size="140,40" alphatest="blend" />
 
-			<widget source="key_red" render="Label" position="28,0" zPosition="1" size="160,40" font="Regular;20" halign="center" valign="center" transparent="1"/>
-			<widget source="key_green" render="Label" position="213,0" zPosition="1" size="160,40" font="Regular;20" halign="center" valign="center" transparent="1"/>
-			<widget source="key_blue" render="Label" position="400,0" zPosition="1" size="160,40" font="Regular;20" halign="center" valign="center" transparent="1"/>
+			<widget source="key_red" render="Label" position="40,10" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" foregroundColor="#ffffff" transparent="1"/>
+			<widget source="key_green" render="Label" position="210,10" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" foregroundColor="#ffffff" transparent="1"/>
+			<widget source="key_blue" render="Label" position="380,10" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#18188b" foregroundColor="#ffffff" transparent="1"/>
 
-			<widget source="status" render="Label" position="15,45" zPosition="1" size="540,40" font="Regular;18" halign="left" valign="center" backgroundColor="#a08500" transparent="1" />
-			<widget name="file_list" position="0,100" size="555,325" scrollbarMode="showOnDemand" />
+			<widget source="status" render="Label" position="15,60" zPosition="1" size="540,40" font="Regular;18" halign="left" valign="center" transparent="1" />
+			<widget name="file_list" position="0,100" size="555,320" scrollbarMode="showOnDemand" />
                 </screen>
-		""" % position_params 
+		"""
 
 	def __init__(self, session): 
 		Screen.__init__(self, session)

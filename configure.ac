@@ -183,6 +183,7 @@ lib/python/Plugins/Extensions/TuxboxPlugins/meta/Makefile
 lib/python/Plugins/Extensions/WebBrowser/Makefile
 lib/python/Plugins/Extensions/WebBrowser/meta/Makefile
 lib/python/Plugins/Extensions/WebBrowser/keymap/Makefile
+lib/python/Plugins/Extensions/WebBrowser/desc/Makefile
 lib/python/Plugins/Extensions/VuplusEvent/Makefile
 lib/python/Plugins/Extensions/VuplusEvent/meta/Makefile
 lib/python/Plugins/SystemPlugins/CleanupWizard/Makefile

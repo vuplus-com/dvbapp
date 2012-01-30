@@ -210,26 +210,14 @@ class FirmwareUpgradeManager:
 		return str(self.fu.errmsg)
 
 class UpgradeStatus(Screen):
-	'''
 	skin = 	"""
-		<screen position="center,center" size="450,100" title=" ">
-			<widget name="name" position="10,0" size="430,20" font="Regular;18" halign="left" valign="bottom"/>
-			<widget name="slider" position="10,25" size="430,30" backgroundColor="white"/>
-			<widget name="status" position="10,25" zPosition="1" size="430,30" font="Regular;18" halign="center" valign="center" foregroundColor="black" backgroundColor="black" transparent="1"/>
-			<widget source="info" render="Label" position="10,70" zPosition="1" size="430,30" font="Regular;22" halign="center" valign="center" backgroundColor="#a08500" transparent="1"/>
-		</screen>
-		"""
-	'''
-	size = getDesktop(0).size()
-	position_params = size.width() > 750 and (' ') or ('backgroundColor=\"blue\"')
-	skin = 	"""
-		<screen position="center,center" size="450,130" title="FPGA Upgrade">
+		<screen position="center,center" size="450,130" title=" ">
 			<widget name="name" position="10,0" size="430,20" font="Regular;18" halign="left" valign="bottom"/>
 			<widget name="slider" position="10,25" size="430,30" borderWidth="2" borderColor="#cccccc"/>
-			<widget name="status" position="10,25" zPosition="1" size="430,30" font="Regular;18" halign="center" valign="center" foregroundColor="blue" %s transparent="1"/>
-			<widget source="info" render="Label" position="10,70" zPosition="1" size="430,60" font="Regular;22" halign="center" valign="center" backgroundColor="#a08500" transparent="1"/>
+			<widget name="status" position="10,25" zPosition="1" size="430,30" font="Regular;18" halign="center" valign="center" foregroundColor="#9f1313" transparent="1"/>
+			<widget source="info" render="Label" position="10,70" zPosition="1" size="430,60" font="Regular;22" halign="center" valign="center" transparent="1"/>
 		</screen>
-		""" % position_params
+		"""
 
 	def __init__(self, session, parent, firmware, datafile, device):
 		Screen.__init__(self,session)
@@ -316,14 +304,15 @@ class UpgradeStatus(Screen):
 			self.callback("Reboot now for a successful upgrade.", True)
 		self.session.openWithCallback(self.cbConfirmExit, MessageBox, _("Do you want to remove binary data?"), MessageBox.TYPE_YESNO, timeout = 10, default = False)
 
-class Filebrowser(Screen):
+class FUFilebrowser(Screen):
 	skin = 	"""
-		<screen position="center,center" size="500,260" title="File Browser" >
-			<ePixmap pixmap="Vu_HD/buttons/blue.png" position="5,7" size="80,40" alphatest="blend" />
-			<widget source="key_blue" render="Label" position="40,0" zPosition="1" size="300,40" font="Regular;20" halign="left" valign="center" transparent="1"/>
-			<widget name="file_list" position="0,50" size="500,160" scrollbarMode="showOnDemand" />
+		<screen position="center,center" size="500,290" title="File Browser" >
+			<ePixmap pixmap="skin_default/buttons/blue.png" position="5,10" size="140,40" alphatest="blend" />
 
-			<widget source="status" render="Label" position="0,220" zPosition="1" size="500,40" font="Regular;18" halign="center" valign="center" backgroundColor="#a08500" transparent="1" />
+			<widget source="key_blue" render="Label" position="5,10" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#18188b" foregroundColor="#ffffff" transparent="1"/>
+
+			<widget name="file_list" position="0,70" size="495,160" scrollbarMode="showOnDemand" />
+			<widget source="status" render="Label" position="0,230" zPosition="1" size="495,70" font="Regular;18" halign="center" valign="center" backgroundColor="#a08500" transparent="1" />
                 </screen>
 		"""
 
@@ -331,7 +320,7 @@ class Filebrowser(Screen):
 		Screen.__init__(self, session)
                 self.session = session 
 		
-		self["key_blue"] = StaticText(_("Download  the  firmware (latest)"))
+		self["key_blue"] = StaticText(_("Download"))
 
 		self["status"]    = StaticText(_(" "))
 		self["file_list"] = FileList("/", matchingPattern = "^.*")
@@ -357,7 +346,7 @@ class Filebrowser(Screen):
 		self.setTitle(firmware.upper() + " File Browser")
 
 	def resetGUI(self):
-		self["status"].setText("Select to press OK, Exit to press Cancel.")
+		self["status"].setText("Select to press OK, Exit to press Cancel.\nPress the BLUE button to download the latest firmware.")
 
 	def setCallback(self, func):
 		self.callback = func
@@ -545,14 +534,14 @@ class Filebrowser(Screen):
 class FirmwareUpgrade(Screen, ConfigListScreen):
 	skin = 	"""
 		<screen position="center,center" size="560,175" title="Firmware Upgrade" >
-			<ePixmap pixmap="Vu_HD/buttons/red.png" position="125,7" size="80,40" alphatest="blend" />
-			<ePixmap pixmap="Vu_HD/buttons/green.png" position="330,7" size="80,40" alphatest="blend" />
+			<ePixmap pixmap="skin_default/buttons/red.png" position="110,10" size="140,40" alphatest="blend" />
+			<ePixmap pixmap="skin_default/buttons/green.png" position="310,10" size="140,40" alphatest="blend" />
 
-			<widget source="key_red" render="Label" position="160,0" zPosition="1" size="155,40" font="Regular;20" halign="left" valign="center" transparent="1" />
-			<widget source="key_green" render="Label" position="365,0" zPosition="1" size="155,40" font="Regular;20" halign="left" valign="center" transparent="1" />
+			<widget source="key_red" render="Label" position="110,10" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" foregroundColor="#ffffff" transparent="1" />
+			<widget source="key_green" render="Label" position="310,10" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" foregroundColor="#ffffff" transparent="1" />
 
-			<widget name="config" zPosition="2" position="0,50" itemHeight="36" size="540,40" scrollbarMode="showOnDemand" transparent="1" />
-			<widget source="status" render="Label" position="0,100" zPosition="1" size="540,75" font="Regular;20" halign="center" valign="center" backgroundColor="#a08500" transparent="1" />
+			<widget name="config" zPosition="2" position="0,70" itemHeight="36" size="540,40" scrollbarMode="showOnDemand" transparent="1" />
+			<widget source="status" render="Label" position="0,100" zPosition="1" size="540,75" font="Regular;20" halign="center" valign="center" />
                 </screen>
 		"""
 
@@ -664,7 +653,7 @@ class FirmwareUpgrade(Screen, ConfigListScreen):
 		fbs.setCallback(self.cbFinishedUpgrade)
 	
 	def doFileOpen(self):
-		fbs = self.session.open(Filebrowser, self, self._item_firmware.value)
+		fbs = self.session.open(FUFilebrowser, self, self._item_firmware.value)
 		fbs.setCallback(self.cbSetStatus)
 
 	def keyLeft(self):
@@ -677,6 +666,8 @@ class FirmwareUpgrade(Screen, ConfigListScreen):
 		self.setupStatus()
 
 	def keyRight(self):
+		if self.rebootLock:
+			return
 		global fwlist
 		if fwlist is None:
 			return
