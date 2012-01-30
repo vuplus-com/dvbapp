@@ -1,6 +1,6 @@
 installdir = $(pkglibdir)/python/Plugins/Extensions/WebBrowser
 
-SUBDIRS = meta keymap
+SUBDIRS = meta keymap desc
 
 install_PYTHON =	 \
 	mp_wb_background.png \
