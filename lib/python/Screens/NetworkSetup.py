@@ -960,20 +960,22 @@ class AdapterSetupConfiguration(Screen, HelpableScreen):
 						iNetwork.checkNetworkState(self.checkNetworkCB)
 
 	def checkNetworkCB(self,data):
-		if iNetwork.getAdapterAttribute(self.iface, "up") is True:
-			if self.LinkState is True:
-				if data <= 2:
-					self["statuspic"].setPixmapNum(0)
+		try:
+			if iNetwork.getAdapterAttribute(self.iface, "up") is True:
+				if self.LinkState is True:
+					if data <= 2:
+						self["statuspic"].setPixmapNum(0)
+					else:
+						self["statuspic"].setPixmapNum(1)
+					self["statuspic"].show()
 				else:
 					self["statuspic"].setPixmapNum(1)
-				self["statuspic"].show()	
+					self["statuspic"].show()
 			else:
 				self["statuspic"].setPixmapNum(1)
 				self["statuspic"].show()
-		else:
-			self["statuspic"].setPixmapNum(1)
-			self["statuspic"].show()
-
+		except:
+			pass
 
 class NetworkAdapterTest(Screen):	
 	def __init__(self, session,iface):
