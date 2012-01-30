@@ -411,21 +411,13 @@ def messageReceived(address, message):
 		elif message == 0x46: # request device name
 			address = addresstv
 			cecmessage = setnamemessage
-			if config.hdmicec.devicename.value == "vuduo":
-				cecmessagetwo ="VU+ Duo"
-				cmd = struct.pack('B8s',cecmessage,cecmessagetwo)
-			elif config.hdmicec.devicename.value == "vusolo":
-				cecmessagetwo ="VU+ Solo"
-				cmd = struct.pack('B9s',cecmessage,cecmessagetwo)
-			elif config.hdmicec.devicename.value == "vuuno":
-				cecmessagetwo ="VU+ Uno"
-				cmd = struct.pack('B8s',cecmessage,cecmessagetwo)
-			elif config.hdmicec.devicename.value == "vuultimo":
-				cecmessagetwo ="VU+ Ultimo"
-				cmd = struct.pack('B8s',cecmessage,cecmessagetwo)
-			else:
+			name_len = len(config.hdmicec.devicename.value)
+			if name_len == 0:
 				cecmessagetwo ="VU+"
 				cmd = struct.pack('B4s',cecmessage,cecmessagetwo)
+			else:
+				cecmessagetwo = config.hdmicec.devicename.value
+				cmd = struct.pack('B'+str(name_len+1)+'s',cecmessage,cecmessagetwo)
 			logcmd = "[HDMI-CEC] send cec message %x:%s to %x" % (cecmessage,cecmessagetwo,address)
 
 		elif message == 0x85: # request active source

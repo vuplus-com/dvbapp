@@ -6,7 +6,7 @@ import Screens.Standby
 from Tools import Notifications
 import time
 from os import system
-
+from Tools.Directories import fileExists
 
 
 class HdmiCec:
@@ -72,18 +72,25 @@ class HdmiCec:
 			("3", _("HDMI 3")),
 			("4", _("HDMI 4")),
 			("5", _("HDMI 5"))])
-		config.hdmicec.devicename = ConfigSelection(
-			choices = {
-			"vuduo": _("VU-Duo"),
-			"vusolo": _("VU-Solo"),
-			"vuuno": _("VU-Uno"),
-			"vuultimo":_("VU-Ultimo"),
-			},
-			default = "vuduo")
-
+		config.hdmicec.devicename = ConfigText(default = self.getDeviceName(), visible_width = 50, fixed_size = False)
 		config.misc.standbyCounter.addNotifier(self.enterStandby, initial_call = False)
 		config.misc.DeepStandbyOn.addNotifier(self.enterDeepStandby, initial_call = False)
 		self.leaveDeepStandby()
+
+	def getDeviceName(self):
+		deviceList = {
+			"duo": "VU+ Duo",
+			"solo": "VU+ Solo",
+			"uno": "VU+ Uno",
+			"ultimo": "VU+ Ultimo",
+		}
+		if fileExists("/proc/stb/info/vumodel"):
+			vumodel = open("/proc/stb/info/vumodel")
+			info=vumodel.read().strip()
+			vumodel.close()
+			return deviceList.setdefault(info, "VU+")
+		else:
+			return "VU+"
 
 	def sendMessages(self, messages):
 		for message in messages.split(','):
