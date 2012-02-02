@@ -229,6 +229,8 @@ eServiceMP3::eServiceMP3(eServiceReference ref)
 	m_prev_decoder_time = -1;
 	m_decoder_time_valid_state = 0;
 	m_errorInfo.missing_codec = "";
+	//vuplus
+	m_is_hls_stream = 0;
 
 	CONNECT(m_seekTimeout->timeout, eServiceMP3::seekTimeoutCB);
 	CONNECT(m_subtitle_sync_timer->timeout, eServiceMP3::pushSubtitles);
@@ -1187,7 +1189,15 @@ void eServiceMP3::gstBusCall(GstBus *bus, GstMessage *msg)
 		case GST_MESSAGE_STATE_CHANGED:
 		{
 			if(GST_MESSAGE_SRC(msg) != GST_OBJECT(m_gst_playbin))
+			{
+				//vuplus
+				if(!strncmp(sourceName, "hls", 3))
+				{
+					//eDebug("HLS Protocol detected : source [%s]", sourceName);
+					m_is_hls_stream = 1;
+				}
 				break;
+			}
 
 			GstState old_state, new_state;
 			gst_message_parse_state_changed(msg, &old_state, &new_state, NULL);
@@ -1466,7 +1476,13 @@ void eServiceMP3::gstBusCall(GstBus *bus, GstMessage *msg)
 						g_object_set (G_OBJECT (owner), "timeout", HTTP_TIMEOUT, NULL);
 						eDebug("eServiceMP3::GST_STREAM_STATUS_TYPE_CREATE -> setting timeout on %s to %is", name, HTTP_TIMEOUT);
 					}
-					
+					//vuplus
+					else if (m_is_hls_stream && !strncmp(name, "queue", 5))
+					{
+						m_streamingsrc_timeout->stop();
+						m_is_hls_stream = 0;
+						//eDebug("Stoped response timeout!! : HLS");
+					}
 				}
 				if ( GST_IS_PAD(source) )
 					gst_object_unref(owner);
