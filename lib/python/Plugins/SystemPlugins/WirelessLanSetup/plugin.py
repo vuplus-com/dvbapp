@@ -669,9 +669,9 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 			self.writeWpasupplicantConf("wep") # passphrasekey is not None
 		else:
 			if wlanconfig.essid.value == 'Input hidden ESSID':
-				cmd = 'wpa_passphrase %s %s' % (wlanconfig.hiddenessid.value,wlanconfig.key.value)
+				cmd = "wpa_passphrase '%s' %s" % (wlanconfig.hiddenessid.value,wlanconfig.key.value)
 			else :
-				cmd = 'wpa_passphrase %s %s' % (wlanconfig.essid.value,wlanconfig.key.value)
+				cmd = "wpa_passphrase '%s' %s" % (wlanconfig.essid.value,wlanconfig.key.value)
 			print cmd
 			self.wpaphraseconsole = Console()
 			self.wpaphraseconsole.ePopen(cmd, self.parseWpaPhrase, self.writeWpasupplicantConf)
