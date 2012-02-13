@@ -335,7 +335,6 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 		self.encryption_key = None
 		self.wlanscanap = None
 		self.wpaphraseconsole = None
-#		self.scanAPcount =5
 		self.scanAPcount =1
 		self.list = []
 		ConfigListScreen.__init__(self, self.list,session = self.session)
@@ -346,7 +345,6 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 		self.scanAplistTimer = eTimer()
 		self.scanAplistTimer.callback.append(self.scanApList)
 		self.Console = Console()
-#		self.scanAplistTimer.start(100,True)
 		self.updateInterfaces(self.readWlanSettings)
 		self.onClose.append(self.cleanup)
 
@@ -415,7 +413,6 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 		wlanconfig.keytype = ConfigSelection(default = default_tmp, choices = [
 			("ascii", _("ASCII")), ("hex", _("HEX"))])
 		default_tmp = self.encryption_key or "XXXXXXXX"
-#		default_tmp = "XXXXXXXX"
 		wlanconfig.key = ConfigPassword(default = default_tmp, visible_width = 50, fixed_size = False)
 		self.scanAplistTimer.start(100,True)
 
@@ -494,7 +491,6 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 				if wlanconfig.usegateway.value is "on":
 					self.configList.append(self.gatewayEntry)
 			self.configList.append( self.essidEntry )
-#			print "#### wlanconfig.essid.value : ",wlanconfig.essid.value
 			if wlanconfig.essid.value == 'Input hidden ESSID':
 				self.configList.append( self.hiddenessidEntry )
 			self.configList.append( self.encryptEntry )
@@ -506,8 +502,6 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 
 		self["config"].list = self.configList
 		self["config"].l.setList(self.configList)
-#		if not self.selectionChanged in self["config"].onSelectionChanged:
-#			self["config"].onSelectionChanged.append(self.selectionChanged)
 
 	def scanApList(self):
 		self.apList = []
@@ -553,7 +547,6 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 				return
 		else:
 			self.apList = []
-#			self.scanAPcount =5
 			self.scanAPcount =0
 			list = data.splitlines()
 			for x in list:
@@ -561,10 +554,9 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 				if xx.startswith('ESSID:') and len(xx)>8 and xx[7:-1]not in self.apList:
 					self.apList.append(xx[7:-1])
 			self.apList.append('Input hidden ESSID')
-#			print "###### selectap : ",selectap
 			if selectap is not None and selectap in self.apList:
 				wlanconfig.essid = ConfigSelection(default=selectap,choices = self.apList)
-			elif self.ap_scan is not None and self.ap_scan.strip() == '2':
+			elif self.scan_ssid is not None and self.scan_ssid.strip() == '1':
 				wlanconfig.essid = ConfigSelection(default='Input hidden ESSID',choices = self.apList)
 			elif self.ssid is not None and self.ssid in self.apList:
 				wlanconfig.essid = ConfigSelection(default=self.ssid,choices = self.apList)
@@ -619,11 +611,6 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 			return
 		self.checkNetworkShares()
 
-#	def checkNetworkShares(self,ret = False):
-#		if ret == False:
-#			if self["config"].getCurrent() == self.keyEntry or self["config"].getCurrent() == self.hiddenessidEntry :
-#				self["config"].getCurrent()[1].onSelect(self.session)
-#			return
 	def checkNetworkShares(self):
 		if not self.Console:
 			self.Console = Console()
@@ -708,17 +695,14 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 				contents += "ctrl_interface=/var/run/wpa_supplicant\n"
 				contents += "eapol_version=1\n"
 				contents += "fast_reauth=1\n"
-
-				if wlanconfig.essid.value == 'Input hidden ESSID':
-					contents += "ap_scan=2\n"
-				else :
-					contents += "ap_scan=1\n"
+				contents += "ap_scan=1\n"
 				contents += "network={\n"
 				if wlanconfig.essid.value == 'Input hidden ESSID':
 					contents += "\tssid=\""+wlanconfig.hiddenessid.value+"\"\n"
+					contents += "\tscan_ssid=1\n"
 				else :
 					contents += "\tssid=\""+wlanconfig.essid.value+"\"\n"
-				contents += "\tscan_ssid=0\n"
+					contents += "\tscan_ssid=0\n"
 				if wlanconfig.encrypt.value == "on":
 					if wlanconfig.method.value =="wep":
 						contents += "\tkey_mgmt=NONE\n"
