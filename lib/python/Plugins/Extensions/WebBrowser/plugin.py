@@ -248,6 +248,29 @@ std_headers = {
 }
 
 class VuPlayerLauncher:
+	QUALITY_CODE = 	{
+			 '5': 'FLV 224p'
+			,'6': 'FLV 270p'
+			,'34':'FLV 360p'
+			,'35':'FLV 480p'
+			,'18':'MP4 360p'
+			,'22':'MP4 720p'
+			,'37':'MP4 1080p'
+			,'38':'MP4 2304p'
+			,'83':'MP4-3D 240p'
+			,'82':'MP4-3D 360p'
+			,'85':'MP4-3D 520p'
+			,'84':'MP4-3D 720p'
+			,'43':'WebM 360p'
+			,'44':'WebM 480p'
+			,'45':'WebM 720p'
+			,'46':'WebM 1080p'
+			,'100':'WebM-3D 360p'
+			,'101':'WebM-3D 480p'
+			,'102':'WebM-3D 720p'
+			,'13':'3GP 0.5'
+			,'17':'3GP 2.0'
+			}
 	def getVideoUrl(self, video_id):
 		video_url = None
 
@@ -301,22 +324,53 @@ class VuPlayerLauncher:
 			if VIDEO_FMT_PRIORITY_MAP.has_key(fmtid):
 				video_fmt_map[VIDEO_FMT_PRIORITY_MAP[fmtid]] = { 'fmtid': fmtid, 'fmturl': unquote_plus(fmturl) }
 			fmt_infomap[int(fmtid)] = unquote_plus(fmturl)
-		print "got",sorted(fmt_infomap.iterkeys())
-		if video_fmt_map and len(video_fmt_map):
-			video_url = video_fmt_map[sorted(video_fmt_map.iterkeys())[0]]['fmturl'].split(';')[0]
-			#print "found best available video format:",video_fmt_map[sorted(video_fmt_map.iterkeys())[0]]['fmtid']
-			#print "found best available video url:",video_url
-		return video_url
+		print "fmtinfomap :",sorted(fmt_infomap.iterkeys())
+	
+		video_url_list = []
+		if video_fmt_map:
+			idx = 0
+			sorted_fmt_keys = sorted(video_fmt_map.iterkeys())
+			for x in video_fmt_map:
+				try:
+					videofmt    = video_fmt_map[sorted_fmt_keys[idx]]
+					video_url   = videofmt['fmturl'].split(';')[0]
+					quality_str = self.qCode2String(videofmt['fmtid'])
+					#print "detected video : quality [%s], url [%s]" % (quality_str, video_url)
+					if video_url and quality_str:
+						video_url_list.append((quality_str, video_url))
+						print "added quality [%s], url [%s]" % (quality_str, video_url)
+				except Exception, msg: print "Error >>", msg
+				idx = idx + 1
+		return video_url_list
+
+	def qCode2String(self, qcode):
+		qstr = None
+		try:
+			qstr = self.QUALITY_CODE[qcode]
+		except: pass 
+		#print "quality : code[%s], str[%s]" % (qcode, qstr)
+		return qstr
 
 	def run(self, tubeid, session, service):
+		self.session = session
+		self.service = service
 		try:
-			myurl = self.getVideoUrl(tubeid)
-			print "Playing URL", myurl
-			if myurl is None:
+			self.url_list = self.getVideoUrl(tubeid)
+			if self.url_list is None or len(self.url_list) == 0:
 				session.open(MessageBox, _("Sorry, video is not available!"), MessageBox.TYPE_INFO)
+				wb_unlock()
 				return
-			myreference = eServiceReference(4097, 0, myurl)
-			session.open(VuPlayer, myreference, service)
+			titlemsg = "Please, choice video quality.\nFor smooth playback depends on network conditions."
+			self.session.openWithCallback(self.cbSelectedQuality, ChoiceBox, title=_(titlemsg), list = self.url_list)
+		except Exception, msg:
+			wb_unlock()
+			print "Error >>", msg
+
+	def cbSelectedQuality(self, choice):
+		try:
+			print "selected [%s] : [%s]" % (choice[0], choice[1])
+			myreference = eServiceReference(4097, 0, choice[1])
+			self.session.open(VuPlayer, myreference, self.service)
 		except Exception, msg:
 			wb_unlock()
 			print "Error >>", msg
@@ -371,10 +425,10 @@ class VuPlayerService:
 			tmp = data.split("?")
 			print tmp # ['http://www.youtube.com/watch', 'v=BpThu778qB4&feature=related']
 			service = self.session.nav.getCurrentlyPlayingServiceReference()
-			if len(tmp) == 2 and tmp[0] == "http://www.youtube.com/watch":
+			if len(tmp) and tmp[0] == "http://www.youtube.com/watch":
 				tmp = tmp[1].split("&")
 				print tmp # ['v=BpThu778qB4', 'feature=related']
-				if len(tmp) > 2:
+				if len(tmp):
 					tmp = tmp[0].split("=")
 					print tmp # ['v', 'BpThu778qB4']
 					if len(tmp) == 2 and tmp[0] == "v":
