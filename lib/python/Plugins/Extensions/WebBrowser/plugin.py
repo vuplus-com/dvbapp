@@ -151,6 +151,7 @@ class VuPlayer(Screen, InfoBarNotifications):
 		self.onClose.append(self.__onClose)
 		self.doPlay()
 
+
 	def __onClose(self):
 		self.session.nav.stopService()
 
@@ -172,8 +173,9 @@ class VuPlayer(Screen, InfoBarNotifications):
 		self.hidetimer.start(5000)
 
 	def doExit(self):
+		message = "Stop playing this movie?"
 		list = ((_("Yes"), "y"), (_("No, but play video again"), "n"),)
-		self.session.openWithCallback(self.cbDoExit, ChoiceBox, title=_("Stop playing this movie?"), list = list)
+		self.session.openWithCallback(self.cbDoExit, ChoiceBox, title=_(message), list = list)
 
 	def cbDoExit(self, answer):
 		answer = answer and answer[1]
@@ -315,15 +317,25 @@ class VuPlayerLauncher:
 		else:
 			tmp_fmtUrlDATA = videoinfo['fmt_url_map'][0].split(',')
 		for fmtstring in tmp_fmtUrlDATA:
+			num_fmtid = 0
 			if videoinfo.has_key('url_encoded_fmt_stream_map'):
 				(fmturl, fmtid) = fmtstring.split('&itag=')
+				try:
+					num_fmtid = int(fmtid)
+				except: 
+					try:
+						num_fmtid = int(fmtid[:fmtid.find(',')])
+					except: pass
+					pass
+
 				if fmturl.find("url=") !=-1:
 					fmturl = fmturl.replace("url=","")
 			else:
 				(fmtid,fmturl) = fmtstring.split('|')
 			if VIDEO_FMT_PRIORITY_MAP.has_key(fmtid):
 				video_fmt_map[VIDEO_FMT_PRIORITY_MAP[fmtid]] = { 'fmtid': fmtid, 'fmturl': unquote_plus(fmturl) }
-			fmt_infomap[int(fmtid)] = unquote_plus(fmturl)
+			if num_fmtid:
+				fmt_infomap[num_fmtid] = unquote_plus(fmturl)
 		print "fmtinfomap :",sorted(fmt_infomap.iterkeys())
 	
 		video_url_list = []
