@@ -348,6 +348,8 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 		self.readWpaSupplicantConf()
 		self.scanAplistTimer = eTimer()
 		self.scanAplistTimer.callback.append(self.scanApList)
+		self.emptyListMsgTimer = eTimer()
+		self.emptyListMsgTimer.callback.append(self.emptyListMsg)
 		self.Console = Console()
 		self.updateInterfaces(self.readWlanSettings)
 		self.onClose.append(self.cleanup)
@@ -522,20 +524,23 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 			self.createConfig()
 
 	def scanApList(self):
+		if self.oldInterfaceState is not True:
+			os_system("ifconfig "+self.iface+" up")
+			iNetwork.setAdapterAttribute(self.iface, "up", True)
 		Iwscanresult  = None
 		wirelessObj = Wireless(self.iface)
 		try:
 			Iwscanresult  = wirelessObj.scan()
 		except IOError:
 			print "%s Interface doesn't support scanning.."%self.iface
-			self.session.open(MessageBox, "%s Interface doesn't support scanning.."%self.iface, MessageBox.TYPE_ERROR,10)
+#			self.session.open(MessageBox, "%s Interface doesn't support scanning.."%self.iface, MessageBox.TYPE_ERROR,10)
 		self.configurationmsg.close(True)
 		if Iwscanresult is None:
-			self.session.open(MessageBox, _("No scan results"), MessageBox.TYPE_ERROR,10)
-
-		for ap in Iwscanresult:
-			if ap.essid not in self.apList and len(ap.essid) > 0:
-				self.apList.append(ap.essid)
+			self.emptyListMsgTimer.start(100,True)
+		else:
+			for ap in Iwscanresult:
+				if ap.essid not in self.apList and len(ap.essid) > 0:
+					self.apList.append(ap.essid)
 		self.apList.append('Input hidden ESSID')
 		if selectap is not None and selectap in self.apList:
 			wlanconfig.essid = ConfigSelection(default=selectap,choices = self.apList)
@@ -553,6 +558,9 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 		else:
 			wlanconfig.hiddenessid = ConfigText(default = "<Input ESSID>", visible_width = 50, fixed_size = False)
 		self.createConfig()
+
+	def emptyListMsg(self):
+		self.session.open(MessageBox, _("No AP detected."), type = MessageBox.TYPE_INFO, timeout = 10)
 
 	def keyLeft(self):
 		ConfigListScreen.keyLeft(self)
@@ -871,7 +879,7 @@ class WlanScanAp(Screen,HelpableScreen):
 			"down": (self.down, _("move down to next entry")),
 			"left": (self.left, _("move up to first entry")),
 			"right": (self.right, _("move down to last entry")),
-		})
+		}, -2)
 
 		self["OkCancelActions"] = HelpableActionMap(self, "OkCancelActions",
 		{
@@ -887,17 +895,6 @@ class WlanScanAp(Screen,HelpableScreen):
 			"blue": (self.startWlanConfig, "Edit Wireless settings"),
 		})
 
-		self["actions"] = NumberActionMap(["WizardActions","ShortcutActions"],
-		{
-			"ok": self.ok,
-			"back": self.close,
-			"up": self.up,
-			"down": self.down,
-			"red": self.close,
-			"left": self.left,
-			"right": self.right,
-		}, -2)
-
 		self["menulist"] = MenuList(self.setApList)
 		self["key_red"] = StaticText(_("Close"))
 		self["key_green"] = StaticText(_("Select"))
@@ -908,11 +905,15 @@ class WlanScanAp(Screen,HelpableScreen):
 		self["Frequency"] = StaticText(" ")
 		self["Encryption key"] = StaticText(" ")
 		self["BitRate"] = StaticText(" ")
+		self.oldInterfaceState = iNetwork.getAdapterAttribute(self.iface, "up")
 		self.getAplistTimer = eTimer()
 		self.getAplistTimer.callback.append(self.getApList)
 		self.scanAplistTimer = eTimer()
 		self.scanAplistTimer.callback.append(self.scanApList)
+		self.emptyListMsgTimer = eTimer()
+		self.emptyListMsgTimer.callback.append(self.emptyListMsg)
 		self.apList = {}
+		self.onClose.append(self.__onClose)
 		self.getAplistTimer.start(100,True)
 		
 	def left(self):
@@ -948,54 +949,57 @@ class WlanScanAp(Screen,HelpableScreen):
 		self.scanAplistTimer.start(100,True)
 
 	def scanApList(self):
+		if self.oldInterfaceState is not True:
+			os_system("ifconfig "+self.iface+" up")
+			iNetwork.setAdapterAttribute(self.iface, "up", True)
 		Iwscanresult  = None
 		wirelessObj = Wireless(self.iface)
 		try:
 			Iwscanresult  = wirelessObj.scan()
 		except IOError:
 			print "%s Interface doesn't support scanning.."%self.iface
-			self.session.open(MessageBox, "%s Interface doesn't support scanning.."%self.iface, MessageBox.TYPE_ERROR,10)
+#			self.session.open(MessageBox, "%s Interface doesn't support scanning.."%self.iface, MessageBox.TYPE_ERROR,10)
 		self.configurationmsg.close(True)
-		if Iwscanresult is None:
-			self.session.open(MessageBox, _("No scan results"), MessageBox.TYPE_ERROR,10)
+		if Iwscanresult is not None:
+			(num_channels, frequencies) = wirelessObj.getChannelInfo()
+			index = 1
+			for ap in Iwscanresult:
+				self.apList[index] = {}
+				self.apList[index]["Address"] = ap.bssid
+				if len(ap.essid) == 0:
+					self.apList[index]["ESSID"] = "<hidden ESSID>"
+				else:
+					self.apList[index]["ESSID"] = ap.essid
+					self.setApList.append( (self.apList[index]["ESSID"], index) )
+				self.apList[index]["Protocol"] = ap.protocol
+				self.apList[index]["Frequency"] = wirelessObj._formatFrequency(ap.frequency.getFrequency())
+				try:
+					self.apList[index]["Channel"] = frequencies.index(self.apList[index]["Frequency"] + 1)
+				except:
+					self.apList[index]["Channel"] = "Unknown"
 
-		(num_channels, frequencies) = wirelessObj.getChannelInfo()
-		index = 1
-		for ap in Iwscanresult:
-			self.apList[index] = {}
-			self.apList[index]["Address"] = ap.bssid
-			if len(ap.essid) == 0:
-				self.apList[index]["ESSID"] = "<hidden ESSID>"
-			else:
-				self.apList[index]["ESSID"] = ap.essid
-				self.setApList.append( (self.apList[index]["ESSID"], index) )
-			self.apList[index]["Protocol"] = ap.protocol
-			self.apList[index]["Frequency"] = wirelessObj._formatFrequency(ap.frequency.getFrequency())
-			try:
-				self.apList[index]["Channel"] = frequencies.index(self.apList[index]["Frequency"] + 1)
-			except:
-				self.apList[index]["Channel"] = "Unknown"
-
-			self.apList[index]["Quality"] = "%s/%s" % \
-				( ap.quality.quality, wirelessObj.getQualityMax().quality )
-			self.apList[index]["Signal Level"] = "%s/%s" % \
-				( ap.quality.getSignallevel(), "100" )
-			self.apList[index]["Noise Level"] = "%s/%s" % \
-				( ap.quality.getNoiselevel(), "100" )
+				self.apList[index]["Quality"] = "%s/%s" % \
+					( ap.quality.quality, wirelessObj.getQualityMax().quality )
+				self.apList[index]["Signal Level"] = "%s/%s" % \
+					( ap.quality.getSignallevel(), "100" )
+				self.apList[index]["Noise Level"] = "%s/%s" % \
+					( ap.quality.getNoiselevel(), "100" )
 
 # get encryption key on/off
-			key_status = "Unknown"
-			if (ap.encode.flags & pythonwifi.flags.IW_ENCODE_DISABLED):
-				key_status = "off"
-			elif (ap.encode.flags & pythonwifi.flags.IW_ENCODE_NOKEY):
-				if (ap.encode.length <= 0):
-					key_status = "on"
-			self.apList[index]["Encryption key"] = key_status
-			self.apList[index]["BitRate"] = wirelessObj._formatBitrate(ap.rate[-1][-1])
-			index += 1
+				key_status = "Unknown"
+				if (ap.encode.flags & pythonwifi.flags.IW_ENCODE_DISABLED):
+					key_status = "off"
+				elif (ap.encode.flags & pythonwifi.flags.IW_ENCODE_NOKEY):
+					if (ap.encode.length <= 0):
+						key_status = "on"
+				self.apList[index]["Encryption key"] = key_status
+				self.apList[index]["BitRate"] = wirelessObj._formatBitrate(ap.rate[-1][-1])
+				index += 1
 #		print self.apList
 #		print self.setApList
 		self.displayApInfo()
+		if len(self.apList) == 0:
+			self.emptyListMsgTimer.start(100,True)
 
 	def displayApInfo(self):
 		if len(self.apList) >0:
@@ -1006,11 +1010,19 @@ class WlanScanAp(Screen,HelpableScreen):
 					self[key].setText((key+":  "+self.apList[index][key]))
 				else:
 					self[key].setText((key+": None"))
-		else:
-			self.session.open(MessageBox, _("No AP detected."), type = MessageBox.TYPE_INFO, timeout = 10)
+
+	def emptyListMsg(self):
+		self.session.open(MessageBox, _("No AP detected."), type = MessageBox.TYPE_INFO, timeout = 10)
+		self["Address"].setText(_("No AP detected."))
+		self["ESSID"].setText(_(""))
 
 	def restartScanAP(self):
 		self.getAplistTimer.start(100,True)
+
+	def __onClose(self):
+		if self.oldInterfaceState is False:
+			iNetwork.setAdapterAttribute(self.iface, "up", False)
+			iNetwork.deactivateInterface(self.iface)
 
 class NetworkAdapterTest(Screen):
 	def __init__(self, session,iface):
