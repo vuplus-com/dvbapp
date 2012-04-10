@@ -254,6 +254,8 @@ lib/python/Plugins/SystemPlugins/CrashReport/meta/Makefile
 lib/python/Plugins/SystemPlugins/3GModemManager/Makefile
 lib/python/Plugins/SystemPlugins/3GModemManager/meta/Makefile
 lib/python/Plugins/SystemPlugins/3GModemManager/script/Makefile
+lib/python/Plugins/SystemPlugins/WirelessAccessPoint/Makefile
+lib/python/Plugins/SystemPlugins/WirelessAccessPoint/meta/Makefile
 lib/python/Tools/Makefile
 lib/service/Makefile
 lib/components/Makefile
