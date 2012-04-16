@@ -314,6 +314,8 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 			<widget source="netmask" render="Label" position="300,275" zPosition="1" size="150,26" font="Regular;20" halign="center" valign="center" />	
 			<eLabel text="Gateway : " position="100,300" size="190,21" font="Regular;19" />
 			<widget source="gateway" render="Label" position="300,300" zPosition="1" size="150,26" font="Regular;20" halign="center" valign="center" />
+			<widget name="VKeyIcon" pixmap="skin_default/buttons/key_text.png" position="460,230" zPosition="10" size="35,25" transparent="1" alphatest="on" />
+			<widget name="HelpWindow" pixmap="skin_default/buttons/key_text.png" position="383,420" zPosition="1" size="1,1" transparent="1" alphatest="on" />
 		</screen>
 		"""
 	def __init__(self, session, iface, essidSelected = None):
@@ -331,6 +333,10 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 			"cancel": self.keyCancel,
 			"red": self.keyCancel,
 		}, -2)
+		self["HelpWindow"] = Pixmap()
+		self["HelpWindow"].hide()
+		self["VKeyIcon"] = Pixmap()
+		self["VKeyIcon"].hide()
 		self.iface = iface
 		self.essidSelected = essidSelected
 		self.ssid = None
@@ -508,6 +514,14 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 
 		self["config"].list = self.configList
 		self["config"].l.setList(self.configList)
+		if not self.showTextIcon in self["config"].onSelectionChanged:
+			self["config"].onSelectionChanged.append(self.showTextIcon)
+
+	def showTextIcon(self):
+		if isinstance(self["config"].getCurrent()[1], ConfigText) or isinstance(self["config"].getCurrent()[1], ConfigPassword):
+			self["VKeyIcon"].show()
+		else:
+			self["VKeyIcon"].hide()
 
 	def getApList(self):
 		if self.essidSelected is None:
