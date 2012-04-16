@@ -563,8 +563,7 @@ class ModemManager(Screen):
 			self.session.open(MessageBox, _(message), MessageBox.TYPE_INFO)
 			return
 
-		#commandBin = resolveFilename(SCOPE_CURRENT_PLUGIN, "SystemPlugins/3GModemManager/3gcommand")
-		commandBin = "/usr/bin/3gcommand"
+		commandBin = resolveFilename(SCOPE_CURRENT_PLUGIN, "SystemPlugins/3GModemManager/3gcommand")
 		if self["key_green"].getText() == 'Disconnect':
 			cmd = "%s -s 0" % (commandBin)
 			self.taskManager.append(cmd, self.cbPrintAvail, self.cbPrintClose)
