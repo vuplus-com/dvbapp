@@ -1,4 +1,4 @@
-<apns version="6">
-  <apn carrier="SKT3G" mcc="450" mnc="05" apn="web.sktelecom.com" mmsc="http://omms.nate.com:9082/oma_mms" mmsproxy="smart.nate.com" mmsport="9093" type="default,supl,mms" />
-  <apn carrier="KT-HSDPA" mcc="450" mnc="08" apn="alwayson-r6.ktfwing.com" mmsc="http://mmsc.ktfwing.com:9082" type="default,supl,mms" />
+<apns version="1">
+    <apn carrier="KT-HSDPA" apn="alwayson-r6.ktfwing.com" phone="*99#" />
+    <apn carrier="SKT3G" apn="web.sktelecom.com" phone="*99#" />
 </apns>
