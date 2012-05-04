@@ -218,7 +218,7 @@ class WirelessAccessPoint(Screen,ConfigListScreen):
 				self.hostapdConfigList[key].value = int(value)
 			elif key in self.hostapdConfigList.keys():
 				self.hostapdConfigList[key].value = value
-			if key == "channel" and value not in range(14):
+			if key == "channel" and int(value) not in range(14):
 				self.hostapdConfigList[key].value = 1
 
 #		for key in self.hostapdConfigList.keys():
@@ -244,7 +244,7 @@ class WirelessAccessPoint(Screen,ConfigListScreen):
 		self.wirelessDeviceEntry = getConfigListEntry(_("AP Device"), apModeConfig.wirelessdevice)
 		self.wirelessModeEntry = getConfigListEntry(_("AP Mode"), apModeConfig.wirelessmode)
 		self.channelEntry = getConfigListEntry(_("Channel (1~13)"), apModeConfig.channel)
-		self.ssidEntry = getConfigListEntry(_("SSID (0~32 Characters)"), apModeConfig.ssid)
+		self.ssidEntry = getConfigListEntry(_("SSID (1~32 Characters)"), apModeConfig.ssid)
 		self.beaconEntry = getConfigListEntry(_("Beacon (15~65535)"), apModeConfig.beacon)
 		self.rtsThresholdEntry = getConfigListEntry(_("RTS Threshold (0~2347)"), apModeConfig.rts_threshold)
 		self.fragmThresholdEntry = getConfigListEntry(_("FRAGM Threshold (256~2346)"), apModeConfig.fragm_threshold)
