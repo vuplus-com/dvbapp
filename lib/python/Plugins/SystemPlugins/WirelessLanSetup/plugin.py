@@ -74,21 +74,38 @@ class WlanSelection(Screen,HelpableScreen):
 		iNetwork.msgPlugins()
 		iNetwork.getInterfaces()
 
+	def checkIfaceMode(self, iface = None):
+		try:
+			obj = Wireless(iface)
+			if obj.getMode() == 'Master':
+				return -1
+			else:
+				return 0
+		except:
+			return -2
+
 	def ok(self):
 #		print len(self["menulist"].list)
 		if len(self["menulist"].list) == 0:
 			self.session.open(MessageBox, (_("Can not find any WirelessLan Module\n")),MessageBox.TYPE_ERROR,5 )
 			return
-		ifaces=self["menulist"].getCurrent()[1]
-		if ifaces == None:
-			pass
+		iface=self["menulist"].getCurrent()[1]
+		if iface == None:
+			return
 		else:
-			self.session.open(WlanSetup,ifaces)
+			ret = self.checkIfaceMode(iface)
+			if ret == -2:
+				self.session.open(MessageBox, (_("Invalid WirelessLan Module.\n")),MessageBox.TYPE_ERROR,5 )
+				return
+			elif ret == -1:
+				self.session.open(MessageBox, (_("Can not setup WirelessLan Module in 'AP Mode'\n")),MessageBox.TYPE_ERROR,5 )
+				return
+		self.session.open(WlanSetup, iface)
 
 	def getWlandevice(self):
 		list = []
 		for x in iNetwork.getInstalledAdapters():
-			if x.startswith('eth'):
+			if x.startswith('eth') or x.startswith('br') or x.startswith('mon'):
 				continue
 			description=self.getAdapterDescription(x)
 			if description == "Unknown network adapter":
