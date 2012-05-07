@@ -189,6 +189,10 @@ lib/python/Plugins/Extensions/VuplusEvent/meta/Makefile
 lib/python/Plugins/Extensions/StreamTV/Makefile
 lib/python/Plugins/Extensions/StreamTV/meta/Makefile
 lib/python/Plugins/Extensions/StreamTV/icons/Makefile
+lib/python/Plugins/Extensions/DLNAServer/Makefile
+lib/python/Plugins/Extensions/DLNAServer/meta/Makefile
+lib/python/Plugins/Extensions/DLNABrowser/Makefile
+lib/python/Plugins/Extensions/DLNABrowser/meta/Makefile
 lib/python/Plugins/SystemPlugins/CleanupWizard/Makefile
 lib/python/Plugins/SystemPlugins/CleanupWizard/meta/Makefile
 lib/python/Plugins/SystemPlugins/CommonInterfaceAssignment/Makefile
