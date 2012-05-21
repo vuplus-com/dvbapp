@@ -1037,7 +1037,7 @@ class WlanScanAp(Screen,HelpableScreen):
 			self["menulist"].setList(self.setApList)
 			index = self["menulist"].getCurrent()[1]
 			for key in ["Address", "ESSID", "Protocol", "Frequency", "Encryption key", "BitRate"]:
-				if self.apList[index].has_key(key):
+				if self.apList[index].has_key(key) and self.apList[index][key] is not None:
 					self[key].setText((key+":  "+self.apList[index][key]))
 				else:
 					self[key].setText((key+": None"))
