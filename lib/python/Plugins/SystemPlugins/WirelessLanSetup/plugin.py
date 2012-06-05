@@ -92,7 +92,7 @@ class WlanSelection(Screen,HelpableScreen):
 		iface=self["menulist"].getCurrent()[1]
 		if iface == None:
 			return
-		else:
+		elif iNetwork.getAdapterAttribute(iface, "up") == True:
 			ret = self.checkIfaceMode(iface)
 			if ret == -2:
 				self.session.open(MessageBox, (_("Invalid WirelessLan Module.\n")),MessageBox.TYPE_ERROR,5 )
