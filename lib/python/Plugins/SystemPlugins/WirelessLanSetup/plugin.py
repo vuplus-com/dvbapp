@@ -554,19 +554,26 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 				wlanconfig.hiddenessid = ConfigText(default = "<Input ESSID>", visible_width = 50, fixed_size = False)
 			self.createConfig()
 
-	def scanApList(self):
-		if self.oldInterfaceState is not True:
-			os_system("ifconfig "+self.iface+" up")
-			iNetwork.setAdapterAttribute(self.iface, "up", True)
+	def getScanResult(self, wirelessObj):
 		Iwscanresult  = None
-		wirelessObj = Wireless(self.iface)
 		try:
 			Iwscanresult  = wirelessObj.scan()
 		except IOError:
 			print "%s Interface doesn't support scanning.."%self.iface
-#			self.session.open(MessageBox, "%s Interface doesn't support scanning.."%self.iface, MessageBox.TYPE_ERROR,10)
+		return Iwscanresult
+
+	def scanApList(self):
+		if self.oldInterfaceState is not True:
+			os_system("ifconfig "+self.iface+" up")
+			iNetwork.setAdapterAttribute(self.iface, "up", True)
+		wirelessObj = Wireless(self.iface)
+		Iwscanresult=self.getScanResult(wirelessObj)
+		if Iwscanresult is None or len(Iwscanresult.aplist) == 0 :
+			import time
+			time.sleep(1.5)
+			Iwscanresult=self.getScanResult(wirelessObj)
 		self.configurationmsg.close(True)
-		if Iwscanresult is None:
+		if Iwscanresult is None or len( Iwscanresult.aplist) == 0:
 			self.emptyListMsgTimer.start(100,True)
 		else:
 			for ap in Iwscanresult:
@@ -965,13 +972,15 @@ class WlanScanAp(Screen,HelpableScreen):
 
 	def ok(self):
 		global selectap
-		selectAp=self["menulist"].getCurrent()[0]
-		selectap = selectAp
+		if self["menulist"].getCurrent() is not None:
+			selectAp=self["menulist"].getCurrent()[0]
+			selectap = selectAp
 		self.close()
 
 	def startWlanConfig(self):
-		selectAp=self["menulist"].getCurrent()[0]
-		self.close(selectAp)
+		if self["menulist"].getCurrent() is not None:
+			selectAp=self["menulist"].getCurrent()[0]
+			self.close(selectAp)
 
 	def getApList(self):
 		self.apList = {}
@@ -979,19 +988,26 @@ class WlanScanAp(Screen,HelpableScreen):
 		self.configurationmsg = self.session.open(MessageBox, _("Please wait for scanning AP..."), type = MessageBox.TYPE_INFO, enable_input = False)
 		self.scanAplistTimer.start(100,True)
 
-	def scanApList(self):
-		if self.oldInterfaceState is not True:
-			os_system("ifconfig "+self.iface+" up")
-			iNetwork.setAdapterAttribute(self.iface, "up", True)
+	def getScanResult(self, wirelessObj):
 		Iwscanresult  = None
-		wirelessObj = Wireless(self.iface)
 		try:
 			Iwscanresult  = wirelessObj.scan()
 		except IOError:
 			print "%s Interface doesn't support scanning.."%self.iface
-#			self.session.open(MessageBox, "%s Interface doesn't support scanning.."%self.iface, MessageBox.TYPE_ERROR,10)
+		return Iwscanresult
+
+	def scanApList(self):
+		if self.oldInterfaceState is not True:
+			os_system("ifconfig "+self.iface+" up")
+			iNetwork.setAdapterAttribute(self.iface, "up", True)
+		wirelessObj = Wireless(self.iface)
+		Iwscanresult=self.getScanResult(wirelessObj)
+		if Iwscanresult is None or len(Iwscanresult.aplist) == 0 :
+			import time
+			time.sleep(1.5)
+			Iwscanresult=self.getScanResult(wirelessObj)
 		self.configurationmsg.close(True)
-		if Iwscanresult is not None:
+		if Iwscanresult is not None and len(Iwscanresult.aplist) != 0:
 			(num_channels, frequencies) = wirelessObj.getChannelInfo()
 			index = 1
 			for ap in Iwscanresult:
@@ -1035,12 +1051,13 @@ class WlanScanAp(Screen,HelpableScreen):
 	def displayApInfo(self):
 		if len(self.apList) >0:
 			self["menulist"].setList(self.setApList)
-			index = self["menulist"].getCurrent()[1]
-			for key in ["Address", "ESSID", "Protocol", "Frequency", "Encryption key", "BitRate"]:
-				if self.apList[index].has_key(key) and self.apList[index][key] is not None:
-					self[key].setText((key+":  "+self.apList[index][key]))
-				else:
-					self[key].setText((key+": None"))
+			if self["menulist"].getCurrent() is not None:
+				index = self["menulist"].getCurrent()[1]
+				for key in ["Address", "ESSID", "Protocol", "Frequency", "Encryption key", "BitRate"]:
+					if self.apList[index].has_key(key) and self.apList[index][key] is not None:
+						self[key].setText((key+":  "+self.apList[index][key]))
+					else:
+						self[key].setText((key+": None"))
 
 	def emptyListMsg(self):
 		self.session.open(MessageBox, _("No AP detected."), type = MessageBox.TYPE_INFO, timeout = 10)
