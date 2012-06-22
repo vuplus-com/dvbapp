@@ -25,6 +25,7 @@ eDVBServicePMTHandler::eDVBServicePMTHandler()
 {
 	m_use_decode_demux = 0;
 	m_pmt_pid = -1;
+	m_isstreamclient = false;
 	eDVBResourceManager::getInstance(m_resourceManager);
 	CONNECT(m_PMT.tableReady, eDVBServicePMTHandler::PMTready);
 	CONNECT(m_PAT.tableReady, eDVBServicePMTHandler::PATready);
@@ -109,7 +110,7 @@ void eDVBServicePMTHandler::PMTready(int error)
 		if (!m_pvr_channel) // don't send campmt to camd.socket for playbacked services
 		{
 			eEPGCache::getInstance()->PMTready(this);
-			if(!m_ca_servicePtr)
+			if(!m_ca_servicePtr && !m_isstreamclient)
 			{
 				int demuxes[2] = {0,0};
 				uint8_t tmp;
@@ -782,12 +783,13 @@ int eDVBServicePMTHandler::tune(eServiceReferenceDVB &ref, int use_decode_demux,
 	return tuneExt(ref, use_decode_demux, s, NULL, cue, simulate, service);
 }
 
-int eDVBServicePMTHandler::tuneExt(eServiceReferenceDVB &ref, int use_decode_demux, ePtr<iTsSource> &source, const char *streaminfo_file, eCueSheet *cue, bool simulate, eDVBService *service)
+int eDVBServicePMTHandler::tuneExt(eServiceReferenceDVB &ref, int use_decode_demux, ePtr<iTsSource> &source, const char *streaminfo_file, eCueSheet *cue, bool simulate, eDVBService *service, bool isstreamclient)
 {
 	RESULT res=0;
 	m_reference = ref;
 	m_use_decode_demux = use_decode_demux;
 	m_no_pat_entry_delay->stop();
+	m_isstreamclient = isstreamclient;
 
 		/* use given service as backup. This is used for timeshift where we want to clone the live stream using the cache, but in fact have a PVR channel */
 	m_service = service;
@@ -831,7 +833,9 @@ int eDVBServicePMTHandler::tuneExt(eServiceReferenceDVB &ref, int use_decode_dem
 		}
 		eDebug("alloc PVR");
 			/* allocate PVR */
-		res = m_resourceManager->allocatePVRChannel(m_pvr_channel);
+		eDVBChannelID chid;
+		if (m_isstreamclient) ref.getChannelID(chid);
+		res = m_resourceManager->allocatePVRChannel(chid, m_pvr_channel);
 		if (res)
 			eDebug("allocatePVRChannel failed!\n");
 		m_channel = m_pvr_channel;
@@ -871,7 +875,15 @@ int eDVBServicePMTHandler::tuneExt(eServiceReferenceDVB &ref, int use_decode_dem
 			m_pvr_channel->setCueSheet(cue);
 
 			if (m_pvr_channel->getDemux(m_pvr_demux_tmp, (!m_use_decode_demux) ? 0 : iDVBChannel::capDecode))
-				eDebug("Allocating %s-decoding a demux for PVR channel failed.", m_use_decode_demux ? "" : "non-");
+			{
+				if (m_isstreamclient)
+				{
+					eDebug("Allocating %s-decoding a demux for http channel failed.", m_use_decode_demux ? "" : "non-");
+					return -2;
+				}
+				else
+					eDebug("Allocating %s-decoding a demux for PVR channel failed.", m_use_decode_demux ? "" : "non-");
+			}
 			else if (source)
 				m_pvr_channel->playSource(source, streaminfo_file);
 			else

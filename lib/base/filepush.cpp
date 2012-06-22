@@ -106,7 +106,7 @@ void eFilePushThread::thread()
 //			eDebug("wrote %d bytes", w);
 			if (w <= 0)
 			{
-				if (errno == EINTR || errno == EAGAIN || errno == EBUSY)
+				if (w < 0 && (errno == EINTR || errno == EAGAIN || errno == EBUSY))
 					continue;
 				eDebug("eFilePushThread WRITE ERROR");
 				sendEvent(evtWriteError);

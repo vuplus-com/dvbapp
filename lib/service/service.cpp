@@ -72,10 +72,23 @@ eServiceReference::eServiceReference(const std::string &string)
 		const char *namestr = strchr(pathstr, ':');
 		if (namestr)
 		{
-			if (pathstr != namestr)
-				path.assign(pathstr, namestr-pathstr);
-			if (*(namestr+1))
-				name=namestr+1;
+			if (!strncmp(namestr, "://", 3)) // The path is a url (e.g. "http://...")
+			{
+				namestr = strchr(namestr, ' ');
+				if (namestr)
+				{
+					path.assign(pathstr, namestr - pathstr);
+					if (*(namestr + 1))
+						name = namestr + 1;
+				}
+			}
+			else
+			{
+				if (pathstr != namestr)
+					path.assign(pathstr, namestr-pathstr);
+				if (*(namestr+1))
+					name=namestr+1;
+			}
 		}
 		else
 			path=pathstr;

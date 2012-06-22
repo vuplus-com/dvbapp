@@ -525,30 +525,46 @@ RESULT eDVBResourceManager::allocateDemux(eDVBRegisteredFrontend *fe, ePtr<eDVBA
 	}
 	else if (m_boxtype == DM8000 || m_boxtype == DM500HD || m_boxtype == DM800SE || m_boxtype == DM7020HD)
 	{
+		iDVBAdapter *adapter = fe ? fe->m_adapter : m_adapter.begin(); /* look for a demux on the same adapter as the frontend, or the first adapter for dvr playback */
+		int source = fe ? fe->m_frontend->getDVBID() : -1;
 		cap |= capHoldDecodeReference; // this is checked in eDVBChannel::getDemux
-		for (; i != m_demux.end(); ++i, ++n)
+		if (!fe)
 		{
-			if (fe)
+			/*
+			 * For pvr playback, start with the last demux.
+			 * On some hardware, we have less ca devices than demuxes,
+			 * so we should try to leave the first demuxes for live tv,
+			 * and start with the last for pvr playback
+			 */
+			i = m_demux.end();
+			--i;
+		}
+		while (i != m_demux.end())
+		{
+			if (i->m_adapter == adapter)
 			{
 				if (!i->m_inuse)
 				{
-					if (!unused)
-						unused = i;
+					/* mark the first unused demux, we'll use that when we do not find a better match */
+					if (!unused) unused = i;
 				}
-				else if (i->m_adapter == fe->m_adapter &&
-				    i->m_demux->getSource() == fe->m_frontend->getDVBID())
+				else
 				{
-					demux = new eDVBAllocatedDemux(i);
-					return 0;
+					/* demux is in use, see if we can share it */
+					if (source >= 0 && i->m_demux->getSource() == source)
+					{
+						demux = new eDVBAllocatedDemux(i);
+						return 0;
+					}
 				}
 			}
-			else if (n == 4) // always use demux4 for PVR (demux 4 can not descramble...)
+			if (fe)
 			{
-				if (i->m_inuse) {
-					demux = new eDVBAllocatedDemux(i);
-					return 0;
-				}
-				unused = i;
+				++i;
+			}
+			else
+			{
+				--i;
 			}
 		}
 	}
@@ -719,8 +735,7 @@ RESULT eDVBResourceManager::allocateRawChannel(eUsePtr<iDVBChannel> &channel, in
 	return 0;
 }
 
-
-RESULT eDVBResourceManager::allocatePVRChannel(eUsePtr<iDVBPVRChannel> &channel)
+RESULT eDVBResourceManager::allocatePVRChannel(const eDVBChannelID &channelid, eUsePtr<iDVBPVRChannel> &channel)
 {
 	ePtr<eDVBAllocatedDemux> demux;
 
@@ -731,7 +746,18 @@ RESULT eDVBResourceManager::allocatePVRChannel(eUsePtr<iDVBPVRChannel> &channel)
 		m_releaseCachedChannelTimer->stop();
 	}
 
-	channel = new eDVBChannel(this, 0);
+	ePtr<eDVBChannel> ch = new eDVBChannel(this, 0);
+	if (channelid)
+	{
+		/*
+		 * user provided a channelid, with the clear intention for
+		 * this channel to be registered at the resource manager.
+		 * (allowing e.g. epgcache to be started)
+		 */
+		ePtr<iDVBFrontendParameters> feparm;
+		ch->setChannel(channelid, feparm);
+	}
+	channel = ch;
 	return 0;
 }
 
@@ -1605,14 +1631,15 @@ RESULT eDVBChannel::setChannel(const eDVBChannelID &channelid, ePtr<iDVBFrontend
 	if (!channelid)
 		return 0;
 
-	if (!m_frontend)
-	{
-		eDebug("no frontend to tune!");
-		return -ENODEV;
-	}
-
 	m_channel_id = channelid;
 	m_mgr->addChannel(channelid, this);
+
+	if (!m_frontend)
+	{
+		/* no frontend, no need to tune (must be a streamed service) */
+		return 0;
+	}
+
 	m_state = state_tuning;
 			/* if tuning fails, shutdown the channel immediately. */
 	int res;
@@ -1722,6 +1749,12 @@ RESULT eDVBChannel::requestTsidOnid(ePyObject callback)
 RESULT eDVBChannel::getDemux(ePtr<iDVBDemux> &demux, int cap)
 {
 	ePtr<eDVBAllocatedDemux> &our_demux = (cap & capDecode) ? m_decoder_demux : m_demux;
+
+	if (m_frontend == NULL)
+	{
+		/* in dvr mode, we have to stick to a single demux (the one connected to our dvr device) */
+		our_demux = m_decoder_demux ? m_decoder_demux : m_demux;
+	}
 
 	if (!our_demux)
 	{
@@ -1833,7 +1866,8 @@ RESULT eDVBChannel::playSource(ePtr<iTsSource> &source, const char *streaminfo_f
 
 	m_pvr_thread = new eDVBChannelFilePush();
 	m_pvr_thread->enablePVRCommit(1);
-	m_pvr_thread->setStreamMode(1);
+	/* If the source specifies a length, it's a file. If not, it's a stream */
+	m_pvr_thread->setStreamMode(source->length() <= 0);
 	m_pvr_thread->setScatterGather(this);
 
 	m_event(this, evtPreStart);

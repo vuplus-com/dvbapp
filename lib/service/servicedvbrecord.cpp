@@ -2,6 +2,7 @@
 #include <lib/base/eerror.h>
 #include <lib/dvb/epgcache.h>
 #include <lib/dvb/metaparser.h>
+#include <lib/base/httpstream.h>
 #include <fcntl.h>
 
 	/* for cutlist */
@@ -14,7 +15,8 @@
 
 DEFINE_REF(eDVBServiceRecord);
 
-eDVBServiceRecord::eDVBServiceRecord(const eServiceReferenceDVB &ref): m_ref(ref)
+eDVBServiceRecord::eDVBServiceRecord(const eServiceReferenceDVB &ref, bool isstreamclient = false):
+	m_ref(ref),m_is_stream_client(isstreamclient)
 {
 	CONNECT(m_service_handler.serviceEvent, eDVBServiceRecord::serviceEvent);
 	CONNECT(m_event_handler.m_eit_changed, eDVBServiceRecord::gotNewEvent);
@@ -232,9 +234,28 @@ int eDVBServiceRecord::doPrepare()
 		/* allocate a ts recorder if we don't already have one. */
 	if (m_state == stateIdle)
 	{
+		bool isstreamclient = false;
 		m_pids_active.clear();
 		m_state = statePrepared;
-		return m_service_handler.tune(m_ref, 0, 0, m_simulate);
+		ePtr<iTsSource> source;
+		if (!m_ref.path.empty())
+		{
+			if (m_is_stream_client)
+			{
+				isstreamclient = true;
+				eHttpStream *f = new eHttpStream();
+				f->open(m_ref.path.c_str());
+				source = ePtr<iTsSource>(f);
+			}
+			else
+			{
+				/* re-record a recording */
+				eRawFile *f = new eRawFile();
+				f->open(m_ref.path.c_str());
+				source = ePtr<iTsSource>(f);
+			}
+		}
+		return m_service_handler.tuneExt(m_ref, 0, source, m_ref.path.c_str(), 0, m_simulate, 0, isstreamclient);
 	}
 	return 0;
 }

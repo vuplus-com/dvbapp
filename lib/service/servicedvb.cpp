@@ -17,6 +17,7 @@
 #include <lib/dvb/tstools.h>
 #include <lib/python/python.h>
 #include <lib/base/nconfig.h> // access to python config
+#include <lib/base/httpstream.h>
 
 		/* for subtitles */
 #include <lib/gui/esubtitle.h>
@@ -292,7 +293,7 @@ public:
 	RESULT getName(const eServiceReference &ref, std::string &name);
 	int getLength(const eServiceReference &ref);
 	RESULT getEvent(const eServiceReference &ref, ePtr<eServiceEvent> &SWIG_OUTPUT, time_t start_time);
-	int isPlayable(const eServiceReference &ref, const eServiceReference &ignore) { return 1; }
+	int isPlayable(const eServiceReference &ref, const eServiceReference &ignore, bool simulate) { return 1; }
 	int getInfo(const eServiceReference &ref, int w);
 	std::string getInfoString(const eServiceReference &ref,int w);
 	PyObject *getInfoObject(const eServiceReference &r, int what);
@@ -404,14 +405,25 @@ RESULT eStaticServiceDVBPVRInformation::getEvent(const eServiceReference &ref, e
 {
 	if (!ref.path.empty())
 	{
-		ePtr<eServiceEvent> event = new eServiceEvent;
-		std::string filename = ref.path;
-		filename.erase(filename.length()-2, 2);
-		filename+="eit";
-		if (!event->parseFrom(filename, (m_parser.m_ref.getTransportStreamID().get()<<16)|m_parser.m_ref.getOriginalNetworkID().get()))
+		if (ref.path.substr(0, 7) == "http://")
 		{
-			evt = event;
-			return 0;
+			eServiceReference equivalentref(ref);
+			/* this might be a scrambled stream (id + 0x100), force equivalent dvb type */
+			equivalentref.type = eServiceFactoryDVB::id;
+			equivalentref.path.clear();
+			return eEPGCache::getInstance()->lookupEventTime(equivalentref, start_time, evt);
+		}
+		else
+		{
+			ePtr<eServiceEvent> event = new eServiceEvent;
+			std::string filename = ref.path;
+			filename.erase(filename.length()-2, 2);
+			filename+="eit";
+			if (!event->parseFrom(filename, (m_parser.m_ref.getTransportStreamID().get()<<16)|m_parser.m_ref.getOriginalNetworkID().get()))
+			{
+				evt = event;
+				return 0;
+			}
 		}
 	}
 	evt = 0;
@@ -816,6 +828,12 @@ RESULT eServiceFactoryDVB::record(const eServiceReference &ref, ePtr<iRecordable
 		return 0;
 	} else
 	{
+		bool isstream = ref.path.substr(0, 7) == "http://";
+		if(isstream)
+		{
+			ptr = new eDVBServiceRecord((eServiceReferenceDVB&)ref, isstream);
+			return 0;
+		}
 		ptr = 0;
 		return -1;
 	}
@@ -917,7 +935,8 @@ eDVBServicePlay::eDVBServicePlay(const eServiceReference &ref, eDVBService *serv
 	m_reference(ref), m_dvb_service(service), m_have_video_pid(0), m_is_paused(0)
 {
 	m_is_primary = 1;
-	m_is_pvr = !m_reference.path.empty();
+	m_is_stream = m_reference.path.substr(0, 7) == "http://";
+	m_is_pvr = (!m_reference.path.empty() && !m_is_stream);
 	
 	m_timeshift_enabled = m_timeshift_active = 0, m_timeshift_changed = 0;
 	m_skipmode = m_fastforward = m_slowmotion = 0;
@@ -1158,7 +1177,7 @@ RESULT eDVBServicePlay::start()
 
 	m_first_program_info = 1;
 	ePtr<iTsSource> source = createTsSource(service);
-	m_service_handler.tuneExt(service, m_is_pvr, source, service.path.c_str(), m_cue, false, m_dvb_service);
+	m_service_handler.tuneExt(service, m_is_pvr, source, service.path.c_str(), m_cue, false, m_dvb_service, m_is_stream);
 
 	if (m_is_pvr)
 	{
@@ -1568,6 +1587,18 @@ RESULT eDVBServicePlay::getName(std::string &name)
 	{
 		ePtr<iStaticServiceInformation> i = new eStaticServiceDVBPVRInformation(m_reference);
 		return i->getName(m_reference, name);
+	}
+	else if (m_is_stream)
+	{
+		name = m_reference.name;
+		if (name.empty())
+		{
+			name = m_reference.path;
+		}
+		if (name.empty())
+		{
+			name = "(...)";
+		}
 	}
 	else if (m_dvb_service)
 	{
@@ -2370,9 +2401,18 @@ void eDVBServicePlay::resetTimeshift(int start)
 
 ePtr<iTsSource> eDVBServicePlay::createTsSource(eServiceReferenceDVB &ref)
 {
-	eRawFile *f = new eRawFile();
-	f->open(ref.path.c_str());
-	return ePtr<iTsSource>(f);
+	if (m_is_stream)
+	{
+		eHttpStream *f = new eHttpStream();
+		f->open(ref.path.c_str());
+		return ePtr<iTsSource>(f);
+	}
+	else
+	{
+		eRawFile *f = new eRawFile();
+		f->open(ref.path.c_str());
+		return ePtr<iTsSource>(f);
+	}
 }
 
 void eDVBServicePlay::switchToTimeshift()
@@ -2526,7 +2566,7 @@ void eDVBServicePlay::updateDecoder(bool sendSeekableStateChanged)
 		m_decoder->setVideoPID(vpid, vpidtype);
 		selectAudioStream();
 
-		if (!(m_is_pvr || m_timeshift_active || !m_is_primary))
+		if (!(m_is_pvr || m_is_stream || m_timeshift_active || !m_is_primary))
 			m_decoder->setSyncPCR(pcrpid);
 		else
 			m_decoder->setSyncPCR(-1);

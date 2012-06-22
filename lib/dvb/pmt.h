@@ -217,12 +217,13 @@ public:
 	int tune(eServiceReferenceDVB &ref, int use_decode_demux, eCueSheet *sg=0, bool simulate=false, eDVBService *service = 0);
 
 	/* new interface */
-	int tuneExt(eServiceReferenceDVB &ref, int use_decode_demux, ePtr<iTsSource> &, const char *streaminfo_file, eCueSheet *sg=0, bool simulate=false, eDVBService *service = 0);
+	int tuneExt(eServiceReferenceDVB &ref, int use_decode_demux, ePtr<iTsSource> &, const char *streaminfo_file, eCueSheet *sg=0, bool simulate=false, eDVBService *service = 0, bool isstreamclient=false);
 
 	void free();
 private:
 	bool m_have_cached_program;
 	program m_cached_program;
+	bool m_isstreamclient;
 #endif
 };
 
