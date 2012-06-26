@@ -12,7 +12,7 @@ from Tools.Directories import fileExists
 class HdmiCec:
 	def __init__(self):
 		config.hdmicec = ConfigSubsection()
-		config.hdmicec.enabled = ConfigYesNo(default = True)
+		config.hdmicec.enabled = ConfigYesNo(default = False)
 		config.hdmicec.logenabledserial = ConfigYesNo(default = False)
 		config.hdmicec.logenabledfile = ConfigYesNo(default = False)
 		config.hdmicec.tvstandby = ConfigYesNo(default = False)
