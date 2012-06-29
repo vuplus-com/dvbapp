@@ -65,11 +65,18 @@ eServiceReference::eServiceReference(const std::string &string)
 		if ( sscanf(c, "%d:%d:%x:%x:%x:%x:%n", &type, &flags, &data[0], &data[1], &data[2], &data[3], &pathl) < 2 )
 			type = idInvalid;
 	}
-
 	if (pathl)
 	{
 		const char *pathstr = c+pathl;
-		const char *namestr = strchr(pathstr, ':');
+		const char *namestr = NULL;
+		int found = strlen(pathstr)-1;
+		for(;found >= 0;found--)
+		{
+			if(pathstr[found] == ':')
+				break;
+		}
+		if (found != -1)
+			namestr = pathstr + found;
 		if (namestr)
 		{
 			if (!strncmp(namestr, "://", 3)) // The path is a url (e.g. "http://...")

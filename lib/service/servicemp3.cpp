@@ -696,6 +696,8 @@ RESULT eServiceMP3::isCurrentlySeekable()
 		return 0;
 	if (m_state != stRunning)
 		return 0;
+	if (m_sourceinfo.is_streaming)
+		return 0;
 
 	g_object_get (G_OBJECT (m_gst_playbin), "video-sink", &sink, NULL);
 
