@@ -633,18 +633,18 @@ void eDVBDB::loadBouquet(const char *path)
 		return;
 	}
 	int entries=0;
-	char line[256];
+	size_t linesize = 256;
+	char *line = (char*)malloc(linesize);
 	bool read_descr=false;
 	eServiceReference *e = NULL;
 	while (1)
 	{
-		if (!fgets(line, 256, fp))
-			break;
-		line[strlen(line)-1]=0;
-		if (strlen(line) && line[strlen(line)-1]=='\r')
-			line[strlen(line)-1]=0;
-		if (!line[0])
-			break;
+		int len;
+		if ((len = getline(&line, &linesize, fp)) < 2) break;
+		/* strip newline */
+		line[--len] = 0;
+		/* strip carriage return (when found) */
+		if (line[len - 1] == '\r') line[--len] = 0;
 		if (line[0]=='#')
 		{
 			if (!strncmp(line, "#SERVICE", 8))
@@ -700,6 +700,7 @@ void eDVBDB::loadBouquet(const char *path)
 			continue;
 		}
 	}
+	free(line);
 	fclose(fp);
 	eDebug("%d entries in Bouquet %s", entries, bouquet_name.c_str());
 }
