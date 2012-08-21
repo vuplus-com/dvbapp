@@ -40,7 +40,7 @@ if os.path.exists("/proc/stb/info/vumodel"):
 			("fpga", _("FPGA"))
 			]
 		fwdata= { 
-			"fpga" : ["http://archive.vuplus.com/download/fpga", "fpga.file", "/dev/fpga_dp;/dev/misc/dp;"]
+			"fpga" : ["http://archive.vuplus.com/download/fpga", "fpga.files", "/dev/fpga_dp;/dev/misc/dp;"]
 			}
 
 import os, fcntl, thread
