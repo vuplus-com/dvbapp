@@ -267,6 +267,9 @@ lib/python/Plugins/SystemPlugins/WirelessAccessPoint/Makefile
 lib/python/Plugins/SystemPlugins/WirelessAccessPoint/meta/Makefile
 lib/python/Plugins/SystemPlugins/ZappingModeSelection/Makefile
 lib/python/Plugins/SystemPlugins/ZappingModeSelection/meta/Makefile
+lib/python/Plugins/SystemPlugins/DeviceManager/Makefile
+lib/python/Plugins/SystemPlugins/DeviceManager/meta/Makefile
+lib/python/Plugins/SystemPlugins/DeviceManager/locale/Makefile
 lib/python/Tools/Makefile
 lib/service/Makefile
 lib/components/Makefile
