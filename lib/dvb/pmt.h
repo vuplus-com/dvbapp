@@ -9,6 +9,7 @@
 #include <lib/dvb/idemux.h>
 #include <lib/dvb/esection.h>
 #include <lib/python/python.h>
+#include <lib/python/connections.h>
 #include <dvbsi++/program_map_section.h>
 #include <dvbsi++/program_association_section.h>
 
@@ -20,6 +21,26 @@
 
 class eDVBCAService;
 class eDVBScan;
+
+#include <dvbsi++/application_information_section.h>
+class OCSection : public LongCrcSection
+{
+protected:
+	void *data;
+
+public:
+	OCSection(const uint8_t * const buffer)
+	: LongCrcSection(buffer)
+	{
+		data = malloc(getSectionLength());
+		memcpy(data, buffer, getSectionLength());
+	}
+	~OCSection()
+	{
+		free(data);
+	}
+	void *getData() { return data; }
+};
 
 struct channel_data: public Object
 {
@@ -69,6 +90,25 @@ public:
 
 #endif
 
+#include <list>
+#include <string>
+class HbbTVApplicationInfo
+{
+public:
+	int m_OrgId;
+	int m_AppId;
+	int m_ControlCode;
+	std::string m_HbbTVUrl;
+	std::string m_ApplicationName;
+public:
+	HbbTVApplicationInfo(int controlCode, int orgid, int appid, std::string hbbtvUrl, std::string applicationName)
+		: m_ControlCode(controlCode), m_HbbTVUrl(hbbtvUrl), m_ApplicationName(applicationName), m_OrgId(orgid), m_AppId(appid)
+	{}
+};
+typedef std::list<HbbTVApplicationInfo *> HbbTVApplicationInfoList;
+typedef HbbTVApplicationInfoList::iterator HbbTVApplicationInfoListIterator;
+typedef HbbTVApplicationInfoList::const_iterator HbbTVApplicationInfoListConstIterator;
+
 class eDVBServicePMTHandler: public Object
 {
 #ifndef SWIG
@@ -95,10 +135,22 @@ class eDVBServicePMTHandler: public Object
 	void SDTScanEvent(int);
 	ePtr<eConnection> m_scan_event_connection;
 
+	eAUTable<eTable<ApplicationInformationSection> > m_AIT;
+	eAUTable<eTable<OCSection> > m_OC;
+
 	void PMTready(int error);
 	void PATready(int error);
 	
 	int m_pmt_pid;
+	
+	void AITready(int error);
+	void OCready(int error);
+	int m_dsmcc_pid;
+	int m_ait_pid;
+	HbbTVApplicationInfoList m_HbbTVApplications;
+	std::string m_HBBTVUrl;
+	std::string m_ApplicationName;
+	unsigned char m_AITData[4096];
 	
 	int m_use_decode_demux;
 	uint8_t m_decode_demux_num;
@@ -127,6 +179,8 @@ public:
 		eventPreStart,     // before start filepush thread
 		eventSOF,          // seek pre start
 		eventEOF,          // a file playback did end
+		
+		eventHBBTVInfo, /* HBBTV information was detected in the AIT */
 		
 		eventMisconfiguration, // a channel was not found in any list, or no frontend was found which could provide this channel
 	};
@@ -196,6 +250,7 @@ public:
 		int pcrPid;
 		int pmtPid;
 		int textPid;
+		int aitPid;
 		bool isCrypted() { return !caids.empty(); }
 		PyObject *createPythonObject();
 	};
@@ -204,6 +259,7 @@ public:
 	int getDataDemux(ePtr<iDVBDemux> &demux);
 	int getDecodeDemux(ePtr<iDVBDemux> &demux);
 	PyObject *getCaIds(bool pair=false); // caid / ecmpid pair
+	PyObject *getHbbTVApplications(void); 
 	
 	int getPVRChannel(ePtr<iDVBPVRChannel> &pvr_channel);
 	int getServiceReference(eServiceReferenceDVB &service) { service = m_reference; return 0; }
@@ -212,6 +268,8 @@ public:
 	int getChannel(eUsePtr<iDVBChannel> &channel);
 	void resetCachedProgram() { m_have_cached_program = false; }
 	void sendEventNoPatEntry();
+
+	void getHBBTVUrl(std::string &ret) { ret = m_HBBTVUrl; }
 
 	/* deprecated interface */
 	int tune(eServiceReferenceDVB &ref, int use_decode_demux, eCueSheet *sg=0, bool simulate=false, eDVBService *service = 0);

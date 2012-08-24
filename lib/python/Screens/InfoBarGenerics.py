@@ -1828,6 +1828,63 @@ class InfoBarSubserviceSelection:
 		else:
 			del self.selectedSubservice
 
+from Components.Sources.HbbtvApplication import HbbtvApplication
+class InfoBarRedButton:
+	def __init__(self):
+		if not (config.misc.rcused.value == 1):
+			self["RedButtonActions"] = HelpableActionMap(self, "InfobarRedButtonActions",
+				{
+					"activateRedButton": (self.activateRedButton, _("Red button...")),
+				})
+			self["HbbtvApplication"] = HbbtvApplication()
+		else:
+			self["HbbtvApplication"] = Boolean(fixed=0)
+			self["HbbtvApplication"].name = "" #is this a hack?
+			
+		self.onHBBTVActivation = [ ]
+		self.onRedButtonActivation = [ ]
+		self.onReadyForAIT = [ ]
+		self.__et = ServiceEventTracker(screen=self, eventmap=
+			{
+				iPlayableService.evHBBTVInfo: self.detectedHbbtvApplication,
+				iPlayableService.evUpdatedInfo: self.updateInfomation
+			})
+
+	def updateAIT(self, orgId=0):
+		for x in self.onReadyForAIT:
+			try:
+				x(orgId)
+			except Exception, ErrMsg: 
+				print ErrMsg
+				#self.onReadyForAIT.remove(x)
+
+	def updateInfomation(self):
+		self["HbbtvApplication"].setApplicationName("")
+		self.updateAIT()
+		
+	def detectedHbbtvApplication(self):
+		service = self.session.nav.getCurrentService()
+		info = service and service.info()
+		try:
+			for x in info.getInfoObject(iServiceInformation.sHBBTVUrl):
+				print x
+				if x[0] == 1:
+					self.updateAIT(x[3])
+					self["HbbtvApplication"].setApplicationName(x[1])
+					break
+		except Exception, ErrMsg:
+			pass
+
+	def activateRedButton(self):
+		service = self.session.nav.getCurrentService()
+		info = service and service.info()
+		if info and info.getInfoString(iServiceInformation.sHBBTVUrl) != "":
+			for x in self.onHBBTVActivation:
+				x()
+		elif False: # TODO: other red button services
+			for x in self.onRedButtonActivation:
+				x()
+
 class InfoBarAdditionalInfo:
 	def __init__(self):
 

@@ -20,16 +20,26 @@
 #include <dvbsi++/registration_descriptor.h>
 #include <dvbsi++/ac3_descriptor.h>
 
+#include <dvbsi++/simple_application_location_descriptor.h>
+#include <dvbsi++/simple_application_boundary_descriptor.h>
+#include <dvbsi++/transport_protocol_descriptor.h>
+#include <dvbsi++/application_name_descriptor.h>
+
+
 eDVBServicePMTHandler::eDVBServicePMTHandler()
 	:m_ca_servicePtr(0), m_dvb_scan(0), m_decode_demux_num(0xFF), m_no_pat_entry_delay(eTimer::create())
 {
 	m_use_decode_demux = 0;
 	m_pmt_pid = -1;
+	m_dsmcc_pid = -1;
 	m_isstreamclient = false;
 	eDVBResourceManager::getInstance(m_resourceManager);
 	CONNECT(m_PMT.tableReady, eDVBServicePMTHandler::PMTready);
 	CONNECT(m_PAT.tableReady, eDVBServicePMTHandler::PATready);
 	CONNECT(m_no_pat_entry_delay->timeout, eDVBServicePMTHandler::sendEventNoPatEntry);
+
+	CONNECT(m_AIT.tableReady, eDVBServicePMTHandler::AITready);
+	CONNECT(m_OC.tableReady, eDVBServicePMTHandler::OCready);
 }
 
 eDVBServicePMTHandler::~eDVBServicePMTHandler()
@@ -189,6 +199,154 @@ void eDVBServicePMTHandler::PATready(int)
 		serviceEvent(eventNoPAT);
 }
 
+static void eraseHbbTVApplications(HbbTVApplicationInfoList  *applications)
+{
+	if(applications->size() == 0)
+		return;
+	for(HbbTVApplicationInfoListConstIterator info = applications->begin() ; info != applications->end() ; ++info)
+		delete(*info);
+	applications->clear();
+}
+
+void saveData(int orgid, unsigned char* data, int sectionLength)
+{
+	int fd = 0, rc = 0;
+	char fileName[255] = {0};
+	sprintf(fileName, "/tmp/ait.%d", orgid);
+	if((fd = open(fileName, O_RDWR|O_CREAT|O_TRUNC)) < 0)
+	{
+		eDebug("Fail to save a AIT Data.");
+		return;
+	}
+	rc = write(fd, data, sectionLength);
+	eDebug("Save Data Len : [%d]", rc);
+	close(fd);
+}
+
+void eDVBServicePMTHandler::AITready(int error)
+{
+	eDebug("AITready");
+	ePtr<eTable<ApplicationInformationSection> > ptr;
+	if (!m_AIT.getCurrent(ptr))
+	{
+		int orgid = 0, appid = 0;
+		m_ApplicationName = m_HBBTVUrl = "";
+
+		eraseHbbTVApplications(&m_HbbTVApplications);
+
+		memcpy(m_AITData, ptr->getBufferData(), 4096);
+
+		int sectionLength = 0;
+		for (std::vector<ApplicationInformationSection*>::const_iterator it = ptr->getSections().begin(); it != ptr->getSections().end(); ++it)
+		{
+			std::list<ApplicationInformation *>::const_iterator i = (*it)->getApplicationInformation()->begin();
+			sectionLength += (*it)->getSectionLength();
+			eDebug("Section Length : %d, Total Section Length : %d", (*it)->getSectionLength(), sectionLength);
+			for (; i != (*it)->getApplicationInformation()->end(); ++i)
+			{
+				std::string hbbtvUrl = "", applicaionName = "";
+
+				int controlCode = (*i)->getApplicationControlCode();
+				ApplicationIdentifier * applicationIdentifier = (*i)->getApplicationIdentifier();
+				orgid = applicationIdentifier->getOrganisationId();
+				appid = applicationIdentifier->getApplicationId();
+				eDebug("found applicaions ids >> pid : %x, orgid : %d, appid : %d", m_ait_pid, orgid, appid);
+				if (controlCode == 1 || controlCode == 2) /* 1:AUTOSTART, 2:ETC */
+				{
+					for (DescriptorConstIterator desc = (*i)->getDescriptors()->begin();
+						desc != (*i)->getDescriptors()->end(); ++desc)
+					{
+						switch ((*desc)->getTag())
+						{
+						case APPLICATION_DESCRIPTOR:
+							break;
+						case APPLICATION_NAME_DESCRIPTOR:
+						{
+							ApplicationNameDescriptor *nameDescriptor  = (ApplicationNameDescriptor*)(*desc);
+							ApplicationNameConstIterator interactionit = nameDescriptor->getApplicationNames()->begin();
+							for(; interactionit != nameDescriptor->getApplicationNames()->end(); ++interactionit)
+							{
+								applicaionName = (*interactionit)->getApplicationName();
+								if(controlCode == 1) m_ApplicationName = applicaionName;
+								break;
+							}
+							break;
+						}
+						case TRANSPORT_PROTOCOL_DESCRIPTOR:
+						{
+							TransportProtocolDescriptor *transport = (TransportProtocolDescriptor*)(*desc);
+							switch (transport->getProtocolId())
+							{
+							case 1: /* object carousel */
+								if (m_dsmcc_pid >= 0)
+								{
+									m_OC.begin(eApp, eDVBDSMCCDLDataSpec(m_dsmcc_pid), m_demux);
+								}
+								break;
+							case 2: /* ip */
+								break;
+							case 3: /* interaction */
+								{
+									InterActionTransportConstIterator interactionit = transport->getInteractionTransports()->begin();
+									for(; interactionit != transport->getInteractionTransports()->end(); ++interactionit)
+									{
+										hbbtvUrl = (*interactionit)->getUrlBase()->getUrl();
+										if(controlCode == 1) m_HBBTVUrl = hbbtvUrl;
+										break;
+									}
+									break;
+								}
+							}
+							break;
+						}
+						case GRAPHICS_CONSTRAINTS_DESCRIPTOR:
+							break;
+						case SIMPLE_APPLICATION_LOCATION_DESCRIPTOR:
+						{
+							SimpleApplicationLocationDescriptor *applicationlocation = (SimpleApplicationLocationDescriptor*)(*desc);
+							hbbtvUrl += applicationlocation->getInitialPath();
+							break;
+						}
+						case APPLICATION_USAGE_DESCRIPTOR:
+							break;
+						case SIMPLE_APPLICATION_BOUNDARY_DESCRIPTOR:
+							break;
+						}
+					}
+				}
+				m_HbbTVApplications.push_back(new HbbTVApplicationInfo(controlCode, orgid, appid, hbbtvUrl, applicaionName));
+			}
+		}
+
+		if (m_HbbTVApplications.size())
+		{
+			saveData(orgid, m_AITData, sectionLength);//4096);
+			for(HbbTVApplicationInfoListConstIterator infoiter = m_HbbTVApplications.begin() ; infoiter != m_HbbTVApplications.end() ; ++infoiter)
+				eDebug("Found : control[%d], name[%s], url[%s]", 
+					(*infoiter)->m_ControlCode, (*infoiter)->m_ApplicationName.c_str(), (*infoiter)->m_HbbTVUrl.c_str());
+			serviceEvent(eventHBBTVInfo);
+		}
+		else eDebug("No found anything.");
+	}
+	/* for now, do not keep listening for table updates */
+	m_AIT.stop();
+}
+
+void eDVBServicePMTHandler::OCready(int error)
+{
+	eDebug("OCready");
+	ePtr<eTable<OCSection> > ptr;
+	if (!m_OC.getCurrent(ptr))
+	{
+		for (std::vector<OCSection*>::const_iterator it = ptr->getSections().begin(); it != ptr->getSections().end(); ++it)
+		{
+			unsigned char* sectionData = (*it)->getData();
+		}
+	}
+	/* for now, do not keep listening for table updates */
+	m_OC.stop();
+}
+
 PyObject *eDVBServicePMTHandler::getCaIds(bool pair)
 {
 	ePyObject ret;
@@ -227,6 +385,26 @@ PyObject *eDVBServicePMTHandler::getCaIds(bool pair)
 	return ret ? (PyObject*)ret : (PyObject*)PyList_New(0);
 }
 
+PyObject *eDVBServicePMTHandler::getHbbTVApplications(void)
+{
+	ePyObject ret= PyList_New(0);;
+	if(m_HbbTVApplications.size())
+	{
+		for(HbbTVApplicationInfoListConstIterator infoiter = m_HbbTVApplications.begin() ; infoiter != m_HbbTVApplications.end() ; ++infoiter)
+		{
+			ePyObject tuple = PyTuple_New(5);
+			PyTuple_SET_ITEM(tuple, 0, PyInt_FromLong((*infoiter)->m_ControlCode));
+			PyTuple_SET_ITEM(tuple, 1, PyString_FromString((*infoiter)->m_ApplicationName.c_str()));
+			PyTuple_SET_ITEM(tuple, 2, PyString_FromString((*infoiter)->m_HbbTVUrl.c_str()));
+			PyTuple_SET_ITEM(tuple, 3, PyInt_FromLong((*infoiter)->m_OrgId));
+			PyTuple_SET_ITEM(tuple, 4, PyInt_FromLong((*infoiter)->m_AppId));
+			PyList_Append(ret, tuple);
+			Py_DECREF(tuple);
+		}
+	}
+	return (PyObject*)ret;
+}
+
 int eDVBServicePMTHandler::getProgramInfo(program &program)
 {
 	ePtr<eTable<ProgramMapSection> > ptr;
@@ -241,6 +419,7 @@ int eDVBServicePMTHandler::getProgramInfo(program &program)
 	program.pcrPid = -1;
 	program.pmtPid = -1;
 	program.textPid = -1;
+	program.aitPid = -1;
 
 	int first_ac3 = -1;
 	program.defaultAudioStream = 0;
@@ -583,6 +762,38 @@ int eDVBServicePMTHandler::getProgramInfo(program &program)
 						}
 						prev_audio = 0;
 					}
+					case 0x05: /* ITU-T Rec. H.222.0 | ISO/IEC 13818-1 private sections */
+					{
+						for (DescriptorConstIterator desc = (*es)->getDescriptors()->begin();
+							desc != (*es)->getDescriptors()->end(); ++desc)
+						{
+							m_ait_pid = -1;
+							switch ((*desc)->getTag())
+							{
+							case APPLICATION_SIGNALLING_DESCRIPTOR:
+								m_ait_pid = program.aitPid = (*es)->getPid();
+								m_AIT.begin(eApp, eDVBAITSpec(program.aitPid), m_demux);
+								break;
+							}
+						}
+						break;
+					}
+					case 0x0b: /* ISO/IEC 13818-6 DSM-CC U-N Messages */
+					{
+						for (DescriptorConstIterator desc = (*es)->getDescriptors()->begin();
+							desc != (*es)->getDescriptors()->end(); ++desc)
+						{
+							switch ((*desc)->getTag())
+							{
+							case CAROUSEL_IDENTIFIER_DESCRIPTOR:
+								m_dsmcc_pid = (*es)->getPid();
+								break;
+							case STREAM_IDENTIFIER_DESCRIPTOR:
+								break;
+							}
+						}
+						break;
+					}
 					default:
 						break;
 					}
@@ -922,6 +1133,9 @@ void eDVBServicePMTHandler::free()
 		m_pvr_channel->stopFile();
 		m_pvr_channel->setCueSheet(0);
 	}
+
+	m_OC.stop();
+	m_AIT.stop();
 
 	m_PMT.stop();
 	m_PAT.stop();

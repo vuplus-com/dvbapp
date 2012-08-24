@@ -40,6 +40,7 @@ class eTable: public eGTable
 private:
 	std::vector<Section*> sections;
 	std::set<int> avail;
+	unsigned char m_section_data[4096];
 protected:
 	int createTable(unsigned int nr, const __u8 *data, unsigned int max)
 	{
@@ -52,6 +53,9 @@ protected:
 		}
 		if (avail.find(nr) != avail.end())
 			delete sections[nr];
+
+		memset(m_section_data, 0, 4096);
+		memcpy(m_section_data, data, 4096);
 
 		sections.resize(max);
 		sections[nr] = new Section(data);
@@ -74,6 +78,7 @@ protected:
 	}
 public:
 	std::vector<Section*> &getSections() { return sections; }
+	unsigned char* getBufferData() { return m_section_data; }
 	eTable(bool debug=true): eGTable(debug)
 	{
 	}
