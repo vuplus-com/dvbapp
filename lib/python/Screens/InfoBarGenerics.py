@@ -1859,8 +1859,11 @@ class InfoBarRedButton:
 				#self.onReadyForAIT.remove(x)
 
 	def updateInfomation(self):
-		self["HbbtvApplication"].setApplicationName("")
-		self.updateAIT()
+		try:
+			self["HbbtvApplication"].setApplicationName("")
+			self.updateAIT()
+		except Exception, ErrMsg:
+			pass
 		
 	def detectedHbbtvApplication(self):
 		service = self.session.nav.getCurrentService()
