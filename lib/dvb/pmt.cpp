@@ -223,13 +223,22 @@ void saveData(int orgid, unsigned char* data, int sectionLength)
 	close(fd);
 }
 
+#include <dvbsi++/application_profile.h>
+#include <dvbsi++/application_descriptor.h>
+#define PACK_VERSION(major,minor,micro) (((major) << 16) + ((minor) << 8) + (micro))
+#define UNPACK_VERSION(version,major,minor,micro) { \
+	major = (version)&0xff; \
+	minor = (version>>8)&0xff; \
+	micro = (version>>16)&0xff; \
+}
 void eDVBServicePMTHandler::AITready(int error)
 {
 	eDebug("AITready");
 	ePtr<eTable<ApplicationInformationSection> > ptr;
 	if (!m_AIT.getCurrent(ptr))
 	{
-		int orgid = 0, appid = 0;
+		short profilecode = 0;
+		int orgid = 0, appid = 0, profileVersion = 0;
 		m_ApplicationName = m_HBBTVUrl = "";
 
 		eraseHbbTVApplications(&m_HbbTVApplications);
@@ -259,7 +268,21 @@ void eDVBServicePMTHandler::AITready(int error)
 						switch ((*desc)->getTag())
 						{
 						case APPLICATION_DESCRIPTOR:
+						{
+							ApplicationDescriptor* applicationDescriptor = (ApplicationDescriptor*)(*desc);
+							ApplicationProfileList* applicationProfiles = applicationDescriptor->getApplicationProfiles();
+							ApplicationProfileConstIterator interactionit = applicationProfiles->begin();
+							for(; interactionit != applicationProfiles->end(); ++interactionit)
+							{
+								profilecode = (*interactionit)->getApplicationProfile();
+								profileVersion = PACK_VERSION(
+									(*interactionit)->getVersionMajor(),
+									(*interactionit)->getVersionMinor(),
+									(*interactionit)->getVersionMicro()
+								);
+							}
 							break;
+						}
 						case APPLICATION_NAME_DESCRIPTOR:
 						{
 							ApplicationNameDescriptor *nameDescriptor  = (ApplicationNameDescriptor*)(*desc);
@@ -314,7 +337,25 @@ void eDVBServicePMTHandler::AITready(int error)
 						}
 					}
 				}
-				m_HbbTVApplications.push_back(new HbbTVApplicationInfo(controlCode, orgid, appid, hbbtvUrl, applicaionName));
+				if(!hbbtvUrl.empty())
+				{
+					char* uu = hbbtvUrl.c_str();
+					if(!strncmp(uu, "http://", 7) || !strncmp(uu, "dvb://", 6) || !strncmp(uu, "https://", 8))
+					{
+						switch(profileVersion)
+						{
+						case 65793:
+						case 66049:
+							m_HbbTVApplications.push_back(new HbbTVApplicationInfo(controlCode, orgid, appid, hbbtvUrl, applicaionName, profilecode));
+							break;
+						case 1280:
+						case 65538:
+						default:
+							m_HbbTVApplications.push_back(new HbbTVApplicationInfo((-1)*controlCode, orgid, appid, hbbtvUrl, applicaionName, profilecode));
+							break;
+						}
+					}
+				}
 			}
 		}
 
@@ -392,12 +433,13 @@ PyObject *eDVBServicePMTHandler::getHbbTVApplications(void)
 	{
 		for(HbbTVApplicationInfoListConstIterator infoiter = m_HbbTVApplications.begin() ; infoiter != m_HbbTVApplications.end() ; ++infoiter)
 		{
-			ePyObject tuple = PyTuple_New(5);
+			ePyObject tuple = PyTuple_New(6);
 			PyTuple_SET_ITEM(tuple, 0, PyInt_FromLong((*infoiter)->m_ControlCode));
 			PyTuple_SET_ITEM(tuple, 1, PyString_FromString((*infoiter)->m_ApplicationName.c_str()));
 			PyTuple_SET_ITEM(tuple, 2, PyString_FromString((*infoiter)->m_HbbTVUrl.c_str()));
 			PyTuple_SET_ITEM(tuple, 3, PyInt_FromLong((*infoiter)->m_OrgId));
 			PyTuple_SET_ITEM(tuple, 4, PyInt_FromLong((*infoiter)->m_AppId));
+			PyTuple_SET_ITEM(tuple, 5, PyInt_FromLong((*infoiter)->m_ProfileCode));
 			PyList_Append(ret, tuple);
 			Py_DECREF(tuple);
 		}

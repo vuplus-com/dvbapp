@@ -1871,7 +1871,7 @@ class InfoBarRedButton:
 		try:
 			for x in info.getInfoObject(iServiceInformation.sHBBTVUrl):
 				print x
-				if x[0] == 1:
+				if x[0] in (-1, 1):
 					self.updateAIT(x[3])
 					self["HbbtvApplication"].setApplicationName(x[1])
 					break

@@ -557,7 +557,7 @@ class HbbTVWindow(Screen, InfoBarNotifications):
 		<screen name="HbbTVWindow" position="0,0" size="1280,720" backgroundColor="transparent" flags="wfNoBorder" title="HbbTV Plugin">
 		</screen>
 		"""
-	def __init__(self, session, url=None, cbf=None, useAIT=False):
+	def __init__(self, session, url=None, cbf=None, useAIT=False, profile=0):
 		self._session = session
 		eRCInput.getInstance().lock()
 
@@ -569,6 +569,7 @@ class HbbTVWindow(Screen, InfoBarNotifications):
 
 		self._url = url
 		self._use_ait = useAIT
+		self._profile = profile
 		self._cb_closed_func = cbf
 		self.onLayoutFinish.append(self._layoutFinished)
 
@@ -584,8 +585,9 @@ class HbbTVWindow(Screen, InfoBarNotifications):
 
 	def _layoutFinished(self):
 		command_util = getCommandUtil()
+		profile = self._profile
 		(sid, onid, tsid, name, orgid) = getChannelInfos()
-		params  = struct.pack('!IIIII', orgid, sid, onid, tsid, len(name)) + name
+		params  = struct.pack('!IIIIII', orgid, profile, sid, onid, tsid, len(name)) + name
 		if self._use_ait:
 			command_util.sendCommand('OP_HBBTV_UNLOAD_AIT')
 			time.sleep(1)
@@ -648,6 +650,7 @@ class HbbTVHelper(Screen):
 		self._timer_infobar.start(1000)
 
 		self._excuted_browser = False
+		self._profile = 0
 
 		__gval__.command_util = BrowserCommandUtil()
 
@@ -706,13 +709,15 @@ class HbbTVHelper(Screen):
 			return
 
 		use_ait = False
+
 		for x in self._urls:
 			control_code = x[0]
 			tmp_url = x[2]
 			if tmp_url == url and control_code == 1:
 				use_ait = True
+
 		self._excuted_browser = True
-		self._session.open(HbbTVWindow, url, self._cb_closed_browser, use_ait)
+		self._session.open(HbbTVWindow, url, self._cb_closed_browser, use_ait, self._profile)
 
 	def _cb_closed_browser(self):
 		self._excuted_browser = False
@@ -729,20 +734,22 @@ class HbbTVHelper(Screen):
 		except: pass
 
 	def getStartHbbTVUrl(self):
-		url, self._urls = None, None
+		url, self._urls, self._profile = None, None, 0
                 service = self._session.nav.getCurrentService()
                 info = service and service.info()
                 if not info: return None
                 self._urls = info.getInfoObject(iServiceInformation.sHBBTVUrl)
 		for u in self._urls:
-			if u[0] == 1: # 0:control code, 1:name, 2:url, 3:orgid, 4:appid
+			if u[0] in (1, -1): # 0:control code, 1:name, 2:url, 3:orgid, 4:appid, 5:profile code
 				url = u[2]
+				self._profile = u[5]
 		if url is None:
 			url = info.getInfoString(iServiceInformation.sHBBTVUrl)
 		return url
 
 	def showApplicationSelectionBox(self):
 		applications = []
+
 		if self.getStartHbbTVUrl():
 			for x in self._urls:
 				applications.append((x[1], x))

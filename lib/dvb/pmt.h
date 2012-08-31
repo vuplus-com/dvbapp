@@ -98,11 +98,13 @@ public:
 	int m_OrgId;
 	int m_AppId;
 	int m_ControlCode;
+	short m_ProfileCode;
 	std::string m_HbbTVUrl;
 	std::string m_ApplicationName;
 public:
-	HbbTVApplicationInfo(int controlCode, int orgid, int appid, std::string hbbtvUrl, std::string applicationName)
-		: m_ControlCode(controlCode), m_HbbTVUrl(hbbtvUrl), m_ApplicationName(applicationName), m_OrgId(orgid), m_AppId(appid)
+	HbbTVApplicationInfo(int controlCode, int orgid, int appid, std::string hbbtvUrl, std::string applicationName, int profileCode)
+		: m_ControlCode(controlCode), m_HbbTVUrl(hbbtvUrl), m_ApplicationName(applicationName), m_OrgId(orgid), 
+		  m_AppId(appid), m_ProfileCode(profileCode)
 	{}
 };
 typedef std::list<HbbTVApplicationInfo *> HbbTVApplicationInfoList;
