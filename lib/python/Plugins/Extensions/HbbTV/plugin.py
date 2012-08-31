@@ -682,7 +682,7 @@ class HbbTVHelper(Screen):
 			orgid   = 0
 			namelen = len(name)
 			for x in info.getInfoObject(iServiceInformation.sHBBTVUrl):
-				if x[0] == 1 :
+				if x[0] in (1, -1) :
 					orgid = x[3]
 					break
 			setChannelInfo(sid, onid, tsid, name, orgid)
