@@ -575,6 +575,7 @@ class HandlerHbbTV(Handler):
 		return (0, "OK")
 
 from libshm import SimpleSharedMemory
+_g_ssm_ = None
 class HbbTVWindow(Screen, InfoBarNotifications):
 	skin = 	"""
 		<screen name="HbbTVWindow" position="0,0" size="1280,720" backgroundColor="transparent" flags="wfNoBorder" title="HbbTV Plugin">
@@ -612,7 +613,8 @@ class HbbTVWindow(Screen, InfoBarNotifications):
 		self._currentServicePositionTimer.callback.append(self._cb_currentServicePosition)
 		self._vodLength = 0
 
-		self._ssm = SimpleSharedMemory()
+		global _g_ssm_
+		self._ssm = _g_ssm_
 		self._vod_length = 0
 
 	def getVodPlayTime(self):
@@ -644,7 +646,6 @@ class HbbTVWindow(Screen, InfoBarNotifications):
 
 	def _serviceStarted(self):
 		try:
-			self._ssm.doConnect()
 			self._ssm.setStatus(0, 0, 0)
 			self._currentServicePositionTimer.start(1000)
 		except Exception, ErrMsg:
@@ -652,16 +653,6 @@ class HbbTVWindow(Screen, InfoBarNotifications):
 
 	def _serviceEOF(self):
 		self._currentServicePositionTimer.stop()
-		if self._vod_length == -1:
-			self._vod_length = 0
-		try:
-			self._ssm.setStatus(self._vod_length, self._vod_length, 2)
-			time.sleep(1)
-			self._ssm.doClose()
-		except Exception, ErrMsg:
-			print ErrMsg
-		command_util = getCommandUtil()
-		command_util.sendCommand('OP_VOD_STOPED', None)
 
 	def _layoutFinished(self):
 		command_util = getCommandUtil()
@@ -733,6 +724,11 @@ class HbbTVHelper(Screen):
 		self._profile = 0
 
 		__gval__.command_util = BrowserCommandUtil()
+
+		global _g_ssm_
+		if _g_ssm_ is None:
+			_g_ssm_ = SimpleSharedMemory()
+			_g_ssm_.doConnect()
 
 	def _cb_registrate_infobar(self):
 		if InfoBar.instance:
