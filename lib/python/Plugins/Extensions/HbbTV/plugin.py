@@ -16,6 +16,7 @@ from Components.ServiceEventTracker import ServiceEventTracker
 from Components.MenuList import MenuList
 from Components.Label import Label, MultiColorLabel
 from Components.ConfigList import ConfigListScreen
+from Components.VolumeControl import VolumeControl
 from Components.config import config, ConfigSubsection, ConfigPosition, getConfigListEntry, ConfigBoolean, ConfigInteger, ConfigText, ConfigSelection, configfile, getCharValue
 
 from enigma import eTimer, eConsoleAppContainer, getDesktop, eServiceReference, iPlayableService, iServiceInformation, RT_HALIGN_LEFT, RT_HALIGN_RIGHT, RT_HALIGN_CENTER, RT_VALIGN_CENTER, getPrevAsciiCode, eRCInput, fbClass
@@ -174,7 +175,10 @@ class OpCodeSet:
 			,"OP_VOD_PAUSE"			: 0x0204
 			,"OP_VOD_STATUS"		: 0x0205
 			,"OP_VOD_FORBIDDEN"		: 0x0206
+			,"OP_VOD_STOPED"		: 0x0207
 			,"OP_BROWSER_OPEN_URL"		: 0x0301
+			,"OP_DVBAPP_VOL_UP"		: 0x0401
+			,"OP_DVBAPP_VOL_DOWN"		: 0x0402
 		}
 		self._opstr_ = {
 			 0x0000 : "OP_UNKNOWN"
@@ -193,7 +197,10 @@ class OpCodeSet:
 			,0x0204 : "OP_VOD_PAUSE"
 			,0x0205 : "OP_VOD_STATUS"
 			,0x0206 : "OP_VOD_FORBIDDEN"
+			,0x0207 : "OP_VOD_STOPED"
 			,0x0301 : "OP_BROWSER_OPEN_URL"
+			,0x0401 : "OP_DVBAPP_VOL_UP"
+			,0x0402 : "OP_DVBAPP_VOL_DOWN"
 		}
 
 	def get(self, opstr):
@@ -395,6 +402,8 @@ class HandlerHbbTV(Handler):
 			,0x0202 : self._cb_handleVODPlayerPlay
 			,0x0203 : self._cb_handleVODPlayerStop
 			,0x0204 : self._cb_handleVODPlayerPlayPause
+			,0x0401 : self._cb_handleDVBAppVolUp
+			,0x0402 : self._cb_handleDVBAppVolDown
 		}
 		self._on_close_cb = None
 		self._on_set_title_cb = None
@@ -436,6 +445,18 @@ class HandlerHbbTV(Handler):
 		self._on_close_cb = None
 		self._on_set_title_cb = None
 		return self.doPack(opcode, params, reserved)
+
+	def _cb_handleDVBAppVolUp(self, opcode, data):
+		self._handle_dump(self._cb_handleDVBAppVolUp, opcode, data)
+		vcm = VolumeControl.instance
+		vcm.volUp()
+		return (0, "OK")
+
+	def _cb_handleDVBAppVolDown(self, opcode, data):
+		self._handle_dump(self._cb_handleDVBAppVolDown, opcode, data)
+		vcm = VolumeControl.instance
+		vcm.volDown()
+		return (0, "OK")
 
 	def _cb_handleGetChannelInfoForUrl(self, opcode, data):
 		self._handle_dump(self._cb_handleGetChannelInfoForUrl, opcode, data)
@@ -486,6 +507,7 @@ class HandlerHbbTV(Handler):
 		before_service = getBeforeService()
 		if before_service is not None:
 			self._session.nav.playService(before_service)
+			self._vod_uri = None
 		return (0, "OK")
 
 	def _cb_handleVODPlayerURI(self, opcode, data):
@@ -552,6 +574,7 @@ class HandlerHbbTV(Handler):
 			print "onPause ERR :", ErrMsg
 		return (0, "OK")
 
+from libshm import SimpleSharedMemory
 class HbbTVWindow(Screen, InfoBarNotifications):
 	skin = 	"""
 		<screen name="HbbTVWindow" position="0,0" size="1280,720" backgroundColor="transparent" flags="wfNoBorder" title="HbbTV Plugin">
@@ -565,6 +588,8 @@ class HbbTVWindow(Screen, InfoBarNotifications):
 		InfoBarNotifications.__init__(self)
 		self.__event_tracker = ServiceEventTracker(screen = self, eventmap = {
 			iPlayableService.evUser+20: self._serviceForbiden,
+			iPlayableService.evStart: self._serviceStarted,
+			iPlayableService.evEOF: self._serviceEOF,
 		})
 
 		self._url = url
@@ -582,6 +607,61 @@ class HbbTVWindow(Screen, InfoBarNotifications):
 
 		self._closeTimer = eTimer()
 		self._closeTimer.callback.append(self._do_close)
+
+		self._currentServicePositionTimer = eTimer()
+		self._currentServicePositionTimer.callback.append(self._cb_currentServicePosition)
+		self._vodLength = 0
+
+		self._ssm = SimpleSharedMemory()
+		self._vod_length = 0
+
+	def getVodPlayTime(self):
+		try:
+			service = self._session.nav.getCurrentService()
+			seek = service and service.seek()
+			l = seek.getLength()
+			p = seek.getPlayPosition()
+			#return (p[1]/90000, l[1]/90000)
+			return (p[1], l[1])
+		except: pass
+		return (-1,-1)
+
+	def _cb_currentServicePosition(self):
+		def getTimeString(t):
+			t = time.localtime(t/90000)
+			return "%2d:%02d:%02d" % (t.tm_hour, t.tm_min, t.tm_sec)
+		position,length = 0,0
+		try:
+			(position,length) = self.getVodPlayTime()
+			self._vod_length = length
+			if position == -1 and length == -1:
+				raise "can't get play status"
+			#print getTimeString(position), "/", getTimeString(length)
+			self._ssm.setStatus(position, length, 1)
+		except Exception, ErrMsg:
+			print ErrMsg
+			self._serviceEOF()
+
+	def _serviceStarted(self):
+		try:
+			self._ssm.doConnect()
+			self._ssm.setStatus(0, 0, 0)
+			self._currentServicePositionTimer.start(1000)
+		except Exception, ErrMsg:
+			print ErrMsg
+
+	def _serviceEOF(self):
+		self._currentServicePositionTimer.stop()
+		if self._vod_length == -1:
+			self._vod_length = 0
+		try:
+			self._ssm.setStatus(self._vod_length, self._vod_length, 2)
+			time.sleep(1)
+			self._ssm.doClose()
+		except Exception, ErrMsg:
+			print ErrMsg
+		command_util = getCommandUtil()
+		command_util.sendCommand('OP_VOD_STOPED', None)
 
 	def _layoutFinished(self):
 		command_util = getCommandUtil()
@@ -715,7 +795,6 @@ class HbbTVHelper(Screen):
 			tmp_url = x[2]
 			if tmp_url == url and control_code == 1:
 				use_ait = True
-
 		self._excuted_browser = True
 		self._session.open(HbbTVWindow, url, self._cb_closed_browser, use_ait, self._profile)
 
@@ -1084,6 +1163,6 @@ def Plugins(path, **kwargs):
 		PluginDescriptor(where=PluginDescriptor.WHERE_SESSIONSTART, needsRestart=True, fnc=session_start_main, weight=-10),
 		PluginDescriptor(name="HbbTV Applications", where=PluginDescriptor.WHERE_EXTENSIONSMENU, needsRestart=True, fnc=plugin_extension_start_application),
 		PluginDescriptor(name="Browser Start/Stop", where=PluginDescriptor.WHERE_EXTENSIONSMENU, needsRestart=True, fnc=plugin_extension_browser_config),
-		PluginDescriptor(name="Opera Web Browser", description="start opera web browser", where=PluginDescriptor.WHERE_PLUGINMENU, needsRestart=True, fnc=plugin_start_main)
+		PluginDescriptor(name="Opera Web Browser", description="start opera web browser", where=PluginDescriptor.WHERE_PLUGINMENU, needsRestart=True, fnc=plugin_start_main),
 		]
 

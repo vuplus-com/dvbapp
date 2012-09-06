@@ -225,6 +225,7 @@ void saveData(int orgid, unsigned char* data, int sectionLength)
 
 #include <dvbsi++/application_profile.h>
 #include <dvbsi++/application_descriptor.h>
+#include <dvbsi++/simple_application_boundary_descriptor.h>
 #define PACK_VERSION(major,minor,micro) (((major) << 16) + ((minor) << 8) + (micro))
 #define UNPACK_VERSION(version,major,minor,micro) { \
 	major = (version)&0xff; \
@@ -254,9 +255,11 @@ void eDVBServicePMTHandler::AITready(int error)
 			for (; i != (*it)->getApplicationInformation()->end(); ++i)
 			{
 				std::string hbbtvUrl = "", applicaionName = "";
-
+				std::string boundaryExtension = "";
+				
 				int controlCode = (*i)->getApplicationControlCode();
 				ApplicationIdentifier * applicationIdentifier = (*i)->getApplicationIdentifier();
+				profilecode = 0;
 				orgid = applicationIdentifier->getOrganisationId();
 				appid = applicationIdentifier->getApplicationId();
 				eDebug("found applicaions ids >> pid : %x, orgid : %d, appid : %d", m_ait_pid, orgid, appid);
@@ -314,7 +317,6 @@ void eDVBServicePMTHandler::AITready(int error)
 									for(; interactionit != transport->getInteractionTransports()->end(); ++interactionit)
 									{
 										hbbtvUrl = (*interactionit)->getUrlBase()->getUrl();
-										if(controlCode == 1) m_HBBTVUrl = hbbtvUrl;
 										break;
 									}
 									break;
@@ -342,6 +344,7 @@ void eDVBServicePMTHandler::AITready(int error)
 					char* uu = hbbtvUrl.c_str();
 					if(!strncmp(uu, "http://", 7) || !strncmp(uu, "dvb://", 6) || !strncmp(uu, "https://", 8))
 					{
+						if(controlCode == 1) m_HBBTVUrl = hbbtvUrl;
 						switch(profileVersion)
 						{
 						case 65793:
@@ -352,6 +355,25 @@ void eDVBServicePMTHandler::AITready(int error)
 						case 65538:
 						default:
 							m_HbbTVApplications.push_back(new HbbTVApplicationInfo((-1)*controlCode, orgid, appid, hbbtvUrl, applicaionName, profilecode));
+							break;
+						}
+					}
+					else if (!boundaryExtension.empty()) {
+						if(boundaryExtension.at(boundaryExtension.length()-1) != '/') {
+							boundaryExtension += "/";
+						}
+						boundaryExtension += hbbtvUrl;
+						if(controlCode == 1) m_HBBTVUrl = boundaryExtension;
+						switch(profileVersion)
+						{
+						case 65793:
+						case 66049:
+							m_HbbTVApplications.push_back(new HbbTVApplicationInfo(controlCode, orgid, appid, boundaryExtension, applicaionName, profilecode));
+							break;
+						case 1280:
+						case 65538:
+						default:
+							m_HbbTVApplications.push_back(new HbbTVApplicationInfo((-1)*controlCode, orgid, appid, boundaryExtension, applicaionName, profilecode));
 							break;
 						}
 					}
