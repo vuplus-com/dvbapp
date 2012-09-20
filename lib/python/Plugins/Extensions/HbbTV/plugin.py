@@ -45,6 +45,8 @@ class GlobalValues:
 	packet_m  = 0xBBADBEE
 	packet_h  = '!IIII'
 	packet_hl = struct.calcsize(packet_h)
+
+	need_restart = False
 __gval__ = GlobalValues()
 
 def getPacketHeaders():
@@ -73,6 +75,15 @@ def getChannelInfos():
 		__gval__.channel_info_tsid, 
 		__gval__.channel_info_name, 
 		__gval__.channel_info_orgid)
+
+def isNeedRestart():
+	global __gval__
+	print "Need Restart(GET) : ", __gval__.need_restart
+	return __gval__.need_restart
+def setNeedRestart(n):
+	global __gval__
+	__gval__.need_restart = n
+	print "Need Restart(SET) : ", __gval__.need_restart
 
 def getCommandUtil():
 	global __gval__
@@ -127,7 +138,7 @@ class MMSStreamURL:
 		sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 		sock.connect((host, port))
 		sock.send(self.sendmsg%(location, host))
-		print "Send Data : "
+		print "Request."
 		print self.sendmsg%(location, host)
 		fullydata = ''
 		while 1:
@@ -166,6 +177,7 @@ class OpCodeSet:
 			,"OP_HBBTV_UNLOAD_AIT"		: 0x0004
 			,"OP_HBBTV_FULLSCREEN"		: 0x0005
 			,"OP_HBBTV_TITLE"		: 0x0006
+			,"OP_HBBTV_RETRY_OPEN_URL"	: 0x0009
 			,"OP_OIPF_GET_CHANNEL_INFO_URL"	: 0x0101
 			,"OP_OIPF_GET_CHANNEL_INFO_AIT" : 0x0102
 			,"OP_OIPF_GET_CHANNEL_INFO_LIST": 0x0103
@@ -179,6 +191,8 @@ class OpCodeSet:
 			,"OP_BROWSER_OPEN_URL"		: 0x0301
 			,"OP_DVBAPP_VOL_UP"		: 0x0401
 			,"OP_DVBAPP_VOL_DOWN"		: 0x0402
+			,"OP_SYSTEM_OUT_OF_MEMORY"	: 0x0501
+			,"OP_SYSTEM_NOTIFY_MY_PID"	: 0x0502
 		}
 		self._opstr_ = {
 			 0x0000 : "OP_UNKNOWN"
@@ -188,6 +202,7 @@ class OpCodeSet:
 			,0x0004 : "OP_HBBTV_UNLOAD_AIT"
 			,0x0005 : "OP_HBBTV_FULLSCREEN"
 			,0x0006 : "OP_HBBTV_TITLE"
+			,0x0009 : "OP_HBBTV_RETRY_OPEN_URL"
 			,0x0101 : "OP_OIPF_GET_CHANNEL_INFO_URL"
 			,0x0102 : "OP_OIPF_GET_CHANNEL_INFO_AIT"
 			,0x0103 : "OP_OIPF_GET_CHANNEL_INFO_LIST"
@@ -201,6 +216,8 @@ class OpCodeSet:
 			,0x0301 : "OP_BROWSER_OPEN_URL"
 			,0x0401 : "OP_DVBAPP_VOL_UP"
 			,0x0402 : "OP_DVBAPP_VOL_DOWN"
+			,0x0501	: "OP_SYSTEM_OUT_OF_MEMORY"
+			,0x0502 : "OP_SYSTEM_NOTIFY_MY_PID"
 		}
 
 	def get(self, opstr):
@@ -313,11 +330,11 @@ class ServerFactory:
 		return streamServer
 
 	def doListenInetTCP(self, ip, port, handler):
-		print "not implemented yet!!"
+		print "Not implemented yet!!"
 	def doListenUnixDGRAM(self, name, handler):
-		print "not implemented yet!!"
+		print "Not implemented yet!!"
 	def doListenInetDGRAM(self, ip, port, handler):
-		print "not implemented yet!!"
+		print "Not implemented yet!!"
 
 class Handler:
 	def doUnpack(self, data):
@@ -345,18 +362,17 @@ class BrowserCommandUtil(OpCodeSet):
 
 	def doConnect(self, filename):
 		if not os.path.exists(filename):
-			print "file not exists :", filename
+			print "File not exists :", filename
 			return False
 		try:
 			self._fd = os.open(filename, os.O_WRONLY|os.O_NONBLOCK)
 			if self._fd is None:
-				print "fail to open file :", filename
+				print "Fail to open file :", filename
 				return False
 		except Exception, ErrMsg:
 			print ErrMsg
 			self._fd = None
 			return False
-		print "connected!! to ", filename
 		return True
 
 	def doDisconnect(self):
@@ -367,7 +383,7 @@ class BrowserCommandUtil(OpCodeSet):
 
 	def doSend(self, command, params=None, reserved=0):
 		if self._fd is None:
-			print "connected pipe was not exists!!"
+			print "Pipe was not exists!!"
 			return False
 		data = ''
 		try:
@@ -395,6 +411,7 @@ class HandlerHbbTV(Handler):
 		self.handle_map = {
 			 0x0001 : self._cb_handleCloseHbbTVBrowser
 			,0x0006 : self._cb_handleSetPageTitle
+			,0x0009 : self._cb_handleHbbTVRetryOpen
 			,0x0101 : self._cb_handleGetChannelInfoForUrl
 			,0x0102 : self._cb_handleGetChannelInfoForAIT
 			,0x0103 : self._cb_handleGetChannelInfoList
@@ -404,11 +421,17 @@ class HandlerHbbTV(Handler):
 			,0x0204 : self._cb_handleVODPlayerPlayPause
 			,0x0401 : self._cb_handleDVBAppVolUp
 			,0x0402 : self._cb_handleDVBAppVolDown
+			,0x0501 : self._cb_handleSystemOutOfMemory
+			,0x0502 : self._cb_handleSystemNotufyMyPID
 		}
 		self._on_close_cb = None
 		self._on_set_title_cb = None
 
 		self._vod_uri = None
+
+		self._retry_open_url = None
+		self._timer_retry_open = eTimer()
+		
 
 	def _handle_dump(self, handle, opcode, data=None):
 		if True: return
@@ -445,6 +468,33 @@ class HandlerHbbTV(Handler):
 		self._on_close_cb = None
 		self._on_set_title_cb = None
 		return self.doPack(opcode, params, reserved)
+
+	def _cb_handleHbbTVRetryOpen(self, opcode, data):
+		def _cb_HbbTVRetryOpenURL():
+			self._timer_retry_open.stop()
+			if self._retry_open_url is not None:
+				command_util = getCommandUtil()
+				command_util.sendCommand('OP_HBBTV_RETRY_OPEN_URL', params=self._retry_open_url)
+			self._retry_open_url = None
+		self._handle_dump(self._cb_handleHbbTVRetryOpen, opcode, data)
+		headLen = struct.calcsize('!I')
+		unpackedData = struct.unpack('!I', data[:headLen])
+		delayTime = unpackedData[0]
+		restartUrl = data[headLen:]
+
+		self._retry_open_url = restartUrl.strip()
+		self._timer_retry_open.callback.append(_cb_HbbTVRetryOpenURL)
+		self._timer_retry_open.start(delayTime*1000)
+		return (0, "OK")
+
+	def _cb_handleSystemNotufyMyPID(self, opcode, data):
+		self._handle_dump(self._cb_handleSystemNotufyMyPID, opcode, data)
+		return (0, "OK")
+
+	def _cb_handleSystemOutOfMemory(self, opcode, data):
+		self._handle_dump(self._cb_handleSystemOutOfMemory, opcode, data)
+		setNeedRestart(True)
+		return (0, "OK")
 
 	def _cb_handleDVBAppVolUp(self, opcode, data):
 		self._handle_dump(self._cb_handleDVBAppVolUp, opcode, data)
@@ -491,6 +541,7 @@ class HandlerHbbTV(Handler):
 		return (0, "OK")
 
 	def _cb_handleCloseHbbTVBrowser(self, opcode, data):
+		self._timer_retry_open.stop()
 		self._handle_dump(self._cb_handleCloseHbbTVBrowser, opcode, data)
 
 		if self._on_close_cb:
@@ -538,7 +589,7 @@ class HandlerHbbTV(Handler):
 		for ii in range(5):
 			self._vod_service = None
 			try:
-				print "try to open vod [%d] : %s" % (ii, url)
+				print "Try to open vod [%d] : %s" % (ii, url)
 				self._vod_service = eServiceReference(4097, 0, url)
 				self._session.nav.playService(self._vod_service)
 				if self._vod_service is not None:
@@ -637,7 +688,7 @@ class HbbTVWindow(Screen, InfoBarNotifications):
 			(position,length) = self.getVodPlayTime()
 			self._vod_length = length
 			if position == -1 and length == -1:
-				raise "can't get play status"
+				raise Exception("Can't get play status")
 			#print getTimeString(position), "/", getTimeString(length)
 			self._ssm.setStatus(position, length, 1)
 		except Exception, ErrMsg:
@@ -692,7 +743,7 @@ class HbbTVWindow(Screen, InfoBarNotifications):
 	def _serviceForbiden(self):
 		global __gval__
 		real_url = MMSStreamURL().getLocationData(__gval__.hbbtv_handelr.getUrl())
-		print "Received URI :\n",real_url
+		print "Received URI :\n", real_url
 
 		if real_url is not None:
 			__gval__.hbbtv_handelr.doRetryOpen(real_url.strip())
@@ -711,8 +762,9 @@ class HbbTVHelper(Screen):
 		__gval__.command_server = ServerFactory().doListenUnixTCP('/tmp/.sock.hbbtv.url', __gval__.hbbtv_handelr)
 
 		self._urls = None
-		self._stop_opera()
-		self._start_opera()
+		#self._stop_opera()
+		#self._start_opera()
+		self._restart_opera()
 
 		Screen.__init__(self, session)
 		self._session = session
@@ -773,6 +825,7 @@ class HbbTVHelper(Screen):
 		self._start_hbbtv_application(title, url)
 
 	def _start_hbbtv_application(self, title, url):
+		use_ait = False
 		tmp_url = self.getStartHbbTVUrl()
 		if url is None:
 			url = tmp_url
@@ -784,7 +837,10 @@ class HbbTVHelper(Screen):
 			print "already excuted opera browser!!"
 			return
 
-		use_ait = False
+		if isNeedRestart():
+			self._restart_opera()
+			time.sleep(2)
+			setNeedRestart(False)
 
 		for x in self._urls:
 			control_code = x[0]
@@ -806,6 +862,11 @@ class HbbTVHelper(Screen):
 	def _stop_opera(self):
 		global HBBTVAPP_PATH
 		try:	os.system('%s/launcher stop'%(HBBTVAPP_PATH))
+		except: pass
+
+	def _restart_opera(self):
+		global HBBTVAPP_PATH
+		try:	os.system('%s/launcher restart'%(HBBTVAPP_PATH))
 		except: pass
 
 	def getStartHbbTVUrl(self):
@@ -1005,7 +1066,7 @@ class OperaBrowser(Screen):
 		eRCInput.getInstance().unlock()
 
 	def _on_setPageTitle(self, title=None):
-		print "page title :",title
+		print "Title :",title
 		if title is None:
 			return
 		self.setTitle(title)
@@ -1135,6 +1196,7 @@ def auto_start_main(reason, **kwargs):
 		command_server.stop()
 
 def session_start_main(session, reason, **kwargs):
+	eRCInput.getInstance().unlock()
 	global _g_helper
 	_g_helper = session.open(HbbTVHelper)
 
