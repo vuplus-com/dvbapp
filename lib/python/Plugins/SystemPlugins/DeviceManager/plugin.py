@@ -251,10 +251,6 @@ class DeviceManager(Screen):
 	def showPartitionList(self):
 		if self.currDevice is None:
 			return
-		self["key_red"].setText(_("Devices"))
-		self["key_green"].setText(_("Mount"))
-		self["key_yellow"].setText(_("Format"))
-		self["key_blue"].setText(_("Check"))
 		partitionList = []
 		for partition in self.currDevice["partitions"]:
 			partitionInfo = deviceinfo.getPartitionInfo(partition)
@@ -270,13 +266,25 @@ class DeviceManager(Screen):
 			)
 #			print "[DeviceManager] partitionEntry : ",partitionEntry
 			partitionList.append(partitionEntry)
-		self.currList = "partitions"
-		self["menu"].style = "partitions"
-		self["menu"].setList(partitionList)
-		self.selectionChanged()
+		if len(partitionList) != 0:
+			self["key_red"].setText(_("Devices"))
+			self["key_green"].setText(_("Mount"))
+			self["key_yellow"].setText(_("Format"))
+			self["key_blue"].setText(_("Check"))
+			self.currList = "partitions"
+			self["menu"].style = "partitions"
+			self["menu"].setList(partitionList)
+			self.selectionChanged()
+		else:
+			self.session.open(MessageBox, _("No partition list found on device.\nPlease click BLUE key and do Initialize to use this device."), MessageBox.TYPE_ERROR, timeout = 10)
+
 
 	def showMountPointSetup(self):
 		if self.currDevice is None or self.currPartition is None:
+			return
+		partition =  self.currPartition["partition"]
+		if not os.access("/autofs/%s"%partition,0):
+			self.session.open(MessageBox, _("This partition is not mountable.\nYou need to check or format this partition."), MessageBox.TYPE_ERROR, timeout = 10)
 			return
 		self["key_red"].setText(_("Partitions"))
 		self["key_green"].setText(_("Ok"))
@@ -313,7 +321,10 @@ class DeviceManager(Screen):
 #		print "keyOk"
 		if self.currList == "default":
 			self.currDevice = self.getCurrentDevice()
-			self.showPartitionList()
+			if len(self.currDevice["partitions"]) == 0:
+				self.session.open(MessageBox, _("No partition list found on device.\nPlease click BLUE key and do Initialize to use this device."), MessageBox.TYPE_ERROR, timeout = 10)
+			else:
+				self.showPartitionList()
 		elif self.currList == "partitions":
 			currMountPoint = self.getCurrentPartition()["mountpoint"]
 			currUuid = self.getCurrentPartition()["uuid"]
@@ -321,8 +332,7 @@ class DeviceManager(Screen):
 				self.currPartition = self.getCurrentPartition()
 				self.showMountPointSetup()
 			else:
-				self.doUmount(currMountPoint)
-				self.showPartitionList()
+				self.doUmount(currMountPoint, self.showPartitionList)
 		elif self.currList == "mountpoint":
 # self["menu"].getCurrent() : (green_button, "menu description", "mount point description, "default", mountpoint, self.divpng)
 			currEntry = self["menu"].getCurrent()[3]
@@ -394,18 +404,19 @@ class DeviceManager(Screen):
 			self.session.openWithCallback(self.deviceFormatCB, DeviceFormat, partition, choice[1])
 
 # about mount funcs..
-	def doUmount(self, mountpoint):
+	def doUmount(self, mountpoint, callback):
 		cmd = "umount %s"%mountpoint
 		print "[DeviceManager] cmd : %s"%cmd
-		self.DeviceManagerConsole.ePopen(cmd, self.doUmountFinished, mountpoint)
+		self.DeviceManagerConsole.ePopen(cmd, self.doUmountFinished, (mountpoint, callback))
 
 	def doUmountFinished(self, result, retval, extra_args = None):
-		mountpoint = extra_args
+		(mountpoint, callback) = extra_args
 		if retval == 0:
 # update current mount state ,devicemanager.cfg
 			devicemanagerconfig.updateConfigList()
 		else:
 			self.session.open(MessageBox, _("Can't umount %s. \nMaybe device or resource busy.")%mountpoint, MessageBox.TYPE_ERROR, timeout = 10)
+		callback()
 
 	def getDefaultMountPoint(self):
 		return self.defaultMountPoint
@@ -1325,37 +1336,32 @@ def callBackforDeviceManager(session, callback_result = False):
 
 def checkMounts(session):
 	try:
-		file = open("/proc/partitions")
-		partitions = file.readlines()
-		file.close()
-		file = open("/proc/mounts")
-		mounts = file.readlines()
-		file.close()
-		not_mounted = False
-		for part in partitions:
-			res = re.sub("\s+", " ", part).strip().split(" ")
-			if res and len(res) == 4:
-				if len(res[3]) == 3 and res[3][:2] == "sd":
-					device = "/dev/" + res[3]
-					print "found device %s"%device
-					not_mounted = True
-					for line in mounts:
-						if line.split()[1].startswith('/autofs'):
-							continue
-						if line.startswith(device):
-							print line
-							not_mounted = False
-							break
-			if not_mounted == True:
-				break
+		notMountable_dev = ""
+		for blockdev in listdir("/sys/block"):
+			devpath = "/sys/block/" + blockdev
+			dev = int(readFile(devpath + "/dev").split(':')[0])
+			if dev in (7, 31) or blockdev[0:2] != 'sd': # 7: loop, 31 : mtdblock
+				continue
+			partitions = []
+			notMountable_partitions = []
+			for partition in listdir(devpath):
+				if not partition.startswith(blockdev):
+					continue
+				partitions.append(partition)
+				if os.access('/autofs/'+partition,0) is False:
+					notMountable_partitions.append(partition)
+			if len(partitions) == 0 or len(notMountable_partitions) != 0:
+				if notMountable_dev != "":
+					notMountable_dev +=  ' '
+				notMountable_dev += blockdev
 
-		if not_mounted == True:
-			print "Umounted partitions found."
-			InfoText = _("umounted partitions found.!\nDo you want to open DeviceManager and set mount point?\n\n(Open 'Menu->Setup->System -> Harddisk -> DeviceManager'\n and press MENU button to deactivate this check.)")
-			AddNotificationWithCallback(
-							boundFunction(callBackforDeviceManager, session), 
-							MessageBox, InfoText, timeout = 60, default = False
-			)
+		if notMountable_dev != "":
+#				print "Not mountable partitions found."
+				InfoText = _("Not mountable devices found.! (%s)\nDo you want to open DeviceManager and do initialize or format this device?\n\n(Open 'Menu->Setup->System -> Harddisk -> DeviceManager'\n and press MENU button to deactivate this check.)"%notMountable_dev)
+				AddNotificationWithCallback(
+								boundFunction(callBackforDeviceManager, session), 
+								MessageBox, InfoText, timeout = 60, default = False
+				)
 	except:
 		print "checkMounts failed!"
 
