@@ -521,6 +521,7 @@ class DeviceInit(Screen):
 		self.exitMessageTimer = eTimer()
 		self.exitMessageTimer.callback.append(self.exitMessage)
 		self.msg = ""
+		self.fstype = None
 
 	def timerStart(self):
 		self.initStartTimer.start(100,True)
@@ -571,10 +572,10 @@ class DeviceInit(Screen):
 	def InputPartitionSize_step2(self):
 		current_partition = len(self.inputbox_partitionSizeList)+1
 		if self.inputbox_partitionSizeRemain == 0:
-			self.initInitializeConfirm()
+			self.choiceBoxFstype()
 		elif current_partition == self.inputbox_partitions:
 			self.inputbox_partitionSizeList.append(str(self.inputbox_partitionSizeRemain))
-			self.initInitializeConfirm()
+			self.choiceBoxFstype()
 		else:
 			text = str(int(self.inputbox_partitionSizeRemain/(self.inputbox_partitions-len(self.inputbox_partitionSizeList) )))
 			self.session.openWithCallback(self.InputPartitionSize_step2_CB, InputBox, title=_("Input size of partition %s.(Max = %d MB)")%(current_partition,self.inputbox_partitionSizeRemain ), text=text, maxSize=False, type=Input.NUMBER)
@@ -590,12 +591,31 @@ class DeviceInit(Screen):
 		else:
 			self.session.openWithCallback(self.exit ,MessageBox, _("The number you entered is wrong!"), MessageBox.TYPE_ERROR, timeout = 10)
 
+	def choiceBoxFstype(self):
+		menu = []
+		menu.append((_("ext2 - recommended for USB flash memory"), "ext2"))
+		menu.append((_("ext3 - recommended for harddisks"), "ext3"))
+		menu.append((_("ext4 - experimental"), "ext4"))
+		menu.append((_("vfat - for USB flash memory"), "vfat"))
+		self.session.openWithCallback(self.choiceBoxFstypeCB, ChoiceBox, title=_("Choice filesystem."), list=menu)
+
+	def choiceBoxFstypeCB(self, choice):
+		if choice is None:
+			self.exit()
+		else:
+			self.fstype = choice[1]
+			if self.fstype not in ["ext2", "ext3", "ext4", "vfat"]:
+				self.exit()
+			else:
+				self.initInitializeConfirm()
+
 	def initInitializeConfirm(self):
 #		print self.inputbox_partitionSizeList
 		partitionsInfo = ""
 		for index in range(len(self.inputbox_partitionSizeList)):
 			print "partition %d : %s Bytes"%(index+1, str(self.inputbox_partitionSizeList[index]))
 			partitionsInfo += "partition %d : %s MB\n"%(index+1, str(self.inputbox_partitionSizeList[index]))
+		partitionsInfo += "filesystem type : %s"%(self.fstype)
 		self.session.openWithCallback(self.initInitializeConfirmCB, MessageBoxConfirm, _("%s\nStart Device Inititlization?") % partitionsInfo , MessageBox.TYPE_YESNO)
 
 	def initInitializeConfirmCB(self,ret):
@@ -667,20 +687,33 @@ class DeviceInit(Screen):
 					break
 		partitions.close()
 
-		if partitionsize > 64 * 1024 * 1024:
-			cmd = "/sbin/mkfs.ext3 "
-			filesystem = "ext3"
+		if self.fstype == "ext4":
+			cmd = "/sbin/mkfs.ext4 -F "
+			if partitionsize > 2 * 1024 * 1024: # 2GB
+				cmd += "-T largefile "
+			cmd += "-O extent,flex_bg,large_file,uninit_bg -m1 " + fulldevicename
+		elif self.fstype == "ext3":
+			cmd = "/sbin/mkfs.ext3 -F "
+			if partitionsize > 2 * 1024 * 1024:
+				cmd += "-T largefile "
+			cmd += "-m0 " + fulldevicename
+		elif self.fstype == "ext2":
+			cmd = "/sbin/mkfs.ext2 -F "
+			if partitionsize > 2 * 1024 * 1024:
+				cmd += "-T largefile "
+			cmd += "-m0 " + fulldevicename
+		elif self.fstype == "vfat":
+			if partitionsize > 4 * 1024 * 1024 * 1024:
+				cmd = "/usr/sbin/mkfs.vfat -I -S4096 " + fulldevicename
+			else:
+				cmd = "/usr/sbin/mkfs.vfat -I " + fulldevicename
 		else:
-			cmd = "/sbin/mkfs.ext2 "
-			filesystem = "ext2"
-			
-		if partitionsize > 2 * 1024 * 1024:
-			cmd += "-T largefile "
-		cmd += "-m0 " + fulldevicename
+			self.createFilesystemFinished(None, -1, (self.device, fulldevicename))
+			return
 
 		msg = _("Create filesystem, please wait ...")
 		msg += _("\nPartition : %s") % (fulldevicename)
-		msg += _("\nFilesystem : %s") % (filesystem)
+		msg += _("\nFilesystem : %s") % (self.fstype)
 		msg += _("\nSize : %d MB\n")%int(self.inputbox_partitionSizeList[self.devicenumber-1])
 		self.msgWaitingMkfs = self.session.openWithCallback(self.msgWaitingMkfsCB, MessageBox_2, msg, type = MessageBox.TYPE_INFO, enable_input = False)
 		self.deviceInitConsole.ePopen(cmd, self.createFilesystemFinished, (self.device, fulldevicename))
@@ -1400,7 +1433,7 @@ class deviceManagerHotplug:
 				print "[DeviceManager] Mount Failed. (Another device is already mounted)"
 				return
 # do mount
-		print "[DeviceManager] doMount"
+#		print "[DeviceManager] doMount"
 		if not path.exists(mountpoint):
 			os.system("mkdir %s"%mountpoint)
 		if path.exists(mountpoint):
@@ -1452,7 +1485,8 @@ class deviceManagerHotplug:
 			return
 # do mount
 		if deviceinfo.isMounted(devpath, mountpoint):
-			print "[DeviceManagerHotplug] already mounted"
+			pass
+#			print "[DeviceManagerHotplug] already mounted"
 		else:
 			self.doMount(uuid, devpath, mountpoint, filesystem)
 
@@ -1508,7 +1542,7 @@ class deviceManagerHotplug:
 				if uuid_cfg == uuid:
 # do mount
 					if deviceinfo.isMounted(devpath, mountpoint_cfg):
-						print "[Devicemanager startup] already mounted"
+#						print "[Devicemanager startup] already mounted"
 						self.addPartitionAutofsMountpoint(devpath, mountpoint_cfg)
 					else:
 #						print "[autoMountOnStartup] do mount(%s %s %s)"%(devpath, configmountpoint, filesystem)
@@ -1525,7 +1559,7 @@ class deviceManagerHotplug:
 				continue
 			devpath, mountpoint  = x.split()[:2]
 			mounts.append((path.basename(devpath), mountpoint))
-#		print "[DeviceManager] mounts : ",mounts
+# get blkid info
 		data = self.getBlkidInfo()
 # check configList
 		for c in configList:
@@ -1535,7 +1569,7 @@ class deviceManagerHotplug:
 			if uuid_cfg in data.keys():
 				device_cfg = data[uuid_cfg]
 			if device_cfg is None:
-				return
+				continue
 			for (device, mountpoint) in mounts:
 				if device_cfg == device:
 					if not deviceinfo.isFstabAutoMounted(uuid_cfg, "/dev/"+device_cfg, mountpoint_cfg):
@@ -1543,8 +1577,9 @@ class deviceManagerHotplug:
 
 	def getBlkidInfo(self):
 		data = {}
-		blkid_lines = os.popen("blkid -c /dev/NULL /dev/sd*").readlines()
-		for line in blkid_lines:
+		blkid_data = os.popen("blkid -c /dev/NULL /dev/sd*").read()
+		for line in blkid_data.split('\n'):
+#			print "[DeviceManager] getBlkidInfo line : ",line
 			device = uuid = ""
 			device = path.basename(line.split(':')[0])
 			if line.find(" UUID=") != -1:
@@ -1584,7 +1619,7 @@ def checkMounts(session):
 
 		if noMountable_dev != "":
 				print "Umountable partitions found."
-				InfoText = _("No mountable devices found.! (%s)\nDo you want to open DeviceManager and do initialize or format this device?\n\n(Open 'Menu->Setup->System -> Harddisk -> DeviceManager'\n and press MENU button to deactivate this check.)"%noMountable_dev)
+				InfoText = _("No mountable devices found.! (%s)\nDo you want to open DeviceManager and do initialize or format this device?\n\n(Open 'Menu->Setup->System -> Harddisk -> DeviceManager'\n and press MENU button to deactivate this check.)")%noMountable_dev
 				AddNotificationWithCallback(
 								boundFunction(callBackforDeviceManager, session), 
 								MessageBox, InfoText, timeout = 60, default = False
