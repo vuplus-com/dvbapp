@@ -178,8 +178,6 @@ class DeviceManager(Screen):
 		self.onLayoutFinish.append(self.showDeviceList)
 		self.onLayoutFinish.append(self.addPartitionListChange)
 		self.onClose.append(self.removePartitionListChange)
-#		self.onLayoutFinish.append(self.hotplugInactive)
-#		self.onClose.append(self.hotplugActive)
 		self.onChangedEntry = []
 		self.blockDevices = {}
 
@@ -194,16 +192,6 @@ class DeviceManager(Screen):
 		if self.currList != "default" and device.device[:3] != self.currDevice["blockdev"]:
 			return
 		self.showDeviceList()
-
-	def hotplugInactive(self):
-		global devicemanagerhotplugactive
-		print "[Device manager] hotplug Inctive"
-		devicemanagerhotplugactive = False
-
-	def hotplugActive(self):
-		global devicemanagerhotplugactive
-		print "[Device manager] hotplug Active"
-		devicemanagerhotplugactive = True
 
 	def loadIcon(self):
 		self.icon_button_green = LoadPixmap(cached=True, path=resolveFilename(SCOPE_CURRENT_SKIN, "skin_default/buttons/button_green.png"))
@@ -277,7 +265,6 @@ class DeviceManager(Screen):
 			self.selectionChanged()
 		else:
 			self.session.open(MessageBox, _("No partition list found on device.\nPlease click BLUE key and do Initialize to use this device."), MessageBox.TYPE_ERROR, timeout = 10)
-
 
 	def showMountPointSetup(self):
 		if self.currDevice is None or self.currPartition is None:
@@ -407,12 +394,8 @@ class DeviceManager(Screen):
 	def doUmount(self, mountpoint, callback):
 		cmd = "umount %s"%mountpoint
 		print "[DeviceManager] cmd : %s"%cmd
-		self.DeviceManagerConsole.ePopen(cmd, self.doUmountFinished, (mountpoint, callback))
-
-	def doUmountFinished(self, result, retval, extra_args = None):
-		(mountpoint, callback) = extra_args
-		if retval == 0:
-# update current mount state ,devicemanager.cfg
+		os.system(cmd)
+		if not path.ismount(mountpoint):
 			devicemanagerconfig.updateConfigList()
 		else:
 			self.session.open(MessageBox, _("Can't umount %s. \nMaybe device or resource busy.")%mountpoint, MessageBox.TYPE_ERROR, timeout = 10)
@@ -436,23 +419,62 @@ class DeviceManager(Screen):
 
 	def doMount(self, partition, mountpoint):
 		try:
+# check mountpoint is in partition list.
+			if mountpoint != self.getDefaultMountPoint():
+				for p in harddiskmanager.partitions:
+					if p.mountpoint == mountpoint:
+						self.session.open(MessageBox, _("Can not use this mount point.(%s) \nPlease select another mount point.")%mountpoint, MessageBox.TYPE_ERROR, timeout = 10)
+						return
+#
 			device = partition["partition"]
-			fstype = partition["fstype"]
+			filesystem = partition["fstype"]
+			uuid = partition["uuid"]
 			if mountpoint.endswith("/"):
 				mountpoint = retval[:-1]
 			if mountpoint.find(' ') != -1:
 				mountpoint = mountpoint.replace(' ','-')
-			dev = deviceinfo.checkMountPoint(mountpoint)
-			if dev is None:
-				if not path.exists(mountpoint):
-					print "[deviceManager] make dir %s"%mountpoint
-					makedirs(mountpoint)
-				if fstype == "ntfs":
-					cmd = "ntfs-3g /dev/%s %s" % (device, mountpoint)
-				else:
-					cmd = "mount /dev/%s %s" % (device, mountpoint)
-				os.system(cmd)
-				print "[DeviceManager] cmd : %s"%cmd
+			devpath = "/dev/"+device
+			if deviceinfo.isMounted(devpath, mountpoint):
+				print "[DeviceManager] '%s -> %s' is already mounted."%(devpath, mountpoint)
+				return
+
+# check current device mounted on another mountpoint.
+			mp_list = deviceinfo.checkMountDev(devpath)
+			for mp in mp_list:
+				if mp != mountpoint and path.ismount(mp):
+					deviceinfo.umountByMountpoint(mp)
+# check another device mounted on configmountpoint
+			devpath_list = deviceinfo.checkMountPoint(mountpoint)
+			for devpath_ in devpath_list:
+				if devpath_ != devpath:
+					self.session.open(MessageBox, _("Mount Failed!\nCurrent path is already mounted by \"%s\"")%devpath_list[0], MessageBox.TYPE_ERROR, timeout = 10)
+					return
+# do mount
+			print "[DeviceManagerHotplugDevice] doMount"
+			if not path.exists(mountpoint):
+				os.system("mkdir %s"%mountpoint)
+			if path.exists(mountpoint):
+				if not path.ismount(mountpoint):
+					if filesystem == "ntfs":
+						cmd = "ntfs-3g %s %s"%(devpath, mountpoint)
+					elif filesystem is None:
+						cmd = "mount %s %s"%(devpath, mountpoint)
+					else:
+						cmd = "mount -t %s %s %s"%(filesystem, devpath, mountpoint)
+					print "[DeviceManager] cmd : %s"%cmd
+					self.DeviceManagerConsole.ePopen(cmd, self.doMountFinished, (devpath, mountpoint) )
+		except:
+			self.session.open(MessageBox, _("Mount Failed!\n(%s -> %s)")%(device, mountpoint), MessageBox.TYPE_ERROR, timeout = 10)
+
+	def doMountFinished(self, result, retval, extra_args = None):
+		(devpath, mountpoint) = extra_args
+		if retval == 0:
+			if not deviceinfo.isMounted(devpath, mountpoint):
+#				print "[DeviceManager] %s doMount failed!"%devpath
+				self.session.open(MessageBox, _("Mount Failed!\n(%s -> %s)")%(devpath, mountpoint), MessageBox.TYPE_ERROR, timeout = 10)
+				return
+			else:
+# make movie directory
 				if mountpoint == "/media/hdd":
 					movieDir = mountpoint + "/movie"
 					if not pathExists(movieDir):
@@ -461,10 +483,6 @@ class DeviceManager(Screen):
 				self.showPartitionList()
 # update current mount state ,devicemanager.cfg
 				devicemanagerconfig.updateConfigList()
-			else:
-				self.session.open(MessageBox, _("Mount Failed!\nCurrent path is already mounted by \"%s\"")%dev, MessageBox.TYPE_ERROR, timeout = 10)
-		except:
-			self.session.open(MessageBox, _("Mount Failed!(%s -> %s)")%(device, mountpoint), MessageBox.TYPE_ERROR, timeout = 10)
 
 	def MountpointBrowserCB(self, retval = None):
 		if retval and retval is not None:
@@ -528,7 +546,8 @@ class DeviceInit(Screen):
 			if not line.startswith("/dev/" + device):
 				continue
 			cmd += "umount %s ;"% line.split()[0]
-			os.system(cmd)
+		print "[DeviceManager] %s"%cmd
+		os.system(cmd)
 #recheck if umounted
 		mounts = file('/proc/mounts').read().split('\n')
 		for line in mounts:
@@ -695,6 +714,7 @@ class DeviceInit(Screen):
 			if ret == True:
 				self.success = True
 				self.msg = _("Device Initialization finished sucessfully!")
+				self.updateDeviceInfo()
 				self.exitMessageTimer.start(100,True)
 			else:
 				self.success = False
@@ -706,7 +726,11 @@ class DeviceInit(Screen):
 			self.session.openWithCallback(self.exit, MessageBox, self.msg, MessageBox.TYPE_INFO, timeout = 10)
 		else:
 			self.session.openWithCallback(self.exit, MessageBox, self.msg, MessageBox.TYPE_ERROR, timeout = 10)
-	
+
+	def updateDeviceInfo(self):
+# update devicemanager configs
+		devicemanagerconfig.updateConfigList()
+
 # Initializing end
 
 # device check start..
@@ -1072,6 +1096,7 @@ class DeviceInfo():
 			return ""
 
 	def checkMountPoint(self, check_mountpoint):
+		res = []
 		try:
 			mounts = file('/proc/mounts').read().split('\n')
 			for x in mounts:
@@ -1079,10 +1104,84 @@ class DeviceInfo():
 					continue
 				devpath, mountpoint  = x.split()[:2]
 				if mountpoint == check_mountpoint:
-					return devpath
+					res.append(devpath)
 		except:
 			pass
-		return None
+		return res
+
+	def checkMountDev(self, device):
+		res = []
+		try:
+			mounts = file('/proc/mounts').read().split('\n')
+			for x in mounts:
+				if not x.startswith('/'):
+					continue
+				devpath, mountpoint  = x.split()[:2]
+				if devpath == device:
+					res.append(mountpoint)
+		except:
+			pass
+		return res
+
+	def isMounted(self, devpath, mountpoint):
+		try:
+			mounts = file('/proc/mounts').read().split('\n')
+			for x in mounts:
+				if not x.startswith('/'):
+					continue
+				_devpath, _mountpoint  = x.split()[:2]
+				if devpath == _devpath and mountpoint == _mountpoint:
+					return True
+		except:
+			pass
+		return False
+
+	def isMountable(self, partition):
+		autofsPath = "/autofs/"+partition.device
+		mountable = False
+		try:
+			os.listdir(autofsPath)
+			mountable = True
+		except:
+			pass
+		return mountable
+
+	def isFstabAutoMounted(self, uuid, devpath, mountpoint):
+#		print "	>> isFstabMounted, uuid : %s, devpath : %s, mountpoint : %s"%(uuid, devpath, mountpoint)
+		if mountpoint[-1] == '/':
+			mountpoint = mountpoint[:-1]
+		data = file('/etc/fstab').read().split('\n')
+		for line in data:
+			if not line.startswith('/'):
+				continue
+			dev, mp, ms = line.split()[0:3]
+			if uuid is not None and dev.startswith('UUID'):
+				if dev.split('=')[1] == uuid.strip("\"") and mp == mountpoint and ms == 'auto':
+#					print "	>> line : ", line
+					return True
+			elif dev == devpath and mp == mountpoint and ms == 'auto':
+#				print "	>> line : ", line
+				return True
+		return False
+
+	def umountByMountpoint(self, mountpoint):
+		if mountpoint is None:
+			return False
+		try:
+			if path.ismount(mountpoint):
+				cmd = "umount " + mountpoint
+				print "[DeviceManager] ", cmd
+				os.system(cmd)
+		except:
+			print "Umount by mountpoint failed!"
+		if not path.ismount(mountpoint):
+			return True
+		return False
+
+	def umountByDevpath(self, devpath):
+		cmd = "umount " + devpath
+		print "[DeviceManager] ", cmd
+		os.system(cmd)
 
 deviceinfo = DeviceInfo()
 
@@ -1278,57 +1377,185 @@ class DeviceManagerConfig():
 
 devicemanagerconfig = DeviceManagerConfig()
 
-devicemanagerhotplugactive = True
+class deviceManagerHotplug:
+	def __init__(self):
+		self.hotplugActive = True
+
+	def printDebug(self):
+		for p in harddiskmanager.partitions:
+			print " # partition : %s %s %s %s %s(mp, des, f_mounted, is_hot, dev)"%(p.mountpoint, p.description, p.force_mounted, p.is_hotplug,p.device)
+
+	def doMount(self, uuid, devpath, mountpoint, filesystem):
+# check current device mounted on another mountpoint.
+		mp_list = []
+		mp_list = deviceinfo.checkMountDev(devpath)
+		for mp in mp_list:
+			if mp != mountpoint and path.ismount(mp):
+				deviceinfo.umountByMountpoint(mp)
+# check another device mounted on configmountpoint
+		devpath_list = []
+		devpath_list = deviceinfo.checkMountPoint(mountpoint)
+		for devpath_ in devpath_list:
+			if devpath_ != devpath:
+				print "[DeviceManager] Mount Failed. (Another device is already mounted)"
+				return
+# do mount
+		print "[DeviceManager] doMount"
+		if not path.exists(mountpoint):
+			os.system("mkdir %s"%mountpoint)
+		if path.exists(mountpoint):
+			if not path.ismount(mountpoint):
+				if filesystem == "ntfs":
+					cmd = "ntfs-3g %s %s"%(devpath, mountpoint)
+				elif filesystem is None:
+					cmd = "mount %s %s"%(devpath, mountpoint)
+				else:
+					cmd = "mount -t %s %s %s"%(filesystem, devpath, mountpoint)
+				print "[DeviceManager] cmd : %s"%cmd
+				os.system(cmd)
+				if not deviceinfo.isMounted(devpath, mountpoint):
+					print "[DeviceManager] %s doMount failed!"%devpath
+					return
+				else:
+# Update partition Info, add
+					self.addPartitionAutofsMountpoint(devpath, mountpoint)
+
+	def doUmount(self, device, mountpoint):
+		devpath = "/dev/"+device
+		if len(deviceinfo.checkMountDev(devpath)) == 0:
+			return
+		cmd = "umount %s"%devpath
+		print "[DeviceManager] cmd : %s"%cmd
+		os.system(cmd)
+
+	def addHotPlugDevice(self, partition):
+		device = partition.device
+		devpath = "/dev/"+device
+# get BlkidInfo
+		(uuid, filesystem) = deviceinfo.getPartitionBlkidInfo(device)
+		if uuid == "":
+# retry..
+			os.system("sleep 1")
+			(uuid, filesystem) = deviceinfo.getPartitionBlkidInfo(device)
+		if uuid == "":
+			print "[DeviceManagerHotplug] getBlkidInfo failed!"
+			return
+# get configList
+		devicemanagerconfig.loadConfig()
+		configList = devicemanagerconfig.getConfigList()
+		mountpoint = None
+		for line in configList:
+			if uuid == line[0].strip():
+				mountpoint = line[1].strip()
+				break
+		if mountpoint is None:
+			return
+# do mount
+		if deviceinfo.isMounted(devpath, mountpoint):
+			print "[DeviceManagerHotplug] already mounted"
+		else:
+			self.doMount(uuid, devpath, mountpoint, filesystem)
+
+	def removeHotplugDevice(self, partition):
+		self.doUmount(partition.device, partition.mountpoint)
+
+	def getHotplugAction(self, action, partition):
+		if not self.hotplugActive or not config.plugins.devicemanager.hotplug_enable.value:
+			return
+		if partition.device is None or not partition.device.startswith("sd"):
+			return
+		print "[DeviceManagerHotplug] action : %s, device : %s"%(action, partition.device)
+
+		if action == 'add':
+			self.addHotPlugDevice(partition)
+		elif action == 'remove':
+			self.removeHotplugDevice(partition)
+
+	def addPartitionAutofsMountpoint(self, devpath, mountpoint):
+		device = path.basename(devpath)
+		autofsMountpoint = harddiskmanager.getAutofsMountpoint(device)
+# check already appended to partition list
+		for x in harddiskmanager.partitions:
+			if x.mountpoint == autofsMountpoint or x.mountpoint == mountpoint:
+				return
+#
+		from Components.Harddisk import Partition
+		physdev = path.realpath('/sys/block/' + device[:3] + '/device')[4:]
+		description = harddiskmanager.getUserfriendlyDeviceName(device, physdev)
+		p = Partition(mountpoint = autofsMountpoint, description = description, force_mounted = True, device = device)
+		harddiskmanager.partitions.append(p)
+		harddiskmanager.on_partition_list_change("add", p)
+
+	def autoMountOnStartup(self):
+		devicemanagerconfig.loadConfig()
+		configList = devicemanagerconfig.getConfigList()
+# get blkid info
+		blkiddata = []
+		data = os.popen("blkid -c /dev/NULL /dev/sd*").readlines()
+		for line in data:
+			devpath = uuid = filesystem = ""
+			devpath = line.split(':')[0]
+			if line.find(" UUID=") != -1:
+				uuid = line.split(" UUID=")[1].split(' ')[0]
+			if line.find(" TYPE=") != -1:
+				filesystem = line.split(" TYPE=")[1].split(' ')[0].strip('"')
+			blkiddata.append((devpath, uuid, filesystem))
+# check configList
+		for c in configList:
+			uuid_cfg = c[0].strip()
+			mountpoint_cfg = c[1].strip()
+			for (devpath, uuid, filesystem) in blkiddata:
+				if uuid_cfg == uuid:
+# do mount
+					if deviceinfo.isMounted(devpath, mountpoint_cfg):
+						print "[Devicemanager startup] already mounted"
+						self.addPartitionAutofsMountpoint(devpath, mountpoint_cfg)
+					else:
+#						print "[autoMountOnStartup] do mount(%s %s %s)"%(devpath, configmountpoint, filesystem)
+						self.doMount(uuid, devpath, mountpoint_cfg, filesystem)
+
+	def umountOnShutdown(self):
+		devicemanagerconfig.loadConfig()
+		configList = devicemanagerconfig.getConfigList()
+# get mount info
+		mounts = []
+		data = file('/proc/mounts').read().split('\n')
+		for x in data:
+			if not x.startswith('/dev/sd'):
+				continue
+			devpath, mountpoint  = x.split()[:2]
+			mounts.append((path.basename(devpath), mountpoint))
+#		print "[DeviceManager] mounts : ",mounts
+		data = self.getBlkidInfo()
+# check configList
+		for c in configList:
+			uuid_cfg = c[0].strip()
+			mountpoint_cfg = c[1].strip()
+			device_cfg = None
+			if uuid_cfg in data.keys():
+				device_cfg = data[uuid_cfg]
+			if device_cfg is None:
+				return
+			for (device, mountpoint) in mounts:
+				if device_cfg == device:
+					if not deviceinfo.isFstabAutoMounted(uuid_cfg, "/dev/"+device_cfg, mountpoint_cfg):
+						self.doUmount(device, mountpoint)
+
+	def getBlkidInfo(self):
+		data = {}
+		blkid_lines = os.popen("blkid -c /dev/NULL /dev/sd*").readlines()
+		for line in blkid_lines:
+			device = uuid = ""
+			device = path.basename(line.split(':')[0])
+			if line.find(" UUID=") != -1:
+				blkid_uuid = line.split(" UUID=")[1].split(' ')[0]
+				data[blkid_uuid] = device
+		return data
+
+devicemanagerhotplug = deviceManagerHotplug()
+
 def DeviceManagerhotplugDeviceStart(action, device):
-	global devicemanagerhotplugactive
-	if devicemanagerhotplugactive:
-		DeviceManagerHotplugDevice(action, device)
-
-def DeviceManagerHotplugDevice(action, device):
-	if not config.plugins.devicemanager.hotplug_enable.value:
-		return
-	print "[DeviceManager Hotplug Device] action : %s, device : %s"%(action, device.device)
-
-	try:
-		if action == 'add' and device.is_hotplug and len(device.device) == 3:
-			if device.device.startswith("sd"):
-				newdevice = "/dev/" + device.device
-				cmd = "sleep 3 && blkid -c /dev/null " + newdevice + "*"
-				data = popen(cmd).read().split('\n')
-#				print "[DeviceManagerHotplugDevice] blkid data : ",data
-				for line in data:
-					uuid = ""
-					partitionType = ""
-					if line.startswith(newdevice):
-						if line.find(" UUID=") != -1:
-							uuid = line.split(" UUID=")[1].split(' ')[0]
-						if line.find(" TYPE=") != -1:
-							partitionType = line.split(" TYPE=")[1].split(' ')[0].strip('"')
-						mountdev = line.split(':')[0]
-						devicemanagerconfig.loadConfig()
-						configList = devicemanagerconfig.getConfigList()
-						for c in configList:
-							if uuid == c[0].strip():
-								mountpoint = c[1].strip()
-								if not os.path.ismount(mountpoint):
-									if partitionType == "ntfs":
-										cmd = "ntfs-3g %s %s"%(mountdev, mountpoint)
-									else:
-										cmd = "mount %s %s"%(mountdev, mountpoint)
-									print "[DeviceManagerHotplugDevice] try..'%s'"%cmd
-									os.system(cmd)
-
-		elif action == 'remove' and device.device is not None and len(device.device) == 3:
-			mounts = file('/proc/mounts').read().split('\n')
-			for x in mounts:
-				if not x.startswith('/'):
-					continue
-				if x.startswith("/dev/"+device.device):
-					cmd = "umount "+x.split()[0]
-					print "[DeviceManagerHotplugDevice] try.. '%s'"%cmd
-					os.system(cmd)
-	except:
-		print "[DeviceManagerHotplug] hotplugDevice error."
+	devicemanagerhotplug.getHotplugAction(action, device)
 
 def callBackforDeviceManager(session, callback_result = False):
 	if callback_result == True:
@@ -1336,28 +1563,28 @@ def callBackforDeviceManager(session, callback_result = False):
 
 def checkMounts(session):
 	try:
-		notMountable_dev = ""
+		noMountable_dev = ""
 		for blockdev in listdir("/sys/block"):
 			devpath = "/sys/block/" + blockdev
 			dev = int(readFile(devpath + "/dev").split(':')[0])
 			if dev in (7, 31) or blockdev[0:2] != 'sd': # 7: loop, 31 : mtdblock
 				continue
 			partitions = []
-			notMountable_partitions = []
+			noMountable_partitions = []
 			for partition in listdir(devpath):
 				if not partition.startswith(blockdev):
 					continue
 				partitions.append(partition)
 				if os.access('/autofs/'+partition,0) is False:
-					notMountable_partitions.append(partition)
-			if len(partitions) == 0 or len(notMountable_partitions) != 0:
-				if notMountable_dev != "":
-					notMountable_dev +=  ' '
-				notMountable_dev += blockdev
+					noMountable_partitions.append(partition)
+			if len(partitions) == 0 or len(noMountable_partitions) != 0:
+				if noMountable_dev != "":
+					noMountable_dev +=  ' '
+				noMountable_dev += blockdev
 
-		if notMountable_dev != "":
-#				print "Not mountable partitions found."
-				InfoText = _("Not mountable devices found.! (%s)\nDo you want to open DeviceManager and do initialize or format this device?\n\n(Open 'Menu->Setup->System -> Harddisk -> DeviceManager'\n and press MENU button to deactivate this check.)"%notMountable_dev)
+		if noMountable_dev != "":
+				print "Umountable partitions found."
+				InfoText = _("No mountable devices found.! (%s)\nDo you want to open DeviceManager and do initialize or format this device?\n\n(Open 'Menu->Setup->System -> Harddisk -> DeviceManager'\n and press MENU button to deactivate this check.)"%noMountable_dev)
 				AddNotificationWithCallback(
 								boundFunction(callBackforDeviceManager, session), 
 								MessageBox, InfoText, timeout = 60, default = False
@@ -1383,9 +1610,7 @@ def autostart(reason, **kwargs):
 			if not fileExists(dmconfigfile):
 				print "[DeviceManager] autostart : check devices at first start"
 				sda_isremovable = False
-#				sdb_isremovable = False
 				sda_UUID = ""
-#				sdb_UUID = ""
 				os.system("touch %s"%dmconfigfile)
 # check sda
 				sda_data = popen("cat /proc/partitions | grep sda1").read()
@@ -1393,65 +1618,20 @@ def autostart(reason, **kwargs):
 					sda_UUID = popen("blkid -o value -s UUID /dev/sda1").read().strip('\n')
 					sda_isremovable = bool(int(readFile("/sys/block/sda/removable")))
 					print "sda : %s, %s"%(sda_UUID, sda_isremovable)
-# check sdb 
-#				sdb_data = popen("cat /proc/partitions | grep sdb1").read()
-#				if sdb_data != '':
-#					sdb_UUID = popen("blkid -o value -s UUID /dev/sdb1").read().strip('\n')
-#					sdb_isremovable = bool(int(readFile("/sys/block/sdb/removable")))
-#					print "sdb : %s, %s"%(sdb_UUID, sdb_isremovable)
 				cfg = ""
 				if sda_data != '':
-#					if sdb_data != '':
-#						if not sda_isremovable:
-#							cfg += '"%s":/media/hdd\n'%sda_UUID
-#							cfg += '"%s":/media/usb\n'%sdb_UUID
-#						else:
-#							if not sdb_isremovable:
-#								cfg += '"%s":/media/hdd\n'%sdb_UUID
-#								cfg += '"%s":/media/usb\n'%sda_UUID
-#							else:
-#								cfg += '"%s":/media/hdd\n'%sda_UUID
-#								cfg += '"%s":/media/usb\n'%sdb_UUID
-#					else:
-#						cfg += '"%s":/media/hdd\n'%sda_UUID
 					cfg += '"%s":/media/hdd\n'%sda_UUID
 				confFile = open(dmconfigfile,'w')
 				confFile.write(cfg)
 				confFile.close()
-#				if not path.exists("/media/usb"):
-#						os.system("mkdir -p /media/usb")
 				if not path.exists("/media/hdd"):
 					os.system("mkdir -p /media/hdd")
-				
-# check at first enigma2 start - end
-			devicemanagerconfig.loadConfig()
-			configList = devicemanagerconfig.getConfigList()
-			if len(configList) != 0:
-				print "[DeviceManager] automount from device manager configs"
-				cmd = "blkid -c /dev/null /dev/sd*"
-				data = popen(cmd).read().split('\n')
-				for line in data:
-					device = ""
-					uuid = ""
-					filesystem = ""
-					device = line.split(':')[0]
-					if line.find(" UUID=") != -1:
-						uuid = line.split(" UUID=")[1].split(' ')[0]
-					if line.find(" TYPE=") != -1:
-						filesystem = line.split(" TYPE=")[1].split(' ')[0].strip('"')
-					for line in configList:
-						configuuid = line[0].strip()
-						configmountpoint = line[1].strip()
-						if configuuid == uuid and path.exists(configmountpoint) and not path.ismount(configmountpoint):
-							if filesystem == "ntfs":
-								cmd = "ntfs-3g %s %s"%(device, configmountpoint)
-							else:
-								cmd = "mount -t %s %s %s"%(filesystem, device, configmountpoint)
-							print "[DeviceManager] ",cmd
-							os.system(cmd)
-							break
+# auto mount
+			devicemanagerhotplug.autoMountOnStartup()
 		except:
 			print "[DeviceManager] autostart failed!"
+	elif reason == 1:
+		devicemanagerhotplug.umountOnShutdown()
 
 def menu(menuid, **kwargs):
 	if menuid == "harddisk":
@@ -1494,3 +1674,4 @@ class MessageBox_2_Summary(Screen):
 			<widget source="parent.Text" render="Label" position="0,0" size="256,64" font="Regular;13" halign="center" valign="center" />
 		</screen>
 	"""
+
