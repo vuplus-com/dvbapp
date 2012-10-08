@@ -1759,6 +1759,11 @@ class OperaBrowser(Screen):
 			url = ''
 		self.session.open(OperaBrowserPreferenceWindow, url)
 	def _cmd_on_OpenStartpage(self):
+		global _g_helper
+		if not _g_helper._is_browser_running():
+			message = "Opera Browser was not running.\nPlease running browser using [File]>[Start/Stop] menu."
+			self.session.open(MessageBox, message, MessageBox.TYPE_INFO)
+			return
 		start = 'http://vuplus.com'
 		try:
 			start = OperaBrowserSetting().getData()['start']
