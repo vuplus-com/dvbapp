@@ -886,7 +886,7 @@ class HbbTVHelper(Screen):
 		self._urls = None
 		#self._stop_opera()
 		#self._start_opera()
-		#self._restart_opera()
+		self._restart_opera()
 
 		Screen.__init__(self, session)
 		self._session = session
@@ -1346,16 +1346,20 @@ class OperaBrowserBookmarkWindow(Screen):
 		self.updateBookmarkList()
 	def getParentCategory(self):
 		idx = self["bookmarklist"].getSelectedIndex()
-		while idx >= 0:
-			data = self.mBookmarkList[idx][0].strip()
-			if data[0] == '#':
-				return self.mBookmarkList[idx][1]
-			idx -= 1
+		try:
+			while idx >= 0:
+				data = self.mBookmarkList[idx][0].strip()
+				if data[0] == '#':
+					return self.mBookmarkList[idx][1]
+				idx -= 1
+		except: pass
 		return None
 	def isCategoryItem(self):
-		head = self["bookmarklist"].getCurrent()[0].strip()
-		if head[0] == '#':
-			return True
+		try:
+			head = self["bookmarklist"].getCurrent()[0].strip()
+			if head[0] == '#':
+				return True
+		except: pass
 		return False
 	def keyNumber(self):
 		data = self["bookmarklist"].getCurrent()[1]

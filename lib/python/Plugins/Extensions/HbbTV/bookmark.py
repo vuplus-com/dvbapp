@@ -123,8 +123,16 @@ class BookmarkManager(SimpleConfigParser):
 		import os
 		if not os.path.exists(_dbFileName):
 			os.system('echo "[__SYS__]" > %s'%(_dbFileName))
-			os.system('echo "category_current_idx = 0" >> %s'%(_dbFileName))
-			os.system('echo "bookmark_current_idx = 0" >> %s'%(_dbFileName))
+			os.system('echo "category_current_idx = 1" >> %s'%(_dbFileName))
+			os.system('echo "bookmark_current_idx = 1" >> %s'%(_dbFileName))
+			os.system('echo "[c-1]" >> %s'%(_dbFileName))
+			os.system('echo "id = 1" >> %s'%(_dbFileName))
+			os.system('echo "name = My favorite" >> %s'%(_dbFileName))
+			os.system('echo "[b-1]" >> %s'%(_dbFileName))
+			os.system('echo "url = http://www2.vuplus.com/" >> %s'%(_dbFileName))
+			os.system('echo "id = 1" >> %s'%(_dbFileName))
+			os.system('echo "parent = 1" >> %s'%(_dbFileName))
+			os.system('echo "title = Vuplus Home" >> %s'%(_dbFileName))
 
 		self.init(_dbFileName)
 
