@@ -1189,7 +1189,7 @@ class BookmarkEditWindow(ConfigListScreen, Screen):
 		self.mMode = _mode
 		self.mType = _type
 		self.mData = _data
-                self.session = session
+                self.mSession = session
 		self.mBookmarkManager = _bm
 
 		if _data is not None:
