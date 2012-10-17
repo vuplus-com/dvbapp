@@ -39,7 +39,21 @@ if os.path.exists("/proc/stb/info/vumodel"):
 		fwlist= [
 			("fpga", _("FPGA"))
 			]
+		fwdata= {
+			"fpga" : ["http://archive.vuplus.com/download/fpga", "fpga.files", "/dev/fpga_dp;/dev/misc/dp;"]
+			}
+	elif info == "solo2":
+		fwlist= [
+			("fpga", _("FPGA"))
+			]
 		fwdata= { 
+			"fpga" : ["http://archive.vuplus.com/download/fpga", "fpga.files", "/dev/fpga_dp;/dev/misc/dp;"]
+			}
+	elif info == "duo2":
+		fwlist= [
+			("fpga", _("FPGA"))
+			]
+		fwdata= {
 			"fpga" : ["http://archive.vuplus.com/download/fpga", "fpga.files", "/dev/fpga_dp;/dev/misc/dp;"]
 			}
 
