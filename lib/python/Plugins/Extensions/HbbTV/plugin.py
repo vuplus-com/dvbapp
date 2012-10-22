@@ -1215,25 +1215,60 @@ class BookmarkEditWindow(ConfigListScreen, Screen):
 		self.menuItemUrl   = None
 		self.menuItemName  = None
 
+		self.menuEntryName = None
+		self.menuEntryTitle = None
+		self.menuEntryUrl = None
+
 		self.makeConfigList()
 		self.onLayoutFinish.append(self.layoutFinished)
 
 	def layoutFinished(self):
 		self.setTitle('Bookmark ' + self.mMode)
+
+	def selectedItem(self):
+		currentPosition = self["config"].getCurrent()
+		if self.mType == BookmarkEditWindow.CATEGORY:
+			return ("Name", self.menuItemName)
+		else:
+			if currentPosition == self.menuEntryTitle:
+				return ("Title", self.menuItemTitle)
+			elif currentPosition == self.menuEntryUrl:
+				return ("Url", self.menuItemUrl)
+		return None
+
+	def showMessageBox(self, text):
+		msg = "Invalid " + text + "!!(Empty)\nPlease, Input to the " + text + "."
+		self.mSession.openWithCallback(self.showVKeyWindow, MessageBox, msg, MessageBox.TYPE_INFO)
+		return False
+
+	def showVKeyWindow(self, data=None):
+		itemTitle = ""
+		itemValue = ""
+		selected = self.selectedItem()
+		if selected is not None:
+			itemValue = selected[1].value
+			if strIsEmpty(itemValue):
+				itemValue = ""
+			itemTitle = selected[0]
+
+		self.session.openWithCallback(self.cbVKeyWindow, VirtualKeyBoard, title=itemTitle, text=itemValue)
+
+	def cbVKeyWindow(self, data=None):
+		if data is not None:
+			selected = self.selectedItem()
+			if selected is not None:
+				selected[1].setValue(data)
+
 	def saveData(self):
 		if self.mType == BookmarkEditWindow.CATEGORY:
 			if self.mMode == 'Add':
 				categoryName = self.menuItemName.value
 				if strIsEmpty(categoryName):
-					msg = "Invalid Category Name!!(Empty)\nPlease, Input to the Category Name."
-					self.mSession.open(MessageBox, msg, MessageBox.TYPE_INFO)
-					return False
+					return self.showMessageBox("Category Name")
 				self.mBookmarkManager.addCategory(categoryName)
 			else:
 				if strIsEmpty(self.menuItemName.value):
-					msg = "Invalid Category Name!!(Empty)\nPlease, Input to the Category Name."
-					self.mSession.open(MessageBox, msg, MessageBox.TYPE_INFO)
-					return False
+					return self.showMessageBox("Category Name")
 				self.mData.mName = self.menuItemName.value
 				self.mBookmarkManager.updateCategory(self.mData)
 		else:
@@ -1241,19 +1276,24 @@ class BookmarkEditWindow(ConfigListScreen, Screen):
 				bookmarkTitle = self.menuItemTitle.value
 				bookmarkUrl   = self.menuItemUrl.value
 				if strIsEmpty(bookmarkTitle):
-					msg = "Invalid Bookmark Title!!(Empty)\nPlease input to the Bookmark Title."
-					self.mSession.open(MessageBox, msg, MessageBox.TYPE_INFO)
-					return False
+					self["config"].setCurrentIndex(0)
+					return self.showMessageBox("Bookmark Title")
+				if strIsEmpty(bookmarkUrl):
+					self["config"].setCurrentIndex(1)
+					return self.showMessageBox("Bookmark URL")
 				self.mBookmarkManager.addBookmark(bookmarkTitle, bookmarkUrl, self.mData.mParent)
 			else:
 				if strIsEmpty(self.menuItemTitle.value):
-					msg = "Invalid Bookmark Title!!(Empty)\nPlease input to the Bookmark Title."
-					self.mSession.open(MessageBox, msg, MessageBox.TYPE_INFO)
-					return False
+					self["config"].setCurrentIndex(0)
+					return self.showMessageBox("Bookmark Title")
+				if strIsEmpty(self.menuItemUrl.value):
+					self["config"].setCurrentIndex(1)
+					return self.showMessageBox("Bookmark URL")
 				self.mData.mTitle = self.menuItemTitle.value
 				self.mData.mUrl   = self.menuItemUrl.value
 				self.mBookmarkManager.updateBookmark(self.mData)
 		return True
+
 	def keyGreen(self):
 		if not self.saveData():
 			return
@@ -1269,15 +1309,19 @@ class BookmarkEditWindow(ConfigListScreen, Screen):
 
 		if self.mType == BookmarkEditWindow.CATEGORY:
 			self.menuItemName = ConfigText(default=self.mData.mName, visible_width=65, fixed_size=False)
-			menuEntryName  = getConfigListEntry(_("Name"), self.menuItemName)
-			self.menulist.append(menuEntryName)
+
+			self.menuEntryName  = getConfigListEntry(_("Name"), self.menuItemName)
+
+			self.menulist.append(self.menuEntryName)
 		else:
 			self.menuItemTitle = ConfigText(default=self.mData.mTitle, visible_width=65, fixed_size=False)
 			self.menuItemUrl   = ConfigText(default=self.mData.mUrl, visible_width=65, fixed_size=False)
-			menuEntryTitle = getConfigListEntry(_("Title"), self.menuItemTitle)
-			menuEntryUrl   = getConfigListEntry(_("Url"), self.menuItemUrl)
-			self.menulist.append(menuEntryTitle)
-			self.menulist.append(menuEntryUrl)
+
+			self.menuEntryTitle = getConfigListEntry(_("Title"), self.menuItemTitle)
+			self.menuEntryUrl   = getConfigListEntry(_("Url"), self.menuItemUrl)
+
+			self.menulist.append(self.menuEntryTitle)
+			self.menulist.append(self.menuEntryUrl)
 			
 		self["config"].list = self.menulist
 		self["config"].l.setList(self.menulist)
