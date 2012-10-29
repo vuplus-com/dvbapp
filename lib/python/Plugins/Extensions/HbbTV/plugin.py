@@ -7,6 +7,7 @@ from Screens.MessageBox import MessageBox
 from Screens.InfoBarGenerics import InfoBarNotifications
 from Screens.VirtualKeyBoard import VirtualKeyBoard
 from Screens.HelpMenu import HelpableScreen
+from Screens.ChannelSelection import service_types_tv
 
 from Components.PluginComponent import plugins
 from Components.Button import Button
@@ -20,7 +21,7 @@ from Components.VolumeControl import VolumeControl
 from Components.Pixmap import Pixmap
 from Components.config import config, ConfigSubsection, ConfigPosition, getConfigListEntry, ConfigBoolean, ConfigInteger, ConfigText, ConfigSelection, configfile, getCharValue
 
-from enigma import eTimer, eConsoleAppContainer, getDesktop, eServiceReference, iPlayableService, iServiceInformation, RT_HALIGN_LEFT, RT_HALIGN_RIGHT, RT_HALIGN_CENTER, RT_VALIGN_CENTER, getPrevAsciiCode, eRCInput, fbClass
+from enigma import eTimer, eConsoleAppContainer, getDesktop, eServiceReference, iPlayableService, iServiceInformation, RT_HALIGN_LEFT, RT_HALIGN_RIGHT, RT_HALIGN_CENTER, RT_VALIGN_CENTER, getPrevAsciiCode, eRCInput, fbClass, eServiceCenter
 
 from bookmark import BookmarkManager, BookmarkData, CategoryData
 
@@ -30,6 +31,8 @@ strIsEmpty = lambda x: x is None or len(x) == 0
 
 HBBTVAPP_PATH = "/usr/local/hbb-browser"
 COMMAND_PATH = '/tmp/.sock.hbbtv.cmd'
+
+_g_helper = None
 
 class GlobalValues:
 	command_util   = None
@@ -189,6 +192,7 @@ class OpCodeSet:
 			,"OP_HBBTV_FULLSCREEN"		: 0x0005
 			,"OP_HBBTV_TITLE"		: 0x0006
 			,"OP_HBBTV_RETRY_OPEN_URL"	: 0x0009
+			,"OP_HBBTV_CHANGE_CHANNEL"	: 0x000A
 			,"OP_OIPF_GET_CHANNEL_INFO_URL"	: 0x0101
 			,"OP_OIPF_GET_CHANNEL_INFO_AIT" : 0x0102
 			,"OP_OIPF_GET_CHANNEL_INFO_LIST": 0x0103
@@ -223,6 +227,7 @@ class OpCodeSet:
 			,0x0005 : "OP_HBBTV_FULLSCREEN"
 			,0x0006 : "OP_HBBTV_TITLE"
 			,0x0009 : "OP_HBBTV_RETRY_OPEN_URL"
+			,0x000A : "OP_HBBTV_CHANGE_CHANNEL"
 			,0x0101 : "OP_OIPF_GET_CHANNEL_INFO_URL"
 			,0x0102 : "OP_OIPF_GET_CHANNEL_INFO_AIT"
 			,0x0103 : "OP_OIPF_GET_CHANNEL_INFO_LIST"
@@ -441,6 +446,7 @@ class HandlerHbbTV(Handler):
 			 0x0001 : self._cb_handleCloseHbbTVBrowser
 			,0x0006 : self._cb_handleSetPageTitle
 			,0x0009 : self._cb_handleHbbTVRetryOpen
+			,0x000A : self._cb_handleHbbTVChangeChannel
 			,0x0101 : self._cb_handleGetChannelInfoForUrl
 			,0x0102 : self._cb_handleGetChannelInfoForAIT
 			,0x0103 : self._cb_handleGetChannelInfoList
@@ -504,8 +510,23 @@ class HandlerHbbTV(Handler):
 		self._on_set_title_cb = None
 		return self.doPack(opcode, params, reserved)
 
+	def _cb_handleHbbTVChangeChannel(self, opcode, data):
+		self._handle_dump(self._cb_handleHbbTVChangeChannel, opcode, data)
+		global _g_helper
+		if _g_helper is None: 
+			return (0, "NOK")
+		dataItems = data.split(":")
+		sid  = dataItems[0]
+		tsid = dataItems[1]
+		if not _g_helper.doChangeChannel(sid, tsid):
+			return (0, "NOK")
+
+
+		return (0, "OK")
+
 	def _cb_handleBrowserMenuReq(self, opcode, data):
 		self._handle_dump(self._cb_handleBrowserMenuReq, opcode, data)
+		fbClass.getInstance().unlock()
 		eRCInput.getInstance().unlock()
 		browser = getPluginBrowser()
 		if browser is not None:
@@ -546,11 +567,13 @@ class HandlerHbbTV(Handler):
 		return (0, "OK")
 
 	def _cb_virtualKeyboardClosed(self, data=None):
+		fbClass.getInstance().lock()
 		eRCInput.getInstance().lock()
 		command_util = getCommandUtil()
 		command_util.sendCommand('OP_BROWSER_VKBD_RES', data)
 	def _cb_handleShowVirtualKeyboard(self, opcode, data):
 		self._handle_dump(self._cb_handleShowVirtualKeyboard, opcode, data)
+		fbClass.getInstance().unlock()
 		eRCInput.getInstance().unlock()
 		if data == 0 or strIsEmpty(data):
 			data = ""
@@ -756,6 +779,7 @@ class HbbTVWindow(Screen, InfoBarNotifications):
 		"""
 	def __init__(self, session, url=None, cbf=None, useAIT=False, profile=0):
 		self._session = session
+		fbClass.getInstance().lock()
 		eRCInput.getInstance().lock()
 
 		Screen.__init__(self, session)
@@ -859,6 +883,7 @@ class HbbTVWindow(Screen, InfoBarNotifications):
 			if self._cb_closed_func is not None:
 				self._cb_closed_func()
 		except: pass
+		fbClass.getInstance().unlock()
 		eRCInput.getInstance().unlock()
 		self.close()
 
@@ -1046,6 +1071,35 @@ class HbbTVHelper(Screen):
 			return ret.strip() != "0"
 		except Exception, ErrMsg:
 			print "Check Browser Running ERR :", ErrMsg
+		return False
+
+	def doChangeChannel(self, _sid, _tsid):
+		root = eServiceReference(service_types_tv)
+		if root is None:
+			return False
+		serviceList = eServiceCenter.getInstance().list(root)
+		if serviceList is None:
+			return False	
+		while True:
+			service = serviceList.getNext()
+			if service is None or not service.valid():
+				break
+
+			#1:0:19:2840:3FB:1:C00000:0:0:0:
+			serviceRef = service.toString()
+			if strIsEmpty(serviceRef):
+				continue
+			serviceRefItems = serviceRef.split(":")
+			if len(serviceRefItems) < 5:
+				continue
+
+			sid  = serviceRefItems[3]
+			tsid = serviceRefItems[4]
+			if sid == _sid and tsid == _tsid:
+				self._session.nav.playService(eServiceReference(serviceRef))
+				service = self._session.nav.getCurrentlyPlayingServiceReference()
+				setBeforeService(service)
+				return True
 		return False
 
 class OperaBrowserSetting:
@@ -1585,7 +1639,6 @@ class BrowserHelpWindow(Screen, HelpableScreen):
 	def keyBlue(self):
 		self.setHelpModeActions(self.MODE_KEYBOARD)
 
-_g_helper = None
 class OperaBrowser(Screen):
 	MENUBAR_ITEM_WIDTH  = 150
 	MENUBAR_ITEM_HEIGHT = 30
@@ -1733,6 +1786,7 @@ class OperaBrowser(Screen):
 		self._on_setPageTitle('Opera Browser')
 		self.enableRCMouse(False)
 		self.toggleMainScreen()
+		fbClass.getInstance().unlock()
 		eRCInput.getInstance().unlock()
 		self._terminatedBrowser = True
 		self._enableKeyEvent = True
@@ -1759,6 +1813,7 @@ class OperaBrowser(Screen):
 			command_server.onHbbTVCloseCB.append(self._on_close_window)
 		self.toggleMainScreen()
 		self.enableRCMouse(True)
+		fbClass.getInstance().lock()
 		eRCInput.getInstance().lock()
 		command_util = getCommandUtil()
 		command_util.sendCommand('OP_BROWSER_OPEN_URL', data)
@@ -1917,6 +1972,7 @@ class OperaBrowser(Screen):
 	def keyCancel(self):
 		if not self._terminatedBrowser:
 			#self._session.openWithCallback(self._cb_virtualKeyboardClosed, VirtualKeyBoard, title=("Please enter URL here"), text="")
+			fbClass.getInstance().lock()
 			eRCInput.getInstance().lock()
 			if self.toggleListViewFlag:
 				self.toggleMainScreen()
@@ -1954,6 +2010,7 @@ def auto_start_main(reason, **kwargs):
 		command_server.stop()
 
 def session_start_main(session, reason, **kwargs):
+	fbClass.getInstance().unlock()
 	eRCInput.getInstance().unlock()
 	global _g_helper
 	_g_helper = session.open(HbbTVHelper)
