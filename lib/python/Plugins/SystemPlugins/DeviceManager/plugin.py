@@ -1669,8 +1669,8 @@ def autostart(reason, **kwargs):
 		devicemanagerhotplug.umountOnShutdown()
 
 def menu(menuid, **kwargs):
-	if menuid == "harddisk":
-		return [(_("DeviceManager"), main, "device_manager", 1)]
+	if menuid == "system":
+		return [(_("DeviceManager"), main, "device_manager", 50)]
 	return []
 
 def main(session, **kwargs):
