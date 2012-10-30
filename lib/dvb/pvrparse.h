@@ -61,6 +61,9 @@ public:
 		   optionall, return next element. Offset will be returned. this allows you to easily 
 		   get previous and next structure elements. */
 	int getStructureEntry(off_t &offset, unsigned long long &data, int get_next);
+	int getStructureEntry_next(off_t &offset, unsigned long long &data);
+	int getStructureEntry_prev(off_t &offset, unsigned long long &data);
+	int update_structure_cache_entries(off_t offset);
 
 	std::string m_filename;
 	int m_structure_cache_valid;

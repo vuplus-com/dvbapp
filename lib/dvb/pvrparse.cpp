@@ -421,9 +421,150 @@ int eMPEGStreamInformation::getStructureEntry(off_t &offset, unsigned long long 
 	if (!get_next)
 		--i;
 
-//	eDebug("[%d] looked for %llx, found %llx=%llx", sizeof offset, offset, m_structure_cache[i * 2], m_structure_cache[i * 2 + 1]);
+//	eDebug("[%d] looked for %lld, found %llu=%llx", sizeof offset, offset, m_structure_cache[i * 2], m_structure_cache[i * 2 + 1]);
 	offset = m_structure_cache[i * 2];
 	data = m_structure_cache[i * 2 + 1];
+	return 0;
+}
+
+int eMPEGStreamInformation::getStructureEntry_next(off_t &offset, unsigned long long &data)
+{
+	if (!m_structure_read)
+	{
+		eDebug("getStructureEntry failed because of no m_structure_read");
+		return -1;
+	}
+
+	off_t _offset = offset;
+	const int struture_cache_entries = sizeof(m_structure_cache) / 16;
+	if ((!m_structure_cache_valid) || ((off_t)m_structure_cache[0] > offset) || ((off_t)m_structure_cache[(struture_cache_entries - 1)*2] <= offset))
+	{
+		if(update_structure_cache_entries(_offset))
+		{
+			return -1;
+		}
+	}
+
+	int i = 0;
+	while ((off_t)m_structure_cache[i * 2] <= offset)
+	{
+		++i;
+		if (i == struture_cache_entries)
+		{
+			eDebug("structure data consistency fail!, we are looking for %llu, but last entry is %llu", offset, m_structure_cache[(struture_cache_entries-1)*2]);
+			return -1;
+		}
+	}
+	if (!i)
+	{
+		eDebug("structure data (first entry) consistency fail!");
+		return -1;
+	}
+
+//	eDebug("[%d] looked for %llu, found data %llu=%llx",sizeof offset, offset, m_structure_cache[i * 2], m_structure_cache[i * 2 + 1]);
+	offset = m_structure_cache[i * 2];
+	data = m_structure_cache[i * 2 + 1];
+	return 0;
+}
+
+int eMPEGStreamInformation::getStructureEntry_prev(off_t &offset, unsigned long long &data)
+{
+	if (!m_structure_read)
+	{
+		eDebug("getStructureEntry failed because of no m_structure_read");
+		return -1;
+	}
+
+	off_t _offset = offset;
+	const int struture_cache_entries = sizeof(m_structure_cache) / 16;
+	if ((!m_structure_cache_valid) || ((off_t)m_structure_cache[0] >= offset) || ((off_t)m_structure_cache[(struture_cache_entries - 1)*2] < offset))
+	{
+		if(update_structure_cache_entries(_offset))
+		{
+			return -1;
+		}
+	}
+
+	int i = struture_cache_entries-1;
+	while ((off_t)m_structure_cache[i * 2] >= offset)
+	{
+		if (i <= 0)
+		{
+			eDebug("structure data consistency fail!, we are looking for %llu, but last entry is %llu", offset, m_structure_cache[i * 2]);
+			return -1;
+		}
+		--i;
+	}
+	if (i == struture_cache_entries-1)
+	{
+		eDebug("structure data (first entry) consistency fail!");
+		return -1;
+	}
+
+//	eDebug("[%d] looked for %llu, found data %llu=%llx",sizeof offset, offset, m_structure_cache[i * 2], m_structure_cache[i * 2 + 1]);
+	offset = m_structure_cache[i * 2];
+	data = m_structure_cache[i * 2 + 1];
+	return 0;
+}
+
+int eMPEGStreamInformation::update_structure_cache_entries(off_t offset)
+{
+	const int struture_cache_entries = sizeof(m_structure_cache) / 16;
+	fseek(m_structure_read, 0, SEEK_END);
+	int l = ftell(m_structure_read);
+	unsigned long long d[2];
+	const int entry_size = sizeof d;
+
+		/* do a binary search */
+	int count = l / entry_size;
+	int i = 0;
+
+	while (count)
+	{
+		int step = count >> 1;
+		fseek(m_structure_read, (i + step) * entry_size, SEEK_SET);
+		if (!fread(d, 1, entry_size, m_structure_read))
+		{
+			eDebug("read error at entry %d", i);
+			return -1;
+		}
+#if BYTE_ORDER != BIG_ENDIAN
+		d[0] = bswap_64(d[0]);
+		d[1] = bswap_64(d[1]);
+#endif
+//		eDebug("%d: %08llx > %llx", i, d[0], d[1]);
+		if (d[0] < (unsigned long long)offset)
+		{
+			i += step + 1;
+			count -= step + 1;
+		} else
+			count = step;
+	}
+	eDebug("found %d", i);
+
+	/* put that in the middle */
+	i -= struture_cache_entries / 2;
+	if (i < 0)
+		i = 0;
+	eDebug("cache starts at %d", i);
+	fseek(m_structure_read, i * entry_size, SEEK_SET);
+	int num = fread(m_structure_cache, entry_size, struture_cache_entries, m_structure_read);
+	eDebug("%d entries", num);
+	for (i = 0; i < struture_cache_entries; ++i)
+	{
+		if (i < num)
+		{
+#if BYTE_ORDER != BIG_ENDIAN
+			m_structure_cache[i * 2] = bswap_64(m_structure_cache[i * 2]);
+			m_structure_cache[i * 2 + 1] = bswap_64(m_structure_cache[i * 2 + 1]);
+#endif
+		} else
+		{
+			m_structure_cache[i * 2] = 0x7fffffffffffffffULL; /* fill with harmless content */
+			m_structure_cache[i * 2 + 1] = 0x7fffffffffffffffULL;
+		}
+	}
+	m_structure_cache_valid = 1;
 	return 0;
 }
 

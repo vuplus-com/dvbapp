@@ -1352,8 +1352,9 @@ static inline long long align_with_len(long long x, int align, size_t &len)
 	if (sign)
 		x = -x;
 
-	x -= x % align;
-	len += x % align;
+	int r = x % align;
+	x -= r;
+	len += r;
 
 	if (sign)
 		x = -x;
@@ -1382,13 +1383,13 @@ void eDVBChannel::getNextSourceSpan(off_t current_offset, size_t bytes_read, off
 		max = align(m_skipmode_n, blocksize);
 	}
 
-	eDebug("getNextSourceSpan, current offset is %08llx, m_skipmode_m = %d!", current_offset, m_skipmode_m);
+	eDebug("getNextSourceSpan, current offset is %08lld, m_skipmode_m = %d!", current_offset, m_skipmode_m);
 	int frame_skip_success = 0;
 
 	if (m_skipmode_m)
 	{
 		int frames_to_skip = m_skipmode_frames + m_skipmode_frames_remainder;
-		eDebug("we are at %llx, and we try to skip %d+%d frames from here", current_offset, m_skipmode_frames, m_skipmode_frames_remainder);
+		eDebug("we are at %lld, and we try to skip %d+%d frames from here", current_offset, m_skipmode_frames, m_skipmode_frames_remainder);
 		size_t iframe_len;
 		off_t iframe_start = current_offset;
 		int frames_skipped = frames_to_skip;
@@ -1409,20 +1410,24 @@ void eDVBChannel::getNextSourceSpan(off_t current_offset, size_t bytes_read, off
 	if (!frame_skip_success)
 	{
 		current_offset += align(m_skipmode_m, blocksize);
-		
-		if (m_skipmode_m)
+		if(current_offset < 0)
+			current_offset = 0;
+		else
 		{
-			eDebug("we are at %llx, and we try to find the iframe here:", current_offset);
-			size_t iframe_len;
-			off_t iframe_start = current_offset;
-			
-			int direction = (m_skipmode_m < 0) ? -1 : +1;
-			if (m_tstools.findFrame(iframe_start, iframe_len, direction))
-				eDebug("failed");
-			else
+			if (m_skipmode_m)
 			{
-				current_offset = align_with_len(iframe_start, blocksize, iframe_len);
-				max = align(iframe_len, blocksize);
+				eDebug("we are at %lld, and we try to find the iframe here:", current_offset);
+				size_t iframe_len;
+				off_t start_offset = current_offset;
+				off_t new_offset = start_offset;
+				int direction = (m_skipmode_m < 0) ? -1 : +1;
+				if (m_tstools.findFrame(start_offset, new_offset, iframe_len, direction))
+					eDebug("failed");
+				else
+				{
+					current_offset = align_with_len(new_offset, blocksize, iframe_len);
+					max = align(iframe_len, blocksize);
+				}
 			}
 		}
 	}
@@ -1580,18 +1585,19 @@ void eDVBChannel::getNextSourceSpan(off_t current_offset, size_t bytes_read, off
 		}
 	}
 
+	if(current_offset <0)
+		current_offset =0;
 	if ((current_offset < -m_skipmode_m) && (m_skipmode_m < 0))
 	{
 		eDebug("reached SOF");
 		m_skipmode_m = 0;
 		m_pvr_thread->sendEvent(eFilePushThread::evtUser);
 	}
-
 	if (m_source_span.empty())
 	{
 		start = current_offset;
 		size = max;
-		eDebug("NO CUESHEET. (%08llx, %zd)", start, size);
+		eDebug("NO CUESHEET. (%08lld, %zd)", start, size);
 	} else
 	{
 		start = current_offset;

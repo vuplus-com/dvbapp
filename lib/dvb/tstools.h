@@ -74,7 +74,7 @@ public:
 	
 	return values are the new offset, the length of the found frame (both unaligned), and the (signed) 
 	number of frames skipped. */
-	int findFrame(off_t &offset, size_t &len, int &direction, int frame_types = frametypeI);
+	int findFrame(off_t &_iframe_offset, off_t &offset, size_t &len, int &direction, int frame_types = frametypeI);
 	int findNextPicture(off_t &offset, size_t &len, int &distance, int frame_types = frametypeAll);
 private:
 	int m_pid;
