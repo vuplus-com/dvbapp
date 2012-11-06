@@ -9,6 +9,7 @@ from Screens.VirtualKeyBoard import VirtualKeyBoard
 from Screens.HelpMenu import HelpableScreen
 from Screens.ChannelSelection import service_types_tv
 
+from Components.Language import language
 from Components.PluginComponent import plugins
 from Components.Button import Button
 from Components.Sources.StaticText import StaticText
@@ -1106,30 +1107,37 @@ class OperaBrowserSetting:
 	def __init__(self):
 		self._settingFileName = '/usr/local/hbb-browser/home/setting.ini'
 		self._start = None
+		self._type  = None
 		self._read()
 	def _read(self):
 		f = open(self._settingFileName)
 		for line in f.readlines():
 			if line.startswith('start='):
-				self._start = line[6:len(line)-1]
+				tmp = line[6:len(line)-1].split()
+				self._start = tmp[0]
+				if len(tmp) > 1:
+					self._type = int(tmp[1])
+				else:	self._type = 0
 		f.close()
 	def _write(self):
 		tmpstr = []
-		tmpstr.append('start=%s\n' % (self._start))
+		tmpstr.append('start=%s %d\n' % (self._start, self._type))
 		f = open(self._settingFileName, 'w')
 		f.writelines(tmpstr)
 		f.close()
-	def setData(self, start):
+	def setData(self, start, types=0):
 		self._start = start
+		self._type = types
 		self._write()
 	def getData(self):
 		return {
-			'start':self._start
+			'start':self._start,
+			'type':self._type,
 		}
 
 class OperaBrowserPreferenceWindow(ConfigListScreen, Screen):
 	skin=   """
-		<screen position="center,center" size="600,350" title="Proference">
+		<screen position="center,center" size="600,350" title="Preference">
 			<widget name="url" position="5,0" size="590,100" valign="center" font="Regular;20" />
 			<widget name="config" position="0,100" size="600,200" scrollbarMode="showOnDemand" />
 
@@ -1167,7 +1175,9 @@ class OperaBrowserPreferenceWindow(ConfigListScreen, Screen):
 
 	def layoutFinished(self):
 		try:
-			self._startPageUrl = OperaBrowserSetting().getData()['start']
+			d = OperaBrowserSetting().getData()
+			self._startPageUrl = d['start']
+			#d['type']
 		except: self._startPageUrl = 'http://vuplus.com'
 		self.updateStartPageUrl()
 
@@ -1184,7 +1194,10 @@ class OperaBrowserPreferenceWindow(ConfigListScreen, Screen):
 		if strIsEmpty(url):
 			self.session.open(MessageBox, 'Invalid URL!!(Empty)\nPlease, Input to the URL.', type = MessageBox.TYPE_INFO)
 			return
-		OperaBrowserSetting().setData(url)
+		mode = 0
+		if url.find('/usr/local/manual') > 0:
+			mode = 1
+		OperaBrowserSetting().setData(url, mode)
 		self.close()
 
 	def keyRed(self):
@@ -1335,7 +1348,7 @@ class BookmarkEditWindow(ConfigListScreen, Screen):
 				if strIsEmpty(bookmarkUrl):
 					self["config"].setCurrentIndex(1)
 					return self.showMessageBox("Bookmark URL")
-				self.mBookmarkManager.addBookmark(bookmarkTitle, bookmarkUrl, self.mData.mParent)
+				self.mBookmarkManager.addBookmark(bookmarkTitle, bookmarkUrl, self.mData.mParent, 0)
 			else:
 				if strIsEmpty(self.menuItemTitle.value):
 					self["config"].setCurrentIndex(0)
@@ -1469,7 +1482,7 @@ class OperaBrowserBookmarkWindow(Screen):
 			if ret is None: return
 			if ret:
 				data = self["bookmarklist"].getCurrent()[1]
-				OperaBrowserSetting().setData(data.mUrl)
+				OperaBrowserSetting().setData(data.mUrl, data.mType)
 		msg = "Do you want to set selected url to the Startpage?"
 		self.mSession.openWithCallback(cbSetStartpage, MessageBox, msg, MessageBox.TYPE_YESNO, default=True)
 
@@ -1483,7 +1496,7 @@ class OperaBrowserBookmarkWindow(Screen):
 					return
 				if strIsEmpty(self.mTitle):
 					return
-				retAdd = self.mBookmarkManager.addBookmark(self.mTitle, self.mUrl, parent.mId)
+				retAdd = self.mBookmarkManager.addBookmark(self.mTitle, self.mUrl, parent.mId, 0)
 				if not retAdd:
 					msg = "Current page is already exist."
 					self.mSession.open(MessageBox, msg, MessageBox.TYPE_INFO)
@@ -1492,7 +1505,7 @@ class OperaBrowserBookmarkWindow(Screen):
 				parent = self.getParentCategory()
 				if parent is None:
 					return
-				b = BookmarkData(0, '', '', parent.mId)
+				b = BookmarkData(0, '', '', parent.mId, 0)
 				self.mSession.openWithCallback(self.cbEditWindow, BookmarkEditWindow, 'Add', BookmarkEditWindow.BOOKMARK, b, self.mBookmarkManager)
 			elif data[1] == 3:
 				c = CategoryData(0, '')
@@ -1526,7 +1539,14 @@ class OperaBrowserBookmarkWindow(Screen):
 		if len(url) == 0:
 			self.session.open(MessageBox, "Can't open selected bookmark.\n   - URL data is empty!!", type = MessageBox.TYPE_INFO)
 			return
-		self.close(url)
+		mode = data.mType
+		if mode:
+			lang = language.getLanguage()
+			if lang == 'ru_RU' and os.path.exists('/usr/local/manual/ru_RU'):
+				url = '/usr/local/manual/ru_RU/main.html'
+			elif lang == 'de_DE' and os.path.exists('/usr/local/manual/de_DE'):
+				url = '/usr/local/manual/de_DE/main.html'
+		self.close((url, mode))
 	def keyRed(self):
 		self.keyCancel()
 	def keyCancel(self):
@@ -1792,6 +1812,7 @@ class OperaBrowser(Screen):
 		self._enableKeyEvent = True
 		#if not self.toggleListViewFlag:
 		#	self.keyDown()
+		self._currentPageUrl = ''
 		self.keyRight()
 		self.keyLeft()
 
@@ -1801,8 +1822,8 @@ class OperaBrowser(Screen):
 			return
 		self.setTitle(title)
 
-	def cbUrlText(self, data=None):
-		print "Inputed Url :", data
+	def cbUrlText(self, data=None, mode=0):
+		print "Inputed Url :", data, mode
 		if strIsEmpty(data):
 			return
 		#self.hideSubmenu()
@@ -1816,7 +1837,7 @@ class OperaBrowser(Screen):
 		fbClass.getInstance().lock()
 		eRCInput.getInstance().lock()
 		command_util = getCommandUtil()
-		command_util.sendCommand('OP_BROWSER_OPEN_URL', data)
+		command_util.sendCommand('OP_BROWSER_OPEN_URL', data, mode)
 		self._terminatedBrowser = False
 		self._enableKeyEvent = False
 
@@ -1826,7 +1847,8 @@ class OperaBrowser(Screen):
 	def _cb_bookmarkWindowClosed(self, data=None):
 		if data is None:
 			return
-		self.cbUrlText(data)
+		(url, mode) = data
+		self.cbUrlText(url, mode)
 
 	def _cmd_on_OpenUrl(self):
 		global _g_helper
@@ -1863,11 +1885,14 @@ class OperaBrowser(Screen):
 			message = "Opera Browser was not running.\nPlease running browser using [File]>[Start/Stop] menu."
 			self.session.open(MessageBox, message, MessageBox.TYPE_INFO)
 			return
+		mode = 0
 		start = 'http://vuplus.com'
 		try:
-			start = OperaBrowserSetting().getData()['start']
+			d = OperaBrowserSetting().getData()
+			start = d['start']
+			mode = d['type']
 		except: pass
-		self.cbUrlText(start)
+		self.cbUrlText(start, mode)
 	def _cmd_on_ReturnToBrowser(self):
 		self.keyCancel()
 

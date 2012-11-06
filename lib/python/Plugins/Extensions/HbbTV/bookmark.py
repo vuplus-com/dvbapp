@@ -1,11 +1,12 @@
 class BookmarkData:
-	def __init__(self, _id, _title, _url, _parent):
+	def __init__(self, _id, _title, _url, _parent, _type):
 		self.mId 	= _id
 		self.mTitle 	= _title
 		self.mUrl 	= _url
 		self.mParent 	= _parent
+		self.mType	= _type
 	def dump(self, _intent='  '):
-		print "%s-> %d, %s, %s, %d" % (_intent, self.mId, self.mTitle, self.mUrl, self.mParent)
+		print "%s-> %d, %s, %s, %d, %d" % (_intent, self.mId, self.mTitle, self.mUrl, self.mParent, self.mType)
 
 class CategoryData:
 	def __init__(self, _id, _name):
@@ -118,13 +119,20 @@ class BookmarkManager(SimpleConfigParser):
 		SimpleConfigParser.__init__(self)
 
 		self.mBookmarkRoot = None
-		self.mDebugEnable = False
+		self.mDebugEnable = True
 
 		import os
 		if not os.path.exists(_dbFileName):
+			f = file('/proc/stb/info/vumodel')
+			model = f.read().strip()
+			f.close()
+			manualmode = (model == "solo2" or model == "duo2")
+
 			os.system('echo "[__SYS__]" > %s'%(_dbFileName))
 			os.system('echo "category_current_idx = 1" >> %s'%(_dbFileName))
-			os.system('echo "bookmark_current_idx = 1" >> %s'%(_dbFileName))
+			if manualmode :
+				os.system('echo "bookmark_current_idx = 2" >> %s'%(_dbFileName))
+			else:	os.system('echo "bookmark_current_idx = 1" >> %s'%(_dbFileName))
 			os.system('echo "[c-1]" >> %s'%(_dbFileName))
 			os.system('echo "id = 1" >> %s'%(_dbFileName))
 			os.system('echo "name = My favorite" >> %s'%(_dbFileName))
@@ -133,7 +141,14 @@ class BookmarkManager(SimpleConfigParser):
 			os.system('echo "id = 1" >> %s'%(_dbFileName))
 			os.system('echo "parent = 1" >> %s'%(_dbFileName))
 			os.system('echo "title = Vuplus Home" >> %s'%(_dbFileName))
-
+			os.system('echo "type = 0" >> %s'%(_dbFileName))
+			if manualmode :
+				os.system('echo "[b-2]" >> %s'%(_dbFileName))
+				os.system('echo "url = file:///usr/local/manual/main.html" >> %s'%(_dbFileName))
+				os.system('echo "id = 2" >> %s'%(_dbFileName))
+				os.system('echo "parent = 1" >> %s'%(_dbFileName))
+				os.system('echo "title = User Manual" >> %s'%(_dbFileName))
+				os.system('echo "type = 1" >> %s'%(_dbFileName))
 		self.init(_dbFileName)
 
 	def message(self, format, params=None):
@@ -151,18 +166,19 @@ class BookmarkManager(SimpleConfigParser):
 					return 'b-%d' % (self.mBookmarkRoot[key].mBookmarks[key2].mId)
 		return None
 
-	def addBookmark(self, _title, _url, _parent):
+	def addBookmark(self, _title, _url, _parent, _type):
 		if self.getBookmark(_title) is not None:
 			return False
 		i = self.mBookmarkCurrentIdx + 1
 		s = "b-%d" % (i,)
-		self.message("add bookmark : %s, %s, %d", (_title, _url, _parent,))
+		self.message("add bookmark : %s, %s, %d, %d", (_title, _url, _parent, _type,))
 
 		self.mConfig.add_section(s)
 		self.setNumber(s, 'id', i)
 		self.setString(s, 'title', _title)
 		self.setString(s, 'url', _url)
 		self.setNumber(s, 'parent', _parent)
+		self.setNumber(s, 'type', _type)
 		self.setNumber('__SYS__', 'bookmark_current_idx', i)
 		self._save()
 
@@ -177,10 +193,11 @@ class BookmarkManager(SimpleConfigParser):
 	def updateBookmark(self, _bookmark):
 		self.populate()
 		s = "b-%d" % (_bookmark.mId)
-		self.message("update bookmark : %s, %s, %d", (_bookmark.mTitle, _bookmark.mUrl, _bookmark.mParent,))
+		self.message("update bookmark : %s, %s, %d, %d", (_bookmark.mTitle, _bookmark.mUrl, _bookmark.mParent, _bookmark.mType,))
 		self.setString(s, 'title', _bookmark.mTitle)
 		self.setString(s, 'url', _bookmark.mUrl)
 		self.setNumber(s, 'parent', _bookmark.mParent)
+		self.setNumber(s, 'type', _bookmark.mType)
 		self._save()
 
 	def getCategory(self, _name):
@@ -246,8 +263,9 @@ class BookmarkManager(SimpleConfigParser):
 				t = self.getString(s, 'title')
 				u = self.getString(s, 'url')
 				p = self.getNumber(s, 'parent')
+				e = self.getNumber(s, 'type')
 				try:
-					categoryList[p].appendBookmark(BookmarkData(i, t, u, p))
+					categoryList[p].appendBookmark(BookmarkData(i, t, u, p, e))
 				except Exception, e: self._del(s)
 			bx += 1
 		for key in categoryList.iterkeys():
