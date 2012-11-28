@@ -1,0 +1,347 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR ORGANIZATION
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2012-11-20 18:20+KST\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: pygettext.py 1.5\n"
+
+
+#: plugin.py:856
+msgid "HbbTV Plugin"
+msgstr ""
+
+#: plugin.py:969
+msgid ""
+"HbbTV Browser was not running.\n"
+"Please running browser before start HbbTV Application."
+msgstr ""
+
+#: plugin.py:1041
+msgid "No detected HbbTV applications."
+msgstr ""
+
+#: plugin.py:1042
+msgid "Please choose an HbbTV application."
+msgstr ""
+
+#: plugin.py:1053
+msgid "Stop"
+msgstr ""
+
+#: plugin.py:1054
+msgid "Start"
+msgstr ""
+
+#: plugin.py:1055
+msgid "Please choose one."
+msgstr ""
+
+#: plugin.py:1165 plugin.py:1280
+msgid "Cancel"
+msgstr ""
+
+#: plugin.py:1166 plugin.py:1281
+msgid "Save"
+msgstr ""
+
+#: plugin.py:1178 plugin.py:1693 plugin.py:1922
+msgid "Preference"
+msgstr ""
+
+#: plugin.py:1197
+msgid ""
+"Invalid URL!!(Empty)\n"
+"Please, Input to the URL."
+msgstr ""
+
+#: plugin.py:1214 plugin.py:1870
+msgid "Please enter URL here"
+msgstr ""
+
+#: plugin.py:1226
+msgid "Start Page"
+msgstr ""
+
+#: plugin.py:1228
+msgid "Current Page"
+msgstr ""
+
+#: plugin.py:1229
+msgid "Direct Input"
+msgstr ""
+
+#: plugin.py:1231
+msgid "Startpage"
+msgstr ""
+
+#: plugin.py:1295 plugin.py:1446 plugin.py:1693 plugin.py:1921
+msgid "Bookmark"
+msgstr ""
+
+#: plugin.py:1300 plugin.py:1382
+msgid "Name"
+msgstr ""
+
+#: plugin.py:1303 plugin.py:1389
+msgid "Title"
+msgstr ""
+
+#: plugin.py:1305 plugin.py:1390
+msgid "Url"
+msgstr ""
+
+#: plugin.py:1309
+msgid ""
+"!!(Empty)\n"
+"Please, Input to the "
+msgstr ""
+
+#: plugin.py:1309
+msgid "Invalid "
+msgstr ""
+
+#: plugin.py:1333 plugin.py:1344 plugin.py:1435 plugin.py:1516 plugin.py:1519
+msgid "Add"
+msgstr ""
+
+#: plugin.py:1336 plugin.py:1340
+msgid "Category Name"
+msgstr ""
+
+#: plugin.py:1349 plugin.py:1357
+msgid "Bookmark Title"
+msgstr ""
+
+#: plugin.py:1352 plugin.py:1360
+msgid "Bookmark URL"
+msgstr ""
+
+#: plugin.py:1434 plugin.py:1581 plugin.py:1692 plugin.py:1916
+msgid "Exit"
+msgstr ""
+
+#: plugin.py:1436 plugin.py:1527 plugin.py:1528
+msgid "Edit"
+msgstr ""
+
+#: plugin.py:1437
+msgid "Delete"
+msgstr ""
+
+#: plugin.py:1438
+msgid "Set as Startpage"
+msgstr ""
+
+#: plugin.py:1485
+msgid "Invalid URL. Please check again!!"
+msgstr ""
+
+#: plugin.py:1493
+msgid "Do you want to set selected url to the Startpage?"
+msgstr ""
+
+#: plugin.py:1508
+msgid "Current page is already exist."
+msgstr ""
+
+#: plugin.py:1521 plugin.py:1522
+msgid "Direct Input(Bookmark)"
+msgstr ""
+
+#: plugin.py:1521 plugin.py:1522
+msgid "Direct Input(Category)"
+msgstr ""
+
+#: plugin.py:1522
+msgid "Currentpage(Bookmark)"
+msgstr ""
+
+#: plugin.py:1523
+msgid "Please choose."
+msgstr ""
+
+#: plugin.py:1538
+msgid "Do you want to delete the category and the bookmarks?"
+msgstr ""
+
+#: plugin.py:1539
+msgid "Do you want to delete the bookmark?"
+msgstr ""
+
+#: plugin.py:1547
+msgid ""
+"Can't open selected bookmark.\n"
+"   - URL data is empty!!"
+msgstr ""
+
+#: plugin.py:1582
+msgid "Global"
+msgstr ""
+
+#: plugin.py:1583
+msgid "Mouse"
+msgstr ""
+
+#: plugin.py:1584
+msgid "Keyboard"
+msgstr ""
+
+#: plugin.py:1602
+msgid "Browser Help"
+msgstr ""
+
+#: plugin.py:1612
+msgid "Exit the Opera browser."
+msgstr ""
+
+#: plugin.py:1615
+msgid "Show the Menu window."
+msgstr ""
+
+#: plugin.py:1618 plugin.py:1649
+msgid "Enter Key"
+msgstr ""
+
+#: plugin.py:1619
+msgid "Show the Virtual keyboard window."
+msgstr ""
+
+#: plugin.py:1620
+msgid "Backspace Key"
+msgstr ""
+
+#: plugin.py:1623
+msgid "Switch to keyboard/mouse mode."
+msgstr ""
+
+#: plugin.py:1628
+msgid "It will move the mouse pointer up."
+msgstr ""
+
+#: plugin.py:1629
+msgid "It will move the mouse pointer down."
+msgstr ""
+
+#: plugin.py:1630
+msgid "It will move the mouse pointer left."
+msgstr ""
+
+#: plugin.py:1631
+msgid "It will move the mouse pointer right."
+msgstr ""
+
+#: plugin.py:1634
+msgid "Left Mouse Button"
+msgstr ""
+
+#: plugin.py:1637
+msgid "Right Mouse Button"
+msgstr ""
+
+#: plugin.py:1638 plugin.py:1645
+msgid "Left Key"
+msgstr ""
+
+#: plugin.py:1639 plugin.py:1646
+msgid "Right Key"
+msgstr ""
+
+#: plugin.py:1643
+msgid "Up Key"
+msgstr ""
+
+#: plugin.py:1644
+msgid "Down Key"
+msgstr ""
+
+#: plugin.py:1652
+msgid "PageUp Key"
+msgstr ""
+
+#: plugin.py:1653
+msgid "PageDown Key"
+msgstr ""
+
+#: plugin.py:1654
+msgid "Go to previous page."
+msgstr ""
+
+#: plugin.py:1655
+msgid "Go to next page."
+msgstr ""
+
+#: plugin.py:1692 plugin.py:1919
+msgid "Open URL"
+msgstr ""
+
+#: plugin.py:1692 plugin.py:1920
+msgid "Start/Stop"
+msgstr ""
+
+#: plugin.py:1692 plugin.py:1924
+msgid "Open Startpage"
+msgstr ""
+
+#: plugin.py:1694 plugin.py:1743 plugin.py:1917
+msgid "Help"
+msgstr ""
+
+#: plugin.py:1694 plugin.py:1918
+msgid "About"
+msgstr ""
+
+#: plugin.py:1741
+msgid "File"
+msgstr ""
+
+#: plugin.py:1742
+msgid "Tools"
+msgstr ""
+
+#: plugin.py:1748 plugin.py:1872
+msgid "Opera Web Browser Plugin v1.0"
+msgstr ""
+
+#: plugin.py:1749
+msgid "BrowserMain"
+msgstr ""
+
+#: plugin.py:1768 plugin.py:1923
+msgid "Return"
+msgstr ""
+
+#: plugin.py:1817
+msgid "Opera Browser"
+msgstr ""
+
+#: plugin.py:1867 plugin.py:1896
+msgid ""
+"Opera Browser was not running.\n"
+"Please running browser using [File]>[Start/Stop] menu."
+msgstr ""
+
+#: plugin.py:2083
+msgid "HbbTV Applications"
+msgstr ""
+
+#: plugin.py:2084
+msgid "Browser Start/Stop"
+msgstr ""
+
+#: plugin.py:2085
+msgid "Opera Web Browser"
+msgstr ""
+
+#: plugin.py:2085
+msgid "start opera web browser"
+msgstr ""
+
