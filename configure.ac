@@ -195,6 +195,7 @@ lib/python/Plugins/Extensions/DLNABrowser/Makefile
 lib/python/Plugins/Extensions/DLNABrowser/meta/Makefile
 lib/python/Plugins/Extensions/HbbTV/Makefile
 lib/python/Plugins/Extensions/HbbTV/meta/Makefile
+lib/python/Plugins/Extensions/HbbTV/locale/Makefile
 lib/python/Plugins/SystemPlugins/CleanupWizard/Makefile
 lib/python/Plugins/SystemPlugins/CleanupWizard/meta/Makefile
 lib/python/Plugins/SystemPlugins/CommonInterfaceAssignment/Makefile
