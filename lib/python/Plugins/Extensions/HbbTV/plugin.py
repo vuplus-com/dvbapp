@@ -350,9 +350,12 @@ class StreamServer:
 class ServerFactory:
 	def doListenUnixTCP(self, name, handler):
 		def destroy(name):
-			if os.path.exists(name):
-				os.unlink(name)
-				print "Removed ", name
+			import os
+			try:
+				if os.path.exists(name):
+					os.unlink(name)
+					print "Removed ", name
+			except: pass
 		destroy(name)
 
 		params = SocketParams()
