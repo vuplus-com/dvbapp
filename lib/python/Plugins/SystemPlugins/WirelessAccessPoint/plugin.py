@@ -523,9 +523,12 @@ class WirelessAccessPoint(Screen,ConfigListScreen):
 		sysctlList = {}
 		for line in sysctlLines:
 			line = line.strip()
-			(key,value) = line.split("=")
-			key=key.strip()
-			value=value.strip()
+			try:
+				(key,value) = line.split("=")
+				key=key.strip()
+				value=value.strip()
+			except:
+				continue
 			sysctlList[key] = value
 		sysctlList["net.ipv4.ip_forward"] = str(setValue)
 		fp = file(sysctlPath, "w")
