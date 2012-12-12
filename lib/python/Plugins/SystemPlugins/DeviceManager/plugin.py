@@ -1455,11 +1455,13 @@ class deviceManagerHotplug:
 
 	def doUmount(self, device, mountpoint):
 		devpath = "/dev/"+device
-		if len(deviceinfo.checkMountDev(devpath)) == 0:
+		mountpoints = deviceinfo.checkMountDev(devpath)
+		if len(mountpoints) == 0:
 			return
-		cmd = "umount %s"%devpath
-		print "[DeviceManager] cmd : %s"%cmd
-		os.system(cmd)
+		for mp in mountpoints:
+			cmd = "umount %s"%devpath
+			print "[DeviceManager] cmd : %s"%cmd
+			os.system(cmd)
 
 	def addHotPlugDevice(self, partition):
 		device = partition.device
