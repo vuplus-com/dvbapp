@@ -577,7 +577,7 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 			self.emptyListMsgTimer.start(100,True)
 		else:
 			for ap in Iwscanresult:
-				if ap.essid not in self.apList and len(ap.essid) > 0:
+				if ap.essid is not None and ap.essid not in self.apList and len(ap.essid) > 0:
 					self.apList.append(ap.essid)
 		self.apList.append('Input hidden ESSID')
 		if selectap is not None and selectap in self.apList:
