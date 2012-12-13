@@ -879,11 +879,14 @@ class DeviceFormat(Screen):
 		self.onLayoutFinish.append(self.timerStart)
 		self.formatStartTimer = eTimer()
 		self.formatStartTimer.callback.append(self.DeviceFormatStart)
+		self.setHotplugDisabled = False
 
 	def timerStart(self):
 		self.formatStartTimer.start(100,True)
 
 	def DeviceFormatStart(self):
+		devicemanagerhotplug.setHotplugActive(False)
+		self.setHotplugDisabled = True
 		print "DeviceFormatStart : ", self.partition,
 		print "Filesystem : ",self.newfstype
 		device = self.partition["partition"]
@@ -1010,6 +1013,9 @@ class DeviceFormat(Screen):
 			self.session.openWithCallback(self.exit, MessageBox, msg, MessageBox.TYPE_ERROR, timeout = 10)
 
 	def exit(self, ret):
+		if self.setHotplugDisabled == True:
+			devicemanagerhotplug.setHotplugActive(True)
+			self.setHotplugDisabled = False
 		self.close()
 
 #device format end
@@ -1413,6 +1419,12 @@ devicemanagerconfig = DeviceManagerConfig()
 class deviceManagerHotplug:
 	def __init__(self):
 		self.hotplugActive = True
+
+	def setHotplugActive(self,value=True):
+		if value:
+			self.hotplugActive = True
+		else:
+			self.hotplugActive = False
 
 	def printDebug(self):
 		for p in harddiskmanager.partitions:
