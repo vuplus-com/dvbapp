@@ -271,9 +271,9 @@ lib/python/Plugins/SystemPlugins/ZappingModeSelection/meta/Makefile
 lib/python/Plugins/SystemPlugins/DeviceManager/Makefile
 lib/python/Plugins/SystemPlugins/DeviceManager/meta/Makefile
 lib/python/Plugins/SystemPlugins/DeviceManager/locale/Makefile
-lib/python/Plugins/SystemPlugins/TransCordingSetup/Makefile
-lib/python/Plugins/SystemPlugins/TransCordingSetup/meta/Makefile
-lib/python/Plugins/SystemPlugins/TransCordingSetup/locale/Makefile
+lib/python/Plugins/SystemPlugins/TransCodingSetup/Makefile
+lib/python/Plugins/SystemPlugins/TransCodingSetup/meta/Makefile
+lib/python/Plugins/SystemPlugins/TransCodingSetup/locale/Makefile
 lib/python/Tools/Makefile
 lib/service/Makefile
 lib/components/Makefile

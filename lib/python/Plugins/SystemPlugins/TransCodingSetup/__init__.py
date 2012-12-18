@@ -2,8 +2,8 @@ from Components.Language import language
 from Tools.Directories import resolveFilename, SCOPE_PLUGINS, SCOPE_LANGUAGE
 import os,gettext
 
-PluginLanguageDomain = "TransCordingSetup"
-PluginLanguagePath = "SystemPlugins/TransCordingSetup/locale"
+PluginLanguageDomain = "TransCodingSetup"
+PluginLanguagePath = "SystemPlugins/TransCodingSetup/locale"
 
 def localeInit():
 	lang = language.getLanguage()[:2]

@@ -1,4 +1,4 @@
-PLUGIN = TransCordingSetup
+PLUGIN = TransCodingSetup
 LANGS = de
 
 CATEGORY ?= "SystemPlugins"

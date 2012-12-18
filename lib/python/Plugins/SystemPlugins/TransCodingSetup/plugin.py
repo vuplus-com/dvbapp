@@ -10,9 +10,9 @@ from enigma import eTimer
 from os import system as os_system
 from __init__ import _
 
-config.plugins.transcordingsetup = ConfigSubsection()
-config.plugins.transcordingsetup.transcording = ConfigSelection(default = "disabled", choices = [ ("enabled", _("enabled")), ("disabled", _("disabled"))] )
-config.plugins.transcordingsetup.port = ConfigSelection(default = "8002", choices = [ ("8001", "8001"), ("8002", "8002")] )
+config.plugins.transcodingsetup = ConfigSubsection()
+config.plugins.transcodingsetup.transcoding = ConfigSelection(default = "disabled", choices = [ ("enabled", _("enabled")), ("disabled", _("disabled"))] )
+config.plugins.transcodingsetup.port = ConfigSelection(default = "8002", choices = [ ("8001", "8001"), ("8002", "8002")] )
 
 error_msg ={
 	-1 : "File not exist - /proc/stb/encoder/enable.",
@@ -23,71 +23,69 @@ error_msg ={
 	-6 : "Set port error.",
 	-7 : "Setting value is incorrect."
 }
-class TranscordingSetupInit:
+class TranscodingSetupInit:
 	def __init__(self):
-		self.transcording_value = config.plugins.transcordingsetup.transcording.value
-		if self.transcording_value == "disabled":
+		self.transcoding_value = config.plugins.transcodingsetup.transcoding.value
+		if self.transcoding_value == "disabled":
 			self.port_value = "8002"
 		else:
-			self.port_value = config.plugins.transcordingsetup.port.value
-		self.transcording_old = config.plugins.transcordingsetup.transcording.value
-		ret = self.setTranscording(self.transcording_value, self.port_value)
+			self.port_value = config.plugins.transcodingsetup.port.value
+		self.transcoding_old = config.plugins.transcodingsetup.transcoding.value
+		ret = self.setTranscoding(self.transcoding_value, self.port_value)
 		if ret is not None and ret < 0:
-			print "[TranscordingSetup] setup failed!(%s, %s)"%(self.transcording_value, self.port_value)
+			print "[TranscodingSetup] set failed!(%s, %s)"%(self.transcoding_value, self.port_value)
 
-	def setTranscording(self, transcording, port):
+	def setTranscoding(self, transcoding, port):
 		if not self.getModel():
 			print "This plugin is only supported for solo2/duo2."
 			return -8
-		if transcording not in ["enabled","disabled"] or port not in ["8001","8002"]:
-			print "Input arg error.."
+		if transcoding not in ["enabled","disabled"] or port not in ["8001","8002"]:
+			print "Input error."
 			return -7
 		if not fileExists("/proc/stb/encoder/enable"):
 			return -1
 		elif not fileExists("/etc/inetd.conf"):
 			return -2
-		if self.setEncoder(transcording) < 0:
+		if self.setEncoder(transcoding) < 0:
 			return -5
 		res = self.setPort(port)
 		if res < 0:
-			self.setEncoder(self.transcording_old)
+			self.setEncoder(self.transcoding_old)
 			return res
 		else:
 			self.inetdRestart()
 		return res
 
 	def setEncoder(self,mode = "disabled"):
-		print "<TranscordingSetup> set encoder : %s" % mode
+		print "<TranscodingSetup> set encoder : %s" % mode
 		mode = mode.strip(' ').strip('\n')
 		try:
 			fd = open("/proc/stb/encoder/enable",'r')
-			self.transcording_old = fd.read()
+			self.transcoding_old = fd.read()
 			fd.close()
 			fd = open("/proc/stb/encoder/enable",'w')
 			fd.write(mode)
 			fd.close()
-			print "-->",mode
 			fd = open("/proc/stb/encoder/enable",'r')
 			encoder_enable = fd.read().strip(' ').strip('\n')
 			fd.close()
-			print "<--",encoder_enable
 			if encoder_enable == mode:
 				return 0
 			else:
-				print "can not setting.."
+#				print "<TranscodingSetup> can not setting."
 				return -1
 		except:
-			print "setEncoder exception error"
+#			print "setEncoder exception error"
 			return -1
 
 	def setPort(self, port = "8001"):
-		print "<TranscordingSetup> set port : %s" % port
+		print "<TranscodingSetup> set port : %s" % port
 		try:
 			fp = file('/etc/inetd.conf', 'r')
 			datas = fp.readlines()
 			fp.close()
 		except:
-			print "file open error, inetd.conf!"
+#			print "file open error, inetd.conf!"
 			return -4
 		try:
 			newdatas=""
@@ -130,9 +128,9 @@ class TranscordingSetupInit:
 		else:
 			return False
 
-class TranscordingSetup(Screen,ConfigListScreen, TranscordingSetupInit):
+class TranscodingSetup(Screen,ConfigListScreen, TranscodingSetupInit):
 	skin =  """
-		<screen position="center,center" size="560,270" title="Transcording Setup" >
+		<screen position="center,center" size="560,270" title="Transcoding Setup" >
 			<ePixmap pixmap="skin_default/buttons/red.png" position="110,10" size="140,40" alphatest="on" />
 			<ePixmap pixmap="skin_default/buttons/green.png" position="310,10" size="140,40" alphatest="on" />
 			<widget source="key_red" render="Label" position="110,10" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" foregroundColor="#ffffff" transparent="1" />
@@ -154,7 +152,7 @@ class TranscordingSetup(Screen,ConfigListScreen, TranscordingSetupInit):
 		}, -2)
 		self.list = []
 		ConfigListScreen.__init__(self, self.list,session = self.session)
-		TEXT = "Tanscoding can be started when there is no corresponding channel recordings."
+		TEXT = "Transcoding can be started when there is no corresponding channel recordings."
 		TEXT += "\nWhen transcoding, both PIP and analog video outputs are disabled."
 		self["key_red"] = StaticText(_("Cancel"))
 		self["key_green"] = StaticText(_("Ok"))
@@ -169,61 +167,61 @@ class TranscordingSetup(Screen,ConfigListScreen, TranscordingSetupInit):
 			self.checkModelTimer.start(1000,True)
 
 	def invalidmodel(self):
-			self.session.openWithCallback(self.close, MessageBox, _("This Plugin is available on SOLO2/DUO2"), MessageBox.TYPE_ERROR)
+			self.session.openWithCallback(self.close, MessageBox, _("This plugin is available on SOLO2/DUO2"), MessageBox.TYPE_ERROR)
 
 	def createSetup(self):
 		self.list = []
-		self.transcording = getConfigListEntry(_("Transcording"), config.plugins.transcordingsetup.transcording)
-		self.port = getConfigListEntry(_("Port"), config.plugins.transcordingsetup.port)
-		self.list.append( self.transcording )
-		if config.plugins.transcordingsetup.transcording.value == "enabled":
+		self.transcoding = getConfigListEntry(_("Transcoding"), config.plugins.transcodingsetup.transcoding)
+		self.port = getConfigListEntry(_("Port"), config.plugins.transcodingsetup.port)
+		self.list.append( self.transcoding )
+		if config.plugins.transcodingsetup.transcoding.value == "enabled":
 			self.list.append( self.port )
 		self["config"].list = self.list
 		self["config"].l.setList(self.list)
 
 	def keySave(self):
-		transcording = config.plugins.transcordingsetup.transcording.value
-		port = config.plugins.transcordingsetup.port.value
-		print "<ZappingModeSelection> Transcording %s(port : %s)"%(transcording, port)
-		ret = self.setupTranscording(transcording, port)
+		transcoding = config.plugins.transcodingsetup.transcoding.value
+		port = config.plugins.transcodingsetup.port.value
+		print "<TranscodingSetup> Transcoding %s(port : %s)"%(transcoding, port)
+		ret = self.setupTranscoding(transcoding, port)
 		if ret is not None and ret <0 :
 			self.resetConfig()
 			global error_msg
-			self.session.openWithCallback(self.close, MessageBox, _("Failed, Encoder %s\n(%s).")%(transcording, error_msg[ret]), MessageBox.TYPE_ERROR)
+			self.session.openWithCallback(self.close, MessageBox, _("Failed, Encoder %s\n(%s).")%(transcoding, error_msg[ret]), MessageBox.TYPE_ERROR)
 		else:
 			self.saveAll()
-			if transcording == "enabled" and port == "8001" :
+			if transcoding == "enabled" and port == "8001" :
 				text = "PC Streaming is replaced with mobile streaming."
-				self.session.openWithCallback(self.close, MessageBox, _("OK. Encoder %s.\n%s")%(transcording,text), MessageBox.TYPE_INFO)
+				self.session.openWithCallback(self.close, MessageBox, _("OK. Encoder %s.\n%s")%(transcoding,text), MessageBox.TYPE_INFO)
 			else:
-				self.session.openWithCallback(self.close, MessageBox, _("OK. Encoder %s.")%transcording, MessageBox.TYPE_INFO)
+				self.session.openWithCallback(self.close, MessageBox, _("OK. Encoder %s.")%transcoding, MessageBox.TYPE_INFO)
 			self.close()
 
 	def resetConfig(self):
 		for x in self["config"].list:
 			x[1].cancel()
 
-	def setupTranscording(self, transcording = None, port = None):
-		if transcording == "disabled":
-			config.plugins.transcordingsetup.port.value = "8002"
+	def setupTranscoding(self, transcoding = None, port = None):
+		if transcoding == "disabled":
+			config.plugins.transcodingsetup.port.value = "8002"
 			port = "8002"
-		return self.setTranscording(transcording, port)
+		return self.setTranscoding(transcoding, port)
 
 	def keyLeft(self):
 		ConfigListScreen.keyLeft(self)
-		if self["config"].getCurrent() == self.transcording:
+		if self["config"].getCurrent() == self.transcoding:
 			self.createSetup()
 
 	def keyRight(self):
 		ConfigListScreen.keyRight(self)
-		if self["config"].getCurrent() == self.transcording:
+		if self["config"].getCurrent() == self.transcoding:
 			self.createSetup()
 
 def main(session, **kwargs):
-	session.open(TranscordingSetup)
+	session.open(TranscodingSetup)
 
 def Plugins(**kwargs):
-	return [PluginDescriptor(name=_("TranscordingSetup"), description="Transcording Setup", where = PluginDescriptor.WHERE_PLUGINMENU, needsRestart = False, fnc=main)]
+	return [PluginDescriptor(name=_("TranscodingSetup"), description="Transcoding Setup", where = PluginDescriptor.WHERE_PLUGINMENU, needsRestart = False, fnc=main)]
 
-transcordingsetupinit = TranscordingSetupInit()
+transcodingsetupinit = TranscodingSetupInit()
 

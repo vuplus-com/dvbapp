@@ -7,7 +7,7 @@ SUBDIRS = SoftwareManager FrontprocessorUpgrade PositionerSetup Satfinder \
 	TempFanControl FactoryTest Fancontrol FPGAUpgrade WirelessLanSetup ManualFancontrol \
 	Blindscan RemoteControlCode UI3DSetup UIPositionSetup HDMICEC LEDBrightnessSetup \
 	FirmwareUpgrade CrashReport 3GModemManager WirelessAccessPoint ZappingModeSelection \
-	DeviceManager TransCordingSetup
+	DeviceManager TransCodingSetup
 
 install_PYTHON =	\
 	__init__.py
