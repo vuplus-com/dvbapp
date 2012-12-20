@@ -118,8 +118,11 @@ class SecConfigure:
 
 	def linkNIMs(self, sec, nim1, nim2):
 		print "link tuner", nim1, "to tuner", nim2
-		if nim2 == (nim1 - 1):
-			self.linkInternally(nim1)
+#		if nim2 == (nim1 - 1):
+#			self.linkInternally(nim1)
+#
+# for internally connect tuner A to B
+		self.linkInternally(nim1)
 		sec.setTunerLinked(nim1, nim2)
 		
 	def getRoot(self, slotid, connto):
