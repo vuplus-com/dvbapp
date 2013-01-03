@@ -522,6 +522,11 @@ class DeviceInit(Screen):
 		self.exitMessageTimer.callback.append(self.exitMessage)
 		self.msg = ""
 		self.fstype = None
+		self.mkfs_cmd = ""
+		self.doMkfsTimer = eTimer()
+		self.doMkfsTimer.callback.append(self.doMkfs)
+		self.doInitializeTimer = eTimer()
+		self.doInitializeTimer.callback.append(self.doInitialize)
 
 	def timerStart(self):
 		self.initStartTimer.start(100,True)
@@ -634,19 +639,22 @@ class DeviceInit(Screen):
 			for index in range(len(self.inputbox_partitionSizeList)):
 				msg += _("\npartition %d : %s MB")%(index+1, str(self.inputbox_partitionSizeList[index]))
 			self.msgWaiting = self.session.openWithCallback(self.msgWaitingCB, MessageBox_2, msg, type = MessageBox.TYPE_INFO, enable_input = False)
-			set = ""
-			partitions = len(self.inputbox_partitionSizeList)
-			if partitions == 1:
-				cmd = 'printf "8,\n;0,0\n;0,0\n;0,0\ny\n" | sfdisk -f -uS /dev/' + self.device
-			else:
-				for p in range(4):
-					if partitions > p+1:
-						set += ",%s\n"%(self.inputbox_partitionSizeList[p])
-					else:
-						set +=";\n"
-				set+="y\n"
-				cmd = 'printf "%s" | sfdisk -f -uM /dev/%s'%(set,self.device)
-			self.deviceInitConsole.ePopen(cmd, self.initInitializeFinished)
+			self.doInitializeTimer.start(500,True)
+
+	def doInitialize(self):
+		set = ""
+		partitions = len(self.inputbox_partitionSizeList)
+		if partitions == 1:
+			cmd = 'printf "8,\n;0,0\n;0,0\n;0,0\ny\n" | sfdisk -f -uS /dev/' + self.device
+		else:
+			for p in range(4):
+				if partitions > p+1:
+					set += ",%s\n"%(self.inputbox_partitionSizeList[p])
+				else:
+					set +=";\n"
+			set+="y\n"
+			cmd = 'printf "%s" | sfdisk -f -uM /dev/%s'%(set,self.device)
+		self.deviceInitConsole.ePopen(cmd, self.initInitializeFinished)
 
 	def initInitializeFinished(self, result, retval, extra_args = None):
 		if retval == 0:
@@ -716,7 +724,12 @@ class DeviceInit(Screen):
 		msg += _("\nFilesystem : %s") % (self.fstype)
 		msg += _("\nSize : %d MB\n")%int(self.inputbox_partitionSizeList[self.devicenumber-1])
 		self.msgWaitingMkfs = self.session.openWithCallback(self.msgWaitingMkfsCB, MessageBox_2, msg, type = MessageBox.TYPE_INFO, enable_input = False)
-		self.deviceInitConsole.ePopen(cmd, self.createFilesystemFinished, (self.device, fulldevicename))
+		self.mkfs_cmd = cmd
+		self.doMkfsTimer.start(500,True)
+
+	def doMkfs(self):
+		fulldevicename = "/dev/" + self.device + str(self.devicenumber)
+		self.deviceInitConsole.ePopen(self.mkfs_cmd, self.createFilesystemFinished, (self.device, fulldevicename))
 
 	def createFilesystemFinished(self, result, retval, extra_args = None):
 		device = extra_args[0]
@@ -777,6 +790,8 @@ class DeviceCheck(Screen):
 		self.onLayoutFinish.append(self.timerStart)
 		self.checkStartTimer = eTimer()
 		self.checkStartTimer.callback.append(self.confirmMessage)
+		self.umountTimer = eTimer()
+		self.umountTimer.callback.append(self.doUnmount)
 
 	def timerStart(self):
 		self.checkStartTimer.start(100,True)
@@ -800,7 +815,6 @@ class DeviceCheck(Screen):
 		print "deviceCheckStart "
 		print "partition : ", self.partition
 		device = self.partition["partition"]
-		mountpoint = self.partition["mountpoint"]
 		fstype = self.partition["fstype"]
 		fssize = self.partition["size"]
 		if device is not None and fstype.startswith("ext"):
@@ -808,12 +822,18 @@ class DeviceCheck(Screen):
 			msg += _("\nDevice : /dev/%s")%(device)
 			msg += _("\nFilesystem : %s")%(fstype)
 			self.msgWaiting = self.session.openWithCallback(self.msgWaitingCB, MessageBox_2, msg, type = MessageBox.TYPE_INFO, enable_input = False)
-			if mountpoint != "":
-				self.doUmountFsck(device, mountpoint, fstype)
-			else:
-				self.umountFsckFinished("NORESULT", 0, (device, mountpoint, fstype))
+			self.umountTimer.start(500,True)
 		else:
 			self.exit()
+
+	def doUnmount(self):
+		device = self.partition["partition"]
+		mountpoint = self.partition["mountpoint"]
+		fstype = self.partition["fstype"]
+		if mountpoint != "":
+			self.doUmountFsck(device, mountpoint, fstype)
+		else:
+			self.umountFsckFinished("NORESULT", 0, (device, mountpoint, fstype))
 
 	def doUmountFsck(self, device, mountpoint, fstype):
 		cmd = "umount /dev/%s" % device
@@ -880,6 +900,8 @@ class DeviceFormat(Screen):
 		self.formatStartTimer = eTimer()
 		self.formatStartTimer.callback.append(self.DeviceFormatStart)
 		self.setHotplugDisabled = False
+		self.umountTimer = eTimer()
+		self.umountTimer.callback.append(self.doUnmount)
 
 	def timerStart(self):
 		self.formatStartTimer.start(100,True)
@@ -891,15 +913,17 @@ class DeviceFormat(Screen):
 		print "Filesystem : ",self.newfstype
 		device = self.partition["partition"]
 		devicepath = "/dev/"+device
-		mountpoint = self.partition["mountpoint"]
 		fssize = self.partition["size"]
 		newfstype = self.newfstype
-
 		msg = _("Format filesystem, please wait ...")
 		msg += _("\nDevice : %s")%(devicepath)
 		msg += _("\nFilesystem : %s")%(newfstype)
 		msg += _("\nSize : %s")%(byteConversion(fssize))
-		self.msgWaiting = self.session.openWithCallback(self.msgWaitingCB, MessageBox_2, msg, type = MessageBox_2.TYPE_INFO, enable_input = False)
+		self.msgWaiting = self.session.openWithCallback(self.msgWaitingCB, MessageBox_2, msg, type = MessageBox_2.TYPE_INFO, enable_input = False, msgBoxID = None)
+		self.umountTimer.start(500,True)
+
+	def doUnmount(self):
+		mountpoint = self.partition["mountpoint"]
 		if mountpoint != "":
 			self.doumountPartition()
 		else:
