@@ -216,6 +216,7 @@ class OpCodeSet:
 			,"OP_BROWSER_VKBD_PASTE_MOUSE"	: 0x030D
 			,"OP_BROWSER_MENU_REQ"		: 0x030E
 			,"OP_BROWSER_MENU_RES"		: 0x030F
+			,"OP_BROWSER_NEED_RELOAD_KEYMAP": 0x0313
 			,"OP_DVBAPP_VOL_UP"		: 0x0401
 			,"OP_DVBAPP_VOL_DOWN"		: 0x0402
 			,"OP_SYSTEM_OUT_OF_MEMORY"	: 0x0501
@@ -251,6 +252,7 @@ class OpCodeSet:
 			,0x030D : "OP_BROWSER_VKBD_PASTE_MOUSE"
 			,0x030E : "OP_BROWSER_MENU_REQ"
 			,0x030F : "OP_BROWSER_MENU_RES"
+			,0x0313 : "OP_BROWSER_NEED_RELOAD_KEYMAP"
 			,0x0401 : "OP_DVBAPP_VOL_UP"
 			,0x0402 : "OP_DVBAPP_VOL_DOWN"
 			,0x0501	: "OP_SYSTEM_OUT_OF_MEMORY"
@@ -853,6 +855,9 @@ class HbbTVWindow(Screen, InfoBarNotifications):
 			print ErrMsg
 
 	def _serviceEOF(self):
+		(position,length) = self.getVodPlayTime()
+		self._ssm.setStatus(length, length, 1)
+		print "service EOF"
 		self._currentServicePositionTimer.stop()
 
 	def _layoutFinished(self):
@@ -1112,6 +1117,7 @@ class OperaBrowserSetting:
 		self._settingFileName = '/usr/local/hbb-browser/home/setting.ini'
 		self._start = None
 		self._type  = None
+		self._keymap = None
 		self._read()
 	def _read(self):
 		f = open(self._settingFileName)
@@ -1122,21 +1128,26 @@ class OperaBrowserSetting:
 				if len(tmp) > 1:
 					self._type = int(tmp[1])
 				else:	self._type = 0
+			elif line.startswith('keymap='):
+				self._keymap = line[7:len(line)-1]
 		f.close()
 	def _write(self):
 		tmpstr = []
 		tmpstr.append('start=%s %d\n' % (self._start, self._type))
+		tmpstr.append('keymap=%s\n' % (self._keymap))
 		f = open(self._settingFileName, 'w')
 		f.writelines(tmpstr)
 		f.close()
-	def setData(self, start, types=0):
+	def setData(self, start, types=0, keymap="us-rc"):
 		self._start = start
 		self._type = types
+		self._keymap = keymap
 		self._write()
 	def getData(self):
 		return {
 			'start':self._start,
 			'type':self._type,
+			'keymap':self._keymap,
 		}
 
 class OperaBrowserPreferenceWindow(ConfigListScreen, Screen):
@@ -1173,18 +1184,12 @@ class OperaBrowserPreferenceWindow(ConfigListScreen, Screen):
 		if self._currentPageUrl is None:
 			self._currentPageUrl = ''
 		self._startPageUrl   = None
-
+		self._keymapType = None
 		self.makeMenuEntry()
 		self.onLayoutFinish.append(self.layoutFinished)
 
 	def layoutFinished(self):
 		self.setTitle(_('Preference'))
-		try:
-			d = OperaBrowserSetting().getData()
-			self._startPageUrl = d['start']
-			#d['type']
-		except: self._startPageUrl = 'http://vuplus.com'
-		self.updateStartPageUrl()
 
 	def updateStartPageUrl(self):
 		if self.menuItemStartpage.value == "startpage":
@@ -1202,7 +1207,10 @@ class OperaBrowserPreferenceWindow(ConfigListScreen, Screen):
 		mode = 0
 		if url.find('/usr/local/manual') > 0:
 			mode = 1
-		OperaBrowserSetting().setData(url, mode)
+		self._keymapType = self.menuItemKeyboardLayout.value
+		OperaBrowserSetting().setData(url, mode, self._keymapType)
+		command_util = getCommandUtil()
+		command_util.sendCommand('OP_BROWSER_NEED_RELOAD_KEYMAP')
 		self.close()
 
 	def keyRed(self):
@@ -1224,6 +1232,16 @@ class OperaBrowserPreferenceWindow(ConfigListScreen, Screen):
 		ConfigListScreen.keyRight(self)
 		self.updateStartPageUrl()
 
+	def getKeymapTypeList(self):
+		types = []
+		for f in os.listdir("/usr/local/hbb-browser/keymap"):
+			filesplit = f.split('.')
+			if len(filesplit) < 2:
+				continue
+			types.append((filesplit[1], filesplit[1]))
+		types.sort()
+		return types
+
 	def makeMenuEntry(self):
 		l = []
 		l.append(("startpage", _("Start Page")))
@@ -1232,11 +1250,27 @@ class OperaBrowserPreferenceWindow(ConfigListScreen, Screen):
 		l.append(("direct", _("Direct Input")))
 		self.menuItemStartpage	= ConfigSelection(default="startpage", choices = l)
 		self.menuEntryStartpage	= getConfigListEntry(_("Startpage"), self.menuItemStartpage)
+
+		kl = self.getKeymapTypeList()
+
+		try:
+			d = OperaBrowserSetting().getData()
+			self._startPageUrl = d['start']
+			self._keymapType = d['keymap']
+			#d['type']
+		except: self._startPageUrl = 'http://vuplus.com'
+		self.updateStartPageUrl()
+
+		if self._keymapType is None or len(self._keymapType) == 0:
+			self._keymapType = "us-rc"
+		self.menuItemKeyboardLayout = ConfigSelection(default=self._keymapType, choices = kl)
+		self.menuEntryKeyboardLayout = getConfigListEntry(_("Keyboard Layout"), self.menuItemKeyboardLayout)
 		self.resetMenuList()
 
 	def resetMenuList(self):
 		self.menulist = []
 		self.menulist.append(self.menuEntryStartpage)
+		self.menulist.append(self.menuEntryKeyboardLayout)
 
 		self["config"].list = self.menulist
 		self["config"].l.setList(self.menulist)
