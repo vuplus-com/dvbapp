@@ -825,7 +825,7 @@ class MediaPlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarAudioSelection, InfoB
 	
 	def playEntry(self):
 		if len(self.playlist.getServiceRefList()):
-			audio_extensions = (".mp2", ".mp3", ".wav", ".ogg", "flac", "m4a")
+			audio_extensions = (".mp2", ".mp3", ".wav", ".ogg", ".flac", ".m4a", ".dts")
 			needsInfoUpdate = False
 			currref = self.playlist.getServiceRefList()[self.playlist.getCurrentIndex()]
 			if self.session.nav.getCurrentlyPlayingServiceReference() is None or currref != self.session.nav.getCurrentlyPlayingServiceReference():
@@ -838,7 +838,11 @@ class MediaPlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarAudioSelection, InfoB
 				currref = self.playlist.getServiceRefList()[idx]
 				text = self.getIdentifier(currref)
 				text = ">"+text
-				ext = text[-4:].lower()
+				try:
+					import os
+					nameext = os.path.splitext(text)
+					ext = nameext[1]
+				except: ext = text[-4:].lower()
 
 				# FIXME: the information if the service contains video (and we should hide our window) should com from the service instead 
 				if ext not in audio_extensions and not self.isAudioCD:
