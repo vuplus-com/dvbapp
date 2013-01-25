@@ -11,7 +11,8 @@ class ChoiceBox(Screen):
 		if isinstance(skin_name, str):
 			skin_name = [skin_name]
 		self.skinName = skin_name + ["ChoiceBox"] 
-
+		self.lcd_xres = None
+		self.lcd_xres=self.readlcdxres()
 		self["text"] = Label(title)
 		self.list = []
 		self.summarylist = []
@@ -121,14 +122,27 @@ class ChoiceBox(Screen):
 		pos = 0
 		summarytext = ""
 		for entry in self.summarylist:
-			if pos > curpos-2 and pos < curpos+5:
+			if self.lcd_xres is not None and self.lcd_xres > 140:
+				if pos > curpos-2 and pos < curpos+5:
+					if pos == curpos:
+						summarytext += ">"
+					else:
+						summarytext += entry[0]
+					summarytext += ' ' + entry[1] + '\n'
+			else:
 				if pos == curpos:
-					summarytext += ">"
-				else:
-					summarytext += entry[0]
-				summarytext += ' ' + entry[1] + '\n'
+					summarytext += entry[0]+' '+ entry[1]
 			pos += 1
 		self["summary_list"].setText(summarytext)
 
 	def cancel(self):
 		self.close(None)
+
+	def readlcdxres(self):
+		try:
+			fd = open("/proc/stb/lcd/xres","r")
+			value = int(fd.read().strip(),16)
+			fd.close()
+			return value
+		except:
+			return None
