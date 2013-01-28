@@ -32,7 +32,7 @@ class ChoiceBox(Screen):
 			pos += 1
 		self["list"] = ChoiceList(list = self.list, selection = selection)
 		self["summary_list"] = StaticText()
-		self.updateSummary()
+		self.updateSummary(selection)
 				
 		self["actions"] = NumberActionMap(["WizardActions", "InputActions", "ColorActions", "DirectionActions"], 
 		{
