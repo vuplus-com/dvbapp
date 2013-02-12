@@ -1,5 +1,5 @@
 PLUGIN = TransCodingSetup
-LANGS = de
+LANGS = de it
 
 CATEGORY ?= "SystemPlugins"
 
