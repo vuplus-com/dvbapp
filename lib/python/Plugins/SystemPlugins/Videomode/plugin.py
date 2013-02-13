@@ -1,156 +1,74 @@
 from Screens.Screen import Screen
-from Plugins.Plugin import PluginDescriptor
-from Components.SystemInfo import SystemInfo
 from Components.ConfigList import ConfigListScreen
-from Components.config import getConfigListEntry, config, ConfigBoolean, ConfigNothing, ConfigSlider
+from Components.ActionMap import NumberActionMap
+from Components.config import config, ConfigNothing, ConfigBoolean, getConfigListEntry
 from Components.Sources.StaticText import StaticText
+from Components.SystemInfo import SystemInfo
+from Plugins.Plugin import PluginDescriptor
 
 from VideoHardware import video_hw
 
 config.misc.videowizardenabled = ConfigBoolean(default = True)
 
-class VideoSetup(Screen, ConfigListScreen):
+class avSetupScreen(ConfigListScreen, Screen):
+	avSetupItems = [
+		{"idx":1, "level":0, "text":"Video Output", "item":config.av.videoport},
+		{"idx":2, "level":0, "text":"Mode", "item":config.av.videomode[config.av.videoport.value]},
+		{"idx":3, "level":0, "text":"Refresh Rate", "item":config.av.videorate[config.av.videomode[config.av.videoport.value].value]},
+		{"idx":4, "level":0, "text":"Aspect Ratio", "item":config.av.aspect},
+		{"idx":5, "level":0, "text":"Display 4:3 content as", "item":config.av.policy_43},
+		{"idx":6, "level":0, "text":"Display > 16:9 content as", "item":config.av.policy_169},
+		{"idx":7, "level":0, "text":"Color Format", "item":config.av.colorformat},
+		{"idx":8, "level":1, "text":"WSS on 4:3", "item":config.av.wss},
+		{"idx":9, "level":1, "text":"Auto scart switching", "requires":"ScartSwitch", "item":config.av.vcrswitch},
+		{"idx":0, "level":1, "text":"Dolby Digital default", "item":config.av.defaultac3},
+		{"idx":0, "level":1, "text":"Dolby Digital downmix", "requires":"CanDownmixAC3", "item":config.av.downmix_ac3},
+		{"idx":0, "level":1, "text":"General Dolby Digital delay(ms)", "item":config.av.generalAC3delay},
+		{"idx":0, "level":1, "text":"General PCM delay(ms)", "item":config.av.generalPCMdelay},
+		{"idx":0, "level":0, "text":"OSD visibility", "requires":"CanChangeOsdAlpha", "item":config.av.osd_alpha},
+		{"idx":0, "level":0, "text":"Scaler sharpness", "item":config.av.scaler_sharpness},
+	]
 
-	def __init__(self, session, hw):
+	def __init__(self, session):
 		Screen.__init__(self, session)
-		# for the skin: first try VideoSetup, then Setup, this allows individual skinning
-		self.skinName = ["VideoSetup", "Setup" ]
+		# for the skin: first try a setup_avsetup, then Setup
+		self.skinName = ["setup_avsetup", "Setup"]
 		self.setup_title = _("A/V Settings")
-		self.hw = hw
+
+		self.video_cfg = video_hw
+		self.audio_cfg = [ ]
+
 		self.onChangedEntry = [ ]
 
-		# handle hotplug by re-creating setup
+		# handle hotplug by re-createing setup
 		self.onShow.append(self.startHotplug)
 		self.onHide.append(self.stopHotplug)
 
 		self.list = [ ]
-		ConfigListScreen.__init__(self, self.list, session = session, on_change = self.changedEntry)
 
-		from Components.ActionMap import ActionMap
-		self["actions"] = ActionMap(["SetupActions"], 
+		self["key_red"] = StaticText( _("Cancel"))
+		self["key_green"] = StaticText( _("OK"))
+
+		self["action"] = NumberActionMap(["SetupActions"],
 			{
 				"cancel": self.keyCancel,
-				"save": self.apply,
+				"save": self.keySave,
 			}, -2)
 
-		self["key_red"] = StaticText(_("Cancel"))
-		self["key_green"] = StaticText(_("OK"))
+		ConfigListScreen.__init__(self, self.list, session = session, on_change = self.changedEntry)
+		
+		self.createScreen()
 
-		self.createSetup()
-		self.grabLastGoodMode()
 		self.onLayoutFinish.append(self.layoutFinished)
-
+	
 	def layoutFinished(self):
 		self.setTitle(self.setup_title)
-
-	def startHotplug(self):
-		self.hw.on_hotplug.append(self.createSetup)
-
-	def stopHotplug(self):
-		self.hw.on_hotplug.remove(self.createSetup)
-
-	def createSetup(self):
-		level = config.usage.setup_level.index
-
-		self.list = [
-			getConfigListEntry(_("Video Output"), config.av.videoport)
-		]
-
-		# if we have modes for this port:
-		if config.av.videoport.value in config.av.videomode:
-			# add mode- and rate-selection:
-			self.list.append(getConfigListEntry(_("Mode"), config.av.videomode[config.av.videoport.value]))
-			if config.av.videomode[config.av.videoport.value].value == 'PC':
-				self.list.append(getConfigListEntry(_("Resolution"), config.av.videorate[config.av.videomode[config.av.videoport.value].value]))
-			else:
-				self.list.append(getConfigListEntry(_("Refresh Rate"), config.av.videorate[config.av.videomode[config.av.videoport.value].value]))
-
-		port = config.av.videoport.value
-		if port not in config.av.videomode:
-			mode = None
-		else:
-			mode = config.av.videomode[port].value
-
-		# some modes (720p, 1080i) are always widescreen. Don't let the user select something here, "auto" is not what he wants.
-		force_wide = self.hw.isWidescreenMode(port, mode)
-
-		if not force_wide:
-			self.list.append(getConfigListEntry(_("Aspect Ratio"), config.av.aspect))
-
-		if force_wide or config.av.aspect.value in ("16_9", "16_10"):
-			self.list.extend((
-				getConfigListEntry(_("Display 4:3 content as"), config.av.policy_43),
-				getConfigListEntry(_("Display >16:9 content as"), config.av.policy_169)
-			))
-		elif config.av.aspect.value == "4_3":
-			self.list.append(getConfigListEntry(_("Display 16:9 content as"), config.av.policy_169))
-
-#		if config.av.videoport.value == "DVI":
-#			self.list.append(getConfigListEntry(_("Allow Unsupported Modes"), config.av.edid_override))
-		if config.av.videoport.value == "Scart":
-			self.list.append(getConfigListEntry(_("Color Format"), config.av.colorformat))
-			if level >= 1:
-				self.list.append(getConfigListEntry(_("WSS on 4:3"), config.av.wss))
-				if SystemInfo["ScartSwitch"]:
-					self.list.append(getConfigListEntry(_("Auto scart switching"), config.av.vcrswitch))
-
-		if level >= 1:
-			self.list.append(getConfigListEntry(_("Dolby Digital default"), config.av.defaultac3))
-			if SystemInfo["CanDownmixAC3"]:
-				self.list.append(getConfigListEntry(_("Dolby Digital downmix"), config.av.downmix_ac3))
-			self.list.extend((
-				getConfigListEntry(_("General Dolby Digital Delay"), config.av.generalAC3delay),
-				getConfigListEntry(_("General PCM Delay"), config.av.generalPCMdelay)
-			))
-
-		if SystemInfo["CanChangeOsdAlpha"]:
-			self.list.append(getConfigListEntry(_("OSD visibility"), config.av.osd_alpha))
-
-		if not isinstance(config.av.scaler_sharpness, ConfigNothing):
-			self.list.append(getConfigListEntry(_("Scaler sharpness"), config.av.scaler_sharpness))
-
-		self["config"].list = self.list
-		self["config"].l.setList(self.list)
-
-	def keyLeft(self):
-		ConfigListScreen.keyLeft(self)
-		self.createSetup()
-
-	def keyRight(self):
-		ConfigListScreen.keyRight(self)
-		self.createSetup()
-
-	def confirm(self, confirmed):
-		if not confirmed:
-			config.av.videoport.value = self.last_good[0]
-			config.av.videomode[self.last_good[0]].value = self.last_good[1]
-			config.av.videorate[self.last_good[1]].value = self.last_good[2]
-			self.hw.setMode(*self.last_good)
-		else:
-			self.keySave()
-
-	def grabLastGoodMode(self):
-		port = config.av.videoport.value
-		mode = config.av.videomode[port].value
-		rate = config.av.videorate[mode].value
-		self.last_good = (port, mode, rate)
-
-	def apply(self):
-		port = config.av.videoport.value
-		mode = config.av.videomode[port].value
-		rate = config.av.videorate[mode].value
-		if (port, mode, rate) != self.last_good:
-			self.hw.setMode(port, mode, rate)
-			from Screens.MessageBox import MessageBox
-			self.session.openWithCallback(self.confirm, MessageBox, _("Is this videomode ok?"), MessageBox.TYPE_YESNO, timeout = 20, default = False)
-		else:
-			self.keySave()
-
+	
 	# for summary:
 	def changedEntry(self):
 		for x in self.onChangedEntry:
 			x()
-
+	
 	def getCurrentEntry(self):
 		return self["config"].getCurrent()[0]
 
@@ -160,75 +78,116 @@ class VideoSetup(Screen, ConfigListScreen):
 	def createSummary(self):
 		from Screens.Setup import SetupSummary
 		return SetupSummary
+	
+	def createScreen(self):
+		self.list = [ ]
+		self.audio_cfg = [ ]
 
-class VideomodeHotplug:
-	def __init__(self, hw):
-		self.hw = hw
+		for x in self.avSetupItems:
+			item_level = int(x.get("level", 0))
+			if item_level > config.usage.setup_level.index:
+				continue
 
-	def start(self):
-		self.hw.on_hotplug.append(self.hotplug)
+			requires = x.get("requires")
+			if requires and not SystemInfo.get(requires, False):
+				continue
 
-	def stop(self):
-		self.hw.on_hotplug.remove(self.hotplug)
+			item_text = _(x.get("text", "??").encode("UTF-8"))
 
-	def hotplug(self, what):
-		print "hotplug detected on port '%s'" % (what)
-		port = config.av.videoport.value
-		mode = config.av.videomode[port].value
-		rate = config.av.videorate[mode].value
+			item = x.get("item", None)
+			if item is None:
+				continue
 
-		if not self.hw.isModeAvailable(port, mode, rate):
-			print "mode %s/%s/%s went away!" % (port, mode, rate)
-			modelist = self.hw.getModeList(port)
-			if not len(modelist):
-				print "sorry, no other mode is available (unplug?). Doing nothing."
-				return
-			mode = modelist[0][0]
-			rate = modelist[0][1]
-			print "setting %s/%s/%s" % (port, mode, rate)
-			self.hw.setMode(port, mode, rate)
+			idx = x.get("idx", 0)
+			if idx > 0:
+				if idx == 1: # Video Output
+					current_port = item.value
+				elif idx == 2: # Mode
+					item = config.av.videomode[current_port]
+					current_mode = item.value
+					# some modes (720p, 1080i, 1080p) are always widescreen.
+					force_wide = self.video_cfg.isWidescreenMode(current_mode)
+				elif idx == 3: # Refresh Rate
+					item = config.av.videorate[current_mode]
+					current_rate = item.value
+					if current_mode == "PC":
+						item_text = _("Resolution")
+				elif idx == 4: # Aspect Ratio
+					current_aspect = item.value
+					if force_wide:
+						continue
+				elif idx == 5: # Display 4:3 content as
+					if current_aspect == "auto" and not force_wide:
+						continue
+					elif current_aspect == "4_3":
+						continue
+				elif idx == 6: # Display 16:9 > content as
+					if current_aspect == "auto" and not force_wide:
+						continue
+				# Color Format, WSS on 4:3, Auto scart switching
+				elif (idx == 7 or idx == 8 or idx == 9) and not current_port == "Scart":
+					continue
+			if idx == 0 and item_level == 1: # audio
+				self.audio_cfg.append(item_text)
 
-hotplug = None
+			# add to configlist
+			if not isinstance(item, ConfigNothing):
+				self.list.append(getConfigListEntry(item_text, item))
 
-def startHotplug():
-	global hotplug, video_hw
-	hotplug = VideomodeHotplug(video_hw)
-	hotplug.start()
+		self["config"].setList(self.list)
+	
+	def keyLeft(self):
+		ConfigListScreen.keyLeft(self)
+		self.createScreen()
+		# show current value on VFD
+		if self.getCurrentEntry() not in self.audio_cfg:
+			self.summaries[0]["SetupTitle"].text = self.getCurrentValue()
+	
+	def keyRight(self):
+		ConfigListScreen.keyRight(self)
+		self.createScreen()
+		# show current value on VFD
+		if self.getCurrentEntry() not in self.audio_cfg:
+			self.summaries[0]["SetupTitle"].text = self.getCurrentValue()
 
-def stopHotplug():
-	global hotplug
-	hotplug.stop()
+	def startHotplug(self):
+		self.video_cfg.on_hotplug.append(self.createScreen)
+
+	def stopHotplug(self):
+		self.video_cfg.on_hotplug.remove(self.createScreen)
 
 
-def autostart(reason, session = None, **kwargs):
-	if session is not None:
-		global my_global_session
-		my_global_session = session
-		return
+def avSetupMain(session, **kwargs):
+	session.open(avSetupScreen)
 
-	if reason == 0:
-		startHotplug()
-	elif reason == 1:
-		stopHotplug()
+def startAVsetup(menuid):
+	if menuid != "system":
+		return []
 
-def videoSetupMain(session, **kwargs):
-	session.open(VideoSetup, video_hw)
+	return [( _("A/V Settings"), avSetupMain, "av_setup", 40)]
 
-def startSetup(menuid):
-	if menuid != "system": 
-		return [ ]
-
-	return [(_("A/V Settings"), videoSetupMain, "av_setup", 40)]
-
-def VideoWizard(*args, **kwargs):
+def startVideoWizard(*args, **kwargs):
 	from VideoWizard import VideoWizard
 	return VideoWizard(*args, **kwargs)
 
 def Plugins(**kwargs):
-	list = [
-#		PluginDescriptor(where = [PluginDescriptor.WHERE_SESSIONSTART, PluginDescriptor.WHERE_AUTOSTART], fnc = autostart),
-		PluginDescriptor(name=_("Video Setup"), description=_("Advanced Video Setup"), where = PluginDescriptor.WHERE_MENU, needsRestart = False, fnc=startSetup) 
+	plugin_list = [ 
+		PluginDescriptor(
+			name = "Videomode-K",
+			description = "Videomode-K based videomode",
+			where = PluginDescriptor.WHERE_MENU,
+			needsRestart = False,
+			fnc = startAVsetup)
 	]
+
 	if config.misc.videowizardenabled.value:
-		list.append(PluginDescriptor(name=_("Video Wizard"), where = PluginDescriptor.WHERE_WIZARD, needsRestart = False, fnc=(0, VideoWizard)))
-	return list
+		plugin_list.append(
+			PluginDescriptor(
+				name = "Video Wizard",
+				where = PluginDescriptor.WHERE_WIZARD,
+				fnc=(0, startVideoWizard)
+			)
+		)
+	
+	return plugin_list
+
