@@ -1411,18 +1411,21 @@ void eServiceMP3::gstBusCall(GstBus *bus, GstMessage *msg)
 			{
 				if ( gst_is_missing_plugin_message(msg) )
 				{
-					GstCaps *caps;
-					gst_structure_get (msgstruct, "detail", GST_TYPE_CAPS, &caps, NULL); 
-					std::string codec = (const char*) gst_caps_to_string(caps);
-					gchar *description = gst_missing_plugin_message_get_description(msg);
-					if ( description )
+					GstCaps *caps= NULL;
+					gboolean ret = gst_structure_get (msgstruct, "detail", GST_TYPE_CAPS, &caps, NULL);
+					if (ret)
 					{
-						eDebug("eServiceMP3::m_errorInfo.missing_codec = %s", codec.c_str());
-						m_errorInfo.error_message = "GStreamer plugin " + (std::string)description + " not available!\n";
-						m_errorInfo.missing_codec = codec.substr(0,(codec.find_first_of(',')));
-						g_free(description);
+						std::string codec = (const char*) gst_caps_to_string(caps);
+						gchar *description = gst_missing_plugin_message_get_description(msg);
+						if ( description )
+						{
+							eDebug("eServiceMP3::m_errorInfo.missing_codec = %s", codec.c_str());
+							m_errorInfo.error_message = "GStreamer plugin " + (std::string)description + " not available!\n";
+							m_errorInfo.missing_codec = codec.substr(0,(codec.find_first_of(',')));
+							g_free(description);
+						}
+						gst_caps_unref(caps);
 					}
-					gst_caps_unref(caps);
 				}
 				else
 				{
