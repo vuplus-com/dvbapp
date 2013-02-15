@@ -1779,9 +1779,9 @@ class OperaBrowser(Screen):
 			<widget name="bottomArea" position="0,640" size="1280,80" font="Regular;20" valign="center" halign="center" backgroundColor="#000000" />
 		</screen>
 		"""
-	MENUITEMS_LIST =[[(_('Open Startpage'), None), (_('Open URL'), None), (_('Start/Stop'),None), (_('Exit'), None)],
-			 [(_('Bookmark'), None), (_('Preference'), None)],
-			 [(_('About'), None), (_('Help'), None)]]
+
+	COMMAND_MAP = {}
+	MENUITEMS_LIST =[]
 	def __init__(self, session, url=None):
 		Screen.__init__(self, session)
 		self["actions"] = ActionMap(["DirectionActions", "MenuActions", "OkCancelActions"], {
@@ -1793,6 +1793,8 @@ class OperaBrowser(Screen):
 			,"down"        : self.keyDown
 			,"menu"        : self.keyMenu
 		}, -2)
+
+		self.UpdateLanguageCB()
 
 		self._terminatedBrowser = True
 		self._enableKeyEvent = True
@@ -1823,6 +1825,24 @@ class OperaBrowser(Screen):
 		self._onCloseTimer.callback.append(self._cb_onClose)
 
 		self.paramUrl = url
+		language.addCallback(self.UpdateLanguageCB)
+
+	def UpdateLanguageCB(self):
+		# modify menu
+		self.MENUITEMS_LIST = [
+			[(_('Open Startpage'), None), (_('Open URL'), None), (_('Start/Stop'),None), (_('Exit'), None)],
+			[(_('Bookmark'), None), (_('Preference'), None)],
+			[(_('About'), None), (_('Help'), None)]]
+		self.COMMAND_MAP = {}
+		self.COMMAND_MAP[_('Exit')] = self._cmd_on_Exit
+		self.COMMAND_MAP[_('Help')] = self._cmd_on_Help
+		self.COMMAND_MAP[_('About')] = self._cmd_on_About
+		self.COMMAND_MAP[_('Open URL')] = self._cmd_on_OpenUrl
+		self.COMMAND_MAP[_('Start/Stop')] = self._cmd_on_StartStop
+		self.COMMAND_MAP[_('Bookmark')] = self._cmd_on_Bookmark
+		self.COMMAND_MAP[_('Preference')] = self._cmd_on_Preference
+		self.COMMAND_MAP[_('Return')] = self._cmd_on_ReturnToBrowser
+		self.COMMAND_MAP[_('Open Startpage')] = self._cmd_on_OpenStartpage
 
 	def enableRCMouse(self, mode): #mode=[0|1]|[False|True]
 		rcmouse_path = "/proc/stb/fp/mouse"
@@ -2027,19 +2047,8 @@ class OperaBrowser(Screen):
 		self.session.open(BrowserHelpWindow)
 
 	def doCommand(self, command):
-		# modify menu
-		cmd_map = {}
-		cmd_map[_('Exit')] = self._cmd_on_Exit
-		cmd_map[_('Help')] = self._cmd_on_Help
-		cmd_map[_('About')] = self._cmd_on_About
-		cmd_map[_('Open URL')] = self._cmd_on_OpenUrl
-		cmd_map[_('Start/Stop')] = self._cmd_on_StartStop
-		cmd_map[_('Bookmark')] = self._cmd_on_Bookmark
-		cmd_map[_('Preference')] = self._cmd_on_Preference
-		cmd_map[_('Return')] = self._cmd_on_ReturnToBrowser
-		cmd_map[_('Open Startpage')] = self._cmd_on_OpenStartpage
 		try:
-			cmd_map[command]()
+			self.COMMAND_MAP[command]()
 		except Exception, ErrMsg: print ErrMsg
 
 	def keyOK(self):
