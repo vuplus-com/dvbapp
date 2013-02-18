@@ -131,7 +131,7 @@ class VideoHardware:
 		for port in self.getPortList():
 			config.av.videomode[port].addNotifier(self.changedVideomode)
 			for mode in self.getModeList(port):
-				config.av.videorate[mode].addNotifier(self.changedVideomode)
+				config.av.videorate[mode[0]].addNotifier(self.changedVideomode)
 
 		self.is_init = False
 	
@@ -180,7 +180,7 @@ class VideoHardware:
 	# check isModeAvailable in this port
 	def isPortAvailable(self, port):
 		for mode in self.getModeList(port):
-			if len(self.getRateList(port, mode)):
+			if len(self.getRateList(port, mode[0])):
 				return True
 
 		return False
@@ -196,7 +196,7 @@ class VideoHardware:
 			rates = self.getRateList(port, mode)
 
 			if len(rates):
-				modelist.append(mode)
+				modelist.append( (mode, rates))
 
 		return modelist
 
@@ -229,16 +229,16 @@ class VideoHardware:
 			mode_choices = self.getModeList(port)
 
 			for mode in mode_choices:
-				modelist.append( (mode, mode))
+				modelist.append( (mode[0], mode[0]))
 
 				# create list of available rates
 				ratelist = [ ]
-				rate_choices = self.getRateList(port, mode)
+				rate_choices = self.getRateList(port, mode[0])
 
 				for rate in rate_choices:
 					ratelist.append( (rate, rate))
 
-				config.av.videorate[mode] = ConfigSelection(choices = ratelist)
+				config.av.videorate[mode[0]] = ConfigSelection(choices = ratelist)
 			config.av.videomode[port] = ConfigSelection(choices = modelist)
 		config.av.videoport = ConfigSelection(choices = portlist)
 	
@@ -266,7 +266,7 @@ class VideoHardware:
 
 		if mode is None:
 			modelist = self.getModeList(port)
-			mode = modelist[0]
+			mode = modelist[0][0]
 
 			ratelist = self.getRateList(port, mode)
 			rate = ratelist[0]
@@ -305,10 +305,6 @@ class VideoHardware:
 				print "cannot open /proc/stb/vide/videomode"
 		
 		self.changedAspect(None)
-	
-	# autoresolution depend on this.
-	def setMode(self, port, mode, rate):
-		self.setVideomode(port, mode, rate)
 	
 	def changedAspect(self, configElement):
 		if self.is_init:
@@ -389,6 +385,16 @@ class VideoHardware:
 			config.av.videorate[mode].value = rate
 			config.av.videorate[mode].save()
 
+	# for dependency
+	def setMode(self, port, mode, rate):
+		self.setVideomode(port, mode, rate)
+
+	def saveMode(self, port, mode, rate):
+		self.saveVideomode(port, mode, rate)
+	
+	def updateAspect(self, configElement):
+		self.changedAspect(configElement)
+	
 video_hw = VideoHardware()
 video_hw.setConfiguredMode()
 
