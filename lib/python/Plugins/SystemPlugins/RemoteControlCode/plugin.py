@@ -40,14 +40,14 @@ class RemoteControlCodeInit:
 
 class RemoteControlCode(Screen,ConfigListScreen,RemoteControlCodeInit):
 	skin = 	"""
-		<screen position="center,center" size="560,250" title="Remote Control System Code Setting" >
-			<ePixmap pixmap="skin_default/buttons/red.png" position="110,10" size="140,40" alphatest="on" />
-			<ePixmap pixmap="skin_default/buttons/green.png" position="310,10" size="140,40" alphatest="on" />
+		<screen position="center,center" size="400,250" title="Remote Control System Code Setting" >
+			<ePixmap pixmap="skin_default/buttons/red.png" position="30,10" size="140,40" alphatest="on" />
+			<ePixmap pixmap="skin_default/buttons/green.png" position="230,10" size="140,40" alphatest="on" />
 
-			<widget source="key_red" render="Label" position="110,10" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" foregroundColor="#ffffff" transparent="1" />
-			<widget source="key_green" render="Label" position="310,10" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" foregroundColor="#ffffff" transparent="1" />
+			<widget source="key_red" render="Label" position="30,10" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" foregroundColor="#ffffff" transparent="1" />
+			<widget source="key_green" render="Label" position="230,10" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" foregroundColor="#ffffff" transparent="1" />
 
-			<widget name="config" zPosition="2" position="5,70" size="550,200" scrollbarMode="showOnDemand" transparent="1" />
+			<widget name="config" zPosition="2" position="5,70" size="380,180" scrollbarMode="showOnDemand" transparent="1" />
 		</screen>
 		"""
 
@@ -158,7 +158,11 @@ self[&quot;list&quot;].instance.resize(eSize(*listsize))
 # center window
 newwidth = wsize[0]
 newheight = wsize[1]
-self.instance.move(ePoint(orgpos.x() + (orgwidth - newwidth)/2, orgpos.y() + (orgheight - newheight)/2))
+window_posx = orgpos.x() + (orgwidth - newwidth)/2
+window_posy = orgpos.y() + (orgheight - newheight)/2
+if (150 &gt; window_posy):
+        window_posy = 150
+self.instance.move(ePoint(window_posx, window_posy))
 			</applet>
 		</screen>
 		"""

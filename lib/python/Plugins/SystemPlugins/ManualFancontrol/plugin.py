@@ -11,15 +11,15 @@ from enigma import eTimer
 
 class ManualFancontrol(Screen,ConfigListScreen):
 	skin = 	"""
-		<screen position="center,center" size="560,300" title="Fancontrol Settings in Standby mode" >
-			<ePixmap pixmap="skin_default/buttons/red.png" position="110,10" size="140,40" alphatest="on" />
-			<ePixmap pixmap="skin_default/buttons/green.png" position="310,10" size="140,40" alphatest="on" />
+		<screen position="center,center" size="400,270" title="Fancontrol Settings in Standby mode" >
+			<ePixmap pixmap="skin_default/buttons/red.png" position="30,10" size="140,40" alphatest="on" />
+			<ePixmap pixmap="skin_default/buttons/green.png" position="230,10" size="140,40" alphatest="on" />
 
-			<widget source="key_red" render="Label" position="110,10" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" foregroundColor="#ffffff" transparent="1" />
-			<widget source="key_green" render="Label" position="310,10" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" foregroundColor="#ffffff" transparent="1" />
+			<widget source="key_red" render="Label" position="30,10" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" foregroundColor="#ffffff" transparent="1" />
+			<widget source="key_green" render="Label" position="230,10" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" foregroundColor="#ffffff" transparent="1" />
 
-			<widget name="config" zPosition="2" position="5,70" size="550,200" scrollbarMode="showOnDemand" transparent="1" />
-			<widget source="current" render="Label" position="150,270" zPosition="1" size="280,30" font="Regular;20" halign="center" valign="center" />
+			<widget name="config" zPosition="2" position="5,70" size="380,150" scrollbarMode="showOnDemand" transparent="1" />
+			<widget source="current" render="Label" position="60,230" zPosition="1" size="280,30" font="Regular;20" halign="center" valign="center" />
 		</screen>
 		"""
 

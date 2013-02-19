@@ -76,7 +76,7 @@ class WirelessAccessPoint(Screen,ConfigListScreen):
 		<widget source="key_yellow" render="Label" position="300,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" foregroundColor="#ffffff" backgroundColor="#a08500" transparent="1" />
 		<widget source="key_blue" render="Label" position="440,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" foregroundColor="#ffffff" backgroundColor="#18188b" transparent="1" />
 
-		<widget name="config" zPosition="2" position="10,70" size="580,270" scrollbarMode="showOnDemand" transparent="1" />
+		<widget name="config" zPosition="2" position="20,70" size="550,270" scrollbarMode="showOnDemand" transparent="1" />
 		<widget source="current_settings" render="Label" position="10,340" size="570,20" font="Regular;19" halign="center" valign="center" transparent="1" />
 		<widget source="IPAddress_text" render="Label" position="130,370" size="190,21" font="Regular;19" transparent="1" />
 		<widget source="Netmask_text" render="Label" position="130,395" size="190,21" font="Regular;19" transparent="1" />

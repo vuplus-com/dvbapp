@@ -39,7 +39,7 @@ class HdmiCecPlugin(Screen,ConfigListScreen):
 			<widget source="key_yellow" render="Label" position="300,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" foregroundColor="#ffffff" backgroundColor="#a08500" transparent="1" />
 			<widget source="key_blue" render="Label" position="440,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" foregroundColor="#ffffff" backgroundColor="#18188b" transparent="1" />
 
-			<widget name="config" zPosition="2" position="10,50" size="580,270" scrollbarMode="showOnDemand" transparent="1" />
+			<widget name="config" zPosition="2" position="30,50" size="540,270" scrollbarMode="showOnDemand" transparent="1" />
 		</screen>
 		"""
 	def __init__(self, session):
