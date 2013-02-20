@@ -1768,17 +1768,24 @@ class OperaBrowser(Screen):
 	# submenulist->position->x : SUBMENULIST_WIDTH+50+SUBMENULIST_NEXT
 	# submenulist->position->y : MENUBAR_ITEM_HEIGHT+30
 	# submenulist->size->x  : SUBMENULIST_WIDTH
+
+	size = getDesktop(0).size()
+	WIDTH  = int(size.width())
+	HEIGHT = int(size.height())
 	skin =	"""
-		<screen name="OperaBrowser" position="0,0" size="1280,720" backgroundColor="transparent" flags="wfNoBorder" title="Opera Browser">
+		<screen name="OperaBrowser" position="0,0" size="%(width)d,%(height)d" backgroundColor="transparent" flags="wfNoBorder" title="Opera Browser">
 			<widget name="topArea" zPosition="-1" position="0,0" size="1280,60" font="Regular;20" valign="center" halign="center" backgroundColor="#000000" />
 			<widget name="menuitemFile" position="30,20" size="150,30" font="Regular;20" valign="center" halign="center" backgroundColor="#000000" foregroundColors="#9f1313,#a08500" />
 			<widget name="menuitemTool" position="180,20" size="150,30" font="Regular;20" valign="center" halign="center" backgroundColor="#000000" foregroundColors="#9f1313,#a08500" />
 			<widget name="menuitemHelp" position="330,20" size="150,30" font="Regular;20" valign="center" halign="center" backgroundColor="#000000" foregroundColors="#9f1313,#a08500" />
 			<widget name="menulist" position="50,60" size="200,150" backgroundColor="#000000" zPosition="10" scrollbarMode="showOnDemand" />
 			<widget name="submenulist" position="252,60" size="200,150" backgroundColor="#000000" zPosition="10" scrollbarMode="showOnDemand" />
-			<widget name="bottomArea" position="0,640" size="1280,80" font="Regular;20" valign="center" halign="center" backgroundColor="#000000" />
+			<widget name="bottomArea" position="0,%(bottom_pos_y)d" size="%(bottom_size_x)d,80" font="Regular;20" valign="center" halign="center" backgroundColor="#000000" />
 		</screen>
-		"""
+		""" % { 'width'  :WIDTH,
+			'height' :HEIGHT,
+			'bottom_pos_y'  :HEIGHT-80,
+			'bottom_size_x' :WIDTH }
 
 	COMMAND_MAP = {}
 	MENUITEMS_LIST =[]
