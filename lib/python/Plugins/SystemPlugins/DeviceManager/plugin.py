@@ -102,41 +102,41 @@ class DeviceManagerConfiguration(Screen, ConfigListScreen):
 
 class DeviceManager(Screen):
 	skin = """
-		<screen position="center,center" size="670,400" title="DeviceManager">
+		<screen position="center,center" size="590,350" title="DeviceManager">
 			<ePixmap pixmap="skin_default/buttons/red.png" position="20,0" size="140,40" alphatest="on" />
-			<ePixmap pixmap="skin_default/buttons/green.png" position="180,0" size="140,40" alphatest="on" />
-			<ePixmap pixmap="skin_default/buttons/yellow.png" position="340,0" size="140,40" alphatest="on" />
-			<ePixmap pixmap="skin_default/buttons/blue.png" position="500,0" size="140,40" alphatest="on" />
+			<ePixmap pixmap="skin_default/buttons/green.png" position="160,0" size="140,40" alphatest="on" />
+			<ePixmap pixmap="skin_default/buttons/yellow.png" position="300,0" size="140,40" alphatest="on" />
+			<ePixmap pixmap="skin_default/buttons/blue.png" position="440,0" size="140,40" alphatest="on" />
 			<widget name="key_red" position="20,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" foregroundColor="#ffffff" backgroundColor="#9f1313" transparent="1" />
-			<widget name="key_green" position="180,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" foregroundColor="#ffffff" backgroundColor="#1f771f" transparent="1" />
-			<widget name="key_yellow" position="340,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" foregroundColor="#ffffff" backgroundColor="#a08500" transparent="1" />
-			<widget name="key_blue" position="500,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" foregroundColor="#ffffff" backgroundColor="#18188b" transparent="1" />
-			<ePixmap pixmap="skin_default/div-h.png" position="0,48" size="670,2" alphatest="on" />
-			<widget source="menu" render="Listbox" position="0,48" size="670,350" scrollbarMode="showOnDemand">
+			<widget name="key_green" position="160,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" foregroundColor="#ffffff" backgroundColor="#1f771f" transparent="1" />
+			<widget name="key_yellow" position="300,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" foregroundColor="#ffffff" backgroundColor="#a08500" transparent="1" />
+			<widget name="key_blue" position="440,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" foregroundColor="#ffffff" backgroundColor="#18188b" transparent="1" />
+			<ePixmap pixmap="skin_default/div-h.png" position="0,48" size="590,2" alphatest="on" />
+			<widget source="menu" render="Listbox" position="0,48" size="590,350" scrollbarMode="showOnDemand">
 				<convert type="TemplatedMultiContent">
 				{"templates":
 					{"default": (54,[
-							MultiContentEntryText(pos = (100, 0), size = (560, 30), font=0, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 0), # index 0 is vendor  - model
-							MultiContentEntryText(pos = (100, 32), size = (130, 20), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 1), # index 1 is Device
-							MultiContentEntryText(pos = (230, 32), size = (130, 20), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 2), # index 2 is Size
-							MultiContentEntryText(pos = (360, 32), size = (130, 20), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 3), # index 3 is Partitions
-							MultiContentEntryText(pos = (490, 32), size = (140, 20), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 4), # index 4 is Removable
-							MultiContentEntryPixmapAlphaTest(pos = (0, 52), size = (670, 2), png = 5), # png 5 is the div pixmap
+							MultiContentEntryText(pos = (50, 0), size = (510, 30), font=0, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 0), # index 0 is vendor  - model
+							MultiContentEntryText(pos = (50, 32), size = (120, 20), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 1), # index 1 is Device
+							MultiContentEntryText(pos = (170, 32), size = (120, 20), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 2), # index 2 is Size
+							MultiContentEntryText(pos = (290, 32), size = (120, 20), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 3), # index 3 is Partitions
+							MultiContentEntryText(pos = (410, 32), size = (130, 20), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 4), # index 4 is Removable
+							MultiContentEntryPixmapAlphaTest(pos = (0, 52), size = (590, 2), png = 5), # png 5 is the div pixmap
 						]),
 					"partitions": (98, [
-							MultiContentEntryText(pos = (100, 0), size = (560, 30), font=0, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 0), # index 1 is Partition
-							MultiContentEntryText(pos = (100, 32), size = (560, 20), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 1), # index 2 is Mounted on
-							MultiContentEntryText(pos = (100, 54), size = (560, 20), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 2), # index 3 UUID
-							MultiContentEntryText(pos = (100, 76), size = (140, 20), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 3), # index 4 Type
-							MultiContentEntryText(pos = (230, 76), size = (140, 20), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 4), # index 5 Size_total
-							MultiContentEntryText(pos = (380, 76), size = (200, 20), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 5), # index 6 Size_free
-							MultiContentEntryPixmapAlphaTest(pos = (0, 96), size = (670, 2), png = 6), # png 6 is the div pixmap
+							MultiContentEntryText(pos = (50, 0), size = (500, 30), font=0, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 0), # index 1 is Partition
+							MultiContentEntryText(pos = (50, 32), size = (500, 20), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 1), # index 2 is Mounted on
+							MultiContentEntryText(pos = (50, 54), size = (500, 20), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 2), # index 3 UUID
+							MultiContentEntryText(pos = (50, 76), size = (130, 20), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 3), # index 4 Type
+							MultiContentEntryText(pos = (180, 76), size = (130, 20), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 4), # index 5 Size_total
+							MultiContentEntryText(pos = (310, 76), size = (190, 20), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 5), # index 6 Size_free
+							MultiContentEntryPixmapAlphaTest(pos = (0, 96), size = (590, 2), png = 6), # png 6 is the div pixmap
 						]),
 					"mountpoint": (54,[
 							MultiContentEntryPixmapAlphaTest(pos = (10, 7), size = (30, 30), png = 0), # index 0: picture
 							MultiContentEntryText(pos = (40, 0), size = (500, 30), font=0, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 1), # index 1 name
 							MultiContentEntryText(pos = (40, 32), size = (500, 20), font=1, flags = RT_HALIGN_LEFT|RT_VALIGN_CENTER, text = 2), # index 2 path
-							MultiContentEntryPixmapAlphaTest(pos = (0, 52), size = (670, 2), png = 5), # index 5 is the div pixmap
+							MultiContentEntryPixmapAlphaTest(pos = (0, 52), size = (590, 2), png = 5), # index 5 is the div pixmap
 						])
 					},
 					"fonts": [gFont("Regular", 22),gFont("Regular", 16),gFont("Regular", 28)],
