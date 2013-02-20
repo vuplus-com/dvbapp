@@ -1,5 +1,5 @@
 PLUGIN = HbbTV
-LANGS = en de
+LANGS = en de it
 
 CATEGORY ?= "Extensions"
 

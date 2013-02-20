@@ -77,7 +77,7 @@ class VideoWizard(WizardLanguage, Rc):
 	def modeList(self):
 		list = [ ]
 		for mode in self.video_cfg.getModeList(self.port):
-			list.append( (mode, mode))
+			list.append( (mode[0], mode[0]))
 		
 		return list
 
