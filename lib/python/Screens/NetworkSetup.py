@@ -324,7 +324,6 @@ class AdapterSetup(Screen, ConfigListScreen, HelpableScreen):
 		self["ColorActions"] = HelpableActionMap(self, "ColorActions",
 			{
 			"red": (self.keyCancel, _("exit network adapter configuration")),
-			"blue": (self.KeyBlue, _("open nameserver configuration")),
 			})
 
 		self["actions"] = NumberActionMap(["SetupActions"],
@@ -356,7 +355,7 @@ class AdapterSetup(Screen, ConfigListScreen, HelpableScreen):
 		self["Adapter"] = StaticText()
 		self["introduction2"] = StaticText(_("Press OK to activate the settings."))
 		self["key_red"] = StaticText(_("Cancel"))
-		self["key_blue"] = StaticText(_("Edit DNS"))
+		self["key_blue"] = StaticText()
 
 		self["VKeyIcon"] = Boolean(False)
 		self["HelpWindow"] = Pixmap()
@@ -395,6 +394,7 @@ class AdapterSetup(Screen, ConfigListScreen, HelpableScreen):
 		self.InterfaceEntry = None
 		self.dhcpEntry = None
 		self.gatewayEntry = None
+		self.DNSConfigEntry = None
 		self.hiddenSSID = None
 		self.wlanSSID = None
 		self.encryption = None
@@ -438,6 +438,14 @@ class AdapterSetup(Screen, ConfigListScreen, HelpableScreen):
 			self.dhcpdefault=False
 		self.hasGatewayConfigEntry = NoSave(ConfigYesNo(default=self.dhcpdefault or False))
 		self.gatewayConfigEntry = NoSave(ConfigIP(default=iNetwork.getAdapterAttribute(self.iface, "gateway") or [0,0,0,0]))
+		if iNetwork.getAdapterAttribute(self.iface, "dns-nameservers"):
+			self.dnsconfigdefault=True
+		else:
+			self.dnsconfigdefault=False
+		self.hasDNSConfigEntry = NoSave(ConfigYesNo(default=self.dnsconfigdefault or False))
+		manualNameservers = (iNetwork.getInterfacesNameserverList(self.iface) + [[0,0,0,0]] * 2)[0:2]
+		self.manualPrimaryDNS = NoSave(ConfigIP(default=manualNameservers[0]))
+		self.manualSecondaryDNS = NoSave(ConfigIP(default=manualNameservers[1]))
 		nameserver = (iNetwork.getNameserverList() + [[0,0,0,0]] * 2)[0:2]
 		self.primaryDNS = NoSave(ConfigIP(default=nameserver[0]))
 		self.secondaryDNS = NoSave(ConfigIP(default=nameserver[1]))
@@ -457,6 +465,13 @@ class AdapterSetup(Screen, ConfigListScreen, HelpableScreen):
 				self.list.append(self.gatewayEntry)
 				if self.hasGatewayConfigEntry.value:
 					self.list.append(getConfigListEntry(_('Gateway'), self.gatewayConfigEntry))
+
+			self.DNSConfigEntry =  getConfigListEntry(_("Use Manual dns-nameserver"), self.hasDNSConfigEntry)
+			if self.dhcpConfigEntry.value:
+				self.list.append(self.DNSConfigEntry)
+			if self.hasDNSConfigEntry.value or not self.dhcpConfigEntry.value:
+				self.list.append(getConfigListEntry(_('Primary DNS'), self.manualPrimaryDNS))
+				self.list.append(getConfigListEntry(_('Secondary DNS'), self.manualSecondaryDNS))
 
 			self.extended = None
 			self.configStrings = None
@@ -485,15 +500,14 @@ class AdapterSetup(Screen, ConfigListScreen, HelpableScreen):
 		self["config"].list = self.list
 		self["config"].l.setList(self.list)
 
-	def KeyBlue(self):
-		self.session.openWithCallback(self.NameserverSetupClosed, NameserverSetup)
-
 	def newConfig(self):
 		if self["config"].getCurrent() == self.InterfaceEntry:
 			self.createSetup()
 		if self["config"].getCurrent() == self.dhcpEntry:
 			self.createSetup()
 		if self["config"].getCurrent() == self.gatewayEntry:
+			self.createSetup()
+		if self["config"].getCurrent() == self.DNSConfigEntry:
 			self.createSetup()
 		if iNetwork.isWirelessInterface(self.iface):
 			if self["config"].getCurrent() == self.encryption:
@@ -556,6 +570,14 @@ class AdapterSetup(Screen, ConfigListScreen, HelpableScreen):
 				iNetwork.setAdapterAttribute(self.iface, "gateway", self.gatewayConfigEntry.value)
 			else:
 				iNetwork.removeAdapterAttribute(self.iface, "gateway")
+
+			if self.hasDNSConfigEntry.value or not self.dhcpConfigEntry.value:
+				interfacesDnsLines = self.makeLineDnsNameservers([self.manualPrimaryDNS.value, self.manualSecondaryDNS.value])
+				if interfacesDnsLines == "" :
+					interfacesDnsLines = False
+				iNetwork.setAdapterAttribute(self.iface, "dns-nameservers", interfacesDnsLines)
+			else:
+				iNetwork.setAdapterAttribute(self.iface, "dns-nameservers", False)
 
 			if (self.extended is not None and self.configStrings is not None):
 				iNetwork.setAdapterAttribute(self.iface, "configStrings", self.configStrings(self.iface))
@@ -647,6 +669,12 @@ class AdapterSetup(Screen, ConfigListScreen, HelpableScreen):
 			if current[1].help_window.instance is not None:
 				current[1].help_window.instance.hide()
 
+	def makeLineDnsNameservers(self, nameservers = []):
+		line = ""
+		entry = ' '.join([("%d.%d.%d.%d" % tuple(x)) for x in nameservers if x != [0, 0, 0, 0] ])
+		if len(entry):
+			line+="\tdns-nameservers %s\n" % entry
+		return line
 
 class AdapterSetupConfiguration(Screen, HelpableScreen):
 	def __init__(self, session,iface):
@@ -836,7 +864,7 @@ class AdapterSetupConfiguration(Screen, HelpableScreen):
 	def genMainMenu(self):
 		menu = []
 		menu.append((_("Adapter settings"), "edit"))
-		menu.append((_("Nameserver settings"), "dns"))
+#		menu.append((_("Nameserver settings"), "dns"))
 		menu.append((_("Network test"), "test"))
 		menu.append((_("Restart network"), "lanrestart"))
 

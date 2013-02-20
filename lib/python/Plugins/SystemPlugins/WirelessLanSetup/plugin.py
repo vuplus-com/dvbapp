@@ -261,7 +261,7 @@ class WlanSetup(Screen,HelpableScreen):
 		menu = []
 		menu.append((_("Adapter settings"), "setting"))
 		menu.append((_("Scan Wireless AP"), "scanap"))
-		menu.append((_("Nameserver settings"), "dns"))
+#		menu.append((_("Nameserver settings"), "dns"))
 		if iNetwork.getAdapterAttribute(self.iface, "up"):
 			menu.append((_("Show WLAN Status"), "status"))
 		menu.append((_("Network test"), "test"))
@@ -323,14 +323,18 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 			<widget source="key_red" render="Label" position="10,360" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" foregroundColor="#ffffff" transparent="1" />
 			<widget source="key_green" render="Label" position="360,360" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" foregroundColor="#ffffff" transparent="1" />
 
-			<widget name="config" position="10,10" backgroundColor="#371e1c1a" transparent="1" size="480,210" scrollbarMode="showOnDemand" />
-			<ePixmap pixmap="skin_default/div-h.png" position="0,225" zPosition="1" size="550,2" />
-			<eLabel text="IP Address : " position="100,250" size="190,21" font="Regular;19" />
-			<widget source="ipaddress" render="Label" position="300,250" zPosition="1" size="150,26" font="Regular;20" halign="center" valign="center" />
-			<eLabel text="NetMask : " position="100,275" size="190,21" font="Regular;19" />
-			<widget source="netmask" render="Label" position="300,275" zPosition="1" size="150,26" font="Regular;20" halign="center" valign="center" />	
-			<eLabel text="Gateway : " position="100,300" size="190,21" font="Regular;19" />
-			<widget source="gateway" render="Label" position="300,300" zPosition="1" size="150,26" font="Regular;20" halign="center" valign="center" />
+			<widget name="config" position="10,10" backgroundColor="#371e1c1a" transparent="1" size="480,195" scrollbarMode="showOnDemand" />
+			<ePixmap pixmap="skin_default/div-h.png" position="0,210" zPosition="1" size="560,2" />
+			<widget source="ipaddresstext" render="Label" position="100,220" zPosition="1" size="190,21" font="Regular;19" halign="Left" valign="center" />
+			<widget source="ipaddress" render="Label" position="300,220" zPosition="1" size="150,26" font="Regular;20" halign="Left" valign="center" />
+			<widget source="netmasktext" render="Label" position="100,245" zPosition="1" size="190,21" font="Regular;19" halign="Left" valign="center" />
+			<widget source="netmask" render="Label" position="300,245" zPosition="1" size="150,26" font="Regular;20" halign="Left" valign="center" />
+			<widget source="gatewaytext" render="Label" position="100,270" zPosition="1" size="190,21" font="Regular;19" halign="Left" valign="center" />
+			<widget source="gateway" render="Label" position="300,270" zPosition="1" size="150,26" font="Regular;20" halign="Left" valign="center" />
+			<widget source="DNS1text" render="Label" position="100,295" zPosition="1" size="190,21" font="Regular;19" halign="Left" valign="center" />
+			<widget source="DNS1" render="Label" position="300,295" zPosition="1" size="150,26" font="Regular;20" halign="Left" valign="center" />
+			<widget source="DNS2text" render="Label" position="100,320" zPosition="1" size="190,21" font="Regular;19" halign="Left" valign="center" />
+			<widget source="DNS2" render="Label" position="300,320" zPosition="1" size="150,26" font="Regular;20" halign="Left" valign="center" />
 			<widget name="VKeyIcon" pixmap="skin_default/buttons/key_text.png" position="460,230" zPosition="10" size="35,25" transparent="1" alphatest="on" />
 			<widget name="HelpWindow" pixmap="skin_default/buttons/key_text.png" position="383,420" zPosition="1" size="1,1" transparent="1" alphatest="on" />
 		</screen>
@@ -340,9 +344,16 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 		self.session = session
 		self["key_red"] = StaticText(_("Close"))
 		self["key_green"] = StaticText(_("Ok"))
+		self["ipaddresstext"] = StaticText(_("IP Address"))
 		self["ipaddress"] = StaticText(_("[ N/A ]"))
-		self["netmask"] = StaticText(_("[ N/A ]"))		
+		self["netmasktext"] = StaticText(_("NetMask"))
+		self["netmask"] = StaticText(_("[ N/A ]"))
+		self["gatewaytext"] = StaticText(_("Gateway"))
 		self["gateway"] = StaticText(_("[ N/A ]"))
+		self["DNS1text"] = StaticText(_("Primary DNS"))
+		self["DNS1"] = StaticText(_("[ N/A ]"))
+		self["DNS2text"] = StaticText(_("Secondary DNS"))
+		self["DNS2"] = StaticText(_("[ N/A ]"))
 		self["OkCancelActions"] = ActionMap(["ShortcutActions", "SetupActions" ],
 		{
 			"ok": self.saveWlanConfig,
@@ -397,6 +408,12 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 			default_tmp = "off"
 		wlanconfig.usedhcp = ConfigSelection(default=default_tmp, choices = [("off", _("no")), ("on", _("yes"))])
 
+		if iNetwork.getAdapterAttribute(self.iface, "dns-nameservers"):
+			self.dnsconfigdefault="on"
+		else:
+			self.dnsconfigdefault="off"
+		wlanconfig.hasdnsconfigentry = ConfigSelection(default=self.dnsconfigdefault, choices = [("off", _("no")), ("on", _("yes"))])
+
 		wlanconfig.ip = ConfigIP(default=iNetwork.getAdapterAttribute(self.iface, "ip")) or [0,0,0,0]
 
 		wlanconfig.netmask = ConfigIP(default=iNetwork.getAdapterAttribute(self.iface, "netmask") or [255,0,0,0])
@@ -411,6 +428,12 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 		self["ipaddress"].setText(_(self.formatip(iNetwork.getAdapterAttribute(self.iface, "ip"))))
 		self["netmask"].setText(_(self.formatip(iNetwork.getAdapterAttribute(self.iface, "netmask"))))
 		self["gateway"].setText(_(self.formatip(iNetwork.getAdapterAttribute(self.iface, "gateway"))))
+
+		nameserver = (iNetwork.getNameserverList() + [[0,0,0,0]] * 2)[0:2]
+		self.primaryDNS = NoSave(ConfigIP(default=nameserver[0]))
+		self.secondaryDNS = NoSave(ConfigIP(default=nameserver[1]))
+		self["DNS1"].setText(self.primaryDNS.getText())
+		self["DNS2"].setText(self.secondaryDNS.getText())
 
 		if self.encryption_key is not None:
 			default_tmp = "on"
@@ -510,6 +533,16 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 		self.usegatewayEntry = getConfigListEntry(_("Use Gateway"), wlanconfig.usegateway)
 		self.gatewayEntry = getConfigListEntry(_("Gateway"), wlanconfig.gateway)
 
+		manualNameservers = (iNetwork.getInterfacesNameserverList(self.iface) + [[0,0,0,0]] * 2)[0:2]
+		self.manualPrimaryDNS = NoSave(ConfigIP(default=manualNameservers[0]))
+		self.manualSecondaryDNS = NoSave(ConfigIP(default=manualNameservers[1]))
+		nameserver = (iNetwork.getNameserverList() + [[0,0,0,0]] * 2)[0:2]
+		self.primaryDNS = NoSave(ConfigIP(default=nameserver[0]))
+		self.secondaryDNS = NoSave(ConfigIP(default=nameserver[1]))
+		self.DNSConfigEntry =  getConfigListEntry(_("Use Manual dns-nameserver"), wlanconfig.hasdnsconfigentry)
+		self.primaryDNSConfigEntry = getConfigListEntry(_('Primary DNS'), self.manualPrimaryDNS)
+		self.secondaryDNSConfigEntry = getConfigListEntry(_('Secondary DNS'), self.manualSecondaryDNS)
+
 		self.configList.append( self.usedeviceEntry )
 		if wlanconfig.usedevice.value is "on":
 			self.configList.append( self.usedhcpEntry )
@@ -519,6 +552,12 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 				self.configList.append(self.usegatewayEntry)
 				if wlanconfig.usegateway.value is "on":
 					self.configList.append(self.gatewayEntry)
+			if wlanconfig.usedhcp.value is "on":
+				self.configList.append(self.DNSConfigEntry)
+			if wlanconfig.hasdnsconfigentry.value is "on" or wlanconfig.usedhcp.value is "off":
+				self.configList.append(self.primaryDNSConfigEntry)
+				self.configList.append(self.secondaryDNSConfigEntry)
+
 			self.configList.append( self.essidEntry )
 			if wlanconfig.essid.value == 'Input hidden ESSID':
 				self.configList.append( self.hiddenessidEntry )
@@ -611,7 +650,8 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 	def newConfig(self):
 		if self["config"].getCurrent() == self.usedeviceEntry or self["config"].getCurrent() == self.encryptEntry \
 			or self["config"].getCurrent() == self.usedhcpEntry or self["config"].getCurrent() == self.usegatewayEntry \
-			or self["config"].getCurrent() == self.essidEntry or self["config"].getCurrent() == self.methodEntry:
+			or self["config"].getCurrent() == self.essidEntry or self["config"].getCurrent() == self.methodEntry \
+			or self["config"].getCurrent() == self.DNSConfigEntry:
 			self.createConfig()
 
 	def saveWlanConfig(self):
@@ -762,21 +802,15 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 				print "content = \n"+contents
 				wpafd.write(contents)
 				wpafd.close()
-				self.writeNetConfig(0)
+				self.writeNetConfig()
 			else :
 				self.session.open(MessageBox, _("wpa_supplicant.conf open error."), type = MessageBox.TYPE_ERROR, timeout = 10)
-				self.writeNetConfig(-1)
+				return
 		else:
-			self.writeNetConfig(-2)
-
-	def writeNetConfig(self,ret = -1):
-		if ret == -1:
-			self.session.open(MessageBox, _("wpa_supplicant.conf open error."), type = MessageBox.TYPE_ERROR, timeout = 10)
-			return
-		elif ret == -2:
 			self.session.open(MessageBox, _("Can NOT generate passphrase"), type = MessageBox.TYPE_ERROR, timeout = 10)
 			return
 
+	def writeNetConfig(self):
 		if wlanconfig.usedevice.value=="on":
 			iNetwork.setAdapterAttribute(self.iface, "up", True)
 			if wlanconfig.usedhcp.value =="on":
@@ -787,17 +821,30 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 				iNetwork.setAdapterAttribute(self.iface, "netmask", wlanconfig.netmask.value)
 				if wlanconfig.usegateway.value == "on":
 					iNetwork.setAdapterAttribute(self.iface, "gateway", wlanconfig.gateway.value)
+			if wlanconfig.hasdnsconfigentry.value == "on" or wlanconfig.usedhcp.value == "off":
+				interfacesDnsLines = self.makeLineDnsNameservers([self.manualPrimaryDNS.value, self.manualSecondaryDNS.value])
+				if interfacesDnsLines == "" :
+					interfacesDnsLines = False
+				iNetwork.setAdapterAttribute(self.iface, "dns-nameservers", interfacesDnsLines)
+			else:
+				iNetwork.setAdapterAttribute(self.iface, "dns-nameservers", False)
 		else:
 			iNetwork.setAdapterAttribute(self.iface, "up", False)
 			iNetwork.deactivateInterface(self.iface)
 		contents = "\tpre-up wpa_supplicant -i"+self.iface+" -c/etc/wpa_supplicant.conf -B -D"+iNetwork.detectWlanModule(self.iface)+"\n"
-		contents += "\tpost-down wpa_cli terminate\n\n"
+		contents += "\tpost-down wpa_cli terminate\n"
 		iNetwork.setAdapterAttribute(self.iface, "configStrings", contents)
 		iNetwork.writeNetworkConfig()
 		iNetwork.restartNetwork(self.updateCurrentInterfaces)
 		self.configurationmsg = None
 		self.configurationmsg = self.session.openWithCallback(self.configFinished, MessageBox, _("Please wait for activation of your network configuration..."), type = MessageBox.TYPE_INFO, enable_input = False)
 
+	def makeLineDnsNameservers(self, nameservers = []):
+		line = "" 
+		entry = ' '.join([("%d.%d.%d.%d" % tuple(x)) for x in nameservers if x != [0, 0, 0, 0] ])
+		if len(entry):
+			line+="\tdns-nameservers %s\n" % entry
+		return line
 
 	def updateCurrentInterfaces(self,ret):
 		if ret is True:

@@ -74,7 +74,7 @@ class Network:
 
 	def IPaddrFinished(self, result, retval, extra_args):
 		(iface, callback ) = extra_args
-		data = { 'up': False, 'dhcp': False, 'preup' : False, 'predown' : False }
+		data = { 'up': False, 'dhcp': False, 'preup' : False, 'predown' : False, 'dns-nameservers' : False }
 		globalIPpattern = re_compile("scope global")
 		ipRegexp = '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}'
 		netRegexp = '[0-9]{1,2}'
@@ -162,10 +162,12 @@ class Network:
 				fp.write(iface["preup"])
 			if iface["predown"] is not False and not iface.has_key("configStrings"):
 				fp.write(iface["predown"])
+			if iface["dns-nameservers"] is not False and len(iface["dns-nameservers"])>0:
+				fp.write("%s" % (iface["dns-nameservers"]))
 			fp.write("\n")				
 		fp.close()
 		self.configuredNetworkAdapters = self.configuredInterfaces
-		self.writeNameserverConfig()
+#		self.writeNameserverConfig()
 
 	def writeNameserverConfig(self):
 		fp = file('/etc/resolv.conf', 'w')
@@ -216,6 +218,9 @@ class Network:
 				if (split[0] in ("pre-down","post-down")):
 					if self.ifaces[currif].has_key("predown"):
 						self.ifaces[currif]["predown"] = i
+				if (split[0] == "dns-nameservers"):
+					if self.ifaces[currif].has_key("dns-nameservers"):
+						self.ifaces[currif]["dns-nameservers"] = i
 
 		for ifacename, iface in ifaces.items():
 			if self.ifaces.has_key(ifacename):
@@ -687,7 +692,19 @@ class Network:
 		if self.config_ready is not None:
 			for p in plugins.getPlugins(PluginDescriptor.WHERE_NETWORKCONFIG_READ):
 				p(reason=self.config_ready)
-	
+
+	def getInterfacesNameserverList(self, iface):
+		result = []
+		nameservers = self.getAdapterAttribute(iface, "dns-nameservers")
+		if nameservers:
+			ipRegexp = '[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}'
+			ipPattern = re_compile(ipRegexp)
+			for x in nameservers.split()[1:]:
+				ip = self.regExpMatch(ipPattern, x)
+				if ip:
+					result.append( [ int(n) for n in ip.split('.') ] )
+		return result
+
 iNetwork = Network()
 
 def InitNetwork():
