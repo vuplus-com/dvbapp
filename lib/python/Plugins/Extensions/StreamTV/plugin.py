@@ -180,45 +180,31 @@ class StreamTVPlayer(Screen, InfoBarNotifications):
 		elif self.state == self.PLAYER_PAUSED:
 			self.setSeekState(self.PLAYER_PLAYING)
 
-class StreamURIParser:
-	def __init__(self, xml):
-		self.xml = xml
+def parseStreamDB(filename):
+	tvlist = []
+	tree = ElementTree()
+	tree.parse(filename)
 
-	def parseStreamList(self):
-		tvlist = []
-		tree = ElementTree()
-		tree.parse(self.xml)
-
-		for iptv in tree.findall('iptv'):
-			n = str(iptv.findtext('name'))
-			i = str(iptv.findtext('icon'))
-			u = str(iptv.findtext('uri'))
-			t = str(iptv.findtext('type'))
-			tvlist.append({'name':n, 'icon':i, 'type':t, 'uri':self.parseStreamURI(u)})
-		return tvlist
-
-	def parseStreamURI(self, uri):
-		uriInfo = {}
-		splitedURI = uri.split()
-		uriInfo['URL'] = splitedURI[0]
-		for x in splitedURI[1:]:
-			i = x.find('=')
-			uriInfo[x[:i].upper()] = str(x[i+1:])
-		return uriInfo
+	for iptv in tree.findall('iptv'):
+		n = str(iptv.findtext('name'))
+		i = str(iptv.findtext('icon'))
+		u = str(iptv.findtext('uri'))
+		t = str(iptv.findtext('type'))
+		tvlist.append({'name':n, 'icon':i, 'type':t, 'uri':u})
+	return tvlist
 
 def streamListEntry(entry):
-	#print entry
-	uriInfo = entry[1].get('uri')
 	return [entry,
 		(eListboxPythonMultiContent.TYPE_PIXMAP_ALPHATEST, 5, 1, 35, 35, loadPNG('%s/icons/%s' % (PLUGIN_PATH, str(entry[1].get('icon'))) )),
-		(eListboxPythonMultiContent.TYPE_TEXT,45,7,200,37,0,RT_HALIGN_LEFT,entry[0]),
-		(eListboxPythonMultiContent.TYPE_TEXT,250,7,310,37,1,RT_HALIGN_LEFT,str(uriInfo.get('URL')))
+		(eListboxPythonMultiContent.TYPE_TEXT,45,7,550,37,0,RT_HALIGN_LEFT,entry[0])
 	] 
-
+#(eListboxPythonMultiContent.TYPE_TEXT,250,7,310,37,1,RT_HALIGN_LEFT,entry[1].get('uri'))
 class StreamTVList(Screen):
 	skin = 	"""
-		<screen name="StreamTVList" position="center,center" size="600,350" title="StreamTV List">
+		<screen name="StreamTVList" position="center,120" size="600,380" title="StreamTV List">
 			<widget name="streamlist" position="0,0" size="600,350" backgroundColor="#000000" zPosition="10" scrollbarMode="showOnDemand" />
+			<widget name="infolabel" position="0,360" size="50,20" font="Regular;18" halign="left" />
+			<widget name="infomation" position="50,360" size="550,20" font="Regular;18" halign="left" />
 	        </screen>
 		"""
 	def __init__(self, session):
@@ -233,7 +219,6 @@ class StreamTVList(Screen):
 			"right" : self.keyRight,
 		}, -1)
 
-		self.streamBin  = resolveFilename(SCOPE_PLUGINS, "Extensions/StreamTV/rtmpdump")
 		self.streamFile = resolveFilename(SCOPE_PLUGINS, "Extensions/StreamTV/stream.xml")
 
 		self.streamList = []
@@ -246,9 +231,12 @@ class StreamTVList(Screen):
 		self['streamlist'] = self.streamMenuList
 		self.streamMenuList.setList(map(streamListEntry, self.streamList))
 
+		self["infolabel"] = Label("URL :")
+		self["infomation"] = Label(" ")
+		self.updateInfomation()
+
 		self.onLayoutFinish.append(self.layoutFinished)
 
-		self.rtmpConsole    = None
 		self.beforeService  = None
 		self.currentService = None
 		self.playerStoped   = False
@@ -262,63 +250,60 @@ class StreamTVList(Screen):
 		if rc is not None:
 			if rc.strip() != '':
 				os.system('killall -INT rtmpdump')
+
+	def updateInfomation(self):
+		infomation = ''
+		try:
+			streamInfo = self["streamlist"].getCurrent()[0][1]
+			infomation = streamInfo.get('uri').split()[0]
+		except:	infomation = ' '
+		self["infomation"].setText(infomation)
+
 	def keyLeft(self):
 		if self.keyLocked:
 			return
 		self['streamlist'].pageUp()
+		self.updateInfomation()
 
 	def keyRight(self):
 		if self.keyLocked:
 			return
 		self['streamlist'].pageDown()
+		self.updateInfomation()
 
 	def keyUp(self):
 		if self.keyLocked:
 			return
 		self['streamlist'].up()
+		self.updateInfomation()
 
 	def keyDown(self):
 		if self.keyLocked:
 			return
 		self['streamlist'].down()
+		self.updateInfomation()
 
 	def keyCancel(self):
-		self.cbAppClosed(True)
 		self.close()
 
 	def keyOK(self):
 		if self.keyLocked:
 			return
 		self.keyLocked = True
-		self.rtmpConsole    = None
 		self.beforeService  = None
 		self.currentService = None
 		self.playerStoped   = False
 		self.serviceDoCommand = None
 
 		streamInfo = self["streamlist"].getCurrent()[0][1]
-		uriInfo    = streamInfo.get('uri')
-		typeInfo   = streamInfo.get('type').split(':')
+		uri = streamInfo.get('uri')
+		typeInfo = streamInfo.get('type').split(':')
 
-		protocol = typeInfo[0]
-		url      = uriInfo.get('URL')
-		if protocol == 'rtmp':
-			self.layoutFinished()
-			self.rtmpConsole = eConsoleAppContainer()
-			self.rtmpConsole.dataAvail.append(self.cbDataAvail)
-			self.rtmpConsole.appClosed.append(self.cbAppClosed)
-			self.rtmpConsole.execute(self.makeCommand(uriInfo))
-		elif protocol in ('rtsp', 'http', 'hls'):
-			serviceType = typeInfo[1]
-			bufferSize  = typeInfo[2]
-			self.doStreamAction(url, serviceType, bufferSize)
+		serviceType = typeInfo[1]
+		bufferSize  = typeInfo[2]
+		self.doStreamAction(uri, serviceType, bufferSize)
 
-	def doStreamAction(self, url=None, serviceType='4097', bufferSize=None):
-		if url is None:
-			url='/tmp/stream.avi'
-			self.streamPlayerTimer.stop()
-			#if os.path.exists(url):
-			#	os.unlink(url)
+	def doStreamAction(self, uri=None, serviceType='4097', bufferSize=None):
 		try:
 			serviceType = int(serviceType)
 		except:	serviceType = 4097
@@ -326,20 +311,25 @@ class StreamTVList(Screen):
 			bufferSize = int(bufferSize)
 		except:	bufferSize = None
 
-		service = eServiceReference(serviceType, 0, url)
+		streamInfo = self["streamlist"].getCurrent()[0][1]
+		serviceRef = "%(TYPE)d:0:1:0:0:0:0:0:0:0:%(URI)s:%(NAME)s" % {
+			'TYPE' :serviceType,
+			'URI'  :uri.replace(':','%3a'),
+			'NAME' :streamInfo.get('name')
+		}
+		service = eServiceReference(serviceRef)
 		#if bufferSize is not None:
 		#	service.setData(2, bufferSize*1024)
 
-		streamInfo = self["streamlist"].getCurrent()[0][1]
-		uriInfo    = streamInfo.get('uri')
 		self.beforeService  = self.session.nav.getCurrentlyPlayingServiceReference()
 		self.currentService = self.session.openWithCallback(self.cbFinishedStream, 
 								    StreamTVPlayer, 
 								    service, 
 								    cbServiceCommand=self.cbServiceCommand,
 								    chName=str(streamInfo.get('name')),
-								    chURL =str(uriInfo.get('URL')),
-								    chIcon=str(streamInfo.get('icon')))
+								    chURL =str(streamInfo.get('uri')),
+								    chIcon=str(streamInfo.get('icon'))
+		)
 
 	def cbServiceCommand(self, params=None):
 		if params is None:
@@ -348,51 +338,13 @@ class StreamTVList(Screen):
 		if params[0] == 'docommand':
 			self.serviceDoCommand = params[1]
 
-	def cbAppClosed(self, ret):
-		print ret
-		self.doConsoleStop()
-		if self.currentService is not None and not self.playerStoped:
-			self.serviceDoCommand('bypass_exit')
-			message = "The connection was terminated from the stream server."
-			self.session.open(MessageBox, message, type=MessageBox.TYPE_INFO)
-			self.currentService.close()
-			self.currentService = None
-			self.serviceDoCommand = None
-
-	def cbDataAvail(self, data):
-		print data
-		if str(data) == 'Connected...':
-			self.streamPlayerTimer = eTimer()
-			self.streamPlayerTimer.timeout.get().append(self.doStreamAction)
-			self.streamPlayerTimer.start(1000)
-
 	def cbFinishedStream(self):
-		self.doConsoleStop()
+		self.keyLocked = False
 		self.session.nav.playService(self.beforeService)
 		print 'player done!!'
 
-	def doConsoleStop(self):
-		self.keyLocked = False
-		if self.rtmpConsole is not None:
-			self.rtmpConsole.sendCtrlC()
-			self.rtmpConsole = None
-
-	def makeCommand(self, uriInfo):
-		def appendCommand(key, option):
-			try:
-				d = uriInfo.get(key)
-				if d is not None:
-					return "-%s %s " %(option, d)
-			except: pass
-			return ''
-		command  = '%s -v ' % (self.streamBin)
-		command += appendCommand('URL', 'r')
-		command += appendCommand('PLAYPATH', 'y')
-		command += appendCommand('SWFURL', 'W')
-		return command
-
 	def makeStreamList(self):
-		streamDB = StreamURIParser(self.streamFile).parseStreamList()
+		streamDB = parseStreamDB(self.streamFile)
 		self.streamList = []
 		for x in streamDB:
 			self.streamList.append((x.get('name'), x))
