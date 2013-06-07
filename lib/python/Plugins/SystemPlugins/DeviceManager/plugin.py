@@ -295,31 +295,40 @@ class DeviceManager(Screen):
 		self["menu"].setList(self.mountPointList)
 
 	def getCurrentDevice(self):
-		if self.currList == "default":
+		try:
 			return self["menu"].getCurrent()[6]
-		return None
+		except:
+			return None
 
 	def getCurrentPartition(self):
-		if self.currList == "partitions":
+		try:
 			return self["menu"].getCurrent()[7]
-		return None
+		except:
+			return None
 
 	def keyOk(self):
 #		print "keyOk"
 		if self.currList == "default":
 			self.currDevice = self.getCurrentDevice()
-			if len(self.currDevice["partitions"]) == 0:
-				self.session.open(MessageBox, _("No partition list found on device.\nPlease click BLUE key and do Initialize to use this device."), MessageBox.TYPE_ERROR, timeout = 10)
+			if self.currDevice is not None:
+				if len(self.currDevice["partitions"]) == 0:
+					self.session.open(MessageBox, _("No partition list found on device.\nPlease click BLUE key and do Initialize to use this device."), MessageBox.TYPE_ERROR, timeout = 10)
+				else:
+					self.showPartitionList()
 			else:
-				self.showPartitionList()
+				self.session.open(MessageBox, _("Device not found."), MessageBox.TYPE_ERROR, timeout = 10)
 		elif self.currList == "partitions":
-			currMountPoint = self.getCurrentPartition()["mountpoint"]
-			currUuid = self.getCurrentPartition()["uuid"]
-			if currMountPoint == "":
-				self.currPartition = self.getCurrentPartition()
-				self.showMountPointSetup()
+			currentPartition = self.getCurrentPartition()
+			if currentPartition is not None:
+				currMountPoint = currentPartition["mountpoint"]
+				currUuid = currentPartition["uuid"]
+				if currMountPoint == "":
+					self.currPartition = currentPartition
+					self.showMountPointSetup()
+				else:
+					self.doUmount(currMountPoint, self.showPartitionList)
 			else:
-				self.doUmount(currMountPoint, self.showPartitionList)
+				self.session.open(MessageBox, _("Partition info is not found."), MessageBox.TYPE_ERROR, timeout = 10)
 		elif self.currList == "mountpoint":
 # self["menu"].getCurrent() : (green_button, "menu description", "mount point description, "default", mountpoint, self.divpng)
 			currEntry = self["menu"].getCurrent()[3]
@@ -352,16 +361,21 @@ class DeviceManager(Screen):
 
 	def keyYellow(self):
 		if self.currList == "partitions":
-			partition = self.getCurrentPartition()
 			self.choiceBoxFstype()
 
 	def keyBlue(self):
 		if self.currList == "default":
 			device = self.getCurrentDevice()
-			self.session.openWithCallback(self.deviceInitCB, DeviceInit, device["blockdev"], device["size"])
+			if device is not None:
+				self.session.openWithCallback(self.deviceInitCB, DeviceInit, device["blockdev"], device["size"])
+			else:
+				self.session.open(MessageBox, _("Device not found."), MessageBox.TYPE_ERROR, timeout = 10)
 		elif self.currList == "partitions":
 			partition = self.getCurrentPartition()
-			self.session.openWithCallback(self.deviceCheckCB, DeviceCheck, partition)
+			if partition is not None:
+				self.session.openWithCallback(self.deviceCheckCB, DeviceCheck, partition)
+			else:
+				self.session.open(MessageBox, _("Partition info is not found."), MessageBox.TYPE_ERROR, timeout = 10)
 
 	def keyMenu(self):
 		self.session.open(DeviceManagerConfiguration)
@@ -388,7 +402,10 @@ class DeviceManager(Screen):
 			return
 		else:
 			partition = self.getCurrentPartition()
-			self.session.openWithCallback(self.deviceFormatCB, DeviceFormat, partition, choice[1])
+			if partition is not None:
+				self.session.openWithCallback(self.deviceFormatCB, DeviceFormat, partition, choice[1])
+			else:
+				self.session.open(MessageBox, _("Partition info is not found."), MessageBox.TYPE_ERROR, timeout = 10)
 
 # about mount funcs..
 	def doUmount(self, mountpoint, callback):
