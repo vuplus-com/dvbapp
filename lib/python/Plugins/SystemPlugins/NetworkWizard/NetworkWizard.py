@@ -200,12 +200,8 @@ class NetworkWizard(WizardLanguage, Rc):
 
 	def AdapterSetupEnd(self, iface):
 		self.originalInterfaceStateChanged = True
-		if iNetwork.getAdapterAttribute(iface, "dhcp") is True:
-			iNetwork.checkNetworkState(self.AdapterSetupEndFinished)
-			self.AdapterRef = self.session.openWithCallback(self.AdapterSetupEndCB, MessageBox, _("Please wait while we test your network..."), type = MessageBox.TYPE_INFO, enable_input = False)
-		else:
-			self.currStep = self.getStepWithID("confdns")
-			self.afterAsyncCode()
+		iNetwork.checkNetworkState(self.AdapterSetupEndFinished)
+		self.AdapterRef = self.session.openWithCallback(self.AdapterSetupEndCB, MessageBox, _("Please wait while we test your network..."), type = MessageBox.TYPE_INFO, enable_input = False)
 
 	def AdapterSetupEndCB(self,data):
 		if data is True:
