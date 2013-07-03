@@ -62,7 +62,7 @@ class TranscodingSetupInit:
 
 	def setTranscoding(self, transcoding, port):
 		if transcoding not in ["enable","disable"] or port not in ["8001","8002"]:
-			print "Input error."
+#			print "Input error."
 			return -7
 		if not fileExists("/proc/stb/encoder/enable"):
 			return -1
@@ -82,7 +82,7 @@ class TranscodingSetupInit:
 		return res
 
 	def setEncoderEnable(self,mode = "disable"):
-		print "<TranscodingSetup> set encoder %s" % mode
+#		print "<TranscodingSetup> set encoder %s" % mode
 		mode = mode.strip(' ').strip('\n')
 		try:
 			fd = open("/proc/stb/encoder/enable",'r')
@@ -104,7 +104,7 @@ class TranscodingSetupInit:
 			return -1
 
 	def setPort(self, port = "8001"):
-		print "<TranscodingSetup> set port %s" % port
+#		print "<TranscodingSetup> set port %s" % port
 		try:
 			fp = file('/etc/inetd.conf', 'r')
 			datas = fp.readlines()
@@ -140,6 +140,8 @@ class TranscodingSetupInit:
 	def inetdRestart(self):
 		if fileExists("/etc/init.d/inetd"):
 			os_system("/etc/init.d/inetd restart")
+		elif fileExists("/etc/init.d/inetd.busybox"):
+			os_system("/etc/init.d/inetd.busybox restart")
 
 	def setEncoderExtra(self):
 		global TranscodingConfigList
@@ -149,7 +151,7 @@ class TranscodingSetupInit:
 		return 0
 
 	def setEncoder(self, procPath, value):
-		print "<TranscodingSetup> set %s "%procPath, value
+#		print "<TranscodingSetup> set %s "%procPath, value
 		if not fileExists(procPath):
 			return -1
 		if isinstance(value, str):
