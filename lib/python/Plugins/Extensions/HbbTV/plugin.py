@@ -190,8 +190,8 @@ class MMSStreamURL:
 		sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 		sock.connect((host, port))
 		sock.send(self.sendmsg%(location, host))
-		print "Request."
-		print self.sendmsg%(location, host)
+		#print "Request."
+		#print self.sendmsg%(location, host)
 		fullydata = ''
 		while 1:
 			res = sock.recv(1024)
@@ -780,7 +780,8 @@ class HandlerHbbTV(Handler):
 		for ii in range(5):
 			self._vod_service = None
 			try:
-				print "Try to open vod [%d] : %s" % (ii, url)
+				#print "Try to open vod [%d] : %s" % (ii, url)
+				print "Try to open vod"
 				self._vod_service = eServiceReference(4097, 0, url)
 				self._session.nav.playService(self._vod_service)
 				if self._vod_service is not None:
@@ -942,7 +943,7 @@ class HbbTVWindow(Screen, InfoBarNotifications):
 	def _serviceForbiden(self):
 		global __gval__
 		real_url = MMSStreamURL().getLocationData(__gval__.hbbtv_handelr.getUrl())
-		print "Received URI :\n", real_url
+		#print "Received URI :\n", real_url
 
 		if real_url is not None:
 			__gval__.hbbtv_handelr.doRetryOpen(real_url.strip())

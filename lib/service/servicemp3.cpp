@@ -330,7 +330,8 @@ eServiceMP3::eServiceMP3(eServiceReference ref)
 
 		uri = g_filename_to_uri(filename, NULL, NULL);
 
-	eDebug("eServiceMP3::playbin2 uri=%s", uri);
+	//eDebug("eServiceMP3::playbin2 uri=%s", uri);
+	eDebug("eServiceMP3::playbin2");
 
 	m_gst_playbin = gst_element_factory_make("playbin2", "playbin");
 	if (!m_gst_playbin)
@@ -453,7 +454,8 @@ RESULT eServiceMP3::stop()
 	
 	//GST_DEBUG_BIN_TO_DOT_FILE(GST_BIN(m_gst_playbin),GST_DEBUG_GRAPH_SHOW_ALL,"e2-playbin");
 
-	eDebug("eServiceMP3::stop %s", m_ref.path.c_str());
+	//eDebug("eServiceMP3::stop %s", m_ref.path.c_str());
+	eDebug("eServiceMP3::stop service..");
 	gst_element_set_state(m_gst_playbin, GST_STATE_NULL);
 	m_state = stStopped;
 

@@ -55,7 +55,8 @@ class Navigation:
 		if ref and oldref and ref == oldref and not forceRestart:
 			print "ignore request to play already running service(1)"
 			return 0
-		print "playing", ref and ref.toString()
+		#print "playing", ref and ref.toString()
+		print "playing service.."
 		if ref is None:
 			self.stopService()
 			return 0
