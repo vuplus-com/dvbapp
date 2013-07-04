@@ -137,7 +137,7 @@ class BookmarkManager(SimpleConfigParser):
 			os.system('echo "id = 1" >> %s'%(_dbFileName))
 			os.system('echo "name = My favorite" >> %s'%(_dbFileName))
 			os.system('echo "[b-1]" >> %s'%(_dbFileName))
-			os.system('echo "url = http://www2.vuplus.com/" >> %s'%(_dbFileName))
+			os.system('echo "url = http://www.vuplus.com/" >> %s'%(_dbFileName))
 			os.system('echo "id = 1" >> %s'%(_dbFileName))
 			os.system('echo "parent = 1" >> %s'%(_dbFileName))
 			os.system('echo "title = Vuplus Home" >> %s'%(_dbFileName))
