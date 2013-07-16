@@ -274,6 +274,8 @@ lib/python/Plugins/SystemPlugins/DeviceManager/locale/Makefile
 lib/python/Plugins/SystemPlugins/TransCodingSetup/Makefile
 lib/python/Plugins/SystemPlugins/TransCodingSetup/meta/Makefile
 lib/python/Plugins/SystemPlugins/TransCodingSetup/locale/Makefile
+lib/python/Plugins/SystemPlugins/WOLSetup/Makefile
+lib/python/Plugins/SystemPlugins/WOLSetup/meta/Makefile
 lib/python/Tools/Makefile
 lib/service/Makefile
 lib/components/Makefile
