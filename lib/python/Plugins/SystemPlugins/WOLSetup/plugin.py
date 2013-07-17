@@ -29,6 +29,21 @@ config.plugins.wolconfig = ConfigSubsection()
 config.plugins.wolconfig.activate = ConfigYesNo(default = False)
 config.plugins.wolconfig.location = ConfigSelection(default = "menu", choices = [("menu", _("Show on the Standby Menu")), ("deepstandby", _("Run at the Deep Standby"))])
 
+import socket
+class NetTool:
+	@staticmethod
+	def GetHardwareAddr(ethname):
+		macaddr = ""
+		try:
+			sock = socket.socket(socket.AF_PACKET, socket.SOCK_RAW)
+			sock.bind((ethname, 9999))
+
+			macaddr = ":".join(["%02X" % ord(x) for x in sock.getsockname()[-1]])
+		except Exception, Message:
+			print Message
+			macaddr = "Unknown"
+		return macaddr
+
 class WOLSetup(ConfigListScreen, Screen):
 	skin = 	"""
 		<screen name="WOLSetup" position="center,120" size="600,390" title="WakeOnLan Setup">
@@ -42,8 +57,8 @@ class WOLSetup(ConfigListScreen, Screen):
 			<widget source="key_yellow" render="Label" position="305,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#a08500" foregroundColor="#ffffff" transparent="1" />
 			<widget source="key_blue" render="Label" position="455,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#18188b" foregroundColor="#ffffff" transparent="1" />
 
-			<widget name="config" position="5,70" size="590,280" scrollbarMode="showOnDemand" />
-			<widget name="introduction" position="5,365" size="590,20" font="Regular;20" halign="center" />
+			<widget name="config" position="5,70" size="590,260" scrollbarMode="showOnDemand" />
+			<widget name="introduction" position="5,345" size="590,40" font="Regular;24" halign="center" />
 		</screen>
 		"""
 	def __init__(self, session):
@@ -63,8 +78,7 @@ class WOLSetup(ConfigListScreen, Screen):
 		self["key_green"]  = StaticText(_("Save"))
 		self["key_yellow"] = StaticText(_(" "))
 		self["key_blue"]   = StaticText(_("Default"))
-
-		self["introduction"] = Label(_(" "))
+		self["introduction"] = Label(" ")
 
 		self.default = {"activate":False, "location":"menu"}
 		self.backup = {
@@ -80,9 +94,13 @@ class WOLSetup(ConfigListScreen, Screen):
 	def UpdateConfigList(self):
 		self.configlist = []
 		if _flagSupportWol:
+			macaddr = " "
 			self.configlist.append(getConfigListEntry(_("WakeOnLan Enable"), config.plugins.wolconfig.activate))
 			if config.plugins.wolconfig.activate.value:
-				self.configlist.append(getConfigListEntry(_("  - Location"), config.plugins.wolconfig.location))
+				self.configlist.append(getConfigListEntry(_("Location"), config.plugins.wolconfig.location))
+				macaddr = "HWaddr of %s is %s" % (_ethDevice, NetTool.GetHardwareAddr(_ethDevice))
+			else:	macaddr = "Wake on Lan disabled"
+			self["introduction"].setText(macaddr)
 
 		self["config"].list = self.configlist
 		self["config"].l.setList(self.configlist)
