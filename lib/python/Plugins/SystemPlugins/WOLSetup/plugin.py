@@ -118,8 +118,7 @@ class WOLSetup(ConfigListScreen, Screen):
 		config.plugins.wolconfig.location.value = self.backup["location"]
 
 	def OnKeyGreenCB(self, answer):
-		answer = answer and answer[1]
-		if answer == "n":
+		if not answer:
 			self.Restore()
 			return
 		self.Save()
@@ -136,7 +135,7 @@ class WOLSetup(ConfigListScreen, Screen):
 			self.close()
 			return
 		message = _("If WOL is enabled, power consumption will be around 2W.\nErP Standby Power Regulation (<0.5W at standby) cannot be met.\nProceed?")
-		self.session.openWithCallback(self.OnKeyGreenCB, ChoiceBox, title=message, list=((_("Yes"), "y"), (_("No"), "n"),))
+		self.session.openWithCallback(self.OnKeyGreenCB, MessageBox, message, MessageBox.TYPE_YESNO, default = True)
 
 	def OnKeyCancel(self):
 		self.Restore()
@@ -166,7 +165,6 @@ class WOLSetup(ConfigListScreen, Screen):
 			return
 		if writeDevice:
 			os.system('echo "%s" > %s' % (enable and "enable" or "disble",_deviseWOL))
-		os.system("ethtool -s %s wol %s" % (_ethDevice, enable and "g" or "d"))
 
 	@staticmethod
 	def DeepStandbyNotifierCB(self=None):
@@ -201,4 +199,3 @@ def Plugins(**kwargs):
 	l.append(PluginDescriptor(where=PluginDescriptor.WHERE_SESSIONSTART, fnc=SessionStartMain))
 	l.append(PluginDescriptor(where=PluginDescriptor.WHERE_MENU, fnc=MenuSelected))
 	return l
-
