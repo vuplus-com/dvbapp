@@ -44,17 +44,23 @@ if os.path.exists("/proc/stb/info/vumodel"):
 			}
 	elif info == "solo2":
 		fwlist= [
-			("fpga", _("FPGA"))
+			 ("fpga", _("FPGA"))
+			,("fp", _("Front Processor"))
 			]
 		fwdata= { 
-			"fpga" : ["http://archive.vuplus.com/download/fpga", "fpga.files", "/dev/fpga_dp;/dev/misc/dp;"]
+			 "fpga" : ["http://archive.vuplus.com/download/fpga", "fpga.files", "/dev/fpga_dp;/dev/misc/dp;"]
+			,"fp"   : ["http://archive.vuplus.com/download/fp", "fp.files", "/dev/bcm_mu;"]
 			}
 	elif info == "duo2":
 		fwlist= [
-			("fpga", _("FPGA"))
+			 ("fpga", _("FPGA"))
+			,("fp", _("Front Processor"))
+			,("vfd", _("VFD Controller"))
 			]
 		fwdata= {
-			"fpga" : ["http://archive.vuplus.com/download/fpga", "fpga.files", "/dev/fpga_dp;/dev/misc/dp;"]
+			 "fpga" : ["http://archive.vuplus.com/download/fpga", "fpga.files", "/dev/fpga_dp;/dev/misc/dp;"]
+			,"fp"   : ["http://archive.vuplus.com/download/fp", "fp.files", "/dev/bcm_mu;"]
+			,"vfd"  : ["http://archive.vuplus.com/download/vfd", "vfd.files", "/dev/bcm_vfd_ctrl;"]
 			}
 
 import os, fcntl, thread
@@ -75,7 +81,7 @@ class FPUpgradeCore() :
 
 	def doUpgrade(self):
 		firmware,device = None,None
-		def closefpga(fp, fd):
+		def closefp(fp, fd):
 			if fd is not None: os.close(fd)
 			if fp is not None: fp.close()
 		try:
@@ -108,13 +114,13 @@ class FPUpgradeCore() :
 				if xx == 2: raise Exception, 'fail to upgrade : %d'%(rc)
 				self.errmsg = 'fail to upgrade, retry..'
 				self.status = STATUS_RETRY_UPGRADE
-				closefpga(firmware, device)
+				closefp(firmware, device)
 			#print '[FPUpgradeCore] upgrade done.'
 			if self.callcount < 20: raise Exception, 'wrong fpga file.'
 		except Exception, msg:
 			self.errmsg = msg
 			print '[FPUpgradeCore] ERROR >>',msg
-			closefpga(firmware, device)
+			closefp(firmware, device)
 			return STATUS_ERROR
 		return STATUS_DONE
 
@@ -188,6 +194,85 @@ class FPGAUpgradeCore() :
 			print '[FPGAUpgrade] occur error.'
 		else:	print '[FPGAUpgrade] occur unknown error.'
 
+
+class VFDCtrlUpgradeCore() :
+	status = STATUS_READY
+	errmsg = ''
+	MAX_CALL_COUNT = 120
+	def __init__(self, firmwarefile, devicefile):
+		#print '[VFDCtrlUpgradeCore]'
+		self.devicefile = devicefile
+		self.firmwarefile = firmwarefile
+		#print '[VFDCtrlUpgradeCore] devicefile :', self.devicefile
+		#print '[VFDCtrlUpgradeCore] firmwarefile :', self.firmwarefile
+
+	def doUpgrade(self):
+		firmware,device,firmwarename = None,None,None
+		print '[VFDCtrlUpgradeCore] checkvfd..'
+		cmd_t = "/usr/lib/enigma2/python/Plugins/SystemPlugins/FirmwareUpgrade/checkvfd %s" 
+		ret_d = os.popen(cmd_t % (self.firmwarefile)).read()
+
+		if ret_d is not None and len(ret_d) > 0:
+			print '[VFDCtrlUpgradeCore] fail to checkvfd.. [' + ret_d + ']'
+			return STATUS_ERROR
+
+		def closevfd(fp, fd, filename):
+			if fd is not None: os.close(fd)
+			if fp is not None: fp.close()
+			if filename is not None: os.system('rm -f %s' % (filename))
+		try:
+			max_size = 1024 * 16
+			size = max_size #os.path.getsize(self.firmwarefile)
+			if size == 0: raise Exception, 'data_size is zero'
+			#print '[VFDCtrlUpgradeCore] data_size :',size
+
+			for xx in range(3):
+				self.callcount = 0
+				self.status = STATUS_READY
+				firmwarename = os.path.splitext(self.firmwarefile)[0]
+				firmware = open(firmwarename, 'rb')
+				device = os.open(self.devicefile, os.O_RDWR)
+				#print '[VFDCtrlUpgradeCore] open >> [ok]'
+
+				rc = fcntl.ioctl(device, 0, size)
+				if rc < 0: raise Exception, 'fail to set size : %d'%(rc)
+				#print '[VFDCtrlUpgradeCore] set size >> [ok]'
+				self.status = STATUS_PREPARED
+
+				total_write_size = 0
+				while True:
+					data = firmware.read(1024)
+					if data == '' or total_write_size == max_size:
+						break
+					os.write(device, data)
+					total_write_size = total_write_size + 1024
+				#print '[VFDCtrlUpgradeCore] write data >> [ok]'
+
+				self.status = STATUS_PROGRAMMING
+				rc = fcntl.ioctl(device, 1, 0)
+				if rc == 0: break
+				if rc < 0 or xx == 2: raise Exception, 'fail to upgrade : %d'%(rc)
+				self.errmsg = 'fail to upgrade, retry..'
+				self.status = STATUS_RETRY_UPGRADE
+			#print '[VFDCtrlUpgradeCore] upgrade done.'
+			if self.callcount < 20: raise Exception, 'wrong fpga file.'
+		except Exception, msg:
+			self.errmsg = msg
+			print '[VFDCtrlUpgradeCore] ERROR >>',msg
+			closevfd(firmware, device, firmwarename)
+			return STATUS_ERROR
+		closevfd(firmware, device, firmwarename)
+		return STATUS_DONE
+
+	def upgradeMain(self):
+		self.status = STATUS_READY
+		self.status = self.doUpgrade()
+		if self.status == STATUS_DONE:
+			print '[VFDCtrlUpgradeCore] upgrade done.'
+		elif self.status == STATUS_ERROR:
+			print '[VFDCtrlUpgradeCore] error.'
+		else:	print '[VFDCtrlUpgradeCore] unknown error.'
+
 class FirmwareUpgradeManager:
 	fu = None
 	def getInterval(self):
@@ -198,6 +283,8 @@ class FirmwareUpgradeManager:
 			self.fu = FPGAUpgradeCore(firmwarefile=datafile, devicefile=device)
 		elif firmware == 'fp':
 			self.fu = FPUpgradeCore(firmwarefile=datafile, devicefile=device)
+		elif firmware == 'vfd':
+			self.fu = VFDCtrlUpgradeCore(firmwarefile=datafile, devicefile=device)
 		thread.start_new_thread(self.fu.upgradeMain, ())
 
 	def checkError(self):
@@ -360,7 +447,7 @@ class FUFilebrowser(Screen):
 		self.setTitle(firmware.upper() + " File Browser")
 
 	def resetGUI(self):
-		self["status"].setText("Select to press OK, Exit to press Cancel.\nPress the BLUE button to download the latest firmware.")
+		self["status"].setText("Press OK to select, Press Cancel to exit.\nPress BLUE to download the latest firmware.")
 
 	def setCallback(self, func):
 		self.callback = func
@@ -386,13 +473,15 @@ class FUFilebrowser(Screen):
 				name_ext = os.path.splitext(self["file_list"].getFilename())
 				return len(name_ext)==2 and ext.startswith(name_ext[1])
 			self.check_ext = False
-			if (self.firmware == "fp" and checkExt(".bin")) or (self.firmware == "fpga" and checkExt(".dat")):
+			if (self.firmware == "fp" and checkExt(".bin")) or (self.firmware == "fpga" and checkExt(".dat")) or (self.firmware == "vfd" and checkExt(".vfd")):
 				self.check_ext = True
 			if self.check_ext == False:
-				self.session.open(MessageBox, _("You chose the incorrect file."), MessageBox.TYPE_INFO)
+				print self.firmware,",",self["file_list"].getFilename()
+				self.session.open(MessageBox, _("You choose the incorrect file. "), MessageBox.TYPE_INFO)
 				return
 		except:
-			self.session.open(MessageBox, _("You chose the incorrect file."), MessageBox.TYPE_INFO)
+			print self.firmware,",",self["file_list"].getFilename()
+			self.session.open(MessageBox, _("You choose the incorrect file. "), MessageBox.TYPE_INFO)
 			return
 
 		if os.path.exists("/usr/bin/md5sum") == False:
@@ -450,7 +539,7 @@ class FUFilebrowser(Screen):
 		def cbDownloadDone(tar):
 			try:
 				if os.path.splitext(tar)[1] != ".files":
-					self["status"].setText("Downloaded : %s\nSelect to press OK, Exit to press Cancel."%(tar))
+					self["status"].setText("Downloaded : %s\nPress OK to select, Press Cancel to exit."%(tar))
 			except:
 				pass
 		# target
@@ -593,7 +682,7 @@ class FirmwareUpgrade(Screen, ConfigListScreen):
 		global fwlist
 		if fwlist is None:
 			self["key_green"] = StaticText(_(" "))
-			self["status"] = StaticText(_("This plugin is supported only the Ultimo/Uno."))
+			self["status"] = StaticText(_("Duo/Solo was not support."))
 		else:
 			self["key_green"] = StaticText(_("Upgrade"))
 			self["status"] = StaticText(_(" "))
@@ -621,7 +710,7 @@ class FirmwareUpgrade(Screen, ConfigListScreen):
 				self.reboot_timer.start(1000)
 			return
 		if not self.rebootLock:
-			self["status"].setText("Press the Green/OK button")
+			self["status"].setText(" ")
 
 	def doReboot(self):
 		from Screens.Standby import TryQuitMainloop
@@ -633,14 +722,14 @@ class FirmwareUpgrade(Screen, ConfigListScreen):
 		if self.cbRebootCallCount < max_call_count:
 			self.cbRebootCallCount = self.cbRebootCallCount + 1
 			#self["status"].setText("%s (%d)"%(self.rebootMessage, max_call_count-self.cbRebootCallCount))
-			self["status"].setText("Reboot after %d seconds. Press the OK to reboot now."%(max_call_count-self.cbRebootCallCount))
+			self["status"].setText("Reboot in %d seconds. Press OK to reboot now."%(max_call_count-self.cbRebootCallCount))
 			return
 		self.doReboot()
 
 	# filebrowser window callback function
 	def cbSetStatus(self, data=None):
 		if data is not None:
-			self["status"].setText("Press the Green/OK button, if you want to upgrade to this file:\n%s\n" % (data))
+			self["status"].setText(" ")
 			self.updateFilePath = data
 			if self.fileopenmode == False:
 				self.upgrade_auto_run_timer.start(1000)
@@ -702,7 +791,7 @@ class FirmwareUpgrade(Screen, ConfigListScreen):
 			#self.session.open(MessageBox, _("No selected binary data!!"), MessageBox.TYPE_INFO)
 			self.doFileOpen()
 			return
-		msg = "You should not be stop during the upgrade.\nDo you want to upgrade?"
+		msg = "You can't cancel during upgrade.\nDo you want to continue?"
 		self.session.openWithCallback(self.cbRunUpgrade, MessageBox, _(msg), MessageBox.TYPE_YESNO, timeout = 15, default = True)
 		self.fileopenmode = False
 
