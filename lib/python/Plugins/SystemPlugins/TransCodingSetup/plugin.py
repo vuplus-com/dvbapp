@@ -47,6 +47,15 @@ class TranscodingSetupInit:
 			if fileExists(x[1]):
 				TranscodingConfigList.append(x)
 
+	def getModel(self):
+		if fileExists("/proc/stb/info/vumodel"):
+			fd = open("/proc/stb/info/vumodel")
+			vumodel=fd.read().strip()
+			fd.close()
+			return vumodel
+		else:
+			return False
+
 	def createConfig(self):
 		config.plugins.transcodingsetup = ConfigSubsection()
 		config.plugins.transcodingsetup.transcoding = ConfigSelection(default = "disable", choices = [ ("enable", _("enable")), ("disable", _("disable"))] )
@@ -54,7 +63,11 @@ class TranscodingSetupInit:
 		global TranscodingConfigList
 		for x in TranscodingConfigList:
 			if x[0] == "Bitrate":
-				config.plugins.transcodingsetup.bitrate = ConfigInteger(default = 2000000, limits = (100000, 5000000))
+				if self.getModel() == "solo2":
+					default_bitrate = 400000
+				else:
+					default_bitrate = 2000000
+				config.plugins.transcodingsetup.bitrate = ConfigInteger(default = default_bitrate, limits = (100000, 5000000))
 				x.append(config.plugins.transcodingsetup.bitrate)
 			elif x[0] == "Framerate":
 				config.plugins.transcodingsetup.framerate = ConfigSelection(default = "30000", choices = [ ("23976", _("23976")), ("24000", _("24000")), ("29970", _("29970")), ("30000", _("30000")), ("59940", _("59940")), ("60000", _("60000"))])
@@ -163,6 +176,7 @@ class TranscodingSetupInit:
 			old_value = fd.read().strip(' ').strip('\n')
 			fd.close()
 			if old_value != value:
+				print "<TranscodingSetup> set %s "%procPath, value
 				fd = open(procPath,'w')
 				fd.write(value)
 				fd.close()
