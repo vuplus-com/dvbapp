@@ -80,7 +80,7 @@ class AudioSelection(Screen, ConfigListScreen):
 			if SystemInfo["CanDownmixAC3"]:
 				self.settings.downmix = ConfigOnOff(default=config.av.downmix_ac3.value)
 				self.settings.downmix.addNotifier(self.changeAC3Downmix, initial_call = False)
-				conflist.append(getConfigListEntry(_("Dolby Digital downmix"), self.settings.downmix))
+				conflist.append(getConfigListEntry(_("Dolby Digital / DTS downmix"), self.settings.downmix))
 				self["key_red"].setBoolean(True)
 
 			if n > 0:
