@@ -276,6 +276,8 @@ lib/python/Plugins/SystemPlugins/TransCodingSetup/meta/Makefile
 lib/python/Plugins/SystemPlugins/TransCodingSetup/locale/Makefile
 lib/python/Plugins/SystemPlugins/WOLSetup/Makefile
 lib/python/Plugins/SystemPlugins/WOLSetup/meta/Makefile
+lib/python/Plugins/SystemPlugins/NetDrive/Makefile
+lib/python/Plugins/SystemPlugins/NetDrive/meta/Makefile
 lib/python/Tools/Makefile
 lib/service/Makefile
 lib/components/Makefile
