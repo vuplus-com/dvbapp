@@ -20,9 +20,9 @@ from os import system
 
 _default = {
 	"type"  :"ftp",
-	"server":" ",
-	"userid":" ",
-	"passwd":" ",
+	"server":"",
+	"userid":"",
+	"passwd":"",
 	"mountpoint":"/media/net/",
 	"startup":False,
 }
