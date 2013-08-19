@@ -196,6 +196,11 @@ lib/python/Plugins/Extensions/DLNABrowser/meta/Makefile
 lib/python/Plugins/Extensions/HbbTV/Makefile
 lib/python/Plugins/Extensions/HbbTV/meta/Makefile
 lib/python/Plugins/Extensions/HbbTV/locale/Makefile
+lib/python/Plugins/Extensions/BackupSuiteHDD/Makefile
+lib/python/Plugins/Extensions/BackupSuiteHDD/meta/Makefile
+lib/python/Plugins/Extensions/BackupSuiteHDD/locale/Makefile
+lib/python/Plugins/Extensions/BackupSuiteUSB/Makefile
+lib/python/Plugins/Extensions/BackupSuiteUSB/meta/Makefile
 lib/python/Plugins/SystemPlugins/CleanupWizard/Makefile
 lib/python/Plugins/SystemPlugins/CleanupWizard/meta/Makefile
 lib/python/Plugins/SystemPlugins/CommonInterfaceAssignment/Makefile
@@ -276,6 +281,8 @@ lib/python/Plugins/SystemPlugins/TransCodingSetup/meta/Makefile
 lib/python/Plugins/SystemPlugins/TransCodingSetup/locale/Makefile
 lib/python/Plugins/SystemPlugins/WOLSetup/Makefile
 lib/python/Plugins/SystemPlugins/WOLSetup/meta/Makefile
+lib/python/Plugins/SystemPlugins/NetDrive/Makefile
+lib/python/Plugins/SystemPlugins/NetDrive/meta/Makefile
 lib/python/Tools/Makefile
 lib/service/Makefile
 lib/components/Makefile
