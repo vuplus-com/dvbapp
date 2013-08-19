@@ -65,9 +65,13 @@ class TranscodingSetupInit:
 			if x[0] == "Bitrate":
 				if self.getModel() == "solo2":
 					default_bitrate = 400000
+					br_min = 50000
+					br_max = 1000000
 				else:
 					default_bitrate = 2000000
-				config.plugins.transcodingsetup.bitrate = ConfigInteger(default = default_bitrate, limits = (100000, 5000000))
+					br_min = 100000
+					br_max = 5000000
+				config.plugins.transcodingsetup.bitrate = ConfigInteger(default = default_bitrate, limits = (br_min, br_max))
 				x.append(config.plugins.transcodingsetup.bitrate)
 			elif x[0] == "Framerate":
 				config.plugins.transcodingsetup.framerate = ConfigSelection(default = "30000", choices = [ ("23976", _("23976")), ("24000", _("24000")), ("29970", _("29970")), ("30000", _("30000")), ("59940", _("59940")), ("60000", _("60000"))])
