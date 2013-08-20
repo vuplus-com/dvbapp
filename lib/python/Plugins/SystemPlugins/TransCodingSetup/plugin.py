@@ -74,7 +74,7 @@ class TranscodingSetupInit:
 				config.plugins.transcodingsetup.bitrate = ConfigInteger(default = default_bitrate, limits = (br_min, br_max))
 				x.append(config.plugins.transcodingsetup.bitrate)
 			elif x[0] == "Framerate":
-				config.plugins.transcodingsetup.framerate = ConfigSelection(default = "30000", choices = [ ("23976", _("23976")), ("24000", _("24000")), ("29970", _("29970")), ("30000", _("30000")), ("59940", _("59940")), ("60000", _("60000"))])
+				config.plugins.transcodingsetup.framerate = ConfigSelection(default = "30000", choices = [ ("23976", _("23976")), ("24000", _("24000")), ("25000", _("25000")), ("29970", _("29970")), ("30000", _("30000")), ("50000", _("50000")), ("59940", _("59940")), ("60000", _("60000"))])
 				x.append(config.plugins.transcodingsetup.framerate)
 
 	def setTranscoding(self, transcoding, port):
