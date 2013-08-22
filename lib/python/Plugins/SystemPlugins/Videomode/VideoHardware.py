@@ -56,8 +56,8 @@ class VideoHardware:
 	}
 
 	widescreen_modes = set(["720p", "1080i", "1080p"])
-	hdmi_hw_types = set(["dm500", "dm800se", "dm7020hd", "duo", "solo", "uno", "ultimo", "solo2", "duo2"])
-	hdmi_pc_hw_types = set(["dm500", "dm800se", "dm7020hd", "duo", "solo", "uno", "ultimo", "solo2", "duo2"])
+	hdmi_hw_types = set(["dm500", "dm800se", "dm7020hd", "bm750", "solo", "uno", "ultimo", "solo2", "duo2"])
+	hdmi_pc_hw_types = set(["dm500", "dm800se", "dm7020hd", "bm750", "solo", "uno", "ultimo", "solo2", "duo2"])
 
 	def getDeviceName(self):
 		device_name = "unknown"
@@ -72,7 +72,7 @@ class VideoHardware:
 		return device_name
 
 	def isVumodel(self, hw_type):
-		return hw_type in set(["duo", "solo", "uno", "ultimo", "solo2", "duo2"])
+		return hw_type in set(["bm750", "solo", "uno", "ultimo", "solo2", "duo2"])
 
 	# re-define AVSwitch.getOutputAspect
 	def getOutputAspect(self):
@@ -134,7 +134,7 @@ class VideoHardware:
 				config.av.videorate[mode[0]].addNotifier(self.changedVideomode)
 
 		self.is_init = False
-	
+
 	def readAvailableModes(self):
 		try:
 			modes = open("/proc/stb/video/videomode_choices").read()[:-1]
@@ -155,7 +155,7 @@ class VideoHardware:
 			self.last_modes_preferred = self.modes_preferred
 			print "hotplug on DVI"
 			self.on_hotplug("DVI") # must be DVI
-	
+
 	# check if HDMI is available
 	def isHDMIAvailable(self, hw_type):
 		return hw_type in self.hdmi_hw_types
@@ -241,7 +241,7 @@ class VideoHardware:
 				config.av.videorate[mode[0]] = ConfigSelection(choices = ratelist)
 			config.av.videomode[port] = ConfigSelection(choices = modelist)
 		config.av.videoport = ConfigSelection(choices = portlist)
-	
+
 	def changedVideomode(self, configElement):
 		if self.is_init:
 			return
@@ -303,9 +303,9 @@ class VideoHardware:
 				open("/proc/stb/video/videomode", "w").write(mode_50)
 			except IOError:
 				print "cannot open /proc/stb/vide/videomode"
-		
+
 		self.changedAspect(None)
-	
+
 	def changedAspect(self, configElement):
 		if self.is_init:
 			return
@@ -344,7 +344,7 @@ class VideoHardware:
 			policy2 = {"letterbox": "letterbox", "panscan": "panscan", "scale": "bestfit"}[config.av.policy_169.value]
 		elif valstr == "auto":
 			aspect = "any"
-			policy = "bestfit" 
+			policy = "bestfit"
 		else:
 			aspect = "4:3"
 			policy = {"letterbox": "letterbox", "panscan": "panscan", "scale": "bestfit"}[config.av.policy_169.value]
@@ -366,14 +366,14 @@ class VideoHardware:
 			open("/proc/stb/video/policy2", "w").write(policy2)
 		except IOError:
 			pass
-	
+
 	def isPortUsed(self, port):
 		if port == "DVI":
 			self.readPreferredModes()
 			return len(self.modes_preferred) != 0
 		else:
 			return True
-	
+
 	def saveVideomode(self, port, mode, rate):
 		print "save Videomode", port, mode, rate
 		config.av.videoport.value = port
@@ -391,10 +391,10 @@ class VideoHardware:
 
 	def saveMode(self, port, mode, rate):
 		self.saveVideomode(port, mode, rate)
-	
+
 	def updateAspect(self, configElement):
 		self.changedAspect(configElement)
-	
+
 video_hw = VideoHardware()
 video_hw.setConfiguredMode()
 
