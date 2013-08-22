@@ -64,14 +64,9 @@ class TranscodingSetupInit:
 		for x in TranscodingConfigList:
 			if x[0] == "Bitrate":
 				if self.getModel() == "solo2":
-					default_bitrate = 400000
-					br_min = 50000
-					br_max = 1000000
+					config.plugins.transcodingsetup.bitrate = ConfigInteger(default = 400000, limits = (50000, 1000000))
 				else:
-					default_bitrate = 2000000
-					br_min = 100000
-					br_max = 5000000
-				config.plugins.transcodingsetup.bitrate = ConfigInteger(default = default_bitrate, limits = (br_min, br_max))
+					config.plugins.transcodingsetup.bitrate = ConfigInteger(default = 2000000, limits = (100000, 5000000))
 				x.append(config.plugins.transcodingsetup.bitrate)
 			elif x[0] == "Framerate":
 				config.plugins.transcodingsetup.framerate = ConfigSelection(default = "30000", choices = [ ("23976", _("23976")), ("24000", _("24000")), ("25000", _("25000")), ("29970", _("29970")), ("30000", _("30000")), ("50000", _("50000")), ("59940", _("59940")), ("60000", _("60000"))])
@@ -195,40 +190,26 @@ class TranscodingSetupInit:
 
 class TranscodingSetup(Screen,ConfigListScreen, TranscodingSetupInit):
 	skin =  """
-		<screen position="center,center" size="400,270" title="Transcoding Setup" >
+		<screen position="center,center" size="540,320">
 			<ePixmap pixmap="skin_default/buttons/red.png" position="30,10" size="140,40" alphatest="on" />
-			<ePixmap pixmap="skin_default/buttons/green.png" position="230,10" size="140,40" alphatest="on" />
+			<ePixmap pixmap="skin_default/buttons/green.png" position="200,10" size="140,40" alphatest="on" />
+			<ePixmap pixmap="skin_default/buttons/yellow.png" position="370,10" size="140,40" alphatest="on" />
 			<widget source="key_red" render="Label" position="30,10" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" foregroundColor="#ffffff" transparent="1" />
-			<widget source="key_green" render="Label" position="230,10" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" foregroundColor="#ffffff" transparent="1" />
-			<widget name="config" zPosition="2" position="5,70" size="390,70" scrollbarMode="showOnDemand" transparent="1" />
-			<widget source="text" render="Label" position="20,140" size="370,130" font="Regular;18" halign="center" valign="center" />
-		</screen>
-		"""
-	skin_ext =  """
-		<screen position="center,center" size="400,320" title="Transcoding Setup" >
-			<ePixmap pixmap="skin_default/buttons/red.png" position="30,10" size="140,40" alphatest="on" />
-			<ePixmap pixmap="skin_default/buttons/green.png" position="230,10" size="140,40" alphatest="on" />
-			<widget source="key_red" render="Label" position="30,10" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" foregroundColor="#ffffff" transparent="1" />
-			<widget source="key_green" render="Label" position="230,10" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" foregroundColor="#ffffff" transparent="1" />
-			<widget name="config" zPosition="2" position="5,70" size="390,120" scrollbarMode="showOnDemand" transparent="1" />
-			<widget source="text" render="Label" position="20,190" size="370,130" font="Regular;18" halign="center" valign="center" />
+			<widget source="key_green" render="Label" position="200,10" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" foregroundColor="#ffffff" transparent="1" />
+			<widget source="key_yellow" render="Label" position="370,10" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#a08500" foregroundColor="#ffffff" transparent="1" />
+			<widget name="config" zPosition="2" position="20,70" size="500,120" scrollbarMode="showOnDemand" transparent="1" />
+			<widget source="text" render="Label" position="30,190" size="480,130" font="Regular;18" halign="center" valign="center" />
 		</screen>
 		"""
 
 	def __init__(self,session):
-		if fileExists("/proc/stb/encoder/0/framerate"):
-			self.skin = TranscodingSetup.skin_ext
-			Screen.__init__(self,session)
-			self.skinName = "TranscodingSetup_ext"
-		else:
-			Screen.__init__(self,session)
-
-		if self.getModel() == "duo2":
-			TEXT = _("Transcoding can be started when there is no corresponding channel recordings.")
-			TEXT += _("\nWhen transcoding, PIP is disabled.")
-		else:
-			TEXT = _("Transcoding can be started when there is no corresponding channel recordings.")
+		Screen.__init__(self,session)
+		self.setTitle(_("Transcoding Setup"))
+		TEXT = _("Transcoding can be started when there is no corresponding channel recordings.")
+		if self.getModel() == "solo2":
 			TEXT += _("\nWhen transcoding, both PIP and analog video outputs are disabled.")
+		else:
+			TEXT += _("\nWhen transcoding, PIP is disabled.")
 		self.session = session
 		self["shortcuts"] = ActionMap(["ShortcutActions", "SetupActions" ],
 		{
@@ -236,11 +217,13 @@ class TranscodingSetup(Screen,ConfigListScreen, TranscodingSetupInit):
 			"cancel": self.keyCancel,
 			"red": self.keyCancel,
 			"green": self.keySave,
+			"yellow" : self.KeyDefault,
 		}, -2)
 		self.list = []
 		ConfigListScreen.__init__(self, self.list,session = self.session)
 		self["key_red"] = StaticText(_("Cancel"))
 		self["key_green"] = StaticText(_("Ok"))
+		self["key_yellow"] = StaticText(_("Default"))
 		self["text"] = StaticText(_("%s")%TEXT)
 		self.createSetup()
 		self.onLayoutFinish.append(self.checkEncoder)
@@ -294,6 +277,16 @@ class TranscodingSetup(Screen,ConfigListScreen, TranscodingSetupInit):
 			else:
 				self.session.openWithCallback(self.close, MessageBox, _("OK. Encoder %s.")%transcoding, MessageBox.TYPE_INFO)
 			self.close()
+
+	def KeyDefault(self):
+		config.plugins.transcodingsetup.port.value = config.plugins.transcodingsetup.port.default
+		global TranscodingConfigList
+		for x in TranscodingConfigList:
+			 if x[0] == "Bitrate":
+				config.plugins.transcodingsetup.bitrate.value = config.plugins.transcodingsetup.bitrate.default
+			 elif x[0] == "Framerate":
+				config.plugins.transcodingsetup.framerate.value = config.plugins.transcodingsetup.framerate.default
+		self.createSetup()
 
 	def resetConfig(self):
 		for x in self["config"].list:
