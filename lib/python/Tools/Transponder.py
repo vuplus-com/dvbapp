@@ -131,7 +131,7 @@ def ConvertToHumanReadable(tp, type = None):
 			eDVBFrontendParametersTerrestrial.Inversion_Off : _("Off")}[tp["inversion"]]
 		ret["system"] = {
 			eDVBFrontendParametersTerrestrial.System_DVB_T : "DVB-T",
-			eDVBFrontendParametersTerrestrial.System_DVB_T2 : "DVB-T2"}.get(tp.get("system"))
+			eDVBFrontendParametersTerrestrial.System_DVB_T2 : "DVB-T2"}[tp.get("system")]
 	else:
 		print "ConvertToHumanReadable: no or unknown type in tpdata dict!"
 	for x in tp.keys():

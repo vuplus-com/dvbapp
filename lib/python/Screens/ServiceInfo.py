@@ -203,7 +203,7 @@ class ServiceInfo(Screen):
 						(_("Inversion"), frontendData["inversion"], TYPE_TEXT),
 						(_("FEC"), frontendData["fec_inner"], TYPE_TEXT))
 			elif frontendDataOrg["tuner_type"] == "DVB-T":
-				data = ((_("NIM"), ('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H')[frontendData["tuner_number"]], TYPE_TEXT),
+				return ((_("NIM"), ('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H')[frontendData["tuner_number"]], TYPE_TEXT),
 						(_("Type"), frontendData["tuner_type"], TYPE_TEXT),
 						(_("System"), frontendData["system"], TYPE_TEXT),
 						(_("Frequency"), frontendData["frequency"], TYPE_VALUE_DEC),
@@ -216,7 +216,9 @@ class ServiceInfo(Screen):
 						(_("Guard interval"), frontendData["guard_interval"], TYPE_TEXT),
 						(_("Hierarchy info"), frontendData["hierarchy_information"], TYPE_TEXT))
 				if frontendData.has_key("plp_id"):
-					data[len(data)] = ((_("PLP ID"), frontendData["plp_id"], TYPE_VALUE_DEC))
+					data += ((_("PLP ID"), frontendData["plp_id"], TYPE_VALUE_DEC), )
+				return data
+
 		return [ ]
 
 	def fillList(self, Labels):
