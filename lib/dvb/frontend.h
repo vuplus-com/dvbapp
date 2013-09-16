@@ -79,6 +79,7 @@ private:
 	bool m_rotor_mode;
 	bool m_need_rotor_workaround;
 	bool m_can_handle_dvbs2;
+	bool m_can_handle_dvbt2;
 	char m_filename[128];
 	char m_description[128];
 #if HAVE_DVB_API_VERSION < 3

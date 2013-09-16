@@ -190,7 +190,7 @@ class NimSetup(Screen, ConfigListScreen, ServiceStopScreen):
 					self.list.append(getConfigListEntry(_("Scan additional SR"), self.nimConfig.cable.scan_sr_ext1))
 					self.list.append(getConfigListEntry(_("Scan additional SR"), self.nimConfig.cable.scan_sr_ext2))
 			self.have_advanced = False
-		elif self.nim.isCompatible("DVB-T"):
+		elif self.nim.isCompatible("DVB-T") or self.nim.isCompatible("DVB-T2"):
 			self.configMode = getConfigListEntry(_("Configuration Mode"), self.nimConfig.configMode)
 			self.list.append(self.configMode)
 			self.have_advanced = False
@@ -574,7 +574,7 @@ class NimSelection(Screen):
 							text = _("simple")
 					elif nimConfig.configMode.value == "advanced":
 						text = _("advanced")
-				elif x.isCompatible("DVB-T") or x.isCompatible("DVB-C"):
+				elif x.isCompatible("DVB-T") or x.isCompatible("DVB-T2") or x.isCompatible("DVB-C"):
 					if nimConfig.configMode.value == "nothing":
 						text = _("nothing connected")
 					elif nimConfig.configMode.value == "enabled":

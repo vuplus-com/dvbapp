@@ -153,7 +153,7 @@ class SecConfigure:
 
 		for slot in nim_slots:
 			if slot.type is not None:
-				used_nim_slots.append((slot.slot, slot.description, slot.config.configMode.value != "nothing" and True or False, slot.isCompatible("DVB-S2"), slot.frontend_id is None and -1 or slot.frontend_id))
+				used_nim_slots.append((slot.slot, slot.description, slot.config.configMode.value != "nothing" and True or False, slot.isCompatible("DVB-S2"), slot.isCompatible("DVB-T2"), slot.frontend_id is None and -1 or slot.frontend_id))
 		eDVBResourceManager.getInstance().setFrontendSlotInformations(used_nim_slots)
 
 		for slot in nim_slots:
@@ -488,7 +488,7 @@ class NIM(object):
 	def __init__(self, slot, type, description, has_outputs = True, internally_connectable = None, multi_type = {}, frontend_id = None, i2c = None, is_empty = False):
 		self.slot = slot
 
-		if type not in ("DVB-S", "DVB-C", "DVB-T", "DVB-S2", None):
+		if type not in ("DVB-S", "DVB-C", "DVB-T", "DVB-S2", "DVB-T2", None):
 			print "warning: unknown NIM type %s, not using." % type
 			type = None
 
@@ -509,7 +509,8 @@ class NIM(object):
 				"DVB-S": ("DVB-S", None),
 				"DVB-C": ("DVB-C", None),
 				"DVB-T": ("DVB-T", None),
-				"DVB-S2": ("DVB-S", "DVB-S2", None)
+				"DVB-S2": ("DVB-S", "DVB-S2", None),
+				"DVB-T2": ("DVB-T", "DVB-T2", None)
 			}
 		return what in compatible[self.type]
 	
@@ -521,7 +522,8 @@ class NIM(object):
 				"DVB-S": ("DVB-S", "DVB-S2"),
 				"DVB-C": ("DVB-C",),
 				"DVB-T": ("DVB-T",),
-				"DVB-S2": ("DVB-S", "DVB-S2")
+				"DVB-S2": ("DVB-S", "DVB-S2"),
+				"DVB-T2": ("DVB-T", "DVB-T2",)
 			}
 		return connectable[self.type]
 
@@ -575,8 +577,9 @@ class NIM(object):
 		return {
 			"DVB-S": "DVB-S", 
 			"DVB-T": "DVB-T",
-			"DVB-S2": "DVB-S2",
 			"DVB-C": "DVB-C",
+			"DVB-S2": "DVB-S2",
+			"DVB-T2": "DVB-T2",
 			None: _("empty")
 			}[self.type]
 
@@ -841,6 +844,8 @@ class NimManager:
 		type = self.getNimType(slotid)
 		if type == "DVB-S2":
 			type = "DVB-S"
+		elif type == "DVB-T2":
+			type = "DVB-T"
 		nimList = self.getNimListOfType(type, slotid)
 		for nim in nimList[:]:
 			mode = self.getNimConfig(nim)
@@ -852,6 +857,8 @@ class NimManager:
 		type = self.getNimType(slotid)
 		if type == "DVB-S2":
 			type = "DVB-S"
+		elif type == "DVB-T2":
+			type = "DVB-T"
 		nimList = self.getNimListOfType(type, slotid)
 		positionerList = []
 		for nim in nimList[:]:
@@ -906,7 +913,7 @@ class NimManager:
 			nim = config.Nims[slotid]
 			configMode = nim.configMode.value
 		
-			if self.nim_slots[slotid].isCompatible("DVB-S") or self.nim_slots[slotid].isCompatible("DVB-T") or self.nim_slots[slotid].isCompatible("DVB-C"):
+			if self.nim_slots[slotid].isCompatible("DVB-S") or self.nim_slots[slotid].isCompatible("DVB-T") or self.nim_slots[slotid].isCompatible("DVB-C") or self.nim_slots[slotid].isCompatible("DVB-T2"):
 				return not (configMode == "nothing")		
 
 	def getSatListForNim(self, slotid):
@@ -1494,6 +1501,20 @@ def InitNimManager(nimmgr):
 			nim.cable.scan_sr_ext1 = ConfigInteger(default = 0, limits = (0, 7230))
 			nim.cable.scan_sr_ext2 = ConfigInteger(default = 0, limits = (0, 7230))
 		elif slot.isCompatible("DVB-T"):
+			nim.configMode = ConfigSelection(
+				choices = {
+					"enabled": _("enabled"),
+					"nothing": _("nothing connected"),
+					},
+				default = "enabled")
+			list = []
+			n = 0
+			for x in nimmgr.terrestrialsList:
+				list.append((str(n), x[0]))
+				n += 1
+			nim.terrestrial = ConfigSelection(choices = list)
+			nim.terrestrial_5V = ConfigOnOff()
+		elif slot.isCompatible("DVB-T2"):
 			nim.configMode = ConfigSelection(
 				choices = {
 					"enabled": _("enabled"),

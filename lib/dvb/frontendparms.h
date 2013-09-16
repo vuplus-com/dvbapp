@@ -74,20 +74,21 @@ struct eDVBFrontendParametersTerrestrial
 #ifndef SWIG
 	void set(const TerrestrialDeliverySystemDescriptor  &);
 #endif
-	enum {
-		Bandwidth_8MHz, Bandwidth_7MHz, Bandwidth_6MHz, /*Bandwidth_5MHz,*/ Bandwidth_Auto
-	}; // Bw5Mhz nyi (compatibilty with enigma1)
 
 	enum {
-		FEC_1_2, FEC_2_3, FEC_3_4, FEC_5_6, FEC_7_8, FEC_Auto
+		Bandwidth_8MHz, Bandwidth_7MHz, Bandwidth_6MHz, Bandwidth_Auto, Bandwidth_5MHz, Bandwidth_10MHz, Bandwidth_1_712MHz
 	};
 
 	enum {
-		TransmissionMode_2k, TransmissionMode_8k, /*TransmissionMode_4k,*/ TransmissionMode_Auto
-	}; // TM4k nyi (compatibility with enigma1)
+		FEC_1_2, FEC_2_3, FEC_3_4, FEC_4_5, FEC_5_6, FEC_7_8, FEC_Auto, FEC_6_7, FEC_8_9
+	};
 
 	enum {
-		GuardInterval_1_32, GuardInterval_1_16, GuardInterval_1_8, GuardInterval_1_4, GuardInterval_Auto
+		TransmissionMode_2k, TransmissionMode_8k, TransmissionMode_Auto, TransmissionMode_4k, TransmissionMode_1k, TransmissionMode_16k, TransmissionMode_32k
+	};
+
+	enum {
+		GuardInterval_1_32, GuardInterval_1_16, GuardInterval_1_8, GuardInterval_1_4, GuardInterval_Auto, GuardInterval_1_128, GuardInterval_19_128, GuardInterval_19_256
 	};
 
 	enum {
@@ -95,11 +96,15 @@ struct eDVBFrontendParametersTerrestrial
 	};
 
 	enum {
-		Modulation_QPSK, Modulation_QAM16, Modulation_QAM64, Modulation_Auto
+		Modulation_QPSK, Modulation_QAM16, Modulation_QAM64, Modulation_Auto, Modulation_QAM256
 	};
 
 	enum {
 		Inversion_Off, Inversion_On, Inversion_Unknown
+	};
+
+	enum {
+		System_DVB_T, System_DVB_T2
 	};
 
 	unsigned int frequency;
@@ -110,6 +115,8 @@ struct eDVBFrontendParametersTerrestrial
 	int guard_interval;
 	int hierarchy;
 	int inversion;
+	int system;
+	int plpid;
 };
 SWIG_ALLOW_OUTPUT_SIMPLE(eDVBFrontendParametersTerrestrial);
 

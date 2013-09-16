@@ -72,34 +72,49 @@ def ConvertToHumanReadable(tp, type = None):
 		ret["tuner_type"] = _("Terrestrial")
 		ret["bandwidth"] = {
 			eDVBFrontendParametersTerrestrial.Bandwidth_Auto : _("Auto"),
+			eDVBFrontendParametersTerrestrial.Bandwidth_10MHz : "10 MHz",
 			eDVBFrontendParametersTerrestrial.Bandwidth_8MHz : "8 MHz",
 			eDVBFrontendParametersTerrestrial.Bandwidth_7MHz : "7 MHz",
-			eDVBFrontendParametersTerrestrial.Bandwidth_6MHz : "6 MHz"}[tp["bandwidth"]]
+			eDVBFrontendParametersTerrestrial.Bandwidth_6MHz : "6 MHz",
+			eDVBFrontendParametersTerrestrial.Bandwidth_5MHz : "5 MHz",
+			eDVBFrontendParametersTerrestrial.Bandwidth_1_712MHz : "1.172 MHz"}[tp["bandwidth"]]
 		ret["code_rate_lp"] = {
 			eDVBFrontendParametersTerrestrial.FEC_Auto : _("Auto"),
 			eDVBFrontendParametersTerrestrial.FEC_1_2 : "1/2",
 			eDVBFrontendParametersTerrestrial.FEC_2_3 : "2/3",
 			eDVBFrontendParametersTerrestrial.FEC_3_4 : "3/4",
 			eDVBFrontendParametersTerrestrial.FEC_5_6 : "5/6",
-			eDVBFrontendParametersTerrestrial.FEC_7_8 : "7/8"}[tp["code_rate_lp"]]
+			eDVBFrontendParametersTerrestrial.FEC_6_7 : "6/7",
+			eDVBFrontendParametersTerrestrial.FEC_7_8 : "7/8",
+			eDVBFrontendParametersTerrestrial.FEC_8_9 : "8/9"}.get(tp.get("code_rate_lp"))
 		ret["code_rate_hp"] = {
 			eDVBFrontendParametersTerrestrial.FEC_Auto : _("Auto"),
 			eDVBFrontendParametersTerrestrial.FEC_1_2 : "1/2",
 			eDVBFrontendParametersTerrestrial.FEC_2_3 : "2/3",
 			eDVBFrontendParametersTerrestrial.FEC_3_4 : "3/4",
 			eDVBFrontendParametersTerrestrial.FEC_5_6 : "5/6",
-			eDVBFrontendParametersTerrestrial.FEC_7_8 : "7/8"}[tp["code_rate_hp"]]
+			eDVBFrontendParametersTerrestrial.FEC_6_7 : "6/7",
+			eDVBFrontendParametersTerrestrial.FEC_7_8 : "7/8",
+			eDVBFrontendParametersTerrestrial.FEC_8_9 : "8/9"}.get(tp.get("code_rate_hp"))
 		ret["constellation"] = {
 			eDVBFrontendParametersTerrestrial.Modulation_Auto : _("Auto"),
 			eDVBFrontendParametersTerrestrial.Modulation_QPSK : "QPSK",
 			eDVBFrontendParametersTerrestrial.Modulation_QAM16 : "QAM16",
-			eDVBFrontendParametersTerrestrial.Modulation_QAM64 : "QAM64"}[tp["constellation"]]
+			eDVBFrontendParametersTerrestrial.Modulation_QAM64 : "QAM64",
+			eDVBFrontendParametersTerrestrial.Modulation_QAM256 : "QAM256"}.get(tp.get("constellation"))
 		ret["transmission_mode"] = {
 			eDVBFrontendParametersTerrestrial.TransmissionMode_Auto : _("Auto"),
+			eDVBFrontendParametersTerrestrial.TransmissionMode_1k : "1k",
 			eDVBFrontendParametersTerrestrial.TransmissionMode_2k : "2k",
-			eDVBFrontendParametersTerrestrial.TransmissionMode_8k : "8k"}[tp["transmission_mode"]]
+			eDVBFrontendParametersTerrestrial.TransmissionMode_4k : "4k",
+			eDVBFrontendParametersTerrestrial.TransmissionMode_8k : "8k",
+			eDVBFrontendParametersTerrestrial.TransmissionMode_16k : "16k",
+			eDVBFrontendParametersTerrestrial.TransmissionMode_32k : "32k"}.get(tp.get("transmission_mode"))
 		ret["guard_interval"] = {
 			eDVBFrontendParametersTerrestrial.GuardInterval_Auto : _("Auto"),
+			eDVBFrontendParametersTerrestrial.GuardInterval_19_256 : "19/256",
+			eDVBFrontendParametersTerrestrial.GuardInterval_19_128 : "19/128",
+			eDVBFrontendParametersTerrestrial.GuardInterval_1_128 : "1/128",
 			eDVBFrontendParametersTerrestrial.GuardInterval_1_32 : "1/32",
 			eDVBFrontendParametersTerrestrial.GuardInterval_1_16 : "1/16",
 			eDVBFrontendParametersTerrestrial.GuardInterval_1_8 : "1/8",
@@ -114,6 +129,9 @@ def ConvertToHumanReadable(tp, type = None):
 			eDVBFrontendParametersTerrestrial.Inversion_Unknown : _("Auto"),
 			eDVBFrontendParametersTerrestrial.Inversion_On : _("On"),
 			eDVBFrontendParametersTerrestrial.Inversion_Off : _("Off")}[tp["inversion"]]
+		ret["system"] = {
+			eDVBFrontendParametersTerrestrial.System_DVB_T : "DVB-T",
+			eDVBFrontendParametersTerrestrial.System_DVB_T2 : "DVB-T2"}.get(tp.get("system"))
 	else:
 		print "ConvertToHumanReadable: no or unknown type in tpdata dict!"
 	for x in tp.keys():

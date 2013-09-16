@@ -80,12 +80,28 @@ class ServiceScan:
 					elif tp_type == iDVBFrontend.feTerrestrial:
 						network = _("Terrestrial")
 						tp = transponder.getDVBT()
-						tp_text = ("DVB-T %s %d %s") %( { tp.Modulation_QPSK : "QPSK",
-							tp.Modulation_QAM16 : "QAM16", tp.Modulation_QAM64 : "QAM64",
-							tp.Modulation_Auto : "AUTO" }.get(tp.modulation, tp.Modulation_Auto),
+						tp_text = ("%s %s %d %s") %(
+							{
+								tp.System_DVB_T : "DVB-T",
+								tp.System_DVB_T2 : "DVB-T2"
+							}.get(tp.system, ""),
+							{
+								tp.Modulation_QPSK : "QPSK",
+								tp.Modulation_QAM16 : "QAM16",
+								tp.Modulation_QAM64 : "QAM64",
+								tp.Modulation_QAM256 : "QAM256",
+								tp.Modulation_Auto : "AUTO"
+							}.get(tp.modulation, tp.Modulation_Auto),
 							tp.frequency,
-							{ tp.Bandwidth_8MHz : "Bw 8MHz", tp.Bandwidth_7MHz : "Bw 7MHz", tp.Bandwidth_6MHz : "Bw 6MHz",
-								tp.Bandwidth_Auto : "Bw Auto" }.get(tp.bandwidth, tp.Bandwidth_Auto))
+							{
+								tp.Bandwidth_8MHz : "Bw 8MHz",
+								tp.Bandwidth_7MHz : "Bw 7MHz",
+								tp.Bandwidth_6MHz : "Bw 6MHz",
+								tp.Bandwidth_Auto : "Bw Auto",
+								tp.Bandwidth_5MHz : "Bw 5MHz",
+								tp.Bandwidth_10MHz : "Bw 10MHz",
+								tp.Bandwidth_1_712MHz : "Bw 1.712MHz"
+							}.get(tp.bandwidth, tp.Bandwidth_Auto))
 					else:
 						print "unknown transponder type in scanStatusChanged"
 				self.network.setText(network)
