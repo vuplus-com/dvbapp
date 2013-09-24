@@ -2258,17 +2258,22 @@ void eDVBFrontend::setFrontend(bool recvEvents)
 		}
 		else if (m_type == iDVBFrontend::feCable)
 		{
-			struct dtv_property p[7];
+			struct dtv_property p[8];
 			struct dtv_properties cmdseq;
 			cmdseq.props = p;
 			p[0].cmd = DTV_CLEAR;
-			p[1].cmd = DTV_FREQUENCY,	p[1].u.data = parm_frequency;
-			p[2].cmd = DTV_MODULATION,	p[2].u.data = parm_u_qam_modulation;
-			p[3].cmd = DTV_SYMBOL_RATE,	p[3].u.data = parm_u_qam_symbol_rate;
-			p[4].cmd = DTV_INNER_FEC,	p[4].u.data = parm_u_qam_fec_inner;
-			p[5].cmd = DTV_INVERSION,	p[5].u.data = parm_inversion;
-			p[6].cmd = DTV_TUNE;
-			cmdseq.num = 7;
+#if DVB_API_VERSION > 5 || DVB_API_VERSION == 5 && DVB_API_VERSION_MINOR >= 6
+			p[1].cmd = DTV_DELIVERY_SYSTEM,	p[1].u.data = SYS_DVBC_ANNEX_A;
+#else
+			p[1].cmd = DTV_DELIVERY_SYSTEM,	p[1].u.data = SYS_DVBC_ANNEX_AC;
+#endif
+			p[2].cmd = DTV_FREQUENCY,	p[2].u.data = parm_frequency;
+			p[3].cmd = DTV_MODULATION,	p[3].u.data = parm_u_qam_modulation;
+			p[4].cmd = DTV_SYMBOL_RATE,	p[4].u.data = parm_u_qam_symbol_rate;
+			p[5].cmd = DTV_INNER_FEC,	p[5].u.data = parm_u_qam_fec_inner;
+			p[6].cmd = DTV_INVERSION,	p[6].u.data = parm_inversion;
+			p[7].cmd = DTV_TUNE;
+			cmdseq.num = 8;
 			if (ioctl(m_fd, FE_SET_PROPERTY, &cmdseq) == -1)
 			{
 				perror("FE_SET_PROPERTY failed");
