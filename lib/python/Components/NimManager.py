@@ -913,7 +913,7 @@ class NimManager:
 			nim = config.Nims[slotid]
 			configMode = nim.configMode.value
 		
-			if self.nim_slots[slotid].isCompatible("DVB-S") or self.nim_slots[slotid].isCompatible("DVB-T") or self.nim_slots[slotid].isCompatible("DVB-C") or self.nim_slots[slotid].isCompatible("DVB-T2"):
+			if self.nim_slots[slotid].isCompatible("DVB-S") or self.nim_slots[slotid].isCompatible("DVB-T") or self.nim_slots[slotid].isCompatible("DVB-C"):
 				return not (configMode == "nothing")		
 
 	def getSatListForNim(self, slotid):
@@ -1501,20 +1501,6 @@ def InitNimManager(nimmgr):
 			nim.cable.scan_sr_ext1 = ConfigInteger(default = 0, limits = (0, 7230))
 			nim.cable.scan_sr_ext2 = ConfigInteger(default = 0, limits = (0, 7230))
 		elif slot.isCompatible("DVB-T"):
-			nim.configMode = ConfigSelection(
-				choices = {
-					"enabled": _("enabled"),
-					"nothing": _("nothing connected"),
-					},
-				default = "enabled")
-			list = []
-			n = 0
-			for x in nimmgr.terrestrialsList:
-				list.append((str(n), x[0]))
-				n += 1
-			nim.terrestrial = ConfigSelection(choices = list)
-			nim.terrestrial_5V = ConfigOnOff()
-		elif slot.isCompatible("DVB-T2"):
 			nim.configMode = ConfigSelection(
 				choices = {
 					"enabled": _("enabled"),
