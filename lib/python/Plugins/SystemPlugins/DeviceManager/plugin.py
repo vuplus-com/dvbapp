@@ -525,7 +525,7 @@ class DeviceInit(Screen):
 		self.devicesize = int(devicesize)
 		self.inputbox_partitions = 1
 		self.inputbox_partitionSizeList = []
-		self.inputbox_partitionSizeTotal = self.inputbox_partitionSizeRemain = int(self.devicesize/1024/1024)
+		self.inputbox_partitionSizeTotal = int(self.devicesize/1024/1024)
 		self.msgWaiting = None
 		self.msgWaitingMkfs = None
 		self.devicenumber = 0
@@ -544,6 +544,11 @@ class DeviceInit(Screen):
 		self.doMkfsTimer.callback.append(self.doMkfs)
 		self.doInitializeTimer = eTimer()
 		self.doInitializeTimer.callback.append(self.doInitialize)
+
+		self.partitionType = "MBR"
+		self.maxPartNum = 4
+		self.inputbox_partitionSizeRemain = self.inputbox_partitionSizeTotal
+		self.unit = "MB"
 
 	def timerStart(self):
 		self.initStartTimer.start(100,True)
@@ -579,13 +584,19 @@ class DeviceInit(Screen):
 		return True
 
 	def InitializeStart(self):
+		if self.devicesize >= ( 2.2 * 1000 * 1000 * 1000 * 1000 ): # 2.2TB
+			self.partitionType = "GPT"
+			self.maxPartNum = 20
+			self.inputbox_partitionSizeRemain = 100
+			self.unit = "%"
+
 		self.InputPartitionSize_step1()
 
 	def InputPartitionSize_step1(self):
-		self.session.openWithCallback(self.InputPartitionSize_step1_CB, InputBox, title=_("How many partitions do you want?(1-4)"), text="1", maxSize=False, type=Input.NUMBER)
+		self.session.openWithCallback(self.InputPartitionSize_step1_CB, InputBox, title=_("How many partitions do you want?(1-%d)" % self.maxPartNum), text="1", maxSize=False, type=Input.NUMBER)
 
 	def InputPartitionSize_step1_CB(self, ret):
-		if ret is not None and int(ret) in range(1,5): # ret in 1~4
+		if ret is not None and int(ret) in range(1,self.maxPartNum+1): # MBR 1~4, GPT 1~20
 			self.inputbox_partitions = int(ret)
 			self.InputPartitionSize_step2()
 		else:
@@ -600,7 +611,7 @@ class DeviceInit(Screen):
 			self.choiceBoxFstype()
 		else:
 			text = str(int(self.inputbox_partitionSizeRemain/(self.inputbox_partitions-len(self.inputbox_partitionSizeList) )))
-			self.session.openWithCallback(self.InputPartitionSize_step2_CB, InputBox, title=_("Input size of partition %s.(Max = %d MB)")%(current_partition,self.inputbox_partitionSizeRemain ), text=text, maxSize=False, type=Input.NUMBER)
+			self.session.openWithCallback(self.InputPartitionSize_step2_CB, InputBox, title=_("Input size of partition %s.(Unit = %s, Max = %d %s)")%(current_partition, self.unit, self.inputbox_partitionSizeRemain, self.unit), text=text, maxSize=False, type=Input.NUMBER)
 
 	def InputPartitionSize_step2_CB(self, ret):
 		if ret is not None:
@@ -635,8 +646,8 @@ class DeviceInit(Screen):
 #		print self.inputbox_partitionSizeList
 		partitionsInfo = ""
 		for index in range(len(self.inputbox_partitionSizeList)):
-			print "partition %d : %s Bytes"%(index+1, str(self.inputbox_partitionSizeList[index]))
-			partitionsInfo += "partition %d : %s MB\n"%(index+1, str(self.inputbox_partitionSizeList[index]))
+			print "partition %d : %s %s"%(index+1, str(self.inputbox_partitionSizeList[index]), self.unit)
+			partitionsInfo += "partition %d : %s %s\n"%(index+1, str(self.inputbox_partitionSizeList[index]), self.unit)
 		partitionsInfo += "filesystem type : %s"%(self.fstype)
 		self.session.openWithCallback(self.initInitializeConfirmCB, MessageBoxConfirm, _("%s\nStart Device Inititlization?") % partitionsInfo , MessageBox.TYPE_YESNO)
 
@@ -654,28 +665,79 @@ class DeviceInit(Screen):
 			msg += _("\nDevice : %s")%self.device
 			msg += _("\nSize : %s MB\n")%self.inputbox_partitionSizeTotal
 			for index in range(len(self.inputbox_partitionSizeList)):
-				msg += _("\npartition %d : %s MB")%(index+1, str(self.inputbox_partitionSizeList[index]))
+				msg += _("\npartition %d : %s %s")%(index+1, str(self.inputbox_partitionSizeList[index]), self.unit)
 			self.msgWaiting = self.session.openWithCallback(self.msgWaitingCB, MessageBox_2, msg, type = MessageBox.TYPE_INFO, enable_input = False)
 			self.doInitializeTimer.start(500,True)
 
 	def doInitialize(self):
+		def CheckPartedVer():
+			cmd = 'parted --version'
+			lines = os.popen(cmd).readlines()
+			for l in lines:
+				if l.find("parted (GNU parted)") != -1:
+					ver = l.split()[3].strip()
+					break
+			try:
+				ver = float(ver)
+			except:
+				print "[CheckPartedVer] check parted version Failed!"
+				return 0
+			return ver
+
+		partitions = len(self.inputbox_partitionSizeList) # get num of partition
 		set = ""
-		partitions = len(self.inputbox_partitionSizeList)
-		if partitions == 1:
-			cmd = 'printf "8,\n;0,0\n;0,0\n;0,0\ny\n" | sfdisk -f -uS /dev/' + self.device
+		if self.partitionType == "MBR":
+			if partitions == 1:
+				cmd = 'printf "8,\n;0,0\n;0,0\n;0,0\ny\n" | sfdisk -f -uS /dev/' + self.device
+			else:
+				for p in range(4):
+					if partitions > p+1:
+						set += ",%s\n"%(self.inputbox_partitionSizeList[p])
+					else:
+						set +=";\n"
+				set+="y\n"
+				cmd = 'printf "%s" | sfdisk -f -uM /dev/%s'%(set,self.device)
+
+		elif self.partitionType == "GPT": # partition type is GPT
+			setAlign = ""
+			partedVer = CheckPartedVer()
+			if partedVer >= 2.1: # align option is supported in version 2.1 or later
+				setAlign = "--align optimal"
+
+			if partitions == 1:
+				cmd = 'parted %s /dev/%s --script mklabel gpt mkpart disk ext2 0%% 100%%' % (setAlign, self.device)
+			else: # has multiple partitions
+				p_current = 0
+				for p in range(partitions):
+					if p == 0:
+						p_start = p_current
+						p_end = int( (long(self.inputbox_partitionSizeList[p]) * 100) / 100 )
+						p_current = p_end
+					elif p > 0 and partitions > (p + 1):
+						p_start = p_current
+						p_end = int( (long(self.inputbox_partitionSizeList[p]) * 100) / 100 )+ p_start
+						p_current = p_end
+					elif partitions == (p + 1):
+						p_start = p_current
+						p_end = 100
+					if p_start == p_end:
+						p_end +=1
+					if p_end > 100:
+						continue
+					set += 'mkpart disk%d ext2 %d%% %d%% ' % (p + 1, p_start, p_end)
+				cmd = 'parted %s /dev/%s --script mklabel gpt %s' % (setAlign, self.device, set)
 		else:
-			for p in range(4):
-				if partitions > p+1:
-					set += ",%s\n"%(self.inputbox_partitionSizeList[p])
-				else:
-					set +=";\n"
-			set+="y\n"
-			cmd = 'printf "%s" | sfdisk -f -uM /dev/%s'%(set,self.device)
+			errorMsg = "Invalid partitioning type"
+			self.msgWaiting.run_close(False, errorMsg)
+			return
 		self.deviceInitConsole.ePopen(cmd, self.initInitializeFinished)
 
 	def initInitializeFinished(self, result, retval, extra_args = None):
 		if retval == 0:
-			cmd = "sfdisk -R /dev/%s ; sleep 5" % (self.device)
+			if self.partitionType == "MBR":
+				cmd = "sfdisk -R /dev/%s ; sleep 5" % (self.device)
+			else: # is GPT
+				cmd = "sleep 5"
 			self.deviceInitConsole.ePopen(cmd, self.initInitializingRefreshFinished)
 		else:
 			errorMsg = "initInitializing device Error at /dev/%s"%self.device
@@ -695,7 +757,12 @@ class DeviceInit(Screen):
 				if len(res[3]) > 3 and res[3][:2] == "sd":
 					self.newpartitions += 1
 		partitions.close()
-		self.msgWaiting.run_close(True)
+		partNum = len(self.inputbox_partitionSizeList) # get num of partition
+		if self.newpartitions != partNum:
+			errorMsg = "Partitioning device Error at /dev/%s"%self.device
+			self.msgWaiting.run_close(False, errorMsg)
+		else:
+			self.msgWaiting.run_close(True)
 #		self.createFilesystem(self.newpartitions)
 
 	def createFilesystem(self, newpartitions):
@@ -739,7 +806,8 @@ class DeviceInit(Screen):
 		msg = _("Create filesystem, please wait ...")
 		msg += _("\nPartition : %s") % (fulldevicename)
 		msg += _("\nFilesystem : %s") % (self.fstype)
-		msg += _("\nSize : %d MB\n")%int(self.inputbox_partitionSizeList[self.devicenumber-1])
+		msg += _("\nDisk Size : %s MB") % (self.inputbox_partitionSizeTotal)
+		msg += _("\nPartition Size : %d %s\n") % (int(self.inputbox_partitionSizeList[self.devicenumber-1]), self.unit)
 		self.msgWaitingMkfs = self.session.openWithCallback(self.msgWaitingMkfsCB, MessageBox_2, msg, type = MessageBox.TYPE_INFO, enable_input = False)
 		self.mkfs_cmd = cmd
 		self.doMkfsTimer.start(500,True)
@@ -992,8 +1060,12 @@ class DeviceFormat(Screen):
 				cmd = "sfdisk -R /dev/%s; sleep 5"%(device)
 				self.deviceFormatConsole.ePopen(cmd, self.refreshPartitionFinished)
 		else:
-			errorMsg = _("Can not change the partition ID for %s")%device
-			self.msgWaiting.run_close(False,errorMsg)
+			if result and result.find("Use GNU Parted") > 0:
+				print "[DeviceManager] /dev/%s use GNU Parted!" % device
+				self.refreshPartitionFinished("NORESULT", 0)
+			else:
+				errorMsg = _("Can not change the partition ID for %s")%device
+				self.msgWaiting.run_close(False,errorMsg)
 
 	def refreshPartitionFinished(self, result, retval, extra_args = None):
 		print "refreshPartitionFinished!"
@@ -1087,6 +1159,16 @@ class DeviceInfo():
 				blockDevice["vendor"] = vendor # str
 				self.blockDeviceList.append(blockDevice)
 
+	def SortPartList(self, partList):
+		length = len(partList)-1
+		sorted = False
+		while sorted is False:
+			sorted = True
+			for idx in range(length):
+				if int(partList[idx][3:]) > int(partList[idx+1][3:]):
+					sorted = False
+					partList[idx] , partList[idx+1] = partList[idx+1], partList[idx]
+
 	def getBlockDeviceInfo(self, blockdev):
 		devpath = "/sys/block/" + blockdev
 		error = False
@@ -1109,6 +1191,8 @@ class DeviceInfo():
 				if partition[:len(blockdev)] != blockdev:
 					continue
 				partitions.append(partition)
+			self.SortPartList(partitions)
+
 		except IOError:
 			error = True
 		return error, blacklisted, removable, partitions, size, model, vendor
