@@ -119,6 +119,9 @@ class TranscodingSetupInit:
 				if line.find("transtreamproxy") != -1:
 					p=line.replace('\t',' ').find(' ')
 					line = port+line[p:]
+				elif line.find("filestreamproxy") != -1:
+					p=line.replace('\t',' ').find(' ')
+					line = "8003"+line[p:]
 				elif line.find("streamproxy") != -1:
 					p=line.replace('\t',' ').find(' ')
 					line = s_port+line[p:]
@@ -126,6 +129,8 @@ class TranscodingSetupInit:
 
 			if newdatas.find("transtreamproxy") == -1:
 				newdatas+=port+'\t'+'stream'+'\t'+'tcp'+'\t'+'nowait'+'\t'+'root'+'\t'+'/usr/bin/transtreamproxy'+'\t'+'transtreamproxy\n'
+			if newdatas.find("filestreamproxy") == -1:
+				newdatas+='8003\t'+'stream'+'\t'+'tcp'+'\t'+'nowait'+'\t'+'root'+'\t'+'/usr/bin/filestreamproxy'+'\t'+'filestreamproxy\n'
 			fd = file("/etc/inetd.conf",'w')
 			fd.write(newdatas)
 			fd.close()
