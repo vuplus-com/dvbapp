@@ -397,7 +397,6 @@ RESULT eDVBFrontendParameters::calculateDifference(const iDVBFrontendParameters 
 		eDVBFrontendParametersTerrestrial oterrestrial;
 		if (parm->getDVBT(oterrestrial))
 			return -2;
-
 		if (exact && oterrestrial.bandwidth != terrestrial.bandwidth &&
 			oterrestrial.bandwidth != eDVBFrontendParametersTerrestrial::Bandwidth_Auto &&
 			terrestrial.bandwidth != eDVBFrontendParametersTerrestrial::Bandwidth_Auto)
@@ -425,6 +424,11 @@ RESULT eDVBFrontendParameters::calculateDifference(const iDVBFrontendParameters 
 		else if (exact && oterrestrial.code_rate_HP != terrestrial.code_rate_HP &&
 			oterrestrial.code_rate_HP != eDVBFrontendParametersTerrestrial::FEC_Auto &&
 			terrestrial.code_rate_HP != eDVBFrontendParametersTerrestrial::FEC_Auto)
+			diff = 1 << 30;
+		else if (oterrestrial.system != terrestrial.system)
+			diff = 1 << 30;
+		else if (oterrestrial.system == terrestrial.System_DVB_T2 &&
+			oterrestrial.plpid != terrestrial.plpid)
 			diff = 1 << 30;
 		else
 			diff = abs(terrestrial.frequency - oterrestrial.frequency) / 1000;
@@ -2754,7 +2758,7 @@ RESULT eDVBFrontend::prepare_terrestrial(const eDVBFrontendParametersTerrestrial
 		parm_inversion = INVERSION_AUTO;
 		break;
 	}
-	eDebug("tuning to %d khz, bandwidth %d, crl %d, crh %d, modulation %d, tm %d, guard %d, hierarchy %d, inversion %d",
+	eDebug("tuning to %d khz, bandwidth %d, crl %d, crh %d, modulation %d, tm %d, guard %d, hierarchy %d, inversion %d, system %d, plpid %d",
 		parm_frequency/1000,
 		parm_u_ofdm_bandwidth,
 		parm_u_ofdm_code_rate_LP,
@@ -2763,7 +2767,9 @@ RESULT eDVBFrontend::prepare_terrestrial(const eDVBFrontendParametersTerrestrial
 		parm_u_ofdm_transmission_mode,
 		parm_u_ofdm_guard_interval,
 		parm_u_ofdm_hierarchy_information,
-		parm_inversion);
+		parm_inversion,
+		feparm.system,
+		feparm.plpid);
 	oparm.ter = feparm;
 	return 0;
 }
