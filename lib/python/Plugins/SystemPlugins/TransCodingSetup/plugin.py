@@ -19,7 +19,7 @@ def getModel():
 	return ""
 
 config.plugins.transcodingsetup = ConfigSubsection()
-config.plugins.transcodingsetup.transcoding = ConfigSelection(default = "disable", choices = [ ("enable", _("enable")), ("disable", _("disable"))] )
+config.plugins.transcodingsetup.transcoding = ConfigSelection(default = "enable", choices = [ ("enable", _("enable")), ("disable", _("disable"))] )
 config.plugins.transcodingsetup.port = ConfigSelection(default = "8002", choices = [ ("8001", "8001"), ("8002", "8002")] )
 if fileExists("/proc/stb/encoder/0/bitrate"):
 	if getModel() == "solo2":
@@ -32,7 +32,7 @@ if fileExists("/proc/stb/encoder/0/framerate"):
 class TranscodingSetupInit:
 	def __init__(self):
 		self.pluginsetup = None
-		config.plugins.transcodingsetup.transcoding.addNotifier(self.setTranscoding)
+		#config.plugins.transcodingsetup.transcoding.addNotifier(self.setTranscoding)
 		config.plugins.transcodingsetup.port.addNotifier(self.setPort)
 		if hasattr(config.plugins.transcodingsetup, "bitrate"):
 			config.plugins.transcodingsetup.bitrate.addNotifier(self.setBitrate)
@@ -99,44 +99,32 @@ class TranscodingSetupInit:
 
 	def setPort(self, configElement):
 		port = configElement.value
+		port2 = (port == "8001") and "8002" or "8001"
+
 		print "[TranscodingSetup] set port ",port
 		try:
-			fp = file('/etc/inetd.conf', 'r')
-			datas = fp.readlines()
-			fp.close()
-		except:
-#			print "file open error, inetd.conf!"
-			self.showMessage("Set port failed.", MessageBox.TYPE_ERROR)
-			return
-		try:
-			newdatas=""
-			s_port = ""
-			if port == "8001":
-				s_port = "8002"
-			else:
-				s_port = "8001"
-			for line in datas:
-				if line.find("transtreamproxy") != -1:
-					p=line.replace('\t',' ').find(' ')
-					line = port+line[p:]
-				elif line.find("filestreamproxy") != -1:
-					p=line.replace('\t',' ').find(' ')
-					line = "8003"+line[p:]
-				elif line.find("streamproxy") != -1:
-					p=line.replace('\t',' ').find(' ')
-					line = s_port+line[p:]
-				newdatas+=line
+			newConfigData = ""
+			oldConfigData = file('/etc/inetd.conf').read()
+			for L in oldConfigData.splitlines():
+				try:
+					if L[0] == '#':
+						newConfigData += L + '\n'
+						continue
+				except: continue
+				LL = L.split()
+				if LL[5] == '/usr/bin/streamproxy':
+					LL[0] = port2
+				elif LL[5] == '/usr/bin/transtreamproxy':
+					LL[0] = port
+				newConfigData += ''.join(str(X) + " " for X in LL) + '\n'
 
-			if newdatas.find("transtreamproxy") == -1:
-				newdatas+=port+'\t'+'stream'+'\t'+'tcp'+'\t'+'nowait'+'\t'+'root'+'\t'+'/usr/bin/transtreamproxy'+'\t'+'transtreamproxy\n'
-			if newdatas.find("filestreamproxy") == -1:
-				newdatas+='8003\t'+'stream'+'\t'+'tcp'+'\t'+'nowait'+'\t'+'root'+'\t'+'/usr/bin/filestreamproxy'+'\t'+'filestreamproxy\n'
-			fd = file("/etc/inetd.conf",'w')
-			fd.write(newdatas)
-			fd.close()
+			if newConfigData.find("transtreamproxy") == -1:
+				newConfigData += port + " stream tcp nowait root /usr/bin/transtreamproxy transtreamproxy\n"
+			file('/etc/inetd.conf', 'w').write(newConfigData)
 		except:
 			self.showMessage("Set port failed.", MessageBox.TYPE_ERROR)
 			return
+
 		self.inetdRestart()
 		if config.plugins.transcodingsetup.transcoding.value == "enable" and port == "8001":
 			msg = "Set port OK.\nPC Streaming is replaced with mobile streaming."
@@ -209,8 +197,8 @@ class TranscodingSetup(Screen,ConfigListScreen):
 
 	def createSetup(self):
 		self.list = []
-		self.transcoding = getConfigListEntry(_("Transcoding"), config.plugins.transcodingsetup.transcoding)
-		self.list.append( self.transcoding )
+		#self.transcoding = getConfigListEntry(_("Transcoding"), config.plugins.transcodingsetup.transcoding)
+		#self.list.append( self.transcoding )
 		if config.plugins.transcodingsetup.transcoding.value == "enable":
 			self.list.append(getConfigListEntry(_("Port"), config.plugins.transcodingsetup.port))
 			if hasattr(config.plugins.transcodingsetup, "bitrate"):
@@ -241,13 +229,13 @@ class TranscodingSetup(Screen,ConfigListScreen):
 
 	def keyLeft(self):
 		ConfigListScreen.keyLeft(self)
-		if self["config"].getCurrent() == self.transcoding:
-			self.createSetup()
+		#if self["config"].getCurrent() == self.transcoding:
+		#	self.createSetup()
 
 	def keyRight(self):
 		ConfigListScreen.keyRight(self)
-		if self["config"].getCurrent() == self.transcoding:
-			self.createSetup()
+		#if self["config"].getCurrent() == self.transcoding:
+		#	self.createSetup()
 
 	def cancelConfirm(self, result):
 		if not result:
