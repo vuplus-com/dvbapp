@@ -39,6 +39,7 @@ public:
 	int getError();
 	
 	void clear();
+	void clearAll();
 	void addInitial(const eDVBFrontendParametersSatellite &p);
 	void addInitial(const eDVBFrontendParametersCable &p);
 	void addInitial(const eDVBFrontendParametersTerrestrial &p);

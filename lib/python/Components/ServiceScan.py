@@ -119,7 +119,7 @@ class ServiceScan:
 		if self.state == self.Done or self.state == self.Error:
 			if self.run != len(self.scanList) - 1:
 				self.foundServices += self.scan.getNumServices()
-				self.execEnd()
+				self.execEnd(False) # reset eComponentScan
 				self.run += 1
 				self.execBegin()
 	
@@ -135,9 +135,11 @@ class ServiceScan:
 		self.network = network
 		self.run = 0
 		self.lcd_summary = lcd_summary
+		self.scan = None
 
 	def doRun(self):
-		self.scan = eComponentScan()
+		if self.scan is None:
+			self.scan = eComponentScan()
 		self.frontendInfo.frontend_source = lambda : self.scan.getFrontend()
 		self.feid = self.scanList[self.run]["feid"]
 		self.flags = self.scanList[self.run]["flags"]
@@ -166,13 +168,17 @@ class ServiceScan:
 			self.errorcode = 0
 		self.scanStatusChanged()
 	
-	def execEnd(self):
+	def execEnd(self, onClose = True):
+		# when closing screen, destroy eComponentScan. otherwise reset.
 		self.scan.statusChanged.get().remove(self.scanStatusChanged)
 		self.scan.newService.get().remove(self.newService)
 		if not self.isDone():
 			print "*** warning *** scan was not finished!"
-		
-		del self.scan
+
+		if onClose:
+			self.scan = None
+		else:
+			self.scan.clearAll()
 
 	def isDone(self):
 		return self.state == self.Done or self.state == self.Error

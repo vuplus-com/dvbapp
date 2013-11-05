@@ -62,6 +62,17 @@ void eComponentScan::clear()
 	m_initial.clear();
 }
 
+void eComponentScan::clearAll()
+{
+	m_scan_event_connection = 0;
+	m_scan = 0;
+
+	m_initial.clear();
+	m_done = -1;
+	m_failed = 0;
+}
+
+
 void eComponentScan::addInitial(const eDVBFrontendParametersSatellite &p)
 {
 	ePtr<eDVBFrontendParameters> parm = new eDVBFrontendParameters();
