@@ -51,6 +51,9 @@ eServiceFactoryMP3::eServiceFactoryMP3()
 		extensions.push_back("3gp");
 		extensions.push_back("3g2");
 		extensions.push_back("dts");
+		extensions.push_back("wmv");
+		extensions.push_back("asf");
+		extensions.push_back("wma");
 		sc->addServiceFactory(eServiceFactoryMP3::id, this, extensions);
 	}
 

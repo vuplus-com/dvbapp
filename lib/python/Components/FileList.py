@@ -35,6 +35,9 @@ EXTENSIONS = {
 		"mts": "movie",
 		"3gp": "movie",
 		"3g2": "movie",
+		"wmv": "movie",
+		"asf": "movie",
+		"wma": "music",
 	}
 
 def FileEntryComponent(name, absolute = None, isDir = False):
