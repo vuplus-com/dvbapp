@@ -283,6 +283,8 @@ lib/python/Plugins/SystemPlugins/WOLSetup/Makefile
 lib/python/Plugins/SystemPlugins/WOLSetup/meta/Makefile
 lib/python/Plugins/SystemPlugins/NetDrive/Makefile
 lib/python/Plugins/SystemPlugins/NetDrive/meta/Makefile
+lib/python/Plugins/SystemPlugins/AudioEffect/Makefile
+lib/python/Plugins/SystemPlugins/AudioEffect/meta/Makefile
 lib/python/Tools/Makefile
 lib/service/Makefile
 lib/components/Makefile
