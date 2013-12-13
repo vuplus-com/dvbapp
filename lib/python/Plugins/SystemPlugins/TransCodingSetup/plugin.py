@@ -103,7 +103,7 @@ def createTransCodingConfig(encoder):
 		setAttr("audiocodec", encoder, choice)
 
 	if fileExists( getProcPath(encoder, "videocodec") ):
-		choice = TconfigSelection(encoder, default = "h264", choices = [ ("h264", _("h264")), ("mpeg2", _("mpeg2")), ("mpeg4p2", _("mpeg4p2"))] )
+		choice = TconfigSelection(encoder, default = "h264", choices = [ ("h264", _("h264")) ] )
 		setAttr("videocodec", encoder, choice)
 
 	if fileExists( getProcPath(encoder, "gopframeb") ):
