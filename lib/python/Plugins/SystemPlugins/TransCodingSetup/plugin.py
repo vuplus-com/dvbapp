@@ -79,7 +79,7 @@ def createTransCodingConfig(encoder):
 		if getModel() == "solo2":
 			choice = TconfigInteger(encoder, default = 400000, limits = (50000, 1000000))
 		else:
-			choice = TconfigInteger(encoder, default = 2000000, limits = (100000, 5000000))
+			choice = TconfigInteger(encoder, default = 2000000, limits = (100000, 10000000))
 		setAttr("bitrate", encoder, choice)
 
 	if fileExists( getProcPath(encoder ,"framerate") ):
@@ -493,7 +493,7 @@ class TranscodingSetup(Screen, ConfigListScreen):
 		elif className == "ConfigInteger" or className == "TconfigInteger":
 			limits = current.limits[0]
 			text = configName
-			text += "%s : %d, %s : %d" % (_("Max"), limits[0], _("Min"), limits[1])
+			text += "%s : %d, %s : %d" % (_("Min"), limits[0], _("Max"), limits[1])
 		self["description"].setText(text)
 
 	def showMessage(self, msg, msgType = MessageBox.TYPE_ERROR):
