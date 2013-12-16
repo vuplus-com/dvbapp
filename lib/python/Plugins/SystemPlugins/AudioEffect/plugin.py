@@ -128,6 +128,8 @@ def setAudioEffectConfigs():
 		if SUPPORT_AVL:
 			setConfigValue(AUDIOEFFECT_PROC_PATH["AVL"], _AvlValue)
 		if SUPPORT_3D_SURROUND_SPEAKER_POSITION:
+			if _3DSurroundValue == "none" :
+				config.plugins.audioeffect.speakerposition.value = config.plugins.audioeffect.speakerposition.default
 			_3DSpeakerPosition = config.plugins.audioeffect.speakerposition.value
 			setConfigValue(AUDIOEFFECT_PROC_PATH["3D_SURROUND_SPEAKER_POSITION"], _3DSpeakerPosition)
 
@@ -195,14 +197,12 @@ class AudioEffect(Screen, ConfigListScreen):
 	def keyLeft(self):
 		ConfigListScreen.keyLeft(self)
 		setAudioEffectConfigs()
-		if self.configEffect and (self["config"].getCurrent() == self.configEffect) :
-			self.createSetup()
+		self.createSetup()
 
 	def keyRight(self):
 		ConfigListScreen.keyRight(self)
 		setAudioEffectConfigs()
-		if self.configEffect and (self["config"].getCurrent() == self.configEffect) :
-			self.createSetup()
+		self.createSetup()
 
 	def cancelConfirm(self, result):
 		if not result:
