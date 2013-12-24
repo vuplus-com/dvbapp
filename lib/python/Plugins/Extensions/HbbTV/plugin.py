@@ -20,7 +20,7 @@ from Components.Label import Label, MultiColorLabel
 from Components.ConfigList import ConfigListScreen
 from Components.VolumeControl import VolumeControl
 from Components.Pixmap import Pixmap
-from Components.config import config, ConfigSubsection, ConfigPosition, getConfigListEntry, ConfigBoolean, ConfigInteger, ConfigText, ConfigSelection, configfile, getCharValue
+from Components.config import config, ConfigYesNo, ConfigSubsection, ConfigPosition, getConfigListEntry, ConfigBoolean, ConfigInteger, ConfigText, ConfigSelection, configfile, getCharValue
 
 from enigma import eTimer, eConsoleAppContainer, getDesktop, eServiceReference, iPlayableService, iServiceInformation, RT_HALIGN_LEFT, RT_HALIGN_RIGHT, RT_HALIGN_CENTER, RT_VALIGN_CENTER, getPrevAsciiCode, eRCInput, fbClass, eServiceCenter
 
@@ -254,8 +254,12 @@ class OpCodeSet:
 			,"OP_BROWSER_NEED_RELOAD_KEYMAP": 0x0313
 			,"OP_DVBAPP_VOL_UP"		: 0x0401
 			,"OP_DVBAPP_VOL_DOWN"		: 0x0402
+			,"OP_DVBAPP_SET_VOL"		: 0x0403
 			,"OP_SYSTEM_OUT_OF_MEMORY"	: 0x0501
 			,"OP_SYSTEM_NOTIFY_MY_PID"	: 0x0502
+			,"OP_VIDEOBACKEND_ENABLE"	: 0x0601
+			,"OP_VIDEOBACKEND_DISABLE"	: 0x0602
+			,"OP_BROWSER_OPEN_YOUTUBETV" 	: 0x0603
 		}
 		self._opstr_ = {
 			 0x0000 : "OP_UNKNOWN"
@@ -290,8 +294,12 @@ class OpCodeSet:
 			,0x0313 : "OP_BROWSER_NEED_RELOAD_KEYMAP"
 			,0x0401 : "OP_DVBAPP_VOL_UP"
 			,0x0402 : "OP_DVBAPP_VOL_DOWN"
+			,0x0403 : "OP_DVBAPP_SET_VOL"
 			,0x0501	: "OP_SYSTEM_OUT_OF_MEMORY"
 			,0x0502 : "OP_SYSTEM_NOTIFY_MY_PID"
+			,0x0601 : "OP_VIDEOBACKEND_ENABLE"
+			,0x0602 : "OP_VIDEOBACKEND_DISABLE"
+			,0x0603 : "OP_BROWSER_OPEN_YOUTUBETV"
 		}
 
 	def get(self, opstr):
@@ -499,6 +507,7 @@ class HandlerHbbTV(Handler):
 			,0x0204 : self._cb_handleVODPlayerPlayPause
 			,0x0401 : self._cb_handleDVBAppVolUp
 			,0x0402 : self._cb_handleDVBAppVolDown
+			,0x0403 : self._cb_handleDVBAppSetVol
 			,0x0208 : self._cb_handleVODSpeedCtrl
 			,0x0209 : self._cb_handleVODSeekCtrl
 			,0x0501 : self._cb_handleSystemOutOfMemory
@@ -506,6 +515,8 @@ class HandlerHbbTV(Handler):
 			,0x0309 : self._cb_handleShowVirtualKeyboard
 			,0x030B : self._cb_handlePasteVirtualKeyboard
 			,0x030E : self._cb_handleBrowserMenuReq
+			,0x0601 : self._cb_handleVideobackendEnable
+			,0x0602 : self._cb_handleVideobackendDisable
 		}
 		self._on_close_cb = None
 		self._on_set_title_cb = None
@@ -553,6 +564,19 @@ class HandlerHbbTV(Handler):
 		self._on_set_title_cb = None
 		return self.doPack(opcode, params, reserved)
 
+	def _cb_handleVideobackendEnable(self, opcode, data):
+		self._handle_dump(self._cb_handleVideobackendEnable, opcode, data)
+		service = self._session.nav.getCurrentlyPlayingServiceReference()
+		setBeforeService(service)
+		self._session.nav.stopService()
+		return (0, "OK")
+
+	def _cb_handleVideobackendDisable(self, opcode, data):
+		self._handle_dump(self._cb_handleVideobackendDisable, opcode, data)
+		before_service = getBeforeService()
+		self._session.nav.playService(before_service)
+		return (0, "OK")
+
 	def _cb_handleHbbTVChangeChannel(self, opcode, data):
 		self._handle_dump(self._cb_handleHbbTVChangeChannel, opcode, data)
 		global _g_helper
@@ -567,7 +591,7 @@ class HandlerHbbTV(Handler):
 
 	def _cb_handleBrowserMenuReq(self, opcode, data):
 		self._handle_dump(self._cb_handleBrowserMenuReq, opcode, data)
-		restoreResolution()
+		#restoreResolution()
 		fbClass.getInstance().unlock()
 		eRCInput.getInstance().unlock()
 		browser = getPluginBrowser()
@@ -611,12 +635,13 @@ class HandlerHbbTV(Handler):
 	def _cb_virtualKeyboardClosed(self, data=None):
 		fbClass.getInstance().lock()
 		eRCInput.getInstance().lock()
-		setResolution(1280, 720)
+		#setResolution(1280, 720)
 		command_util = getCommandUtil()
 		command_util.sendCommand('OP_BROWSER_VKBD_RES', data)
+
 	def _cb_handleShowVirtualKeyboard(self, opcode, data):
 		self._handle_dump(self._cb_handleShowVirtualKeyboard, opcode, data)
-		restoreResolution()
+		#restoreResolution()
 		fbClass.getInstance().unlock()
 		eRCInput.getInstance().unlock()
 		if data == 0 or strIsEmpty(data):
@@ -693,6 +718,12 @@ class HandlerHbbTV(Handler):
 		vcm.volDown()
 		return (0, "OK")
 
+	def _cb_handleDVBAppSetVol(self, opcode, data):
+		self._handle_dump(self._cb_handleDVBAppSetVol, opcode, data)
+		v = int(data)
+		VolumeControl.instance.volctrl.setVolume(v, v)
+		return (0, "OK")
+
 	def _cb_handleGetChannelInfoForUrl(self, opcode, data):
 		self._handle_dump(self._cb_handleGetChannelInfoForUrl, opcode, data)
 		(sid, onid, tsid, name, orgid) = getChannelInfos()
@@ -749,7 +780,7 @@ class HandlerHbbTV(Handler):
 			self._session.nav.playService(before_service)
 			self._vod_uri = None
 
-		restoreResolution()
+		#restoreResolution()
 		return (0, "OK")
 
 	def _cb_handleVODPlayerURI(self, opcode, data):
@@ -1058,7 +1089,8 @@ class HbbTVHelper(Screen):
 	def _start_opera(self):
 		if not self._is_browser_running():
 			global HBBTVAPP_PATH
-			start_command = '%s/launcher start'%(HBBTVAPP_PATH)
+			global __gval__
+			start_command = '%s/launcher start %d %d'%(HBBTVAPP_PATH, __gval__.resX, __gval__.resY)
 			os.system(start_command)
 		return True
 
@@ -1069,7 +1101,8 @@ class HbbTVHelper(Screen):
 
 	def _restart_opera(self):
 		global HBBTVAPP_PATH
-		try:	os.system('%s/launcher restart'%(HBBTVAPP_PATH))
+		global __gval__
+		try:	os.system('%s/launcher restart %d %d'%(HBBTVAPP_PATH, __gval__.resX, __gval__.resY))
 		except: pass
 		return True
 
@@ -1790,7 +1823,7 @@ class OperaBrowser(Screen):
 
 	COMMAND_MAP = {}
 	MENUITEMS_LIST =[]
-	def __init__(self, session, url=None):
+	def __init__(self, session, url=None, isWebAppMode=False):
 		Screen.__init__(self, session)
 		self["actions"] = ActionMap(["DirectionActions", "MenuActions", "OkCancelActions"], {
 			 "cancel"      : self.keyCancel
@@ -1833,6 +1866,7 @@ class OperaBrowser(Screen):
 		self._onCloseTimer.callback.append(self._cb_onClose)
 
 		self.paramUrl = url
+		self.paramIsWebAppMode = isWebAppMode
 		language.addCallback(self.UpdateLanguageCB)
 
 	def UpdateLanguageCB(self):
@@ -1871,7 +1905,9 @@ class OperaBrowser(Screen):
 
 		if self.paramUrl is not None:
 			self.keyMenu()
-			self.cbUrlText(self.paramUrl, 1)
+			if self.paramIsWebAppMode:
+				self.cbUrlText(data=self.paramUrl, mode=1, opcode='OP_BROWSER_OPEN_YOUTUBETV')
+			else:	self.cbUrlText(data=self.paramUrl, mode=1)
 
 	def selectMenuitem(self):
 		tmp = [self["menuitemFile"], self["menuitemTool"], self["menuitemHelp"]]# modify menu
@@ -1962,7 +1998,7 @@ class OperaBrowser(Screen):
 			return
 		self.setTitle(title)
 
-	def cbUrlText(self, data=None, mode=0):
+	def cbUrlText(self, data=None, mode=0, opcode='OP_BROWSER_OPEN_URL'):
 		global _g_helper
 		if not _g_helper._is_browser_running():
 			return
@@ -1981,10 +2017,10 @@ class OperaBrowser(Screen):
 		fbClass.getInstance().lock()
 		eRCInput.getInstance().lock()
 
-		setResolution(1280, 720)
+		#setResolution(1280, 720)
 
 		command_util = getCommandUtil()
-		command_util.sendCommand('OP_BROWSER_OPEN_URL', data, mode)
+		command_util.sendCommand(opcode, data, mode)
 		self._terminatedBrowser = False
 		self._enableKeyEvent = False
 
@@ -2146,7 +2182,7 @@ class OperaBrowser(Screen):
 			#self._session.openWithCallback(self._cb_virtualKeyboardClosed, VirtualKeyBoard, title=("Please enter URL here"), text="")
 			fbClass.getInstance().lock()
 			eRCInput.getInstance().lock()
-			setResolution(1280, 720)
+			#setResolution(1280, 720)
 			if self.toggleListViewFlag:
 				self.toggleMainScreen()
 			self._currentPageUrl   = None
@@ -2174,6 +2210,153 @@ class OperaBrowser(Screen):
 	def hideSubmenu(self):
 		self.currentListView.pageUp()
 		self.keyUp()
+
+config.plugins.youtubetv = ConfigSubsection()
+config.plugins.youtubetv.showhelp = ConfigYesNo(default = False)
+config.plugins.youtubetv.uri = ConfigText(default = "http://www.youtube.com/tv", visible_width = 50, fixed_size = False)
+class YoutubeTVWindow(Screen, HelpableScreen):
+        skin =	"""
+                <screen name="YoutubeTVWindow" position="center,center" size="550,160" title="Start YouTube TV" >
+			<widget name="infomation" position="5,0" size="540,80" valign="center" halign="center" font="Regular;20" />
+			<widget name="startdesc" position="10,80" size="395,40" valign="center" font="Regular;20" />
+			<widget name="helpdesc" position="10,120" size="395,40" valign="center" font="Regular;20" />
+			<ePixmap pixmap="skin_default/buttons/green.png" position="400,80" size="140,40" alphatest="on" />
+			<ePixmap pixmap="skin_default/buttons/yellow.png" position="400,120" size="140,40" alphatest="on" />
+			<widget source="key_green" render="Label" position="400,80" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" foregroundColor="#ffffff" transparent="1" />
+			<widget source="key_yellow" render="Label" position="400,120" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#a08500" foregroundColor="#ffffff" transparent="1" />
+                </screen>
+		"""
+        def __init__(self, session):
+                Screen.__init__(self, session)
+		HelpableScreen.__init__(self)
+
+		self["actions"] = ActionMap(["WizardActions", "DirectionActions", "OkCancelActions","ColorActions", "EPGSelectActions",], {
+				"cancel": self.keyCancel,
+				"red"	: self.keyCancel,
+				"green"	: self.keyGreen,
+				"yellow": self.keyYellow,
+			},-2)
+
+		self["key_green"]  = StaticText(_("Start"))
+		self["key_yellow"] = StaticText(_("Help"))
+
+		self["infomation"] = Label()
+		self["startdesc"]  = Label()
+		self["helpdesc"]   = Label()
+
+		self.onLayoutFinish.append(self.layoutFinished)
+
+	def layoutFinished(self):
+		self.setTitle(_('Start YouTube TV'))
+		self["infomation"].setText(_("YouTube TV is a new way to watch YouTube videos on Vu+"))
+		self["startdesc" ].setText(_("* Start YouTube TV"))
+		self["helpdesc"  ].setText(_("* RC Help"))
+
+	def setHelpModeActions(self):
+		self.helpList = []
+		self["OkCancelActions"] = HelpableActionMap(self, "OkCancelActions", {
+			"ok"    : (self.keyPass, _("Play ther selected the video")),
+			"cancel": (self.keyPass, _("Exit the YouTube TV")),
+		})
+		self["EventViewActions"] = HelpableActionMap(self, "EventViewActions", {
+			"pageUp"    : (self.keyPass, _("Move up")),
+			"pageDown"  : (self.keyPass, _("Move down")),
+			"prevEvent" : (self.keyPass, _("Move left")),
+			"nextEvent" : (self.keyPass, _("Move right")),
+		})
+		self["EPGSelectActions"] = HelpableActionMap(self, "EPGSelectActions", {
+			"info"        : (self.keyPass, _("Search a video")),
+			"nextService" : (self.keyPass, _("Skip forward 10 sec")),
+			"prevService" : (self.keyPass, _("Skip backward 10 sec")),
+		})
+		self["MediaPlayerActions"] = HelpableActionMap(self, "MediaPlayerActions", {
+			"play"  : (self.keyPass, _("Play current video")),
+			"pause" : (self.keyPass, _("Pause current video")),
+			"stop"  : (self.keyPass, _("Stop current video")),
+		})
+		self["ColorActions"] = HelpableActionMap(self, "ColorActions", {
+			"red"   : (self.keyPass, _("Back")),
+		})
+		self.showHelp()
+
+	def keyPass(self):
+		pass
+	def keyCancel(self):
+		config.plugins.youtubetv.showhelp.cancel()
+		self.close(False)
+	def keyGreen(self):
+		config.plugins.youtubetv.showhelp.save()
+		config.plugins.youtubetv.save()
+		config.plugins.save()
+		self.close(True)
+	def keyYellow(self):
+		self.setHelpModeActions()
+	def keyBlue(self):
+		if config.plugins.youtubetv.showhelp.value == True :
+			config.plugins.youtubetv.showhelp.setValue(False)
+		else:	config.plugins.youtubetv.showhelp.setValue(True)
+
+class YoutubeTVSettings(ConfigListScreen, Screen):
+    skin=   """
+	<screen position="center,center" size="600,140" title="YouTube TV Settings">
+	    <widget name="config" position="0,0" size="600,100" scrollbarMode="showOnDemand" />
+
+	    <ePixmap pixmap="skin_default/buttons/red.png" position="310,100" size="140,40" alphatest="on" />
+	    <ePixmap pixmap="skin_default/buttons/green.png" position="150,100" size="140,40" alphatest="on" />
+
+	    <widget source="key_red" render="Label" position="310,100" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#9f1313" foregroundColor="#ffffff" transparent="1" />
+	    <widget source="key_green" render="Label" position="150,100" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" foregroundColor="#ffffff" transparent="1" />
+	</screen>
+	"""
+    def __init__(self, session):
+	self.session = session
+	Screen.__init__(self, session)
+
+	self.menulist = []
+	ConfigListScreen.__init__(self, self.menulist)
+
+	self["actions"] = ActionMap(["OkCancelActions", "ColorActions",], {
+	    "ok"     : self.keyGreen,
+	    "green"  : self.keyGreen,
+	    "red"    : self.keyRed,
+	    "cancel" : self.keyRed,
+		}, -2)
+
+	self["key_red"]   = StaticText(_("Cancel"))
+	self["key_green"] = StaticText(_("Save"))
+
+	self.makeConfigList()
+	self.onLayoutFinish.append(self.layoutFinished)
+
+    def layoutFinished(self):
+	self.setTitle(_('YouTube TV Settings'))
+
+    def keyGreen(self):
+	config.plugins.youtubetv.showhelp.save()
+	config.plugins.youtubetv.uri.save()
+	config.plugins.youtubetv.save()
+	config.plugins.save()
+	self.close()
+    def keyRed(self):
+	config.plugins.youtubetv.showhelp.cancel()
+	config.plugins.youtubetv.uri.cancel()
+	self.close()
+
+    def keyLeft(self):
+	ConfigListScreen.keyLeft(self)
+
+    def keyRight(self):
+	ConfigListScreen.keyRight(self)
+
+    def makeConfigList(self):
+	self.menulist = []
+	entryUri = getConfigListEntry(_("YouTube TV URL"), config.plugins.youtubetv.uri)
+	entryShowHelp = getConfigListEntry(_("Do not show YouTube TV Stater again"), config.plugins.youtubetv.showhelp)
+	self.menulist.append(entryUri)
+	self.menulist.append(entryShowHelp)
+
+	self["config"].list = self.menulist
+	self["config"].l.setList(self.menulist)
 
 def auto_start_main(reason, **kwargs):
 	if reason:
@@ -2226,6 +2409,44 @@ def showManual(self):
 		_g_clearBrowserDataTimer.start(50)
 	setPluginBrowser(self.session.openWithCallback(clearBrowserData, OperaBrowser, url))
 
+_g_backupSession = None
+def showYoutubeTV(session, **kwargs):
+	def _do_clean():
+		_g_clearBrowserDataTimer.stop()
+		try:	_g_clearBrowserDataTimer.callback.remove(_do_clean)
+		except: pass
+		setPluginBrowser(None)
+		global _g_backupSession
+		
+		service = getBeforeService()
+		if service is not None:
+			_g_backupSession.nav.playService(eServiceReference(service))
+			_g_backupSession = None
+	def clearBrowserData():
+		_g_clearBrowserDataTimer.callback.append(_do_clean)
+		_g_clearBrowserDataTimer.start(50)
+	def cbYoutubeTVClose(ret):
+		if ret:
+			global _g_backupSession
+			_g_backupSession = session
+			service = session.nav.getCurrentlyPlayingServiceReference()
+			if service is not None:
+				setBeforeService(service.toString())
+				session.nav.stopService()
+			else:	setBeforeService(service)
+			setPluginBrowser(session.openWithCallback(clearBrowserData, OperaBrowser, config.plugins.youtubetv.uri.value, True))
+	if config.plugins.youtubetv.showhelp.value == True:
+		cbYoutubeTVClose(True)
+	else:	session.openWithCallback(cbYoutubeTVClose, YoutubeTVWindow)
+
+def youtube_setting_main(session, **kwargs):
+	session.open(YoutubeTVSettings)
+
+def start_menu_main(menuid, **kwargs):
+	if menuid == "mainmenu":
+		return [(_("YouTube TV"), showYoutubeTV, "youtube_tv", 46)]
+	return []
+
 def plugin_start_main(session, **kwargs):
 	#session.open(OperaBrowser)
 	def _do_clean():
@@ -2253,6 +2474,8 @@ def plugin_extension_browser_config(session, **kwargs):
 def Plugins(path, **kwargs):
 	l = []
 	l.append(PluginDescriptor(where=PluginDescriptor.WHERE_AUTOSTART, fnc=auto_start_main))
+	l.append(PluginDescriptor(name=_("YouTube TV"), where=PluginDescriptor.WHERE_MENU, fnc=start_menu_main))
+	l.append(PluginDescriptor(name=_("YouTube TV Settings"), where=PluginDescriptor.WHERE_PLUGINMENU, fnc=youtube_setting_main))
 	l.append(PluginDescriptor(where=PluginDescriptor.WHERE_SESSIONSTART, needsRestart=True, fnc=session_start_main, weight=-10))
 	l.append(PluginDescriptor(name=_("HbbTV Applications"), where=PluginDescriptor.WHERE_EXTENSIONSMENU, needsRestart=True, fnc=plugin_extension_start_application))
 	l.append(PluginDescriptor(name=_("Browser Start/Stop"), where=PluginDescriptor.WHERE_EXTENSIONSMENU, needsRestart=True, fnc=plugin_extension_browser_config))
