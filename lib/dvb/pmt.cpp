@@ -117,6 +117,7 @@ void eDVBServicePMTHandler::PMTready(int error)
 	{
 		m_have_cached_program = false;
 		serviceEvent(eventNewProgramInfo);
+		mDemuxId = m_decode_demux_num;
 		if (!m_pvr_channel) // don't send campmt to camd.socket for playbacked services
 		{
 			eEPGCache::getInstance()->PMTready(this);

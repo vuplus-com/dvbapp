@@ -157,6 +157,7 @@ class eDVBServicePMTHandler: public Object
 	int m_use_decode_demux;
 	uint8_t m_decode_demux_num;
 	ePtr<eTimer> m_no_pat_entry_delay;
+	uint8_t mDemuxId;
 public:
 	eDVBServicePMTHandler();
 	~eDVBServicePMTHandler();
@@ -272,6 +273,7 @@ public:
 	void sendEventNoPatEntry();
 
 	void getHBBTVUrl(std::string &ret) { ret = m_HBBTVUrl; }
+	void getDemuxID(int &id) { id = mDemuxId; }
 
 	/* deprecated interface */
 	int tune(eServiceReferenceDVB &ref, int use_decode_demux, eCueSheet *sg=0, bool simulate=false, eDVBService *service = 0);

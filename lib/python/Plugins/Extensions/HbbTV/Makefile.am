@@ -5,6 +5,7 @@ SUBDIRS = meta locale
 install_PYTHON = \
 	keymap.xml \
 	__init__.py \
+	aitreader.py \
 	bookmark.py \
 	plugin.py 
 

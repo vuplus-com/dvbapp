@@ -20,7 +20,7 @@ from Components.Label import Label, MultiColorLabel
 from Components.ConfigList import ConfigListScreen
 from Components.VolumeControl import VolumeControl
 from Components.Pixmap import Pixmap
-from Components.config import config, ConfigYesNo, ConfigSubsection, ConfigPosition, getConfigListEntry, ConfigBoolean, ConfigInteger, ConfigText, ConfigSelection, configfile, getCharValue
+from Components.config import config, ConfigYesNo, ConfigSubsection, ConfigPosition, getConfigListEntry, ConfigBoolean, ConfigInteger, ConfigText, ConfigSelection, configfile
 
 from enigma import eTimer, eConsoleAppContainer, getDesktop, eServiceReference, iPlayableService, iServiceInformation, RT_HALIGN_LEFT, RT_HALIGN_RIGHT, RT_HALIGN_CENTER, RT_VALIGN_CENTER, getPrevAsciiCode, eRCInput, fbClass, eServiceCenter
 
@@ -170,54 +170,6 @@ def _pack(opcode, params=None, reserved=0):
 		params = ''
 	packed_data = struct.pack(h, m, opcode, len(params), reserved)
 	return packed_data + params
-
-class MMSStreamURL:
-	headers = [
-                   'GET %s HTTP/1.0'
-                  ,'Accept: */* '
-                  ,'User-Agent: NSPlayer/7.10.0.3059 '
-                  ,'Host: %s '
-                  ,'Connection: Close '
-		  ]
-
-	def __init__(self):
-		self.sendmsg = ''
-		for m in self.headers:
-			self.sendmsg += m + '\n'
-		self.sendmsg += '\n\n'
-
-	def request(self, host, port=80, location='/'):
-		sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-		sock.connect((host, port))
-		sock.send(self.sendmsg%(location, host))
-		#print "Request."
-		#print self.sendmsg%(location, host)
-		fullydata = ''
-		while 1:
-			res = sock.recv(1024)
-			if res == '': break
-			fullydata += res
-		sock.close()
-		return fullydata
-
-	def parse(self, data):
-		for d in data.splitlines():
-			if d.startswith('Location: '):
-				return d[9:]
-		return None
-
-	def getLocationData(self, url):
-		url_list,host,location = None,None,None
-		try:
-			url = url[url.find(':')+3:]
-			url_list = url.split('/')
-			host = url_list[0]
-			location = url[len(url_list[0]):]
-		except Exception, err_msg:
-			print err_msg
-			return None
-		html = self.request(host=host, location=location)
-		return self.parse(html)
 
 class OpCodeSet:
 	def __init__(self):
@@ -864,7 +816,6 @@ class HbbTVWindow(Screen, InfoBarNotifications):
 		Screen.__init__(self, session)
 		InfoBarNotifications.__init__(self)
 		self.__event_tracker = ServiceEventTracker(screen = self, eventmap = {
-			iPlayableService.evUser+20: self._serviceForbiden,
 			iPlayableService.evStart: self._serviceStarted,
 			iPlayableService.evEOF: self._serviceEOF,
 		})
@@ -899,8 +850,9 @@ class HbbTVWindow(Screen, InfoBarNotifications):
 			seek = service and service.seek()
 			l = seek.getLength()
 			p = seek.getPlayPosition()
-			#return (p[1]/90000, l[1]/90000)
-			return (p[1], l[1])
+			if(not l[0] and not p[0]):
+				return (p[1], l[1])
+			return (90000,90000)
 		except: pass
 		return (-1,-1)
 
@@ -971,30 +923,22 @@ class HbbTVWindow(Screen, InfoBarNotifications):
 		eRCInput.getInstance().unlock()
 		self.close()
 
-	def _serviceForbiden(self):
-		global __gval__
-		real_url = MMSStreamURL().getLocationData(__gval__.hbbtv_handelr.getUrl())
-		#print "Received URI :\n", real_url
-
-		if real_url is not None:
-			__gval__.hbbtv_handelr.doRetryOpen(real_url.strip())
-
 	def _cb_set_page_title(self, title=None):
 		print "page title :",title
 		if title is None:
 			return
 		self.setTitle(title)
 
-class HbbTVHelper(Screen):
+class HbbTVHelper(Screen, InfoBarNotifications):
 	skin = 	"""<screen name="HbbTVHelper" position="0,0" size="0,0" backgroundColor="transparent" flags="wfNoBorder" title=" "></screen>"""
 	def __init__(self, session):
 		global __gval__
 		__gval__.hbbtv_handelr = HandlerHbbTV(session)
 		__gval__.command_server = ServerFactory().doListenUnixTCP('/tmp/.sock.hbbtv.url', __gval__.hbbtv_handelr)
 
-		self._urls = None
-
 		Screen.__init__(self, session)
+		InfoBarNotifications.__init__(self)
+
 		self._session = session
 
 		self._restart_opera()
@@ -1015,20 +959,39 @@ class HbbTVHelper(Screen):
 
 		self._callbackStartStop = None
 
+		self.__et = ServiceEventTracker(screen=self, eventmap={
+				iPlayableService.evHBBTVInfo: self._cb_detectedAIT,
+				iPlayableService.evUpdatedInfo: self._cb_updateInfo
+			})
+		self._applicationList = None
+
+		self.mVuplusBox = False
+		issue = open("/etc/issue").read()
+		if(issue.startswith("Vuplus")):
+			self.mVuplusBox = True
+
+	def _cb_detectedAIT(self):
+		name = self._cb_ready_for_ait()
+		if name is not None and self.mVuplusBox:
+			from Screens.InfoBarGenerics import gHbbtvApplication
+			gHbbtvApplication.setApplicationName(str(name))
+
+	def _cb_updateInfo(self):
+		if not self._excuted_browser:
+			command_util = getCommandUtil()
+			command_util.sendCommand('OP_HBBTV_UNLOAD_AIT')
+		if self.mVuplusBox:
+			from Screens.InfoBarGenerics import gHbbtvApplication
+			gHbbtvApplication.setApplicationName("")
+		#self._applicationList = None
+
 	def _cb_registrate_infobar(self):
 		if InfoBar.instance:
 			self._timer_infobar.stop()
-			if self._cb_ready_for_ait not in InfoBar.instance.onReadyForAIT:
-				InfoBar.instance.onReadyForAIT.append(self._cb_ready_for_ait)
 			if self._cb_hbbtv_activated not in InfoBar.instance.onHBBTVActivation:
 				InfoBar.instance.onHBBTVActivation.append(self._cb_hbbtv_activated)
 
-	def _cb_ready_for_ait(self, orgId=0):
-		if orgId == 0:
-			if not self._excuted_browser:
-				command_util = getCommandUtil()
-				command_util.sendCommand('OP_HBBTV_UNLOAD_AIT')
-			return
+	def _cb_ready_for_ait(self):
 		setChannelInfo(None, None, None, None, None)
 
 		service = self._session.nav.getCurrentService()
@@ -1040,13 +1003,25 @@ class HbbTVHelper(Screen):
 			name = info.getName()
 			if name is None:
 				name = ""
-			orgid   = 0
-			namelen = len(name)
-			for x in info.getInfoObject(iServiceInformation.sHBBTVUrl):
-				if x[0] in (1, -1) :
-					orgid = x[3]
-					break
-			setChannelInfo(sid, onid, tsid, name, orgid)
+
+			pmtid = info.getInfo(iServiceInformation.sPMTPID)
+			demux = 0#info.getInfoString(iServiceInformation.sLiveStreamDemuxId)
+
+			from aitreader import eAITSectionReader
+			reader = eAITSectionReader(demux, pmtid, sid)
+			if reader.doOpen():
+				reader.doParseApplications()
+				reader.doDump()
+			else:	print "no data!!"
+
+			try:
+				self._applicationList = reader.getApplicationList()
+				if len(self._applicationList) > 0:
+					orgid = int(self._applicationList[0]["orgid"])
+					setChannelInfo(sid, onid, tsid, name, orgid)
+					return self._applicationList[0]["name"]
+			except:	pass
+		return None
 
 	def _cb_hbbtv_activated(self, title=None, url=None):
 		if not self._is_browser_running():
@@ -1075,9 +1050,9 @@ class HbbTVHelper(Screen):
 			time.sleep(2)
 			setNeedRestart(False)
 
-		for x in self._urls:
-			control_code = x[0]
-			tmp_url = x[2]
+		for x in self._applicationList:
+			control_code = int(x["control"])
+			tmp_url = x["url"]
 			if tmp_url == url and control_code == 1:
 				use_ait = True
 		self._excuted_browser = True
@@ -1107,16 +1082,13 @@ class HbbTVHelper(Screen):
 		return True
 
 	def getStartHbbTVUrl(self):
-		url, self._urls, self._profile = None, None, 0
-                service = self._session.nav.getCurrentService()
-                info = service and service.info()
-                if not info: return None
-                self._urls = info.getInfoObject(iServiceInformation.sHBBTVUrl)
-		for u in self._urls:
-			if u[0] in (1, -1): # 0:control code, 1:name, 2:url, 3:orgid, 4:appid, 5:profile code
-				url = u[2]
-				self._profile = u[5]
+		url, self._profile = None, 0
+		if self._applicationList is not None:
+			self._profile = self._applicationList[0]["profile"]
+			url = self._applicationList[0]["url"]
 		if url is None:
+			service = self._session.nav.getCurrentService()
+			info = service and service.info()
 			url = info.getInfoString(iServiceInformation.sHBBTVUrl)
 		return url
 
@@ -1124,15 +1096,16 @@ class HbbTVHelper(Screen):
 		applications = []
 
 		if self.getStartHbbTVUrl():
-			for x in self._urls:
-				applications.append((x[1], x))
+			for x in self._applicationList:
+				applications.append((x["name"], x))
 		else: applications.append((_("No detected HbbTV applications."), None))
 		self._session.openWithCallback(self._application_selected, ChoiceBox, title=_("Please choose an HbbTV application."), list=applications)
 
 	def _application_selected(self, selected):
+		print selected
 		try:
 			if selected[1] is None: return
-			self._cb_hbbtv_activated(selected[1][1], selected[1][2])
+			self._cb_hbbtv_activated(selected[1]["name"], selected[1]["url"])
 		except Exception, ErrMsg: print ErrMsg
 
 	def showBrowserConfigBox(self, callback=None):
