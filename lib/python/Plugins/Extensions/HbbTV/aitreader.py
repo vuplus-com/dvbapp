@@ -1,8 +1,11 @@
 import os, xml.dom.minidom
+from enigma import iServiceInformation
 
 DUMPBIN = "/usr/lib/enigma2/python/Plugins/Extensions/HbbTV/dumpait"
 class eAITSectionReader:
 	def __init__(self, demux, pmtid, sid):
+		self.mVuplusBox = None
+		self.mInfo = None
 		self.mAppList  = []
 		self.mDocument = None
 		self.mCommand  = "%s --demux=%s --pmtid=%x --serviceid=%x"%(DUMPBIN, demux, pmtid, sid)
@@ -21,26 +24,46 @@ class eAITSectionReader:
 
 	def __application(self, application):
 		item = {}
-		item["name"]    = str(self.__item(application, "name"))
-		item["url"]     = str(self.__item(application, "url"))
-		item["control"] = int(self.__item(application, "control"))
-		item["orgid"]   = int(self.__item(application, "orgid"))
-		item["appid"]   = int(self.__item(application, "appid"))
-		item["profile"] = int(self.__item(application, "profile"))
+
+		if self.mVuplusBox is not None:
+			item["name"]    = str(application[1])
+			item["url"]     = str(application[2])
+			item["control"] = int(application[0])
+			item["orgid"]   = int(application[3])
+			item["appid"]   = int(application[4])
+			item["profile"] = int(application[5])
+		else:
+			item["name"]    = str(self.__item(application, "name"))
+			item["url"]     = str(self.__item(application, "url"))
+			item["control"] = int(self.__item(application, "control"))
+			item["orgid"]   = int(self.__item(application, "orgid"))
+			item["appid"]   = int(self.__item(application, "appid"))
+			item["profile"] = int(self.__item(application, "profile"))
 		#print item
 		return item
 
 	def doParseApplications(self):
 		l = []
-		for application in self.mDocument.getElementsByTagName("application"):
-			item = self.__application(application)
-			l.append(item)
+
+		if self.mVuplusBox is not None:
+			for application in self.mInfo.getInfoObject(iServiceInformation.sHBBTVUrl):
+				item = self.__application(application)
+				l.append(item)
+		else:
+			for application in self.mDocument.getElementsByTagName("application"):
+				item = self.__application(application)
+				l.append(item)
 		self.mAppList = l
 
 	def getApplicationList(self):
 		return self.mAppList
 
-	def doOpen(self):
+	def doOpen(self, info, is_vuplusbox):
+		if is_vuplusbox is not None:
+			self.mVuplusBox = is_vuplusbox
+			self.mInfo = info
+			return True
+
 		document = ""
 		try:	document = os.popen(self.mCommand).read()
 		except Exception, ErrMsg:

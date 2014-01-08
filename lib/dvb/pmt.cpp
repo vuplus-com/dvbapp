@@ -386,8 +386,14 @@ void eDVBServicePMTHandler::AITready(int error)
 		{
 			saveData(orgid, m_AITData, sectionLength);//4096);
 			for(HbbTVApplicationInfoListConstIterator infoiter = m_HbbTVApplications.begin() ; infoiter != m_HbbTVApplications.end() ; ++infoiter)
+			{
+				char fileName[255] = {0};
+				sprintf(fileName, "/tmp/ait.%d", (*infoiter)->m_OrgId);
+				if (access(fileName, 0) < 0)
+					saveData((*infoiter)->m_OrgId, m_AITData, sectionLength);
 				eDebug("Found : control[%d], name[%s], url[%s]", 
 					(*infoiter)->m_ControlCode, (*infoiter)->m_ApplicationName.c_str(), (*infoiter)->m_HbbTVUrl.c_str());
+			}
 			serviceEvent(eventHBBTVInfo);
 		}
 		else eDebug("No found anything.");

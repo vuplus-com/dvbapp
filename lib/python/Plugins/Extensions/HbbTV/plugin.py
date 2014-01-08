@@ -1005,11 +1005,11 @@ class HbbTVHelper(Screen, InfoBarNotifications):
 				name = ""
 
 			pmtid = info.getInfo(iServiceInformation.sPMTPID)
-			demux = 0#info.getInfoString(iServiceInformation.sLiveStreamDemuxId)
+			demux = info.getInfoString(iServiceInformation.sLiveStreamDemuxId)
 
 			from aitreader import eAITSectionReader
 			reader = eAITSectionReader(demux, pmtid, sid)
-			if reader.doOpen():
+			if reader.doOpen(info, self.mVuplusBox):
 				reader.doParseApplications()
 				reader.doDump()
 			else:	print "no data!!"
