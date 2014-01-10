@@ -1108,8 +1108,10 @@ class HbbTVHelper(Screen, InfoBarNotifications):
 	def getStartHbbTVUrl(self):
 		url, self._profile = None, 0
 		if self._applicationList is not None:
-			self._profile = self._applicationList[0]["profile"]
-			url = self._applicationList[0]["url"]
+			for u in self._applicationList:
+				if u["control"] in (1, -1):
+					url = u["url"]
+					self._profile = u["profile"]
 		if url is None:
 			service = self._session.nav.getCurrentService()
 			info = service and service.info()
