@@ -206,7 +206,7 @@ private:
 		stIdle, stRunning, stStopped,
         };
         int m_state;
-        GstElement *m_gst_playbin;
+        GstElement *m_gst_playbin, *audioSink, *videoSink;
         GstTagList *m_stream_tags;
 
         struct Message
@@ -232,6 +232,7 @@ private:
         eFixedMessagePump<Message> m_pump;
 
         audiotype_t gstCheckAudioPad(GstStructure* structure);
+        static gint match_sinktype(GstElement *element, gpointer type);
         void gstBusCall(GstBus *bus, GstMessage *msg);
         static GstBusSyncReply gstBusSyncHandler(GstBus *bus, GstMessage *message, gpointer user_data);
 	static void gstTextpadHasCAPS(GstPad *pad, GParamSpec * unused, gpointer user_data);

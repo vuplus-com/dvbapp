@@ -238,6 +238,7 @@ eServiceMP3::eServiceMP3(eServiceReference ref)
 	m_errorInfo.missing_codec = "";
 	//vuplus
 	m_is_hls_stream = 0;
+	audioSink = videoSink = NULL;
 
 	CONNECT(m_seekTimeout->timeout, eServiceMP3::seekTimeoutCB);
 	CONNECT(m_subtitle_sync_timer->timeout, eServiceMP3::pushSubtitles);
@@ -410,6 +411,17 @@ eServiceMP3::~eServiceMP3()
 
 	if (m_stream_tags)
 		gst_tag_list_free(m_stream_tags);
+
+	if (audioSink)
+	{
+		gst_object_unref(GST_OBJECT(audioSink));
+		audioSink = NULL;
+	}
+	if (videoSink)
+	{
+		gst_object_unref(GST_OBJECT(videoSink));
+		videoSink = NULL;
+	}
 	
 	if (m_gst_playbin)
 	{
@@ -654,7 +666,6 @@ RESULT eServiceMP3::getPlayPosition(pts_t &pts)
 {
 	GstFormat fmt = GST_FORMAT_TIME;
 	gint64 pos;
-	GstElement *sink;
 	pts = 0;
 
 	if (!m_gst_playbin)
@@ -662,26 +673,19 @@ RESULT eServiceMP3::getPlayPosition(pts_t &pts)
 	if (m_state != stRunning)
 		return -1;
 
-	g_object_get (G_OBJECT (m_gst_playbin), "audio-sink", &sink, NULL);
-
-	if (!sink)
-		g_object_get (G_OBJECT (m_gst_playbin), "video-sink", &sink, NULL);
-
-	if (!sink)
-		return -1;
-
-	gchar *name = gst_element_get_name(sink);
-	gboolean use_get_decoder_time = strstr(name, "dvbaudiosink") || strstr(name, "dvbvideosink");
-	g_free(name);
-
-	if (use_get_decoder_time)
-		g_signal_emit_by_name(sink, "get-decoder-time", &pos);
-
-	gst_object_unref(sink);
-
-	if (!use_get_decoder_time && !gst_element_query_position(m_gst_playbin, &fmt, &pos)) {
-		eDebug("gst_element_query_position failed in getPlayPosition");
-		return -1;
+	if (audioSink || videoSink)
+	{
+		g_signal_emit_by_name(audioSink ? audioSink : videoSink, "get-decoder-time", &pos);
+		if (!GST_CLOCK_TIME_IS_VALID(pos))
+			return -1;
+	}
+	else
+	{
+		if(!gst_element_query_position(m_gst_playbin, &fmt, &pos))
+		{
+			eDebug("gst_element_query_position failed in getPlayPosition");
+			return -1;
+		}
 	}
 
 	/* pos is in nanoseconds. we have 90 000 pts per second. */
@@ -1176,6 +1180,11 @@ subtype_t getSubtitleType(GstPad* pad, gchar *g_codec=NULL)
 	return type;
 }
 
+gint eServiceMP3::match_sinktype(GstElement *element, gpointer type)
+{
+	return strcmp(g_type_name(G_OBJECT_TYPE(element)), (const char*)type);
+}
+
 void eServiceMP3::gstBusCall(GstBus *bus, GstMessage *msg)
 {
 	if (!msg)
@@ -1230,6 +1239,7 @@ void eServiceMP3::gstBusCall(GstBus *bus, GstMessage *msg)
 				}	break;
 				case GST_STATE_CHANGE_READY_TO_PAUSED:
 				{
+					GstIterator *children;
 					GstElement *appsink = gst_bin_get_by_name(GST_BIN(m_gst_playbin), "subtitle_sink");
  					if (appsink)
  					{
@@ -1239,6 +1249,26 @@ void eServiceMP3::gstBusCall(GstBus *bus, GstMessage *msg)
  						eDebug("eServiceMP3::appsink properties set!");
  						gst_object_unref(appsink);
  					}
+
+					if (audioSink)
+					{
+						gst_object_unref(GST_OBJECT(audioSink));
+						audioSink = NULL;
+					}
+					if (videoSink)
+					{
+						gst_object_unref(GST_OBJECT(videoSink));
+						videoSink = NULL;
+					}
+
+					children = gst_bin_iterate_recurse(GST_BIN(m_gst_playbin));
+					audioSink = GST_ELEMENT_CAST(gst_iterator_find_custom(children, (GCompareFunc)match_sinktype, (gpointer)"GstDVBAudioSink"));
+					gst_iterator_free(children);
+
+					children = gst_bin_iterate_recurse(GST_BIN(m_gst_playbin));
+					videoSink = GST_ELEMENT_CAST(gst_iterator_find_custom(children, (GCompareFunc)match_sinktype, (gpointer)"GstDVBVideoSink"));
+					gst_iterator_free(children);
+
 					setAC3Delay(ac3_delay);
 					setPCMDelay(pcm_delay);
 				}	break;
@@ -1252,6 +1282,16 @@ void eServiceMP3::gstBusCall(GstBus *bus, GstMessage *msg)
 				}	break;
 				case GST_STATE_CHANGE_PAUSED_TO_READY:
 				{
+					if (audioSink)
+					{
+						gst_object_unref(GST_OBJECT(audioSink));
+						audioSink = NULL;
+					}
+					if (videoSink)
+					{
+						gst_object_unref(GST_OBJECT(videoSink));
+						videoSink = NULL;
+					}
 				}	break;
 				case GST_STATE_CHANGE_READY_TO_NULL:
 				{
@@ -1926,16 +1966,12 @@ void eServiceMP3::setAC3Delay(int delay)
 		return;
 	else
 	{
-		GstElement *sink;
 		int config_delay_int = delay;
-		g_object_get (G_OBJECT (m_gst_playbin), "video-sink", &sink, NULL);
-
-		if (sink)
+		if (videoSink)
 		{
 			std::string config_delay;
 			if(ePythonConfigQuery::getConfigValue("config.av.generalAC3delay", config_delay) == 0)
 				config_delay_int += atoi(config_delay.c_str());
-			gst_object_unref(sink);
 		}
 		else
 		{
@@ -1943,15 +1979,9 @@ void eServiceMP3::setAC3Delay(int delay)
 			config_delay_int = 0;
 		}
 
-		g_object_get (G_OBJECT (m_gst_playbin), "audio-sink", &sink, NULL);
-
-		if (sink)
+		if (audioSink)
 		{
-			gchar *name = gst_element_get_name(sink);
-			if (strstr(name, "dvbaudiosink"))
-				eTSMPEGDecoder::setHwAC3Delay(config_delay_int);
-			g_free(name);
-			gst_object_unref(sink);
+			eTSMPEGDecoder::setHwAC3Delay(config_delay_int);
 		}
 	}
 }
@@ -1963,16 +1993,12 @@ void eServiceMP3::setPCMDelay(int delay)
 		return;
 	else
 	{
-		GstElement *sink;
 		int config_delay_int = delay;
-		g_object_get (G_OBJECT (m_gst_playbin), "video-sink", &sink, NULL);
-
-		if (sink)
+		if (videoSink)
 		{
 			std::string config_delay;
 			if(ePythonConfigQuery::getConfigValue("config.av.generalPCMdelay", config_delay) == 0)
 				config_delay_int += atoi(config_delay.c_str());
-			gst_object_unref(sink);
 		}
 		else
 		{
@@ -1980,22 +2006,9 @@ void eServiceMP3::setPCMDelay(int delay)
 			config_delay_int = 0;
 		}
 
-		g_object_get (G_OBJECT (m_gst_playbin), "audio-sink", &sink, NULL);
-
-		if (sink)
+		if (audioSink)
 		{
-			gchar *name = gst_element_get_name(sink);
-			if (strstr(name, "dvbaudiosink"))
-				eTSMPEGDecoder::setHwPCMDelay(config_delay_int);
-			else
-			{
-				// this is realy untested..and not used yet
-				gint64 offset = config_delay_int;
-				offset *= 1000000; // milli to nano
-				g_object_set (G_OBJECT (m_gst_playbin), "ts-offset", offset, NULL);
-			}
-			g_free(name);
-			gst_object_unref(sink);
+			eTSMPEGDecoder::setHwPCMDelay(config_delay_int);
 		}
 	}
 }
