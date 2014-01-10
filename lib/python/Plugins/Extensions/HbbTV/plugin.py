@@ -479,6 +479,8 @@ class HandlerHbbTV(Handler):
 		self._timer_retry_open = eTimer()
 		self._timer_paste_vkbd = eTimer()
 		self._curren_title = None
+		self._max_volume  = -1
+		self._soft_volume = -1
 
 	def _handle_dump(self, handle, opcode, data=None):
 		if True: return
@@ -526,7 +528,8 @@ class HandlerHbbTV(Handler):
 	def _cb_handleVideobackendDisable(self, opcode, data):
 		self._handle_dump(self._cb_handleVideobackendDisable, opcode, data)
 		before_service = getBeforeService()
-		self._session.nav.playService(before_service)
+		if before_service is not None:
+			self._session.nav.playService(before_service)
 		return (0, "OK")
 
 	def _cb_handleHbbTVChangeChannel(self, opcode, data):
@@ -658,21 +661,40 @@ class HandlerHbbTV(Handler):
 			raise Exception("This stream is not support trick play.")
 		return (0, "OK")
 
+	def SetVolume(self, volume):
+		if self._max_volume < 0:
+			self._max_volume = VolumeControl.instance.volctrl.getVolume()
+
+		self._max_volume += volume
+		if self._max_volume > 100:
+			self._max_volume = 100
+		elif self._max_volume < 0:
+			self._max_volume = 0
+
+		if self._soft_volume > 0:
+			v = int((self._max_volume * self._soft_volume) / 100)
+			VolumeControl.instance.volctrl.setVolume(v, v)
+		else:	VolumeControl.instance.volctrl.setVolume(self._max_volume, self._max_volume)
+
 	def _cb_handleDVBAppVolUp(self, opcode, data):
 		self._handle_dump(self._cb_handleDVBAppVolUp, opcode, data)
-		vcm = VolumeControl.instance
-		vcm.volUp()
+		self.SetVolume(5)
 		return (0, "OK")
 
 	def _cb_handleDVBAppVolDown(self, opcode, data):
 		self._handle_dump(self._cb_handleDVBAppVolDown, opcode, data)
-		vcm = VolumeControl.instance
-		vcm.volDown()
+		self.SetVolume(-5)
 		return (0, "OK")
 
 	def _cb_handleDVBAppSetVol(self, opcode, data):
 		self._handle_dump(self._cb_handleDVBAppSetVol, opcode, data)
-		v = int(data)
+		if self._max_volume < 0:
+			self._max_volume = VolumeControl.instance.volctrl.getVolume()
+		self._soft_volume = int(data)
+
+		v = 0
+		if self._soft_volume > 0 and self._max_volume > 0:
+			v = int((self._max_volume * self._soft_volume) / 100)
 		VolumeControl.instance.volctrl.setVolume(v, v)
 		return (0, "OK")
 
@@ -886,6 +908,8 @@ class HbbTVWindow(Screen, InfoBarNotifications):
 		self._currentServicePositionTimer.stop()
 
 	def _layoutFinished(self):
+		global __gval__
+		__gval__.hbbtv_handelr._soft_volume = -1
 		self.setTitle(_('HbbTV Plugin'))
 		command_util = getCommandUtil()
 		profile = self._profile
@@ -1996,6 +2020,9 @@ class OperaBrowser(Screen):
 		command_util.sendCommand(opcode, data, mode)
 		self._terminatedBrowser = False
 		self._enableKeyEvent = False
+
+		global __gval__
+		__gval__.hbbtv_handelr._soft_volume = -1
 
 	def _on_close_window(self):
 		self._onCloseTimer.start(1000)
