@@ -999,10 +999,11 @@ class HbbTVHelper(Screen, InfoBarNotifications):
 			})
 		self._applicationList = None
 
-		self.mVuplusBox = False
-		issue = open("/etc/issue").read()
-		if(issue.startswith("Vuplus")):
-			self.mVuplusBox = True
+		try:
+			from Screens.InfoBarGenerics import gHbbtvApplication
+			self.mVuplusBox = gHbbtvApplication.getUseAit()
+		except:
+			self.mVuplusBox = False
 
 	def _cb_detectedAIT(self):
 		name = self._cb_ready_for_ait()
