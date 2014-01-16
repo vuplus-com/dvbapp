@@ -483,6 +483,7 @@ class HandlerHbbTV(Handler):
 		self._curren_title = None
 		self._max_volume  = -1
 		self._soft_volume = -1
+		self._videobackend_activate = False
 
 	def _handle_dump(self, handle, opcode, data=None):
 		if True: return
@@ -525,6 +526,7 @@ class HandlerHbbTV(Handler):
 		service = self._session.nav.getCurrentlyPlayingServiceReference()
 		setBeforeService(service)
 		self._session.nav.stopService()
+		self._videobackend_activate = True
 		return (0, "OK")
 
 	def _cb_handleVideobackendDisable(self, opcode, data):
@@ -532,6 +534,7 @@ class HandlerHbbTV(Handler):
 		before_service = getBeforeService()
 		if before_service is not None:
 			self._session.nav.playService(before_service)
+		self._videobackend_activate = False
 		return (0, "OK")
 
 	def _cb_handleHbbTVChangeChannel(self, opcode, data):
@@ -755,10 +758,11 @@ class HandlerHbbTV(Handler):
 
 		command_util = getCommandUtil()
 		command_util.sendCommand('OP_HBBTV_FULLSCREEN', None)
-		before_service = getBeforeService()
-		if before_service is not None:
-			self._session.nav.playService(before_service)
-			self._vod_uri = None
+		if self._videobackend_activate == False:
+			before_service = getBeforeService()
+			if before_service is not None:
+				self._session.nav.playService(before_service)
+				self._vod_uri = None
 
 		#restoreResolution()
 		return (0, "OK")
