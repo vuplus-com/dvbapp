@@ -106,11 +106,11 @@ def getPacketHeaders():
 	return (__gval__.packet_m, __gval__.packet_h, __gval__.packet_hl)
 
 def setChannelInfo(sid, onid, tsid, name, orgid):
-	if sid is None:   sid   = 0;
-	if onid is None:  onid  = 0;
-	if tsid is None:  tsid  = 0;
-	if name is None:  name  = "";
-	if orgid is None: orgid = 0;
+	if sid is None:   sid   = 0
+	if onid is None:  onid  = 0
+	if tsid is None:  tsid  = 0
+	if name is None:  name  = ""
+	if orgid is None: orgid = 0
 	global __gval__
 	__gval__.channel_info_sid   = sid
 	__gval__.channel_info_onid  = onid
@@ -120,12 +120,12 @@ def setChannelInfo(sid, onid, tsid, name, orgid):
 	print "Set Channel Info >> sid : %X, onid : %X, tsid : %X, name : %s, orgid : %d " % (sid, onid, tsid, name, orgid)
 def getChannelInfos():
 	global __gval__
-	print "Get Channel Info >> sid : %X, onid : %X, tsid : %X, name : %s, orgid : %d " % (__gval__.channel_info_sid, 
+	print "Get Channel Info >> sid : %X, onid : %X, tsid : %X, name : %s, orgid : %d " % (__gval__.channel_info_sid,
 		__gval__.channel_info_onid, __gval__.channel_info_tsid, __gval__.channel_info_name, __gval__.channel_info_orgid)
-	return (__gval__.channel_info_sid, 
-		__gval__.channel_info_onid, 
-		__gval__.channel_info_tsid, 
-		__gval__.channel_info_name, 
+	return (__gval__.channel_info_sid,
+		__gval__.channel_info_onid,
+		__gval__.channel_info_tsid,
+		__gval__.channel_info_name,
 		__gval__.channel_info_orgid)
 
 def isNeedRestart():
@@ -174,44 +174,45 @@ def _pack(opcode, params=None, reserved=0):
 class OpCodeSet:
 	def __init__(self):
 		self._opcode_ = {
-			 "OP_UNKNOWN"			: 0x0000
-			,"OP_HBBTV_EXIT"		: 0x0001
-			,"OP_HBBTV_OPEN_URL"		: 0x0002
-			,"OP_HBBTV_LOAD_AIT"		: 0x0003
-			,"OP_HBBTV_UNLOAD_AIT"		: 0x0004
-			,"OP_HBBTV_FULLSCREEN"		: 0x0005
-			,"OP_HBBTV_TITLE"		: 0x0006
-			,"OP_HBBTV_RETRY_OPEN_URL"	: 0x0009
-			,"OP_HBBTV_CHANGE_CHANNEL"	: 0x000A
-			,"OP_OIPF_GET_CHANNEL_INFO_URL"	: 0x0101
-			,"OP_OIPF_GET_CHANNEL_INFO_AIT" : 0x0102
-			,"OP_OIPF_GET_CHANNEL_INFO_LIST": 0x0103
-			,"OP_VOD_URI"			: 0x0201
-			,"OP_VOD_PLAY"			: 0x0202
-			,"OP_VOD_STOP"			: 0x0203
-			,"OP_VOD_PAUSE"			: 0x0204
-			,"OP_VOD_STATUS"		: 0x0205
-			,"OP_VOD_FORBIDDEN"		: 0x0206
-			,"OP_VOD_STOPED"		: 0x0207
-			,"OP_VOD_SPEED_CTRL"		: 0x0208
-			,"OP_VOD_SEEK_CTRL"		: 0x0209
-			,"OP_BROWSER_OPEN_URL"		: 0x0301
-			,"OP_BROWSER_VKBD_REQ"		: 0x0309
-			,"OP_BROWSER_VKBD_RES"		: 0x030A
-			,"OP_BROWSER_VKBD_PASTE_REQ"	: 0x030B
-			,"OP_BROWSER_VKBD_PASTE_KEY"	: 0x030C
-			,"OP_BROWSER_VKBD_PASTE_MOUSE"	: 0x030D
-			,"OP_BROWSER_MENU_REQ"		: 0x030E
-			,"OP_BROWSER_MENU_RES"		: 0x030F
-			,"OP_BROWSER_NEED_RELOAD_KEYMAP": 0x0313
-			,"OP_DVBAPP_VOL_UP"		: 0x0401
-			,"OP_DVBAPP_VOL_DOWN"		: 0x0402
-			,"OP_DVBAPP_SET_VOL"		: 0x0403
-			,"OP_SYSTEM_OUT_OF_MEMORY"	: 0x0501
-			,"OP_SYSTEM_NOTIFY_MY_PID"	: 0x0502
-			,"OP_VIDEOBACKEND_ENABLE"	: 0x0601
-			,"OP_VIDEOBACKEND_DISABLE"	: 0x0602
-			,"OP_BROWSER_OPEN_YOUTUBETV" 	: 0x0603
+			 "OP_UNKNOWN"						: 0x0000
+			,"OP_HBBTV_EXIT"					: 0x0001
+			,"OP_HBBTV_OPEN_URL"				: 0x0002
+			,"OP_HBBTV_LOAD_AIT"				: 0x0003
+			,"OP_HBBTV_UNLOAD_AIT"				: 0x0004
+			,"OP_HBBTV_FULLSCREEN"				: 0x0005
+			,"OP_HBBTV_TITLE"					: 0x0006
+			,"OP_HBBTV_RETRY_OPEN_URL"			: 0x0009
+			,"OP_HBBTV_CHANGE_CHANNEL"			: 0x000A
+			,"OP_HBBTV_ABORT_SIG"				: 0x000B
+			,"OP_OIPF_GET_CHANNEL_INFO_URL"		: 0x0101
+			,"OP_OIPF_GET_CHANNEL_INFO_AIT"		: 0x0102
+			,"OP_OIPF_GET_CHANNEL_INFO_LIST"	: 0x0103
+			,"OP_VOD_URI"						: 0x0201
+			,"OP_VOD_PLAY"						: 0x0202
+			,"OP_VOD_STOP"						: 0x0203
+			,"OP_VOD_PAUSE"						: 0x0204
+			,"OP_VOD_STATUS"					: 0x0205
+			,"OP_VOD_FORBIDDEN"					: 0x0206
+			,"OP_VOD_STOPED"					: 0x0207
+			,"OP_VOD_SPEED_CTRL"				: 0x0208
+			,"OP_VOD_SEEK_CTRL"					: 0x0209
+			,"OP_BROWSER_OPEN_URL"				: 0x0301
+			,"OP_BROWSER_VKBD_REQ"				: 0x0309
+			,"OP_BROWSER_VKBD_RES"				: 0x030A
+			,"OP_BROWSER_VKBD_PASTE_REQ"		: 0x030B
+			,"OP_BROWSER_VKBD_PASTE_KEY"		: 0x030C
+			,"OP_BROWSER_VKBD_PASTE_MOUSE"		: 0x030D
+			,"OP_BROWSER_MENU_REQ"				: 0x030E
+			,"OP_BROWSER_MENU_RES"				: 0x030F
+			,"OP_BROWSER_NEED_RELOAD_KEYMAP"	: 0x0313
+			,"OP_DVBAPP_VOL_UP"					: 0x0401
+			,"OP_DVBAPP_VOL_DOWN"				: 0x0402
+			,"OP_DVBAPP_SET_VOL"				: 0x0403
+			,"OP_SYSTEM_OUT_OF_MEMORY"			: 0x0501
+			,"OP_SYSTEM_NOTIFY_MY_PID"			: 0x0502
+			,"OP_VIDEOBACKEND_ENABLE"			: 0x0601
+			,"OP_VIDEOBACKEND_DISABLE"			: 0x0602
+			,"OP_BROWSER_OPEN_YOUTUBETV"		: 0x0603
 		}
 		self._opstr_ = {
 			 0x0000 : "OP_UNKNOWN"
@@ -223,6 +224,7 @@ class OpCodeSet:
 			,0x0006 : "OP_HBBTV_TITLE"
 			,0x0009 : "OP_HBBTV_RETRY_OPEN_URL"
 			,0x000A : "OP_HBBTV_CHANGE_CHANNEL"
+			,0x000B : "OP_HBBTV_ABORT_SIG"
 			,0x0101 : "OP_OIPF_GET_CHANNEL_INFO_URL"
 			,0x0102 : "OP_OIPF_GET_CHANNEL_INFO_AIT"
 			,0x0103 : "OP_OIPF_GET_CHANNEL_INFO_LIST"
@@ -233,10 +235,10 @@ class OpCodeSet:
 			,0x0205 : "OP_VOD_STATUS"
 			,0x0206 : "OP_VOD_FORBIDDEN"
 			,0x0207 : "OP_VOD_STOPED"
-			,0x0208	: "OP_VOD_SPEED_CTRL"
-			,0x0209	: "OP_VOD_SEEK_CTRL"
+			,0x0208 : "OP_VOD_SPEED_CTRL"
+			,0x0209 : "OP_VOD_SEEK_CTRL"
 			,0x0301 : "OP_BROWSER_OPEN_URL"
-			,0x0309	: "OP_BROWSER_VKBD_REQ"
+			,0x0309 : "OP_BROWSER_VKBD_REQ"
 			,0x030A : "OP_BROWSER_VKBD_RES"
 			,0x030B : "OP_BROWSER_VKBD_PASTE_REQ"
 			,0x030C : "OP_BROWSER_VKBD_PASTE_KEY"
@@ -247,7 +249,7 @@ class OpCodeSet:
 			,0x0401 : "OP_DVBAPP_VOL_UP"
 			,0x0402 : "OP_DVBAPP_VOL_DOWN"
 			,0x0403 : "OP_DVBAPP_SET_VOL"
-			,0x0501	: "OP_SYSTEM_OUT_OF_MEMORY"
+			,0x0501 : "OP_SYSTEM_OUT_OF_MEMORY"
 			,0x0502 : "OP_SYSTEM_NOTIFY_MY_PID"
 			,0x0601 : "OP_VIDEOBACKEND_ENABLE"
 			,0x0602 : "OP_VIDEOBACKEND_DISABLE"
@@ -269,22 +271,22 @@ class OpCodeSet:
 class SocketParams:
 	def __init__(self):
 		self.protocol = None
-		self.type     = None
-		self.addr     = None
+		self.type = None
+		self.addr = None
 		self.buf_size = 4096
-		self.handler  = None
-		self.timeout  = 5
-		self.destroy  = None
+		self.handler = None
+		self.timeout = 5
+		self.destroy = None
 
 class StreamServer:
 	def __init__(self, params):
 		self._protocol = params.protocol
-		self._type     = params.type
-		self._addr     = params.addr
+		self._type = params.type
+		self._addr = params.addr
 		self._buf_size = params.buf_size
-		self._handler  = params.handler
-		self._timeout  = params.timeout
-		self._destroy  = params.destroy
+		self._handler = params.handler
+		self._timeout = params.timeout
+		self._destroy = params.destroy
 
 		self._terminated = False
 		self._server_thread = None
@@ -330,12 +332,12 @@ class StreamServer:
 
 	def _client(self, conn, addr):
 		try:
-			send_data     = ''
+			send_data = ''
 			received_data = conn.recv(self._buf_size)
 			if self._handler is not None and not strIsEmpty(received_data):
 				send_data = self._handler.doHandle(received_data, self.onHbbTVCloseCB, self.onSetPageTitleCB)
 			self._send(conn, send_data)
-		except Exception, ErrMsg: 
+		except Exception, ErrMsg:
 			try: conn.close()
 			except:pass
 			if self._handler is not None:
@@ -347,7 +349,6 @@ class StreamServer:
 class ServerFactory:
 	def doListenUnixTCP(self, name, handler):
 		def destroy(name):
-			import os
 			try:
 				if os.path.exists(name):
 					os.unlink(name)
@@ -357,10 +358,10 @@ class ServerFactory:
 
 		params = SocketParams()
 		params.protocol = socket.AF_UNIX
-		params.type     = socket.SOCK_STREAM
-		params.addr     = name
-		params.handler  = handler
-		params.destroy  = destroy
+		params.type = socket.SOCK_STREAM
+		params.addr = name
+		params.handler = handler
+		params.destroy = destroy
 
 		streamServer = StreamServer(params)
 		streamServer.start()
@@ -429,7 +430,7 @@ class BrowserCommandUtil(OpCodeSet):
 				return False
 			os.write(self._fd, data)
 			print "Send OK!! :", command
-		except:	return False
+		except: return False
 		return True
 
 	def sendCommand(self, command, params=None, reserved=0):
@@ -450,6 +451,7 @@ class HandlerHbbTV(Handler):
 			,0x0006 : self._cb_handleSetPageTitle
 			,0x0009 : self._cb_handleHbbTVRetryOpen
 			,0x000A : self._cb_handleHbbTVChangeChannel
+			,0x000B : self._cb_handleHbbTVAbortSig
 			,0x0101 : self._cb_handleGetChannelInfoForUrl
 			,0x0102 : self._cb_handleGetChannelInfoForAIT
 			,0x0103 : self._cb_handleGetChannelInfoList
@@ -535,10 +537,10 @@ class HandlerHbbTV(Handler):
 	def _cb_handleHbbTVChangeChannel(self, opcode, data):
 		self._handle_dump(self._cb_handleHbbTVChangeChannel, opcode, data)
 		global _g_helper
-		if _g_helper is None: 
+		if _g_helper is None:
 			return (0, "NOK")
 		dataItems = data.split(":")
-		sid  = dataItems[0]
+		sid = dataItems[0]
 		tsid = dataItems[1]
 		if not _g_helper.doChangeChannel(sid, tsid):
 			return (0, "NOK")
@@ -731,6 +733,11 @@ class HandlerHbbTV(Handler):
 						self._on_set_title_cb.remove(x)
 		return (0, "OK")
 
+	def _cb_handleHbbTVAbortSig(self, opcode, data):
+		self._cb_handleCloseHbbTVBrowser(opcode, data)
+		global __gval__
+		return (0, struct.pack('!II', __gval__.resX, __gval__.resY));
+
 	def _cb_handleCloseHbbTVBrowser(self, opcode, data):
 		self._timer_retry_open.stop()
 		try:
@@ -748,7 +755,6 @@ class HandlerHbbTV(Handler):
 
 		command_util = getCommandUtil()
 		command_util.sendCommand('OP_HBBTV_FULLSCREEN', None)
-
 		before_service = getBeforeService()
 		if before_service is not None:
 			self._session.nav.playService(before_service)
@@ -791,7 +797,7 @@ class HandlerHbbTV(Handler):
 				self._session.nav.playService(self._vod_service)
 				if self._vod_service is not None:
 					return True
-			except Exception, ErrMsg: 
+			except Exception, ErrMsg:
 				print "OpenVOD ERR :", ErrMsg
 			time.sleep(1)
 		return False
@@ -805,7 +811,7 @@ class HandlerHbbTV(Handler):
 
 	def _cb_handleVODPlayerStop(self, opcode, data):
 		self._handle_dump(self._cb_handleVODPlayerStop, opcode, data)
-		self.doStop()	
+		self.doStop()
 		return (0, "OK")
 
 	def _cb_handleVODPlayerPlayPause(self, opcode, data):
@@ -825,7 +831,7 @@ class HandlerHbbTV(Handler):
 from libshm import SimpleSharedMemory
 _g_ssm_ = None
 class HbbTVWindow(Screen, InfoBarNotifications):
-	skin = 	"""
+	skin = """
 		<screen name="HbbTVWindow" position="0,0" size="1280,720" backgroundColor="transparent" flags="wfNoBorder" title="HbbTV Plugin">
 		</screen>
 		"""
@@ -888,7 +894,7 @@ class HbbTVWindow(Screen, InfoBarNotifications):
 			self._vod_length = length
 			if position == -1 and length == -1:
 				raise Exception("Can't get play status")
-			#print getTimeString(position), "/", getTimeString(length)
+			#print position, "/", length, " - ", getTimeString(position), "/", getTimeString(length)
 			self._ssm.setStatus(position, length, 1)
 		except Exception, ErrMsg:
 			print ErrMsg
@@ -914,7 +920,7 @@ class HbbTVWindow(Screen, InfoBarNotifications):
 		command_util = getCommandUtil()
 		profile = self._profile
 		(sid, onid, tsid, name, orgid) = getChannelInfos()
-		params  = struct.pack('!IIIIII', orgid, profile, sid, onid, tsid, len(name)) + name
+		params = struct.pack('!IIIIII', orgid, profile, sid, onid, tsid, len(name)) + name
 		if self._use_ait:
 			command_util.sendCommand('OP_HBBTV_UNLOAD_AIT')
 			time.sleep(1)
@@ -936,7 +942,7 @@ class HbbTVWindow(Screen, InfoBarNotifications):
 		except Exception, ErrMsg: pass
 		try:
 			if self._cb_close_window in command_server.onHbbTVCloseCB:
-					command_server.onHbbTVCloseCB.remove(self._cb_close_window)
+				command_server.onHbbTVCloseCB.remove(self._cb_close_window)
 		except Exception, ErrMsg: pass
 		try:
 			if self._cb_closed_func is not None:
@@ -954,7 +960,7 @@ class HbbTVWindow(Screen, InfoBarNotifications):
 		self.setTitle(title)
 
 class HbbTVHelper(Screen, InfoBarNotifications):
-	skin = 	"""<screen name="HbbTVHelper" position="0,0" size="0,0" backgroundColor="transparent" flags="wfNoBorder" title=" "></screen>"""
+	skin = """<screen name="HbbTVHelper" position="0,0" size="0,0" backgroundColor="transparent" flags="wfNoBorder" title=" "></screen>"""
 	def __init__(self, session):
 		global __gval__
 		__gval__.hbbtv_handelr = HandlerHbbTV(session)
@@ -1019,9 +1025,9 @@ class HbbTVHelper(Screen, InfoBarNotifications):
 		setChannelInfo(None, None, None, None, None)
 
 		service = self._session.nav.getCurrentService()
-                info = service and service.info()
+		info = service and service.info()
 		if info is not None:
-			sid  = info.getInfo(iServiceInformation.sSID)
+			sid = info.getInfo(iServiceInformation.sSID)
 			onid = info.getInfo(iServiceInformation.sONID)
 			tsid = info.getInfo(iServiceInformation.sTSID)
 			name = info.getName()
@@ -1044,7 +1050,7 @@ class HbbTVHelper(Screen, InfoBarNotifications):
 					orgid = int(self._applicationList[0]["orgid"])
 					setChannelInfo(sid, onid, tsid, name, orgid)
 					return self._applicationList[0]["name"]
-			except:	pass
+			except: pass
 		return None
 
 	def _cb_hbbtv_activated(self, title=None, url=None):
@@ -1097,6 +1103,7 @@ class HbbTVHelper(Screen, InfoBarNotifications):
 		global HBBTVAPP_PATH
 		try:	os.system('%s/launcher stop'%(HBBTVAPP_PATH))
 		except: pass
+		return True
 
 	def _restart_opera(self):
 		global HBBTVAPP_PATH
@@ -1115,7 +1122,8 @@ class HbbTVHelper(Screen, InfoBarNotifications):
 		if url is None:
 			service = self._session.nav.getCurrentService()
 			info = service and service.info()
-			url = info.getInfoString(iServiceInformation.sHBBTVUrl)
+			if info:
+				url = info.getInfoString(iServiceInformation.sHBBTVUrl)
 		return url
 
 	def showApplicationSelectionBox(self):
@@ -1171,7 +1179,7 @@ class HbbTVHelper(Screen, InfoBarNotifications):
 			return False
 		serviceList = eServiceCenter.getInstance().list(root)
 		if serviceList is None:
-			return False	
+			return False
 		while True:
 			service = serviceList.getNext()
 			if service is None or not service.valid():
@@ -1185,7 +1193,7 @@ class HbbTVHelper(Screen, InfoBarNotifications):
 			if len(serviceRefItems) < 5:
 				continue
 
-			sid  = serviceRefItems[3]
+			sid	 = serviceRefItems[3]
 			tsid = serviceRefItems[4]
 			if sid == _sid and tsid == _tsid:
 				self._session.nav.playService(eServiceReference(serviceRef))
@@ -1198,7 +1206,7 @@ class OperaBrowserSetting:
 	def __init__(self):
 		self._settingFileName = '/usr/local/hbb-browser/home/setting.ini'
 		self._start = None
-		self._type  = None
+		self._type = None
 		self._keymap = None
 		self._read()
 	def _read(self):
@@ -1233,7 +1241,7 @@ class OperaBrowserSetting:
 		}
 
 class OperaBrowserPreferenceWindow(ConfigListScreen, Screen):
-	skin=   """
+	skin = """
 		<screen position="center,120" size="600,350" title="Preference">
 			<widget name="url" position="5,0" size="590,100" valign="center" font="Regular;20" />
 			<widget name="config" position="0,100" size="600,200" scrollbarMode="showOnDemand" />
@@ -1245,27 +1253,27 @@ class OperaBrowserPreferenceWindow(ConfigListScreen, Screen):
 			<widget source="key_green" render="Label" position="150,310" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" foregroundColor="#ffffff" transparent="1" />
 		</screen>
 		"""
-	def __init__(self, session, currentUrl): 
-                self.session = session
+	def __init__(self, session, currentUrl):
+		self.session = session
 		Screen.__init__(self, session)
 
 		self.menulist = []
 		ConfigListScreen.__init__(self, self.menulist)
 
 		self["actions"] = ActionMap(["OkCancelActions", "ShortcutActions", "WizardActions", "ColorActions", "SetupActions", ], {
-			"red"    : self.keyRed,
-			"green"  : self.keyGreen,
-			"ok"     : self.keyOK,
+			"red"	 : self.keyRed,
+			"green"	 : self.keyGreen,
+			"ok"	 : self.keyOK,
 			"cancel" : self.keyRed
-                }, -2)
-		self["key_red"]   = StaticText(_("Cancel"))
+		}, -2)
+		self["key_red"] = StaticText(_("Cancel"))
 		self["key_green"] = StaticText(_("Save"))
-		self["url"]	  = Label()
+		self["url"] = Label()
 
 		self._currentPageUrl = currentUrl
 		if self._currentPageUrl is None:
 			self._currentPageUrl = ''
-		self._startPageUrl   = None
+		self._startPageUrl = None
 		self._keymapType = None
 		self.makeMenuEntry()
 		self.onLayoutFinish.append(self.layoutFinished)
@@ -1330,8 +1338,8 @@ class OperaBrowserPreferenceWindow(ConfigListScreen, Screen):
 		if not strIsEmpty(self._currentPageUrl):
 			l.append(("current", _("Current Page")))
 		l.append(("direct", _("Direct Input")))
-		self.menuItemStartpage	= ConfigSelection(default="startpage", choices = l)
-		self.menuEntryStartpage	= getConfigListEntry(_("Startpage"), self.menuItemStartpage)
+		self.menuItemStartpage = ConfigSelection(default="startpage", choices = l)
+		self.menuEntryStartpage = getConfigListEntry(_("Startpage"), self.menuItemStartpage)
 
 		kl = self.getKeymapTypeList()
 
@@ -1359,7 +1367,7 @@ class OperaBrowserPreferenceWindow(ConfigListScreen, Screen):
 
 class BookmarkEditWindow(ConfigListScreen, Screen):
 	CATEGORY,BOOKMARK = 0,1
-	skin=   """
+	skin = """
 		<screen position="center,center" size="600,140" title="Bookmark Edit">
 			<widget name="config" position="0,0" size="600,100" scrollbarMode="showOnDemand" />
 
@@ -1377,7 +1385,7 @@ class BookmarkEditWindow(ConfigListScreen, Screen):
 		self.mMode = _mode
 		self.mType = _type
 		self.mData = _data
-                self.mSession = session
+		self.mSession = session
 		self.mBookmarkManager = _bm
 
 		if _data is not None:
@@ -1389,14 +1397,14 @@ class BookmarkEditWindow(ConfigListScreen, Screen):
 		ConfigListScreen.__init__(self, self.menulist)
 
 		self["actions"] = ActionMap(["OkCancelActions", "ColorActions",], {
-			"ok"     : self.keyGreen,
-			"green"  : self.keyGreen,
-			"red"    : self.keyRed,
+			"ok"	 : self.keyGreen,
+			"green"	 : self.keyGreen,
+			"red"	 : self.keyRed,
 			"cancel" : self.keyRed,
-                }, -2)
+		}, -2)
 
-		self["VKeyIcon"]  = Pixmap()
-		self["key_red"]   = StaticText(_("Cancel"))
+		self["VKeyIcon"] = Pixmap()
+		self["key_red"] = StaticText(_("Cancel"))
 		self["key_green"] = StaticText(_("Save"))
 
 		self.menuItemTitle = None
@@ -1425,7 +1433,7 @@ class BookmarkEditWindow(ConfigListScreen, Screen):
 		return None
 
 	def showMessageBox(self, text):
-		msg = _("Invalid ") + text + _("!!(Empty)\nPlease, Input to the ") + text + "."
+		msg = _("Invalid ") + text + _("!!(Empty)\nPlease, Input to the") + " " + text + "."
 		self.mSession.openWithCallback(self.showVKeyWindow, MessageBox, msg, MessageBox.TYPE_INFO)
 		return False
 
@@ -1462,7 +1470,7 @@ class BookmarkEditWindow(ConfigListScreen, Screen):
 		else:
 			if self.mMode == _('Add'):
 				bookmarkTitle = self.menuItemTitle.value
-				bookmarkUrl   = self.menuItemUrl.value
+				bookmarkUrl = self.menuItemUrl.value
 				if strIsEmpty(bookmarkTitle):
 					self["config"].setCurrentIndex(0)
 					return self.showMessageBox(_("Bookmark Title"))
@@ -1478,7 +1486,7 @@ class BookmarkEditWindow(ConfigListScreen, Screen):
 					self["config"].setCurrentIndex(1)
 					return self.showMessageBox(_("Bookmark URL"))
 				self.mData.mTitle = self.menuItemTitle.value
-				self.mData.mUrl   = self.menuItemUrl.value
+				self.mData.mUrl = self.menuItemUrl.value
 				self.mBookmarkManager.updateBookmark(self.mData)
 		return True
 
@@ -1498,7 +1506,7 @@ class BookmarkEditWindow(ConfigListScreen, Screen):
 		if self.mType == BookmarkEditWindow.CATEGORY:
 			self.menuItemName = ConfigText(default=self.mData.mName, visible_width=65, fixed_size=False)
 
-			self.menuEntryName  = getConfigListEntry(_("Name"), self.menuItemName)
+			self.menuEntryName = getConfigListEntry(_("Name"), self.menuItemName)
 
 			self.menulist.append(self.menuEntryName)
 		else:
@@ -1506,16 +1514,16 @@ class BookmarkEditWindow(ConfigListScreen, Screen):
 			self.menuItemUrl   = ConfigText(default=self.mData.mUrl, visible_width=65, fixed_size=False)
 
 			self.menuEntryTitle = getConfigListEntry(_("Title"), self.menuItemTitle)
-			self.menuEntryUrl   = getConfigListEntry(_("Url"), self.menuItemUrl)
+			self.menuEntryUrl = getConfigListEntry(_("Url"), self.menuItemUrl)
 
 			self.menulist.append(self.menuEntryTitle)
 			self.menulist.append(self.menuEntryUrl)
-			
+
 		self["config"].list = self.menulist
 		self["config"].l.setList(self.menulist)
 
 class OperaBrowserBookmarkWindow(Screen):
-	skin =	"""
+	skin = """
 		<screen name="HbbTVBrowserBookmarkWindow" position="center,120" size="600,400" title="Bookmark" >
 			<widget name="bookmarklist" position="0,0" size="600,200" zPosition="10" scrollbarMode="showOnDemand" />
 
@@ -1535,7 +1543,7 @@ class OperaBrowserBookmarkWindow(Screen):
 		"""
 
 	def __init__(self, _session, _url=None, _title=None):
-		self.mUrl   = _url
+		self.mUrl = _url
 		self.mTitle = _title
 		self.mBookmarkManager = BookmarkManager.getInstance()
 		self.mSession = _session
@@ -1544,10 +1552,10 @@ class OperaBrowserBookmarkWindow(Screen):
 				"ok"	: self.keyOK,
 				"cancel": self.keyCancel,
 				"red"	: self.keyRed,
-				"green"	: self.keyGreen,
+				"green" : self.keyGreen,
 				"yellow": self.keyYellow,
 				"blue"	: self.keyBlue,
-				"0"	: self.keyNumber,
+				"0" : self.keyNumber,
 			},-2)
 
 		self["key_red"]    = StaticText(_("Exit"))
@@ -1578,7 +1586,7 @@ class OperaBrowserBookmarkWindow(Screen):
 		self.mBookmarkList = self.setBookmarkList()
 		self["bookmarklist"].setList(self.mBookmarkList)
 	def cbEditWindow(self, ret=False):
-		if not ret: 
+		if not ret:
 			return
 		self.updateBookmarkList()
 	def getParentCategory(self):
@@ -1680,8 +1688,8 @@ class OperaBrowserBookmarkWindow(Screen):
 
 class BrowserHelpWindow(Screen, HelpableScreen):
 	MODE_GLOBAL,MODE_KEYBOARD,MODE_MOUSE = 1,2,3
-        skin =	"""
-                <screen name="BrowserHelpWindow" position="center,center" size="600,40" title="Browser Help" >
+	skin = """
+		<screen name="BrowserHelpWindow" position="center,center" size="600,40" title="Browser Help" >
 			<ePixmap pixmap="skin_default/buttons/red.png" position="5,0" size="140,40" alphatest="on" />
 			<ePixmap pixmap="skin_default/buttons/green.png" position="155,0" size="140,40" alphatest="on" />
 			<ePixmap pixmap="skin_default/buttons/yellow.png" position="305,0" size="140,40" alphatest="on" />
@@ -1691,10 +1699,10 @@ class BrowserHelpWindow(Screen, HelpableScreen):
 			<widget source="key_green" render="Label" position="155,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" foregroundColor="#ffffff" transparent="1" />
 			<widget source="key_yellow" render="Label" position="305,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#a08500" foregroundColor="#ffffff" transparent="1" />
 			<widget source="key_blue" render="Label" position="450,0" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#18188b" foregroundColor="#ffffff" transparent="1" />
-                </screen>
+		</screen>
 		"""
-        def __init__(self, session):
-                Screen.__init__(self, session)
+	def __init__(self, session):
+		Screen.__init__(self, session)
 		HelpableScreen.__init__(self)
 
 		self["key_red"]    = StaticText(_("Exit"))
@@ -1706,7 +1714,7 @@ class BrowserHelpWindow(Screen, HelpableScreen):
 				"ok"    : self.keyRed,
 				"cancel": self.keyRed,
 				"red"	: self.keyRed,
-				"green"	: self.keyGreen,
+				"green" : self.keyGreen,
 				"yellow": self.keyYellow,
 				"blue"	: self.keyBlue,
 			},-2)
@@ -1925,7 +1933,7 @@ class OperaBrowser(Screen):
 		l = self.MENUITEMS_LIST[self.menubarCurrentIndex]
 		if not self._terminatedBrowser and self.menubarCurrentIndex == 0: # running
 			l = [(_('Return'), None)]
-		self.lvMenuItems = l #self.MENUITEMS_LIST[self.menubarCurrentIndex]	
+		self.lvMenuItems = l #self.MENUITEMS_LIST[self.menubarCurrentIndex]
 		return self.lvMenuItems
 
 	def setSubListOnView(self):
@@ -1967,7 +1975,7 @@ class OperaBrowser(Screen):
 		command_server = getCommandServer()
 		try:
 			if self._on_close_window in command_server.onHbbTVCloseCB:
-					command_server.onHbbTVCloseCB.remove(self._on_close_window)
+				command_server.onHbbTVCloseCB.remove(self._on_close_window)
 		except Exception, ErrMsg: pass
 		try:
 			if self._on_setPageTitle in command_server.onSetPageTitleCB:
@@ -2007,7 +2015,7 @@ class OperaBrowser(Screen):
 		#self.hideSubmenu()
 		command_server = getCommandServer()
 		if self._on_setPageTitle not in command_server.onSetPageTitleCB:
-				command_server.onSetPageTitleCB.append(self._on_setPageTitle)
+			command_server.onSetPageTitleCB.append(self._on_setPageTitle)
 		if self._on_close_window not in command_server.onHbbTVCloseCB:
 			command_server.onHbbTVCloseCB.append(self._on_close_window)
 		self.toggleMainScreen()
@@ -2353,7 +2361,7 @@ class YoutubeTVSettings(ConfigListScreen, Screen):
     def makeConfigList(self):
 	self.menulist = []
 	entryUri = getConfigListEntry(_("YouTube TV URL"), config.plugins.youtubetv.uri)
-	entryShowHelp = getConfigListEntry(_("Do not show YouTube TV Stater again"), config.plugins.youtubetv.showhelp)
+	entryShowHelp = getConfigListEntry(_("Do not show YouTube TV Starter again"), config.plugins.youtubetv.showhelp)
 	self.menulist.append(entryUri)
 	self.menulist.append(entryShowHelp)
 
@@ -2386,7 +2394,7 @@ def HelpableScreen__init__(self):
 
 		self["helpActions"] = ActionMap(["HelpbuttonActions"], {
 			"help_b" : self.showHelp,
-			"help_l" : self.showManual, 
+			"help_l" : self.showManual,
 		}, -2)
 
 _g_clearBrowserDataTimer = eTimer()
@@ -2406,6 +2414,7 @@ def showManual(self):
 		try:	_g_clearBrowserDataTimer.callback.remove(_do_clean)
 		except: pass
 		setPluginBrowser(None)
+
 	def clearBrowserData():
 		_g_clearBrowserDataTimer.callback.append(_do_clean)
 		_g_clearBrowserDataTimer.start(50)
@@ -2463,13 +2472,13 @@ def plugin_start_main(session, **kwargs):
 
 def plugin_extension_start_application(session, **kwargs):
 	global _g_helper
-	if _g_helper is None: 
+	if _g_helper is None:
 		return
 	_g_helper.showApplicationSelectionBox()
 
 def plugin_extension_browser_config(session, **kwargs):
 	global _g_helper
-	if _g_helper is None: 
+	if _g_helper is None:
 		return
 	_g_helper.showBrowserConfigBox()
 

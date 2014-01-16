@@ -4,7 +4,7 @@ from enigma import iServiceInformation
 DUMPBIN = "/usr/lib/enigma2/python/Plugins/Extensions/HbbTV/dumpait"
 class eAITSectionReader:
 	def __init__(self, demux, pmtid, sid):
-		self.mVuplusBox = None
+		self.mVuplusBox = False
 		self.mInfo = None
 		self.mAppList  = []
 		self.mDocument = None
@@ -25,7 +25,7 @@ class eAITSectionReader:
 	def __application(self, application):
 		item = {}
 
-		if self.mVuplusBox is not None:
+		if self.mVuplusBox:
 			item["name"]    = str(application[1])
 			item["url"]     = str(application[2])
 			item["control"] = int(application[0])
@@ -45,7 +45,7 @@ class eAITSectionReader:
 	def doParseApplications(self):
 		l = []
 
-		if self.mVuplusBox is not None:
+		if self.mVuplusBox:
 			for application in self.mInfo.getInfoObject(iServiceInformation.sHBBTVUrl):
 				item = self.__application(application)
 				l.append(item)
@@ -59,7 +59,7 @@ class eAITSectionReader:
 		return self.mAppList
 
 	def doOpen(self, info, is_vuplusbox):
-		if is_vuplusbox is not None:
+		if is_vuplusbox:
 			self.mVuplusBox = is_vuplusbox
 			self.mInfo = info
 			return True

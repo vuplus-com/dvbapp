@@ -109,15 +109,13 @@ class SimpleConfigParser:
 
 class BookmarkManager(SimpleConfigParser):
 	_instance = None
-        def __new__(cls, *args, **kwargs):
-            if not cls._instance:
-                cls._instance = super(Singleton, cls).__new__(
-                                   cls, *args, **kwargs)
-            return cls._instance
+	def __new__(cls, *args, **kwargs):
+		if not cls._instance:
+			cls._instance = super(Singleton, cls).__new__(cls, *args, **kwargs)
+		return cls._instance
 
 	def __init__(self, _dbFileName):
 		SimpleConfigParser.__init__(self)
-
 		self.mBookmarkRoot = None
 		self.mDebugEnable = True
 
