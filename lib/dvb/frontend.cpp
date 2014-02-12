@@ -496,6 +496,8 @@ RESULT eDVBFrontendParameters::calcLockTimeout(unsigned int &timeout) const
 DEFINE_REF(eDVBFrontend);
 
 int eDVBFrontend::PriorityOrder=0;
+int eDVBFrontend::PreferredFrontendIndex=-1;
+
 
 eDVBFrontend::eDVBFrontend(int adap, int fe, int &ok, bool simulate, eDVBFrontend *simulate_fe)
 	:m_simulate(simulate), m_enabled(false), m_type(-1), m_simulate_fe(simulate_fe), m_dvbid(fe), m_slotid(fe)
@@ -3086,40 +3088,67 @@ RESULT eDVBFrontend::setData(int num, long val)
 int eDVBFrontend::isCompatibleWith(ePtr<iDVBFrontendParameters> &feparm)
 {
 	int type;
+	int score = 0;
+	bool preferred = (eDVBFrontend::getPreferredFrontend() >= 0 && m_slotid == eDVBFrontend::getPreferredFrontend());
+
 	if (feparm->getSystem(type) || type != m_type || !m_enabled)
 		return 0;
+
 	if (m_type == eDVBFrontend::feSatellite)
 	{
-		ASSERT(m_sec);
 		eDVBFrontendParametersSatellite sat_parm;
-		int ret = feparm->getDVBS(sat_parm);
-		ASSERT(!ret);
-		if (sat_parm.system == eDVBFrontendParametersSatellite::System_DVB_S2 && !m_can_handle_dvbs2)
+		if (feparm->getDVBS(sat_parm) < 0)
+		{
 			return 0;
-		ret = m_sec->canTune(sat_parm, this, 1 << m_slotid);
-		if (ret > 1 && sat_parm.system == eDVBFrontendParametersSatellite::System_DVB_S && m_can_handle_dvbs2)
-			ret -= 1;
-		return ret;
+		}
+		if (sat_parm.system == eDVBFrontendParametersSatellite::System_DVB_S2 && !m_can_handle_dvbs2)
+		{
+			return 0;
+		}
+		score = m_sec ? m_sec->canTune(sat_parm, this, 1 << m_slotid) : 0;
+		if (score > 1 && sat_parm.system == eDVBFrontendParametersSatellite::System_DVB_S && m_can_handle_dvbs2)
+		{
+			/* prefer to use a S tuner, try to keep S2 free for S2 transponders */
+			score--;
+		}
 	}
+
 	else if (m_type == eDVBFrontend::feCable)
-		return 2;  // more prio for cable frontends
+	{
+		eDVBFrontendParametersCable cab_parm;
+		if (feparm->getDVBC(cab_parm) < 0)
+		{
+			return 0;
+		}
+		score = 2;
+	}
+
 	else if (m_type == eDVBFrontend::feTerrestrial)
 	{
 		eDVBFrontendParametersTerrestrial ter_parm;
-		if ( feparm->getDVBT(ter_parm) )
+		if (feparm->getDVBT(ter_parm) < 0)
 		{
 			return 0;
 		}
-		if (ter_parm.system == eDVBFrontendParametersTerrestrial::System_DVB_T2)
+		if (ter_parm.system == eDVBFrontendParametersTerrestrial::System_DVB_T2 && !m_can_handle_dvbt2)
 		{
-			return m_can_handle_dvbt2 ? 1 : 0;
+			return 0;
 		}
-		else // DVB-T
+		score = 2;
+		if (ter_parm.system == eDVBFrontendParametersTerrestrial::System_DVB_T && m_can_handle_dvbt2)
 		{
-			return m_can_handle_dvbt2 ? 1 : 2;
+			/* prefer to use a T tuner, try to keep T2 free for T2 transponders */
+			score--;
 		}
 	}
-	return 0;
+
+	if (score && preferred)
+	{
+		/* make 'sure' we always prefer this frontend */
+		score += 100000;
+	}
+
+	return score;
 }
 
 bool eDVBFrontend::setSlotInfo(ePyObject obj)

@@ -1,7 +1,9 @@
 from Components.Harddisk import harddiskmanager
+from Components.NimManager import nimmanager
 from config import ConfigSubsection, ConfigYesNo, config, ConfigSelection, ConfigText, ConfigNumber, ConfigSet, ConfigLocations
 from Tools.Directories import resolveFilename, SCOPE_HDD
-from enigma import Misc_Options, setTunerTypePriorityOrder, eEnv;
+from enigma import Misc_Options, eEnv
+from enigma import setTunerTypePriorityOrder, setPreferredTuner
 from SystemInfo import SystemInfo
 import os
 
@@ -70,6 +72,11 @@ def InitUsageConfig():
 		("4", "DVB-T/-C/-S"),
 		("5", "DVB-T/-S/-C") ])
 
+	nims = [ ("-1", _("auto")) ]
+	for x in nimmanager.nim_slots:
+		nims.append( (str(x.slot), x.getSlotName()) )
+	config.usage.frontend_priority = ConfigSelection(default = "-1", choices = nims)
+
 	config.usage.show_event_progress_in_servicelist = ConfigYesNo(default = False)
 
 	config.usage.blinking_display_clock_during_recording = ConfigYesNo(default = False)
@@ -81,6 +88,10 @@ def InitUsageConfig():
 	def TunerTypePriorityOrderChanged(configElement):
 		setTunerTypePriorityOrder(int(configElement.value))
 	config.usage.alternatives_priority.addNotifier(TunerTypePriorityOrderChanged, immediate_feedback=False)
+
+	def PreferredTunerChanged(configElement):
+		setPreferredTuner(int(configElement.value))
+	config.usage.frontend_priority.addNotifier(PreferredTunerChanged)
 
 	def setHDDStandby(configElement):
 		for hdd in harddiskmanager.HDDList():

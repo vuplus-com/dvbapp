@@ -116,6 +116,7 @@ private:
 	void setFrontend(bool recvEvents=true);
 	bool setSecSequencePos(int steps);
 	static int PriorityOrder;
+	static int PreferredFrontendIndex;
 public:
 	eDVBFrontend(int adap, int fe, int &ok, bool simulate=false, eDVBFrontend *simulate_fe=NULL);
 	virtual ~eDVBFrontend();
@@ -148,6 +149,8 @@ public:
 	bool setSlotInfo(ePyObject obj); // get a tuple (slotid, slotdescr)
 	static void setTypePriorityOrder(int val) { PriorityOrder = val; }
 	static int getTypePriorityOrder() { return PriorityOrder; }
+	static void setPreferredFrontend(int index) { PreferredFrontendIndex = index; }
+	static int getPreferredFrontend() { return PreferredFrontendIndex; }
 
 	void reopenFrontend();
 	int openFrontend();

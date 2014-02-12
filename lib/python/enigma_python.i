@@ -326,6 +326,14 @@ void setTunerTypePriorityOrder(int order)
 }
 %}
 
+void setPreferredTuner(int);
+%{
+void setPreferredTuner(int index)
+{
+	eDVBFrontend::setPreferredFrontend(index);
+}
+%}
+
 /************** temp *****************/
 
 	/* need a better place for this, i agree. */
