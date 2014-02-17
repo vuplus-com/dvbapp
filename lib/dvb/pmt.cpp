@@ -214,6 +214,16 @@ void saveData(int orgid, unsigned char* data, int sectionLength)
 	int fd = 0, rc = 0;
 	char fileName[255] = {0};
 	sprintf(fileName, "/tmp/ait.%d", orgid);
+
+	if (data[6] > 0) {
+		eDebug("section_number %d > 0", data[6]);
+		data[6] = 0;
+	}
+	if (data[7] > data[6]) {
+		eDebug("last_section_number %d > section_number %d", data[7], data[6]);
+		data[7] = data[6];
+	}
+
 	if((fd = open(fileName, O_RDWR|O_CREAT|O_TRUNC)) < 0)
 	{
 		eDebug("Fail to save a AIT Data.");
@@ -245,13 +255,12 @@ void eDVBServicePMTHandler::AITready(int error)
 
 		eraseHbbTVApplications(&m_HbbTVApplications);
 
-		memcpy(m_AITData, ptr->getBufferData(), 4096);
-
 		int sectionLength = 0;
 		for (std::vector<ApplicationInformationSection*>::const_iterator it = ptr->getSections().begin(); it != ptr->getSections().end(); ++it)
 		{
 			std::list<ApplicationInformation *>::const_iterator i = (*it)->getApplicationInformation()->begin();
-			sectionLength += (*it)->getSectionLength();
+			memcpy(m_AITData, ptr->getBufferData(), 4096);
+			sectionLength = (*it)->getSectionLength() + 3;
 			eDebug("Section Length : %d, Total Section Length : %d", (*it)->getSectionLength(), sectionLength);
 			for (; i != (*it)->getApplicationInformation()->end(); ++i)
 			{
@@ -264,6 +273,8 @@ void eDVBServicePMTHandler::AITready(int error)
 				orgid = applicationIdentifier->getOrganisationId();
 				appid = applicationIdentifier->getApplicationId();
 				eDebug("found applicaions ids >> pid : %x, orgid : %d, appid : %d", m_ait_pid, orgid, appid);
+				if (controlCode == 1)
+					saveData(orgid, m_AITData, sectionLength);
 				if (controlCode == 1 || controlCode == 2) /* 1:AUTOSTART, 2:ETC */
 				{
 					for (DescriptorConstIterator desc = (*i)->getDescriptors()->begin();
@@ -384,7 +395,6 @@ void eDVBServicePMTHandler::AITready(int error)
 
 		if (m_HbbTVApplications.size())
 		{
-			saveData(orgid, m_AITData, sectionLength);//4096);
 			for(HbbTVApplicationInfoListConstIterator infoiter = m_HbbTVApplications.begin() ; infoiter != m_HbbTVApplications.end() ; ++infoiter)
 			{
 				char fileName[255] = {0};
