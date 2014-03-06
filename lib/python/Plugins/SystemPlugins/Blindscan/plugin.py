@@ -18,7 +18,8 @@ from Tools.Directories import resolveFilename, SCOPE_DEFAULTPARTITIONMOUNTDIR, S
 
 from enigma import eTimer, eDVBFrontendParametersSatellite, eComponentScan, eDVBSatelliteEquipmentControl, eDVBFrontendParametersTerrestrial, eDVBFrontendParametersCable, eConsoleAppContainer, eDVBResourceManager, getDesktop
 
-_supportNimType   = { 'AVL1208':'', 'AVL6222':'6222_', 'AVL6211':'6211_'}
+_modelName = file('/proc/stb/info/vumodel').read().strip()
+_supportNimType = { 'AVL1208':'', 'AVL6222':'6222_', 'AVL6211':'6211_', 'BCM7356':'bcm7346_'}
 
 class Blindscan(ConfigListScreen, Screen):
 	skin = 	"""
@@ -88,9 +89,9 @@ class Blindscan(ConfigListScreen, Screen):
 		self.nimSockets = self.ScanNimsocket()
 		self.makeNimSocket()
 
-	def ScanNimsocket(self):
+	def ScanNimsocket(self, filepath = '/proc/bus/nim_sockets'):
 		_nimSocket = {}
-		fp = file('/proc/bus/nim_sockets')
+		fp = file(filepath)
 
 		sNo, sName, sI2C = -1, "", -1
 		for line in fp:
@@ -103,9 +104,16 @@ class Blindscan(ConfigListScreen, Screen):
 				try:    sI2C = line.split()[1]
 				except: sI2C = -1
 			elif line.startswith('Name:'):
-				try:    sName = line.split()[3][4:-1]
+				splitLines = line.split()
+				try:
+					if splitLines[1].startswith('BCM'):
+						sName = splitLines[1]
+					else:
+						sName = splitLines[3][4:-1]
 				except: sName = ""
 			if sNo >= 0 and sName != "":
+				if sName.startswith('BCM'):
+					sI2C = sNo
 				if sI2C != -1:
 					_nimSocket[sNo] = [sName, sI2C]
 				else:	_nimSocket[sNo] = [sName]
@@ -127,7 +135,7 @@ class Blindscan(ConfigListScreen, Screen):
 		if is_exist_i2c: return
 
 		if nimname == "AVL6222":
-			model = file('/proc/stb/info/vumodel').read().strip()
+			model = _modelName #file('/proc/stb/info/vumodel').read().strip()
 			if model == "uno":
 				self.i2c_mapping_table = {0:3, 1:3, 2:1, 3:0}
 			elif model == "duo2":
@@ -392,7 +400,7 @@ class Blindscan(ConfigListScreen, Screen):
 			except: pass
 			return "vuplus_blindscan", ""
 		self.binName,nimName =  GetCommand(self.scan_nims.value)
-		
+
 		self.makeNimSocket(nimName)
 		if self.binName is None:
 			self.session.open(MessageBox, "Blindscan is not supported in " + nimName + " tuner.", MessageBox.TYPE_ERROR)
@@ -520,7 +528,8 @@ class Blindscan(ConfigListScreen, Screen):
 						"ROLLOFF_25" : parm.RollOff_alpha_0_25,
 						"ROLLOFF_35" : parm.RollOff_alpha_0_35}
 					pilot={ "PILOT_ON" : parm.Pilot_On,
-						"PILOT_OFF" : parm.Pilot_Off}
+						"PILOT_OFF" : parm.Pilot_Off,
+						"PILOT_AUTO" : parm.Pilot_Unknown}
 					pol = {	"HORIZONTAL" : parm.Polarisation_Horizontal,
 						"VERTICAL" : parm.Polarisation_Vertical}
 					try :
@@ -535,8 +544,7 @@ class Blindscan(ConfigListScreen, Screen):
 						parm.modulation = qam[data[8]]
 						parm.rolloff = roll[data[9]]
 						self.tmp_tplist.append(parm)
-					except:
-						pass
+					except:	pass
 		self.blindscan_session.close(True)
 
 	def blindscanContainerAvail(self, str):
