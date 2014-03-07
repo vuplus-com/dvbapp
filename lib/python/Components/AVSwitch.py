@@ -3,6 +3,7 @@ from config import config, ConfigSlider, ConfigSelection, ConfigYesNo, \
 from enigma import eAVSwitch, getDesktop
 from SystemInfo import SystemInfo
 from os import path as os_path
+from os import access, W_OK
 
 class AVSwitch:
 	def setInput(self, input):
@@ -143,6 +144,19 @@ def InitAVSwitch():
 	SystemInfo["ScartSwitch"] = eAVSwitch.getInstance().haveScartSwitch()
 
 	try:
+		can_pcm_multichannel = access("/proc/stb/audio/multichannel_pcm", W_OK)
+	except:
+		can_pcm_multichannel = False
+
+	SystemInfo["supportPcmMultichannel"] = can_pcm_multichannel
+
+	if can_pcm_multichannel:
+		def setPCMMultichannel(configElement):
+			open("/proc/stb/audio/multichannel_pcm", "w").write(configElement.value and "enable" or "disable")
+		config.av.pcm_multichannel = ConfigYesNo(default = False)
+		config.av.pcm_multichannel.addNotifier(setPCMMultichannel)
+
+	try:
 		can_downmix = open("/proc/stb/audio/ac3_choices", "r").read()[:-1].find("downmix") != -1
 	except:
 		can_downmix = False
@@ -151,6 +165,11 @@ def InitAVSwitch():
 	if can_downmix:
 		def setAC3Downmix(configElement):
 			open("/proc/stb/audio/ac3", "w").write(configElement.value and "downmix" or "passthrough")
+			if SystemInfo.get("supportPcmMultichannel", False) and (not configElement.value) :
+				SystemInfo["CanPcmMultichannel"] = True
+			else:
+				SystemInfo["CanPcmMultichannel"] = False
+
 		config.av.downmix_ac3 = ConfigYesNo(default = True)
 		config.av.downmix_ac3.addNotifier(setAC3Downmix)
 

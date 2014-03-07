@@ -12,22 +12,23 @@ config.misc.videowizardenabled = ConfigBoolean(default = True)
 
 class avSetupScreen(ConfigListScreen, Screen):
 	avSetupItems = [
-		{"idx":1, "level":0, "text":"Video Output", "item":config.av.videoport},
-		{"idx":2, "level":0, "text":"Mode", "item":config.av.videomode[config.av.videoport.value]},
-		{"idx":3, "level":0, "text":"Refresh Rate", "item":config.av.videorate[config.av.videomode[config.av.videoport.value].value]},
-		{"idx":4, "level":0, "text":"Aspect Ratio", "item":config.av.aspect},
-		{"idx":5, "level":0, "text":"Display 4:3 content as", "item":config.av.policy_43},
-		{"idx":6, "level":0, "text":"Display > 16:9 content as", "item":config.av.policy_169},
-		{"idx":7, "level":0, "text":"Color Format", "item":config.av.colorformat},
-		{"idx":8, "level":1, "text":"WSS on 4:3", "item":config.av.wss},
-		{"idx":9, "level":1, "text":"Auto scart switching", "requires":"ScartSwitch", "item":config.av.vcrswitch},
-		{"idx":0, "level":1, "text":"Dolby Digital default", "item":config.av.defaultac3},
-		{"idx":0, "level":1, "text":"Dolby Digital / DTS downmix", "requires":"CanDownmixAC3", "item":config.av.downmix_ac3},
-		{"idx":0, "level":1, "text":"AAC downmix", "requires":"CanDownmixAAC", "item":config.av.downmix_aac},
-		{"idx":0, "level":1, "text":"General Dolby Digital delay(ms)", "item":config.av.generalAC3delay},
-		{"idx":0, "level":1, "text":"General PCM delay(ms)", "item":config.av.generalPCMdelay},
-		{"idx":0, "level":0, "text":"OSD visibility", "requires":"CanChangeOsdAlpha", "item":config.av.osd_alpha},
-		{"idx":0, "level":0, "text":"Scaler sharpness", "item":config.av.scaler_sharpness},
+		{"idx":1, "level":0, "text":"Video Output", "item":"config.av.videoport"},
+		{"idx":2, "level":0, "text":"Mode", "item":"config.av.videomode[config.av.videoport.value]"},
+		{"idx":3, "level":0, "text":"Refresh Rate", "item":"config.av.videorate[config.av.videomode[config.av.videoport.value].value]"},
+		{"idx":4, "level":0, "text":"Aspect Ratio", "item":"config.av.aspect"},
+		{"idx":5, "level":0, "text":"Display 4:3 content as", "item":"config.av.policy_43"},
+		{"idx":6, "level":0, "text":"Display > 16:9 content as", "item":"config.av.policy_169"},
+		{"idx":7, "level":0, "text":"Color Format", "item":"config.av.colorformat"},
+		{"idx":8, "level":1, "text":"WSS on 4:3", "item":"config.av.wss"},
+		{"idx":9, "level":1, "text":"Auto scart switching", "requires":"ScartSwitch", "item":"config.av.vcrswitch"},
+		{"idx":0, "level":1, "text":"Dolby Digital default", "item":"config.av.defaultac3"},
+		{"idx":0, "level":1, "text":"Dolby Digital / DTS downmix", "requires":"CanDownmixAC3", "item":"config.av.downmix_ac3"},
+		{"idx":0, "level":1, "text":"PCM Multichannel", "requires":"CanPcmMultichannel", "item":"config.av.pcm_multichannel"},
+		{"idx":0, "level":1, "text":"AAC downmix", "requires":"CanDownmixAAC", "item":"config.av.downmix_aac"},
+		{"idx":0, "level":1, "text":"General Dolby Digital delay(ms)", "item":"config.av.generalAC3delay"},
+		{"idx":0, "level":1, "text":"General PCM delay(ms)", "item":"config.av.generalPCMdelay"},
+		{"idx":0, "level":0, "text":"OSD visibility", "requires":"CanChangeOsdAlpha", "item":"config.av.osd_alpha"},
+		{"idx":0, "level":0, "text":"Scaler sharpness", "item":"config.av.scaler_sharpness"},
 	]
 
 	def __init__(self, session):
@@ -95,9 +96,10 @@ class avSetupScreen(ConfigListScreen, Screen):
 
 			item_text = _(x.get("text", "??").encode("UTF-8"))
 
-			item = x.get("item", None)
-			if item is None:
+			item_str = x.get("item", None)
+			if item_str is None:
 				continue
+			item = eval(item_str)
 
 			idx = x.get("idx", 0)
 			if idx > 0:

@@ -15,7 +15,8 @@
 			<item level="1" text="Dolby Digital default">config.av.defaultac3</item>
 			<item level="1" text="General Dolby Digital delay (ms)">config.av.generalAC3delay</item>
 			<item level="1" text="General PCM delay (ms)">config.av.generalPCMdelay</item>
-			<item level="1" text="Dolby Digital / DTS downmix" requires="CanDownmixAC3">config.av.downmix_ac3</item>
+			<item level="1" text="Dolby Digital / DTS downmix" requires="CanDownmixAC3" entrychange="yes">config.av.downmix_ac3</item>
+			<item level="1" text="PCM Multichannel" requires="CanPcmMultichannel">config.av.pcm_multichannel</item>
 			<item level="1" text="AAC downmix" requires="CanDownmixAAC">config.av.downmix_aac</item>
 			<item level="1" text="Auto scart switching" requires="ScartSwitch">config.av.vcrswitch</item>
 		</setup>
