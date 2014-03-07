@@ -1,3 +1,5 @@
+#include <linux/dvb/version.h>
+
 #include <lib/dvb/dvb.h>
 #include <lib/dvb/frontendparms.h>
 #include <lib/base/eerror.h>
@@ -1245,7 +1247,7 @@ static void fillDictWithTerrestrialData(ePyObject dict, struct dtv_property *p)
 		case SYS_DVBT: tmp = eDVBFrontendParametersTerrestrial::System_DVB_T; break;
 		case SYS_DVBT2:
 		{
-#ifdef DTV_DVBT2_PLP_ID
+#if DVB_API_VERSION > 5 || DVB_API_VERSION == 5 && DVB_API_VERSION_MINOR >= 3
 			tmp = p[10].u.data;
 			PutToDict(dict, "plp_id", tmp);
 #endif
@@ -1630,7 +1632,10 @@ void eDVBFrontend::getTransponderData(ePyObject dest, bool original)
 				p[7].cmd = DTV_GUARD_INTERVAL;
 				p[8].cmd = DTV_HIERARCHY;
 				p[9].cmd = DTV_INVERSION;
-#ifdef DTV_DVBT2_PLP_ID
+#if DVB_API_VERSION > 5 || DVB_API_VERSION == 5 && DVB_API_VERSION_MINOR >= 9
+				p[10].cmd = DTV_STREAM_ID;
+				cmdseq.num = 11;
+#elif DVB_API_VERSION > 5 || DVB_API_VERSION == 5 && DVB_API_VERSION_MINOR >= 3
 				p[10].cmd = DTV_DVBT2_PLP_ID;
 				cmdseq.num = 11;
 #else
@@ -2322,7 +2327,9 @@ void eDVBFrontend::setFrontend(bool recvEvents)
 			p[cmdseq.num].cmd = DTV_HIERARCHY,	p[cmdseq.num].u.data = parm_u_ofdm_hierarchy_information, cmdseq.num++;
 			p[cmdseq.num].cmd = DTV_BANDWIDTH_HZ,	p[cmdseq.num].u.data = bandwidth, cmdseq.num++;
 			p[cmdseq.num].cmd = DTV_INVERSION,	p[cmdseq.num].u.data = parm_inversion, cmdseq.num++;
-#ifdef DTV_DVBT2_PLP_ID
+#if DVB_API_VERSION > 5 || DVB_API_VERSION == 5 && DVB_API_VERSION_MINOR >= 9
+			p[cmdseq.num].cmd = DTV_STREAM_ID	,	p[cmdseq.num].u.data = oparm.ter.plpid, cmdseq.num++;
+#elif DVB_API_VERSION > 5 || DVB_API_VERSION == 5 && DVB_API_VERSION_MINOR >= 3
 			p[cmdseq.num].cmd = DTV_DVBT2_PLP_ID	,	p[cmdseq.num].u.data = oparm.ter.plpid, cmdseq.num++;
 #endif
 			p[cmdseq.num].cmd = DTV_TUNE, cmdseq.num++;
