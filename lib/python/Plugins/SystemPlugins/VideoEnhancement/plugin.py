@@ -66,6 +66,8 @@ class VideoEnhancementSetup(Screen, ConfigListScreen):
 		self.oldMosquito_noise = config.pep.mosquito_noise_reduction.value
 		self.oldDigital_contour = config.pep.digital_contour_removal.value
 		self.oldScaler_sharpness = config.av.scaler_sharpness.value
+		self.oldScaler_vertical_dejagging = config.pep.scaler_vertical_dejagging.value
+		self.oldSmooth = config.pep.smooth.value
 		self.oldSplit = config.pep.split.value
 		self.oldSharpness = config.pep.sharpness.value
 		self.oldAuto_flesh = config.pep.auto_flesh.value
@@ -91,6 +93,8 @@ class VideoEnhancementSetup(Screen, ConfigListScreen):
 		self.hueEntry = addToConfigList(_("Hue"), config.pep.hue)
 		self.brightnessEntry = addToConfigList(_("Brightness"), config.pep.brightness)
 		self.scaler_sharpnessEntry = addToConfigList(_("Scaler sharpness"), config.av.scaler_sharpness)
+		self.scaler_vertical_dejaggingEntry = addToConfigList(_("Scaler vertical dejagging"), config.pep.scaler_vertical_dejagging)
+		self.smoothEntry = addToConfigList(_("Smooth"), config.pep.smooth)
 		self.splitEntry = addToConfigList(_("Split preview mode"), config.pep.split, True)
 		add_to_xtdlist = self.splitEntry is not None
 		self.sharpnessEntry = addToConfigList(_("Sharpness"), config.pep.sharpness, add_to_xtdlist)
@@ -120,6 +124,8 @@ class VideoEnhancementSetup(Screen, ConfigListScreen):
 		current = self["config"].getCurrent()
 		if current == self.splitEntry:
 			ConfigListScreen.keyLeft(self)
+		elif (current == self.scaler_vertical_dejaggingEntry) or (current == self.smoothEntry):
+			ConfigListScreen.keyLeft(self)
 		elif current != self.splitEntry and current in self.xtdlist:
 			self.previewlist = [
 				current,
@@ -138,6 +144,8 @@ class VideoEnhancementSetup(Screen, ConfigListScreen):
 		current = self["config"].getCurrent()
 		if current == self.splitEntry:
 			ConfigListScreen.keyRight(self)
+		elif (current == self.scaler_vertical_dejaggingEntry) or (current == self.smoothEntry):
+			ConfigListScreen.keyRight(self)
 		elif current != self.splitEntry and current in self.xtdlist:
 			self.previewlist = [
 				current,
@@ -151,6 +159,7 @@ class VideoEnhancementSetup(Screen, ConfigListScreen):
 			]
 			maxvalue = current[1].max
 			self.session.openWithCallback(self.PreviewClosed, VideoEnhancementPreview, configEntry = self.previewlist, oldSplitMode = None, maxValue = maxvalue)
+
 
 	def confirm(self, confirmed):
 		if not confirmed:
@@ -195,6 +204,10 @@ class VideoEnhancementSetup(Screen, ConfigListScreen):
 				config.pep.digital_contour_removal.setValue(self.oldDigital_contour)
 			if self.scaler_sharpnessEntry is not None:
 				config.av.scaler_sharpness.setValue(self.oldScaler_sharpness)
+			if self.scaler_vertical_dejaggingEntry is not None:
+				config.pep.scaler_vertical_dejagging.setValue(self.oldScaler_vertical_dejagging)
+			if self.smoothEntry is not None:
+				config.pep.smooth.setValue(self.oldSmooth)
 			if self.splitEntry is not None:
 				config.pep.split.setValue('off')
 			if self.sharpnessEntry is not None:
@@ -232,6 +245,10 @@ class VideoEnhancementSetup(Screen, ConfigListScreen):
 				config.pep.digital_contour_removal.setValue(0)
 			if self.scaler_sharpnessEntry is not None:
 				config.av.scaler_sharpness.setValue(13)
+			if self.scaler_vertical_dejaggingEntry is not None:
+				config.pep.scaler_vertical_dejagging.setValue(False)
+			if self.smoothEntry is not None:
+				config.pep.smooth.setValue(False)
 			if self.splitEntry is not None:
 				config.pep.split.setValue('off')
 			if self.sharpnessEntry is not None:
