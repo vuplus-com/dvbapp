@@ -5,6 +5,4 @@ SUBDIRS = meta
 install_PYTHON =  \
 	__init__.py \
 	plugin.py \
-	hostapd.conf.orig \
-	_wirelessap.so \
-	wirelessap.py
+	hostapd.conf.orig
