@@ -270,7 +270,7 @@ class DeviceManager(Screen):
 		if self.currDevice is None or self.currPartition is None:
 			return
 		partition =  self.currPartition["partition"]
-		if not os.access("/autofs/%s"%partition,0):
+		if deviceinfo.isMountable(partition) is False:
 			self.session.open(MessageBox, _("This partition is not mountable.\nYou need to check or format this partition."), MessageBox.TYPE_ERROR, timeout = 10)
 			return
 		self["key_red"].setText(_("Partitions"))
@@ -1289,7 +1289,7 @@ class DeviceInfo():
 
 	def isMounted(self, devpath, mountpoint):
 		try:
-			mounts = file('/proc/mounts').read().split('\n')
+			mounts = file('/proc/mounts').readlines()
 			for x in mounts:
 				if not x.startswith('/'):
 					continue
@@ -1300,15 +1300,48 @@ class DeviceInfo():
 			pass
 		return False
 
-	def isMountable(self, partition):
-		autofsPath = "/autofs/"+partition.device
-		mountable = False
+	def isMounted_anymp(self, devpath):
 		try:
-			os.listdir(autofsPath)
-			mountable = True
+			mounts = open('/proc/mounts', 'r').readlines()
+			for x in mounts:
+				if not x.startswith('/'):
+					continue
+				_devPart, _mountpoint  = x.split()[:2]
+				if devPart == _devPart:
+					return True
 		except:
 			pass
-		return mountable
+		return False
+
+	# check partition ID in extended or swap.
+	def checkSwapExtended(self, partition):
+		partID_Extended = ("5", "0f", "85", "c5", "d5")
+		partID_swap = ("82", "42")
+		data = os.popen("fdisk -l /dev/%s |grep %s" % (partition[:-1], partition )).readline().split()
+		if data[1] == '*':
+			partID = str(data[5])
+		else:
+			partID = str(data[4])
+#		print "partID: " ,partID
+#		print "checkIDS : ", partID_Extended + partID_swap
+		if partID in partID_Extended + partID_swap:
+			return True
+		else:
+			return False
+
+	def isMountable(self, partition):
+		if self.checkSwapExtended(partition):
+			return False
+
+		try:
+			if self.isMounted_anymp('/dev/'+partition):
+				return True
+
+			elif os.access('/autofs/'+partition, 0):
+				return True
+		except:
+			pass
+		return False
 
 	def isFstabAutoMounted(self, uuid, devpath, mountpoint):
 #		print "	>> isFstabMounted, uuid : %s, devpath : %s, mountpoint : %s"%(uuid, devpath, mountpoint)
@@ -1748,9 +1781,18 @@ def checkMounts(session):
 			for partition in listdir(devpath):
 				if not partition.startswith(blockdev):
 					continue
+
+				if deviceinfo.checkSwapExtended(partition):
+					continue
+
 				partitions.append(partition)
-				if os.access('/autofs/'+partition,0) is False:
+
+				if deviceinfo.isMounted_anymp('/dev/' + partition):
+					continue
+
+				if os.access('/autofs/'+partition, 0) is False:
 					noMountable_partitions.append(partition)
+
 			if len(partitions) == 0 or len(noMountable_partitions) != 0:
 				if noMountable_dev != "":
 					noMountable_dev +=  ' '
