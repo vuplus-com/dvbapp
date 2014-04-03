@@ -51,8 +51,10 @@ int getType(int code)
 	case 138: // help
 	case 139: // menu
 	case 163: // FF
+	case 208: // FF
 	case 164: // pause
-	case 165: // RF
+	case 165: // RW
+	case 168: // RW
 	case 167: // record
 	case 174: // exit
 	case 207: // play
