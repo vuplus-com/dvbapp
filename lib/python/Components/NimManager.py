@@ -500,11 +500,7 @@ class NIM(object):
 		self.i2c = i2c
 		self.frontend_id = frontend_id
 		self.__is_empty = is_empty
-
-	def isCompatible(self, what):
-		if not self.isSupported():
-			return False
-		compatible = {
+		self.compatible = {
 				None: (None,),
 				"DVB-S": ("DVB-S", None),
 				"DVB-C": ("DVB-C", None),
@@ -512,7 +508,19 @@ class NIM(object):
 				"DVB-S2": ("DVB-S", "DVB-S2", None),
 				"DVB-T2": ("DVB-T", "DVB-T2", None)
 			}
-		return what in compatible[self.type]
+
+	def isCompatible(self, what):
+		if not self.isSupported():
+			return False
+		return what in self.compatible[self.type]
+
+	def canBeCompatible(self, what):
+		if self.isCompatible(what):
+			return True
+		for type in self.getMultiTypeList().values():
+			if what in self.compatible[type]:
+				return True
+		return False
 	
 	def getType(self):
 		return self.type
@@ -764,11 +772,8 @@ class NimManager:
 
 	def hasNimType(self, chktype):
 		for slot in self.nim_slots:
-			if slot.isCompatible(chktype):
+			if slot.canBeCompatible(chktype):
 				return True
-			for type in slot.getMultiTypeList().values():
-				if chktype == type:
-					return True
 		return False
 	
 	def getNimType(self, slotid):
