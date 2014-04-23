@@ -23,12 +23,12 @@ from Tools.Directories import resolveFilename, SCOPE_PLUGINS, SCOPE_CURRENT_SKIN
 from Tools.LoadPixmap import LoadPixmap
 from Plugins.Plugin import PluginDescriptor
 from enigma import eTimer, ePoint, eSize, RT_HALIGN_LEFT, eListboxPythonMultiContent, gFont
-from os import path as os_path, system as os_system, unlink,listdir
+from os import path as os_path, system as os_system, unlink, listdir, access, R_OK, popen
 from re import compile as re_compile, search as re_search
 from Tools.Directories import fileExists
 import time
 from pythonwifi.iwlibs import Wireless
-import pythonwifi.flags
+from pythonwifi import flags as wifi_flags
 
 class WlanSelection(Screen,HelpableScreen):
 	skin = 	"""
@@ -130,12 +130,41 @@ class WlanSelection(Screen,HelpableScreen):
 					return _("Ralink")+ " " + _("WLAN adapter.")
 				elif os_path.realpath(driverdir).endswith('rt73usb'):
 					return _("Ralink")+ " " + _("WLAN adapter.")
+				elif self.isRalinkModule(iface):
+					return _("Ralink")+ " " + _("WLAN adapter.")
 				else:
 					return str(os_path.basename(os_path.realpath(driverdir))) + " " + _("WLAN adapter")
 			else:
 				return _("Unknown network adapter")
 		else:
 			return _("Unknown network adapter")
+
+	def isRalinkModule(self, iface):
+# check vendor ID for lagacy driver
+		vendorID = "148f" # ralink vendor ID
+		idVendorPath = "/sys/class/net/%s/device/idVendor" % iface
+		if access(idVendorPath, R_OK):
+			fd = open(idVendorPath, "r")
+			data = fd.read().strip()
+			fd.close()
+
+#			print "Vendor ID : %s" % data
+
+			if data == vendorID:
+				return True
+
+# check sys driver path for kernel driver
+		ralinkKmod = "rt2800usb" # ralink kernel driver name
+		driverPath = "/sys/class/net/%s/device/driver/" % iface
+		if os_path.exists(driverPath):
+			driverName = os_path.basename(os_path.realpath(driverPath))
+
+#			print "driverName : %s" % driverName
+
+			if driverName == ralinkKmod:
+				return True
+
+		return False
 
 	def cleanup(self):
 		iNetwork.stopGetInterfacesConsole()
@@ -170,9 +199,6 @@ class WlanSetup(Screen,HelpableScreen):
 		self["description"] = StaticText()
 		self["IFtext"] = StaticText()
 		self["IF"] = StaticText()
-		self["Statustext"] = StaticText()
-		self["statuspic"] = MultiPixmap()
-		self["statuspic"].hide()
 		self.onLayoutFinish.append(self.loadDescription)
 		
 		self.oktext = _("Press OK on your remote control to continue.")
@@ -271,7 +297,7 @@ class WlanSetup(Screen,HelpableScreen):
 
 	def WlanScanApCallback(self, essid = None):
 		if essid is not None:
-			self.session.openWithCallback(self.checklist, WlanConfig, self.iface, essid)
+			self.session.openWithCallback(self.checklist, WlanConfig, self.iface)
 
 	def restartLan(self, ret = False):
 		if (ret == True):
@@ -294,26 +320,9 @@ class WlanSetup(Screen,HelpableScreen):
 		iNetwork.stopRestartConsole()
 		iNetwork.stopGetInterfacesConsole()
 
-wlanconfig = ConfigSubsection()
-wlanconfig.usedevice = ConfigSelection(default = "off", choices = [
-	("off", _("off")), ("on", _("on"))])
-wlanconfig.usedhcp = ConfigSelection(default = "off", choices = [
-	("off", _("no")), ("on", _("yes"))])
-wlanconfig.essid = ConfigSelection(default = "none", choices = ["none"])
-wlanconfig.encrypt = ConfigSelection(default = "off", choices = [
-	("off", _("no")), ("on", _("yes"))])
-wlanconfig.method = ConfigSelection(default = "wep", choices = [
-	("wep", _("WEP")), ("wpa", _("WPA")), ("wpa2", _("WPA2")),("wpa/wpa2", _("WPA/WPA2"))])
-wlanconfig.keytype = ConfigSelection(default = "ascii", choices = [
-	("ascii", _("ASCII")), ("hex", _("HEX"))])
-wlanconfig.key = ConfigPassword(default = "XXXXXXXX", visible_width = 50, fixed_size = False)
-wlanconfig.usegateway = ConfigSelection(default = "off", choices = [
-	("off", _("no")), ("on", _("yes"))])
-wlanconfig.ip	 = ConfigIP([0,0,0,0])
-wlanconfig.netmask = ConfigIP([0,0,0,0])
-wlanconfig.gateway = ConfigIP([0,0,0,0])
+ESSID_SELECTED_IN_APLIST = None
+CHECK_NETWORK_SHARE = False
 
-selectap = None	
 class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 	skin = 	"""
 		<screen position="center,center" size="510,400" title="Wireless Network Configuration..." >
@@ -339,7 +348,7 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 			<widget name="HelpWindow" pixmap="skin_default/buttons/key_text.png" position="383,420" zPosition="1" size="1,1" transparent="1" alphatest="on" />
 		</screen>
 		"""
-	def __init__(self, session, iface, essidSelected = None):
+	def __init__(self, session, iface):
 		Screen.__init__(self,session)
 		self.session = session
 		self["key_red"] = StaticText(_("Close"))
@@ -366,26 +375,12 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 		self["VKeyIcon"] = Pixmap()
 		self["VKeyIcon"].hide()
 		self.iface = iface
-		self.essidSelected = essidSelected
-		self.ssid = None
-		self.ap_scan = None
-		self.scan_ssid = None
-		self.key_mgmt = None
-		self.proto = None
-		self.key_type = None
-		self.encryption_key = None
-		self.wlanscanap = None
-		self.wpaphraseconsole = None
+
 		self.list = []
-		ConfigListScreen.__init__(self, self.list,session = self.session)
+		ConfigListScreen.__init__(self, self.list, session = self.session)
 		self.oldInterfaceState = iNetwork.getAdapterAttribute(self.iface, "up")
-		self.readWpaSupplicantConf()
-		self.scanAplistTimer = eTimer()
-		self.scanAplistTimer.callback.append(self.scanApList)
-		self.emptyListMsgTimer = eTimer()
-		self.emptyListMsgTimer.callback.append(self.emptyListMsg)
-		self.Console = Console()
-		self.updateInterfaces(self.readWlanSettings)
+
+		self.updateInterfaces(self.updateInterfaceCB)
 		self.onClose.append(self.cleanup)
 
 	def updateInterfaces(self,callback = None):
@@ -393,179 +388,221 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 		iNetwork.msgPlugins()
 		iNetwork.getInterfaces(callback)
 
-	def readWlanSettings(self,ret=None):
+	def updateInterfaceCB(self, ret=None):
 		if ret is not True:
 			print "getInterfaces Fail... "
-		if iNetwork.getAdapterAttribute(self.iface, "up") == True:
-			default_tmp = "on"
+
+		self.createConfig()
+		self.createSetup()
+
+	def getWpaSupplicantName(self, iface):
+		return "/etc/wpa_supplicant.conf.%s" % iface
+
+	def readWpaSupplicantConf(self):
+		wpaSupplicantName = self.getWpaSupplicantName(self.iface)
+		wsconf = {}
+		try:
+			if fileExists(wpaSupplicantName):
+				wpafd = open(wpaSupplicantName, "r")
+				lines = wpafd.readlines()
+				wpafd.close()
+				data = {}
+				for line in lines:
+					try:
+						(key, value) = line.strip().split('=',1)
+					except:
+						continue
+
+#					if key not in ('ssid', 'ap_scan', 'scan_ssid', 'key_mgmt', 'proto', 'wep_key0', 'psk', '#psk'):
+					if key not in ('ssid', 'scan_ssid', 'key_mgmt', 'proto', 'wep_key0', 'psk', '#psk'):
+						continue
+
+					elif key == 'ssid':
+						data[key] = value.strip('"')
+
+					else:
+						data[key] = value.strip()
+
+				wsconf["ssid"] = data.get("ssid", "INPUTSSID")
+				wsconf["hidden_ssid"] = data.get("scan_ssid") == '1' and True or False
+
+				key_mgmt = data.get("key_mgmt")
+				if key_mgmt == "NONE":
+					wep_key = data.get("wep_key0")
+
+					if wep_key is None:
+						wsconf["encrypt_mothod"] = "None"
+					else:
+						wsconf["encrypt_mothod"] = "wep"
+
+						if wep_key.startswith('"') and wep_key.endswith('"'):
+							wsconf["wep_keytype"] = "ascii"
+							wsconf["key"] = wep_key.strip('"')
+						else:
+							wsconf["wep_keytype"] = "hex"
+							wsconf["key"] = wep_key
+
+				elif key_mgmt == "WPA-PSK":
+					proto = data.get("proto")
+
+					if proto == "WPA":
+						wsconf["encrypt_mothod"] = "wpa"
+
+					elif proto == "RSN":
+						wsconf["encrypt_mothod"] = "wpa2"
+
+					elif proto in ( "WPA RSN", "WPA WPA2"):
+						wsconf["encrypt_mothod"] = "wpa/wpa2"
+
+					else:
+						wsconf["encrypt_mothod"] = "wpa2"
+
+					psk = data.get("#psk")
+					if psk:
+						wsconf["key"] = psk.strip('"')
+					else:
+						wsconf["key"] = data.get("psk")
+				else:
+					wsconf["encrypt_mothod"] = "wpa2"
+		except:
+			pass
+
+		if wsconf.get("ssid") is None:
+			wsconf["ssid"] = "INPUTSSID"
+		if wsconf.get("hidden_ssid") is None:
+			wsconf["hidden_ssid"] = False
+		if wsconf.get("encrypt_mothod") is None:
+			wsconf["encrypt_mothod"] = "wpa2"
+		if wsconf.get("wep_keytype") is None:
+			wsconf["wep_keytype"] = "ascii"
+		if wsconf.get("key") is None:
+			wsconf["key"] = "XXXXXXXX"
+
+#		print ""
+#		for (k,v) in wsconf.items():
+#			print "[wsconf][%s] %s" % (k , v)
+
+		return wsconf
+
+	def displayIP(self, domain, entry):
+		text = entry.getText()
+		if text is not None and text != "0.0.0.0":
+			self[domain].setText(entry.getText())
 		else:
-			default_tmp = "off"
-		wlanconfig.usedevice = ConfigSelection(default=default_tmp, choices = [("off", _("off")), ("on", _("on"))])
+			self[domain].setText(_("N/A"))
 
-		if iNetwork.getAdapterAttribute(self.iface, "dhcp"):
-			default_tmp = "on"
-		else:
-			default_tmp = "off"
-		wlanconfig.usedhcp = ConfigSelection(default=default_tmp, choices = [("off", _("no")), ("on", _("yes"))])
+	def createConfig(self):
+# activate Interface setup
+		self.activateInterfaceEntry = NoSave(ConfigYesNo(default=iNetwork.getAdapterAttribute(self.iface, "up") or False))
+# dhcp setup
+		self.usedhcpConfigEntry = NoSave(ConfigYesNo(default=iNetwork.getAdapterAttribute(self.iface, "dhcp") or False))
 
-		if iNetwork.getAdapterAttribute(self.iface, "dns-nameservers"):
-			self.dnsconfigdefault="on"
-		else:
-			self.dnsconfigdefault="off"
-		wlanconfig.hasdnsconfigentry = ConfigSelection(default=self.dnsconfigdefault, choices = [("off", _("no")), ("on", _("yes"))])
-
-		wlanconfig.ip = ConfigIP(default=iNetwork.getAdapterAttribute(self.iface, "ip")) or [0,0,0,0]
-
-		wlanconfig.netmask = ConfigIP(default=iNetwork.getAdapterAttribute(self.iface, "netmask") or [255,0,0,0])
+# gateway setup
 		if iNetwork.getAdapterAttribute(self.iface, "gateway"):
-			default_tmp = "on"
+			usegatewayDefault=True
 		else:
-			default_tmp = "off"
-		wlanconfig.usegateway = ConfigSelection(default = default_tmp, choices = [("off", _("no")), ("on", _("yes"))])
+			usegatewayDefault=False
+		self.usegatewayConfigEntry = NoSave(ConfigYesNo(default=usegatewayDefault))
 
-		wlanconfig.gateway = ConfigIP(default=iNetwork.getAdapterAttribute(self.iface, "gateway") or [0,0,0,0])
+		self.gatewayConfigEntry = NoSave(ConfigIP(default=iNetwork.getAdapterAttribute(self.iface, "gateway") or [0,0,0,0]))
 
-		self["ipaddress"].setText(_(self.formatip(iNetwork.getAdapterAttribute(self.iface, "ip"))))
-		self["netmask"].setText(_(self.formatip(iNetwork.getAdapterAttribute(self.iface, "netmask"))))
-		self["gateway"].setText(_(self.formatip(iNetwork.getAdapterAttribute(self.iface, "gateway"))))
+# IP, Netmask setup
+		self.IPConfigEntry = NoSave(ConfigIP(default=iNetwork.getAdapterAttribute(self.iface, "ip") or [0,0,0,0]))
+		self.netmaskConfigEntry = NoSave(ConfigIP(default=iNetwork.getAdapterAttribute(self.iface, "netmask") or [255,0,0,0]))
+
+# DNS setup
+		if iNetwork.getAdapterAttribute(self.iface, "dns-nameservers"):
+			dnsDefault = True
+		else:
+			dnsDefault = False
+		self.useDNSConfigEntry = NoSave(ConfigYesNo(default=dnsDefault or False))
 
 		nameserver = (iNetwork.getNameserverList() + [[0,0,0,0]] * 2)[0:2]
 		self.primaryDNS = NoSave(ConfigIP(default=nameserver[0]))
 		self.secondaryDNS = NoSave(ConfigIP(default=nameserver[1]))
-		self["DNS1"].setText(self.primaryDNS.getText())
-		self["DNS2"].setText(self.secondaryDNS.getText())
 
-		if self.encryption_key is not None:
-			default_tmp = "on"
+		self.displayIP("ipaddress", self.IPConfigEntry)
+		self.displayIP("netmask", self.netmaskConfigEntry)
+		self.displayIP("gateway", self.gatewayConfigEntry)
+		self.displayIP("DNS1", self.primaryDNS)
+		self.displayIP("DNS2", self.secondaryDNS)
+
+# readWPASupplicantConf
+		wsconf = self.readWpaSupplicantConf()
+
+# method setup
+		encryptionChoices = [("wep", _("WEP")), ("wpa", _("WPA")), ("wpa2", _("WPA2")), ("wpa/wpa2", _("WPA/WPA2")), ("None", _("No Encrypt"))  ]
+		self.methodConfigEntry = NoSave(ConfigSelection(default = wsconf["encrypt_mothod"], choices = encryptionChoices))
+
+# key type setup
+		keytypeChoices = [("ascii", _("ASCII")), ("hex", _("HEX"))]
+		self.keytypeConfigEntry = NoSave(ConfigSelection(default = wsconf["wep_keytype"], choices = keytypeChoices))
+
+# key setup
+		self.keyConfigEntry = NoSave(ConfigPassword(default = wsconf["key"], visible_width = 50, fixed_size = False))
+
+# hidden ssid setup
+		self.hiddenssidConfigEntry = NoSave(ConfigYesNo(default = wsconf["hidden_ssid"]))
+
+# ssid setup
+
+		global ESSID_SELECTED_IN_APLIST
+		if ESSID_SELECTED_IN_APLIST:
+			essidDefault = ESSID_SELECTED_IN_APLIST
 		else:
-			default_tmp = "off"
-		wlanconfig.encrypt = ConfigSelection(default = default_tmp, choices = [("off", _("no")), ("on", _("yes"))])
+			essidDefault = wsconf["ssid"]
 
-		if self.key_mgmt=="NONE":
-			default_tmp = "wep"
-		elif self.key_mgmt == "WPA-PSK":
-			if self.proto == "WPA":
-				default_tmp = "wpa"
-			elif self.proto == "RSN":
-				default_tmp = "wpa2"
-			elif self.proto in ( "WPA RSN", "WPA WPA2"):
-				default_tmp = "wpa/wpa2"
-			else:
-				default_tmp = "wpa"
-		else:
-			default_tmp = "wep"
+		self.ssidConfigEntry = NoSave(ConfigText(default = essidDefault, visible_width = 50, fixed_size = False))
 
-		wlanconfig.method = ConfigSelection(default = default_tmp, choices = [
-			("wep", _("WEP")), ("wpa", _("WPA")), ("wpa2", _("WPA2")),("wpa/wpa2", _("WPA/WPA2"))])
-
-		if self.key_type == 0:
-			default_tmp = "hex"
-		else:
-			default_tmp = "ascii"
-		wlanconfig.keytype = ConfigSelection(default = default_tmp, choices = [
-			("ascii", _("ASCII")), ("hex", _("HEX"))])
-		default_tmp = self.encryption_key or "XXXXXXXX"
-		wlanconfig.key = ConfigPassword(default = default_tmp, visible_width = 50, fixed_size = False)
-		self.getApList()
-
-	def readWpaSupplicantConf(self):
-		try:
-			if fileExists("/etc/wpa_supplicant.conf"):
-				wpafd = open("/etc/wpa_supplicant.conf","r")
-				if wpafd >0:
-					data = wpafd.readline()
-					while len(data) > 0:
-#						print "####readWpaSupplicantConf, data : ",data
-						data = data.lstrip()
-						if len(data) == 0:
-							data = wpafd.readline()
-							continue
-						if data.startswith('ssid=') and len(data) > 6:
-							self.ssid = data[6:-2]
-						elif data.startswith('ap_scan=') :
-							self.ap_scan = data[8:]
-#							print "####readWpaSupplicantConf, ap_scan : ",self.ap_scan
-						elif data.startswith('scan_ssid=') and len(data) > 10:
-							self.scan_ssid = data[10:-1]
-						elif data.startswith('key_mgmt=') and len(data) > 9:
-							self.key_mgmt = data[9:-1]
-						elif data.startswith('proto=') and len(data) > 6:
-							self.proto = data[6:-1]
-						elif data.startswith('wep_key0="') and len(data) > 11:
-							self.key_type = 1 # ascii
-							self.encryption_key = data[10:-2]
-						elif data.startswith('wep_key0=') and len(data) > 9:
-							self.key_type = 0 # hex
-							self.encryption_key = data[9:-1]
-						elif data.startswith('psk="') and len(data) > 6:
-							self.key_type = 1 # ascii
-							self.encryption_key = data[5:-2]
-						elif data.startswith('#psk="') and len(data) > 6:
-							self.key_type = 0 # hex
-							self.encryption_key = data[6:-2]
-						elif not self.encryption_key and data.startswith('psk=') and len(data) > 4:
-							self.key_type = 0 # hex
-							self.encryption_key = data[4:-1]
-						data = wpafd.readline()
-#					print self.ssid,self.scan_ssid,self.key_mgmt,self.proto,self.key_type,self.encryption_key
-					wpafd.close()
-				else:
-					print 'read error'
-			else:
-				pass
-		except:
-			print 'failed loading wpasupplicant.conf'
-
-	def createConfig(self):
+	def createSetup(self):
 		self.configList=[]
-		self.usedeviceEntry = getConfigListEntry(_("Use Device"), wlanconfig.usedevice)
-		self.usedhcpEntry = getConfigListEntry(_("Use DHCP"), wlanconfig.usedhcp)
-		self.essidEntry = getConfigListEntry(_("ESSID"), wlanconfig.essid)
-		self.hiddenessidEntry = getConfigListEntry(_("Input Hidden ESSID"), wlanconfig.hiddenessid)
-		self.encryptEntry = getConfigListEntry(_("Encrypt"), wlanconfig.encrypt)
-		self.methodEntry = getConfigListEntry(_("Method"), wlanconfig.method)
-		self.keytypeEntry = getConfigListEntry(_("Key Type"), wlanconfig.keytype)
-		self.keyEntry = getConfigListEntry(_("KEY"), wlanconfig.key)
+		self.usedeviceEntry = getConfigListEntry(_("Use Device"), self.activateInterfaceEntry)
+		self.usedhcpEntry = getConfigListEntry(_("Use DHCP"), self.usedhcpConfigEntry)
+		self.essidEntry = getConfigListEntry(_("SSID"), self.ssidConfigEntry)
+		self.hiddenessidEntry = getConfigListEntry(_("Hidden Network"), self.hiddenssidConfigEntry)
+		self.methodEntry = getConfigListEntry(_("Encrypt Method"), self.methodConfigEntry)
+		self.keytypeEntry = getConfigListEntry(_("Key Type"), self.keytypeConfigEntry)
+		self.keyEntry = getConfigListEntry(_("KEY"), self.keyConfigEntry)
 
-		self.ipEntry = getConfigListEntry(_("IP"), wlanconfig.ip)
-		self.netmaskEntry = getConfigListEntry(_("NetMask"), wlanconfig.netmask)
+		self.ipEntry = getConfigListEntry(_("IP"), self.IPConfigEntry)
+		self.netmaskEntry = getConfigListEntry(_("NetMask"), self.netmaskConfigEntry)
 
-		self.usegatewayEntry = getConfigListEntry(_("Use Gateway"), wlanconfig.usegateway)
-		self.gatewayEntry = getConfigListEntry(_("Gateway"), wlanconfig.gateway)
+		self.usegatewayEntry = getConfigListEntry(_("Use Gateway"), self.usegatewayConfigEntry)
+		self.gatewayEntry = getConfigListEntry(_("Gateway"), self.gatewayConfigEntry)
 
 		manualNameservers = (iNetwork.getInterfacesNameserverList(self.iface) + [[0,0,0,0]] * 2)[0:2]
 		self.manualPrimaryDNS = NoSave(ConfigIP(default=manualNameservers[0]))
 		self.manualSecondaryDNS = NoSave(ConfigIP(default=manualNameservers[1]))
-		nameserver = (iNetwork.getNameserverList() + [[0,0,0,0]] * 2)[0:2]
-		self.primaryDNS = NoSave(ConfigIP(default=nameserver[0]))
-		self.secondaryDNS = NoSave(ConfigIP(default=nameserver[1]))
-		self.DNSConfigEntry =  getConfigListEntry(_("Use Manual dns-nameserver"), wlanconfig.hasdnsconfigentry)
+
+		self.usednsEntry =  getConfigListEntry(_("Use Manual dns-nameserver"), self.useDNSConfigEntry)
 		self.primaryDNSConfigEntry = getConfigListEntry(_('Primary DNS'), self.manualPrimaryDNS)
 		self.secondaryDNSConfigEntry = getConfigListEntry(_('Secondary DNS'), self.manualSecondaryDNS)
 
 		self.configList.append( self.usedeviceEntry )
-		if wlanconfig.usedevice.value is "on":
+		if self.activateInterfaceEntry.value is True:
 			self.configList.append( self.usedhcpEntry )
-			if wlanconfig.usedhcp.value is "off":
+
+			if self.usedhcpConfigEntry.value is True:
+				self.configList.append(self.usednsEntry)
+			else:
 				self.configList.append(self.ipEntry)
 				self.configList.append(self.netmaskEntry)
 				self.configList.append(self.usegatewayEntry)
-				if wlanconfig.usegateway.value is "on":
+
+				if self.usegatewayConfigEntry.value is True:
 					self.configList.append(self.gatewayEntry)
-			if wlanconfig.usedhcp.value is "on":
-				self.configList.append(self.DNSConfigEntry)
-			if wlanconfig.hasdnsconfigentry.value is "on" or wlanconfig.usedhcp.value is "off":
+
+			if self.useDNSConfigEntry.value is True or self.usedhcpConfigEntry.value is False:
 				self.configList.append(self.primaryDNSConfigEntry)
 				self.configList.append(self.secondaryDNSConfigEntry)
 
+			self.configList.append( self.hiddenessidEntry )
 			self.configList.append( self.essidEntry )
-			if wlanconfig.essid.value == 'Input hidden ESSID':
-				self.configList.append( self.hiddenessidEntry )
-			self.configList.append( self.encryptEntry )
-			if wlanconfig.encrypt.value is "on" :
-				self.configList.append( self.methodEntry )
-				if wlanconfig.method.value =="wep":
-					self.configList.append( self.keytypeEntry )
+			self.configList.append( self.methodEntry )
+
+			if self.methodConfigEntry.value =="wep":
+				self.configList.append( self.keytypeEntry )
+			if self.methodConfigEntry.value != "None":
 				self.configList.append( self.keyEntry )
 
 		self["config"].list = self.configList
@@ -579,65 +616,13 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 		else:
 			self["VKeyIcon"].hide()
 
-	def getApList(self):
-		if self.essidSelected is None:
-			self.apList = []
-			self.configurationmsg = self.session.open(MessageBox, _("Please wait for scanning AP..."), type = MessageBox.TYPE_INFO, enable_input = False)
-			self.scanAplistTimer.start(100,True)
-		else:
-			self.apList = [self.essidSelected]
-			wlanconfig.essid = ConfigSelection(choices = self.apList)
-			if self.ssid is not None:
-				wlanconfig.hiddenessid = ConfigText(default = self.ssid, visible_width = 50, fixed_size = False)
-			else:
-				wlanconfig.hiddenessid = ConfigText(default = "<Input ESSID>", visible_width = 50, fixed_size = False)
-			self.createConfig()
+	def onSelectHelpWindow(self, ret = False):
+		if isinstance(self["config"].getCurrent()[1], ConfigText) or isinstance(self["config"].getCurrent()[1], ConfigPassword):
+			self["config"].getCurrent()[1].onSelect(self.session)
 
-	def getScanResult(self, wirelessObj):
-		Iwscanresult  = None
-		try:
-			Iwscanresult  = wirelessObj.scan()
-		except IOError:
-			print "%s Interface doesn't support scanning.."%self.iface
-		return Iwscanresult
-
-	def scanApList(self):
-		if self.oldInterfaceState is not True:
-			os_system("ifconfig "+self.iface+" up")
-			iNetwork.setAdapterAttribute(self.iface, "up", True)
-		wirelessObj = Wireless(self.iface)
-		Iwscanresult=self.getScanResult(wirelessObj)
-		if Iwscanresult is None or len(Iwscanresult.aplist) == 0 :
-			import time
-			time.sleep(1.5)
-			Iwscanresult=self.getScanResult(wirelessObj)
-		self.configurationmsg.close(True)
-		if Iwscanresult is None or len( Iwscanresult.aplist) == 0:
-			self.emptyListMsgTimer.start(100,True)
-		else:
-			for ap in Iwscanresult:
-				if ap.essid is not None and ap.essid not in self.apList and len(ap.essid) > 0:
-					self.apList.append(ap.essid)
-		self.apList.append('Input hidden ESSID')
-		if selectap is not None and selectap in self.apList:
-			wlanconfig.essid = ConfigSelection(default=selectap,choices = self.apList)
-		elif self.scan_ssid is not None and self.scan_ssid.strip() == '1':
-			wlanconfig.essid = ConfigSelection(default='Input hidden ESSID',choices = self.apList)
-		elif self.ssid is not None and self.ssid in self.apList:
-			wlanconfig.essid = ConfigSelection(default=self.ssid, choices = self.apList)
-		else:
-			try:
-				wlanconfig.essid = ConfigSelection(defalut = self.apList[0], choices = self.apList)
-			except:
-				wlanconfig.essid = ConfigSelection(choices = self.apList)
-		if self.ssid is not None:
-			wlanconfig.hiddenessid = ConfigText(default = self.ssid, visible_width = 50, fixed_size = False)
-		else:
-			wlanconfig.hiddenessid = ConfigText(default = "<Input ESSID>", visible_width = 50, fixed_size = False)
-		self.createConfig()
-
-	def emptyListMsg(self):
-		self.session.open(MessageBox, _("No AP detected."), type = MessageBox.TYPE_INFO, timeout = 10)
+	def onDeselectHelpWindow(self, ret = False):
+		if isinstance(self["config"].getCurrent()[1], ConfigText) or isinstance(self["config"].getCurrent()[1], ConfigPassword):
+			self["config"].getCurrent()[1].onDeselect(self.session)
 
 	def keyLeft(self):
 		ConfigListScreen.keyLeft(self)
@@ -648,16 +633,15 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 		self.newConfig()
 
 	def newConfig(self):
-		if self["config"].getCurrent() == self.usedeviceEntry or self["config"].getCurrent() == self.encryptEntry \
-			or self["config"].getCurrent() == self.usedhcpEntry or self["config"].getCurrent() == self.usegatewayEntry \
-			or self["config"].getCurrent() == self.essidEntry or self["config"].getCurrent() == self.methodEntry \
-			or self["config"].getCurrent() == self.DNSConfigEntry:
-			self.createConfig()
+		if self["config"].getCurrent() == self.usedeviceEntry or self["config"].getCurrent() == self.usedhcpEntry \
+			or self["config"].getCurrent() == self.usegatewayEntry or self["config"].getCurrent() == self.methodEntry \
+			or self["config"].getCurrent() == self.methodEntry or self["config"].getCurrent() == self.usednsEntry:
+			self.createSetup()
 
 	def saveWlanConfig(self):
 		try:
-			if self["config"].getCurrent() == self.keyEntry or self["config"].getCurrent() == self.hiddenessidEntry :
-				self["config"].getCurrent()[1].onDeselect(self.session)
+			self.onDeselectHelpWindow()
+
 			if self["config"].isChanged():
 				self.session.openWithCallback(self.checkNetworkConfig, MessageBox, (_("Are you sure you want to restart your network interfaces?\n") ) )
 			else:
@@ -667,52 +651,49 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 
 	def checkNetworkConfig(self, ret = False):
 		if ret == False:
-			if self["config"].getCurrent() == self.keyEntry or self["config"].getCurrent() == self.hiddenessidEntry :
-				self["config"].getCurrent()[1].onSelect(self.session)
-			return
-		if wlanconfig.essid.value == 'Input hidden ESSID':
-			if len(wlanconfig.hiddenessid.value) == 0:
-				self.session.open(MessageBox, ("PLEASE INPUT HIDDEN ESSID"), type = MessageBox.TYPE_ERROR, timeout = 10)
-				return
-		if len(wlanconfig.key.value) == 0:
-			self.session.open(MessageBox, ("PLEASE INPUT NETWORK KEY"), type = MessageBox.TYPE_ERROR, timeout = 10)
-			return
-		self.checkNetworkShares()
+			self.onSelectHelpWindow()
 
-	def checkNetworkShares(self):
-		if not self.Console:
-			self.Console = Console()
+		elif len(self.ssidConfigEntry.value) == 0:
+			self.session.open(MessageBox, ("PLEASE INPUT SSID"), type = MessageBox.TYPE_ERROR, timeout = 10)
+
+		elif len(self.keyConfigEntry.value) == 0:
+			self.session.open(MessageBox, ("PLEASE INPUT ENCRYPT KEY"), type = MessageBox.TYPE_ERROR, timeout = 10)
+
+		else:
+			global CHECK_NETWORK_SHARE
+			if CHECK_NETWORK_SHARE:
+				self.checkNetworkShares(self.confirmAnotherIfaces)
+			else:
+				self.confirmAnotherIfaces()
+
+	def checkNetworkShares(self, callback):
 		cmd = "cat /proc/mounts"
-		self.Console.ePopen(cmd, self.checkSharesFinished, self.confirmAnotherIfaces)
-
-	def checkSharesFinished(self, result, retval, extra_args):
-		callback = extra_args
-#		print "checkMountsFinished : result : \n",result
+		data = popen(cmd).readlines()
 		networks = ['nfs','smbfs','ncp','coda']
-		for line in result.splitlines():
+		for line in data:
 			split = line.strip().split(' ',3)
 			if split[2] in networks:
-				self.session.open(MessageBox, ("NOT deconfiguring network interfaces :\n network shares still mounted\n"), type = MessageBox.TYPE_ERROR, timeout = 10)
-				callback(False)
-				if self["config"].getCurrent() == self.keyEntry or self["config"].getCurrent() == self.hiddenessidEntry :
-					self["config"].getCurrent()[1].onSelect(self.session)
+				self.session.openWithCallback(self.onSelectHelpWindow, MessageBox, ("NOT deconfiguring network interfaces :\n network shares still mounted\n"), type = MessageBox.TYPE_ERROR, timeout = 10)
 				return
-		callback(True)
+		callback()
 
-	def confirmAnotherIfaces(self, ret = False):
-		if ret == False:
-			return
-		else:
-			num_configured_if = len(iNetwork.getConfiguredAdapters())
-			if num_configured_if >= 1:
-				if num_configured_if == 1 and self.iface in iNetwork.getConfiguredAdapters():
-					self.getWpaPhrase(False)
-				else:
-					self.session.openWithCallback(self.getWpaPhrase, MessageBox, _("A second configured interface has been found.\n\nDo you want to disable the second network interface?"), default = True)
+	def confirmAnotherIfaces(self):
+		num_configured_if = len(iNetwork.getConfiguredAdapters())
+		if num_configured_if >= 1:
+			if num_configured_if == 1 and self.iface in iNetwork.getConfiguredAdapters():
+				self.confirmAnotherIfacesCB(False)
 			else:
-				self.getWpaPhrase(False)
+				self.session.openWithCallback(self.confirmAnotherIfacesCB, MessageBox, _("A second configured interface has been found.\n\nDo you want to disable the second network interface?"), default = True)
+		else:
+			self.confirmAnotherIfacesCB(False)
 
-	def getWpaPhrase(self,ret):
+	def isWPAMethod(self, method):
+		if method in ("wep", "None"):
+			return False
+		else:
+			return True
+
+	def confirmAnotherIfacesCB(self, ret):
 		if ret == True:
 			configuredInterfaces = iNetwork.getConfiguredAdapters()
 			for interface in configuredInterfaces:
@@ -720,108 +701,107 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 					continue
 				iNetwork.setAdapterAttribute(interface, "up", False)
 				iNetwork.deactivateInterface(interface)
-		if wlanconfig.method.value =="wep":
-			self.writeWpasupplicantConf("wep") # passphrasekey is not None
-		else:
-			if wlanconfig.essid.value == 'Input hidden ESSID':
-				cmd = "wpa_passphrase '%s' %s" % (wlanconfig.hiddenessid.value,wlanconfig.key.value)
-			else :
-				cmd = "wpa_passphrase '%s' %s" % (wlanconfig.essid.value,wlanconfig.key.value)
-			print cmd
-			self.wpaphraseconsole = Console()
-			self.wpaphraseconsole.ePopen(cmd, self.parseWpaPhrase, self.writeWpasupplicantConf)
 
-	def parseWpaPhrase(self, result, retval, extra_args):
-		(writewlanconfig) = extra_args
-		if self.wpaphraseconsole is not None:
-			if retval == 0:
-				self.wpaphraseconsole.killAll()
-				self.wpaphraseconsole = None
-#				print "parseWpaPhrase result : "
-#				print result
-				psk = None
-				for line in result.splitlines():
-					if line.find('ssid') == -1 and line.find('#psk=') != -1:
-						plainpwd	= line
-	 				elif line.find('psk=') != -1:
-						psk = line
-				if psk:
-					writewlanconfig(psk,plainpwd)
-				else:
-					writewlanconfig(None)
-			else:
-				writewlanconfig(None)
-
-	def writeWpasupplicantConf(self, passphrasekey=None,plainpwd=None):
-		if passphrasekey:
-			wpafd = open("/etc/wpa_supplicant.conf","w")
-			if wpafd > 0:
-				contents = "#WPA Supplicant Configuration by STB\n"
-				contents += "ctrl_interface=/var/run/wpa_supplicant\n"
-				contents += "eapol_version=1\n"
-				contents += "fast_reauth=1\n"
-				contents += "ap_scan=1\n"
-				contents += "network={\n"
-				if wlanconfig.essid.value == 'Input hidden ESSID':
-					contents += "\tssid=\""+wlanconfig.hiddenessid.value+"\"\n"
-					contents += "\tscan_ssid=1\n"
-				else :
-					contents += "\tssid=\""+wlanconfig.essid.value+"\"\n"
-					contents += "\tscan_ssid=0\n"
-				if wlanconfig.encrypt.value == "on":
-					if wlanconfig.method.value =="wep":
-						contents += "\tkey_mgmt=NONE\n"
-						contents += "\twep_key0="
-						if wlanconfig.keytype.value == "ascii":
-							contents += "\""+wlanconfig.key.value+"\"\n"
-						else:
-							contents += wlanconfig.key.value+"\n"
-					else:
-#						print "plainpwd : ",plainpwd
-#						print "passphrasekey : ",passphrasekey
-						if wlanconfig.method.value == "wpa":
-							contents += "\tkey_mgmt=WPA-PSK\n"
-							contents += "\tproto=WPA\n"
-							contents += "\tpairwise=CCMP TKIP\n"
-							contents += "\tgroup=CCMP TKIP\n"	
-						elif wlanconfig.method.value == "wpa2":
-							contents += "\tkey_mgmt=WPA-PSK\n"
-							contents += "\tproto=RSN\n"
-							contents += "\tpairwise=CCMP TKIP\n"
-							contents += "\tgroup=CCMP TKIP\n"
-						else:
-							contents += "\tkey_mgmt=WPA-PSK\n"
-							contents += "\tproto=WPA RSN\n"
-							contents += "\tpairwise=CCMP TKIP\n"
-							contents += "\tgroup=CCMP TKIP\n"
-						contents += plainpwd+"\n"
-						contents += passphrasekey+"\n"
-				else:
-					contents += "\tkey_mgmt=NONE\n"
-				contents += "}\n"
-				print "content = \n"+contents
-				wpafd.write(contents)
-				wpafd.close()
-				self.writeNetConfig()
-			else :
-				self.session.open(MessageBox, _("wpa_supplicant.conf open error."), type = MessageBox.TYPE_ERROR, timeout = 10)
-				return
+		if not self.isWPAMethod(self.methodConfigEntry.value):
+			self.writeWpasupplicantConf()
 		else:
-			self.session.open(MessageBox, _("Can NOT generate passphrase"), type = MessageBox.TYPE_ERROR, timeout = 10)
+			self.getWpaPhrase()
+
+	def getWpaPhrase(self):
+		cmd = "wpa_passphrase '%s' %s" % (self.ssidConfigEntry.value, self.keyConfigEntry.value)
+#		print cmd
+		data = popen(cmd).readlines()
+		plainpwd = None
+		psk = None
+		for line in data:
+#			print line,
+			try:
+				(key, value) = line.strip().split('=',1)
+			except:
+				continue
+
+			if key == '#psk':
+				plainpwd = line
+			elif key == 'psk':
+				psk = line
+		self.writeWpasupplicantConf(psk, plainpwd)
+
+	def writeWpasupplicantConf(self, passphrasekey=None, plainpwd=None):
+		wpaSupplicantName = self.getWpaSupplicantName(self.iface)
+		try:
+			wpafd = open(wpaSupplicantName, "w")
+		except:
+			self.session.open(MessageBox, _("%s open error." % wpaSupplicantName ), type = MessageBox.TYPE_ERROR, timeout = 10)
 			return
 
+		contents = "#WPA Supplicant Configuration by STB\n"
+		contents += "ctrl_interface=/var/run/wpa_supplicant\n"
+		contents += "eapol_version=1\n"
+		contents += "fast_reauth=1\n"
+		contents += "ap_scan=1\n"
+		contents += "network={\n"
+# ssid
+		contents += "\tssid=\""+self.ssidConfigEntry.value+"\"\n"
+# hidden ssid
+		if self.hiddenssidConfigEntry.value is True:
+			contents += "\tscan_ssid=1\n"
+		else:
+			contents += "\tscan_ssid=0\n"
+
+		if self.methodConfigEntry.value == "None":
+			contents += "\tkey_mgmt=NONE\n"
+
+		elif self.methodConfigEntry.value == "wep":
+			contents += "\tkey_mgmt=NONE\n"
+			contents += "\twep_key0="
+			if self.keytypeConfigEntry.value == "ascii":
+				contents += "\""+self.keyConfigEntry.value+"\"\n"
+			else:
+				contents += self.keyConfigEntry.value+"\n"
+
+		else:
+			if self.methodConfigEntry.value == "wpa":
+				contents += "\tkey_mgmt=WPA-PSK\n"
+				contents += "\tproto=WPA\n"
+				contents += "\tpairwise=CCMP TKIP\n"
+				contents += "\tgroup=CCMP TKIP\n"
+			elif self.methodConfigEntry.value == "wpa2":
+				contents += "\tkey_mgmt=WPA-PSK\n"
+				contents += "\tproto=RSN\n"
+				contents += "\tpairwise=CCMP TKIP\n"
+				contents += "\tgroup=CCMP TKIP\n"
+			else:
+				contents += "\tkey_mgmt=WPA-PSK\n"
+				contents += "\tproto=WPA RSN\n"
+				contents += "\tpairwise=CCMP TKIP\n"
+				contents += "\tgroup=CCMP TKIP\n"
+
+#				print "plainpwd : ",plainpwd
+#				print "passphrasekey : ",passphrasekey
+			if plainpwd is not None and passphrasekey is not None:
+				contents += plainpwd
+				contents += passphrasekey
+			else:
+				contents += "\tpsk=%s\n" % self.keyConfigEntry.value
+
+		contents += "}\n"
+#		print "content = \n"+contents
+		wpafd.write(contents)
+		wpafd.close()
+		self.writeNetConfig()
+
 	def writeNetConfig(self):
-		if wlanconfig.usedevice.value=="on":
+		if self.activateInterfaceEntry.value is True:
 			iNetwork.setAdapterAttribute(self.iface, "up", True)
-			if wlanconfig.usedhcp.value =="on":
+			if self.usedhcpConfigEntry.value is True:
 				iNetwork.setAdapterAttribute(self.iface, "dhcp", True)
 			else:
 				iNetwork.setAdapterAttribute(self.iface, "dhcp", False)
-				iNetwork.setAdapterAttribute(self.iface, "ip", wlanconfig.ip.value)
-				iNetwork.setAdapterAttribute(self.iface, "netmask", wlanconfig.netmask.value)
-				if wlanconfig.usegateway.value == "on":
-					iNetwork.setAdapterAttribute(self.iface, "gateway", wlanconfig.gateway.value)
-			if wlanconfig.hasdnsconfigentry.value == "on" or wlanconfig.usedhcp.value == "off":
+				iNetwork.setAdapterAttribute(self.iface, "ip", self.IPConfigEntry.value)
+				iNetwork.setAdapterAttribute(self.iface, "netmask", self.netmaskConfigEntry.value)
+				if self.usegatewayConfigEntry.value is True:
+					iNetwork.setAdapterAttribute(self.iface, "gateway", self.gatewayConfigEntry.value)
+			if self.useDNSConfigEntry.value is True or self.usedhcpConfigEntry.value is False:
 				interfacesDnsLines = self.makeLineDnsNameservers([self.manualPrimaryDNS.value, self.manualSecondaryDNS.value])
 				if interfacesDnsLines == "" :
 					interfacesDnsLines = False
@@ -831,7 +811,9 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 		else:
 			iNetwork.setAdapterAttribute(self.iface, "up", False)
 			iNetwork.deactivateInterface(self.iface)
-		contents = "\tpre-up wpa_supplicant -i"+self.iface+" -c/etc/wpa_supplicant.conf -B -D"+iNetwork.detectWlanModule(self.iface)+"\n"
+
+		wpaSupplicantName = self.getWpaSupplicantName(self.iface)
+		contents = "\tpre-up wpa_supplicant -i"+self.iface+" -c%s -B -D" % (wpaSupplicantName)  +iNetwork.detectWlanModule(self.iface)+"\n"
 		contents += "\tpost-down wpa_cli terminate\n"
 		iNetwork.setAdapterAttribute(self.iface, "configStrings", contents)
 		iNetwork.writeNetworkConfig()
@@ -846,85 +828,58 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 			line+="\tdns-nameservers %s\n" % entry
 		return line
 
-	def updateCurrentInterfaces(self,ret):
+	def updateCurrentInterfaces(self, ret):
 		if ret is True:
 			iNetwork.getInterfaces(self.configurationMsgClose)
+		elif self.configurationmsg is not None:
+			self.configurationmsg.close(False)
 
 	def configurationMsgClose(self,ret):
-		if ret is True and self.configurationmsg is not None:
-			self.configurationmsg.close(True)
+		if self.configurationmsg is not None:
+			if ret is True:
+				self.configurationmsg.close(True)
+			else:
+				self.configurationmsg.close(False)
 
 	def configFinished(self,data):
-		global selectap
 		if data is True:
 			self.session.openWithCallback(self.configFinishedCB, MessageBox, _("Your network configuration has been activated."), type = MessageBox.TYPE_INFO, timeout = 10)
-			selectap = wlanconfig.essid.value
+			global ESSID_SELECTED_IN_APLIST
+			ESSID_SELECTED_IN_APLIST = None
+		else:
+			self.session.openWithCallback(self.configFinishedCB, MessageBox, _("Network configuration is failed."), type = MessageBox.TYPE_INFO, timeout = 10)
 
-	def configFinishedCB(self,data):
-		if data is not None:
-			if data is True:
-				self.close()
-	
-	def formatip(self, iplist):
-		list = []
-		list = iplist
-#		print "iplist : ",iplist
-		try:
-			if len(iplist) == 4:
-				result = str(iplist[0])+"."+str(iplist[1])+"."+str(iplist[2])+"."+str(iplist[3])
-			else:
-				result ="0.0.0.0"
-#			print "result : ",result
-			return result
-		except:
-			return "[N/A]"
+	def configFinishedCB(self, data):
+		if data is True:
+			self.close()
 			
 	def keyCancelConfirm(self, result):
 		if not result:
+			self.onSelectHelpWindow()
 			return
+
 		if self.oldInterfaceState is False:
-			iNetwork.setAdapterAttribute(self.iface, "up", False)
-			iNetwork.deactivateInterface(self.iface,self.keyCancelCB)
+			iNetwork.deactivateInterface(self.iface, self.keyCancelCB)
 		else:
 			self.close()
 
 	def keyCancel(self,yesno = True):
 		if self["config"].isChanged():
+			self.onDeselectHelpWindow()
 			self.session.openWithCallback(self.keyCancelConfirm, MessageBox, _("Really close without saving settings?"))
 		else:
-			self.keyCancelConfirm(True)
+			self.close()
 
 	def keyCancelCB(self,data):
-		if data is not None:
-			if data is True:
-				self.close()
+		if data is True:
+			self.close()
 
 	def cleanup(self):
 		iNetwork.stopRestartConsole()
 		iNetwork.stopGetInterfacesConsole()
 		iNetwork.stopDeactivateInterfaceConsole()
-		self.stopwlanscanapConsole()
-		self.stopCheckNetworkSharesConsole()
-		self.stopWpaPhraseConsole()
 
-	def stopwlanscanapConsole(self):
-		if self.wlanscanap is not None:
-			if len(self.wlanscanap.appContainers):
-				for name in self.wlanscanap.appContainers.keys():
-					self.wlanscanap.kill(name)
-
-	def stopCheckNetworkSharesConsole(self):
-		if self.Console is not None:
-			if len(self.Console.appContainers):
-				for name in self.Console.appContainers.keys():
-					self.Console.kill(name)
-
-	def stopWpaPhraseConsole(self):
-		if self.wpaphraseconsole is not None:
-			if len(self.wpaphraseconsole.appContainers):
-					for name in self.wpaphraseconsole.appContainers.keys():
-						self.wpaphraseconsole.kill(name)
-
+SHOW_HIDDEN_NETWORK = False
 class WlanScanAp(Screen,HelpableScreen):
 	skin = 	"""
 		<screen position="center,center" size="510,400" title="Wireless Network AP Scan..." >
@@ -939,16 +894,19 @@ class WlanScanAp(Screen,HelpableScreen):
 			<widget source="key_green" render="Label" position="185,360" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#1f771f" foregroundColor="#ffffff" transparent="1" />
 			<widget source="key_blue" render="Label" position="360,360" zPosition="1" size="140,40" font="Regular;20" halign="center" valign="center" backgroundColor="#18188b" foregroundColor="#ffffff" transparent="1" />
 
-			<widget name="menulist" position="20,20" size="230,260" backgroundColor="#371e1c1a" transparent="1" zPosition="10" scrollbarMode="showOnDemand" />
+			<widget name="aplist" position="20,20" size="230,275" backgroundColor="#371e1c1a" transparent="1" zPosition="10" scrollbarMode="showOnDemand" />
 
-			<widget source="Address" render="Label" position="265,70" zPosition="1" size="240,30" font="Regular;18" halign="center" valign="center" />
-			<widget source="ESSID" render="Label" position="265,100" zPosition="1" size="240,30" font="Regular;18" halign="center" valign="center" />
+			<widget source="ESSID" render="Label" position="265,70" zPosition="1" size="240,30" font="Regular;18" halign="center" valign="center" />
+			<widget source="Address" render="Label" position="265,100" zPosition="1" size="240,30" font="Regular;18" halign="center" valign="center" />
 			<widget source="Protocol" render="Label" position="265,130" zPosition="1" size="240,30" font="Regular;18" halign="center" valign="center" />
-			<widget source="Frequency" render="Label" position="265,160" zPosition="1" size="240,40" font="Regular;18" halign="center" valign="center" />
-			<widget source="Encryption key" render="Label" position="265,200" zPosition="1" size="240,30" font="Regular;18" halign="center" valign="center" />
-			<widget source="BitRate" render="Label" position="265,220" zPosition="1" size="240,60" font="Regular;18" halign="center" valign="center" />
+			<widget source="Frequency" render="Label" position="265,160" zPosition="1" size="240,30" font="Regular;18" halign="center" valign="center" />
+			<widget source="Channel" render="Label" position="265,190" zPosition="1" size="240,30" font="Regular;18" halign="center" valign="center" />
+			<widget source="Encryption key" render="Label" position="265,220" zPosition="1" size="240,30" font="Regular;18" halign="center" valign="center" />
+			<widget source="BitRate" render="Label" position="265,250" zPosition="1" size="240,30" font="Regular;18" halign="center" valign="center" />
+			<widget source="Status" render="Label" position="115,310" zPosition="1" size="300,30" font="Regular;18" halign="center" valign="center" />
 		</screen>
 		"""
+
 	def __init__(self, session, iface):
 		Screen.__init__(self,session)
 		HelpableScreen.__init__(self)
@@ -976,64 +934,88 @@ class WlanScanAp(Screen,HelpableScreen):
 		{
 			"red": (self.close, _("exit")),
 			"green": (self.ok, "select AP"),
-			"yellow": (self.restartScanAP, "restart scan AP"),
 			"blue": (self.startWlanConfig, "Edit Wireless settings"),
 		})
 
-		self["menulist"] = MenuList(self.setApList)
+		self["aplist"] = MenuList(self.setApList)
 		self["key_red"] = StaticText(_("Close"))
 		self["key_green"] = StaticText(_("Select"))
 		self["key_blue"] = StaticText(_("EditSetting"))
-		self["Address"] = StaticText(_("Scanning AP List.."))
-		self["ESSID"] = StaticText(_("Wait a moment"))
+		self["Status"] = StaticText(_(" "))
+		self["ESSID"] = StaticText(" ")
+		self["Address"] = StaticText(" ")
 		self["Protocol"] = StaticText(" ")
 		self["Frequency"] = StaticText(" ")
+		self["Channel"] = StaticText(" ")
 		self["Encryption key"] = StaticText(" ")
 		self["BitRate"] = StaticText(" ")
 		self.oldInterfaceState = iNetwork.getAdapterAttribute(self.iface, "up")
-		self.getAplistTimer = eTimer()
-		self.getAplistTimer.callback.append(self.getApList)
+
+		self.startupTimer = eTimer()
+		self.startupTimer.callback.append(self.startup)
+
+		self.activateIfaceTimer = eTimer()
+		self.activateIfaceTimer.callback.append(self.activateIface)
+
+		self.updateStatusTimer = eTimer()
+		self.updateStatusTimer.callback.append(self.updateStatus)
+		
 		self.scanAplistTimer = eTimer()
 		self.scanAplistTimer.callback.append(self.scanApList)
-		self.emptyListMsgTimer = eTimer()
-		self.emptyListMsgTimer.callback.append(self.emptyListMsg)
+		
 		self.apList = {}
 		self.onClose.append(self.__onClose)
-		self.getAplistTimer.start(100,True)
+		self.onShown.append(lambda: self.startupTimer.start(10, True))
+
+	def startup(self):
+		if self.oldInterfaceState is not True:
+			self["Status"].setText(("Please wait for activating interface..."))
+			self.activateIfaceTimer.start(10, True)
+		else:
+			self.updateStatusTimer.start(10, True)
+
+	def activateIface(self):
+		os_system("ifconfig "+self.iface+" up")
+		iNetwork.setAdapterAttribute(self.iface, "up", True)
+		self.updateStatusTimer.start(2000, True)
 		
+
+	def updateStatus(self):
+		self["Status"].setText(("Please wait for scanning AP..."))
+		self.scanAplistTimer.stop()
+		self.scanAplistTimer.start(10, True)
+
+	def updateAPList(self):
+		self.updateStatusTimer.stop()
+		self.updateStatusTimer.start(8000, True)
+
 	def left(self):
-		self["menulist"].pageUp()
+		self["aplist"].pageUp()
 		self.displayApInfo()
 	
 	def right(self):
-		self["menulist"].pageDown()
+		self["aplist"].pageDown()
 		self.displayApInfo()
 
 	def up(self):
-		self["menulist"].up()
+		self["aplist"].up()
 		self.displayApInfo()
 		
 	def down(self):
-		self["menulist"].down()
+		self["aplist"].down()
 		self.displayApInfo()
 
 	def ok(self):
-		global selectap
-		if self["menulist"].getCurrent() is not None:
-			selectAp=self["menulist"].getCurrent()[0]
-			selectap = selectAp
+		global ESSID_SELECTED_IN_APLIST
+		if self["aplist"].getCurrent() is not None:
+			ESSID_SELECTED_IN_APLIST = self["aplist"].getCurrent()[0]
 		self.close()
 
-	def startWlanConfig(self):
-		if self["menulist"].getCurrent() is not None:
-			selectAp=self["menulist"].getCurrent()[0]
-			self.close(selectAp)
-
-	def getApList(self):
-		self.apList = {}
-		self.setApList = []
-		self.configurationmsg = self.session.open(MessageBox, _("Please wait for scanning AP..."), type = MessageBox.TYPE_INFO, enable_input = False)
-		self.scanAplistTimer.start(100,True)
+	def startWlanConfig(self): # key blue
+		global ESSID_SELECTED_IN_APLIST
+		if self["aplist"].getCurrent() is not None:
+			ESSID_SELECTED_IN_APLIST = self["aplist"].getCurrent()[0]
+			self.close(True)
 
 	def getScanResult(self, wirelessObj):
 		Iwscanresult  = None
@@ -1044,80 +1026,96 @@ class WlanScanAp(Screen,HelpableScreen):
 		return Iwscanresult
 
 	def scanApList(self):
-		if self.oldInterfaceState is not True:
-			os_system("ifconfig "+self.iface+" up")
-			iNetwork.setAdapterAttribute(self.iface, "up", True)
+		self.apList = {}
+		self.setApList = []
+
 		wirelessObj = Wireless(self.iface)
 		Iwscanresult=self.getScanResult(wirelessObj)
-		if Iwscanresult is None or len(Iwscanresult.aplist) == 0 :
-			import time
-			time.sleep(1.5)
-			Iwscanresult=self.getScanResult(wirelessObj)
-		self.configurationmsg.close(True)
-		if Iwscanresult is not None and len(Iwscanresult.aplist) != 0:
-			(num_channels, frequencies) = wirelessObj.getChannelInfo()
-			index = 1
-			for ap in Iwscanresult:
-				self.apList[index] = {}
-				self.apList[index]["Address"] = ap.bssid
-				if len(ap.essid) == 0:
-					self.apList[index]["ESSID"] = "<hidden ESSID>"
-				else:
-					self.apList[index]["ESSID"] = ap.essid
-					self.setApList.append( (self.apList[index]["ESSID"], index) )
-				self.apList[index]["Protocol"] = ap.protocol
-				self.apList[index]["Frequency"] = wirelessObj._formatFrequency(ap.frequency.getFrequency())
-				try:
-					self.apList[index]["Channel"] = frequencies.index(self.apList[index]["Frequency"] + 1)
-				except:
-					self.apList[index]["Channel"] = "Unknown"
 
-				self.apList[index]["Quality"] = "%s/%s" % \
-					( ap.quality.quality, wirelessObj.getQualityMax().quality )
-				self.apList[index]["Signal Level"] = "%s/%s" % \
-					( ap.quality.getSignallevel(), "100" )
-				self.apList[index]["Noise Level"] = "%s/%s" % \
-					( ap.quality.getNoiselevel(), "100" )
+		if Iwscanresult is None or len(Iwscanresult.aplist) == 0:
+			self["Status"].setText(("NO AP detected"))
+			return
+
+		try:
+			(num_channels, frequencies) = wirelessObj.getChannelInfo()
+		except:
+			pass
+
+		index = 1
+		for ap in Iwscanresult:
+			self.apList[index] = {}
+			self.apList[index]["Address"] = ap.bssid
+			if len(ap.essid) == 0:
+				self.apList[index]["ESSID"] = None
+			else:
+				self.apList[index]["ESSID"] = ap.essid
+
+			self.apList[index]["Protocol"] = ap.protocol
+			self.apList[index]["Frequency"] = wirelessObj._formatFrequency(ap.frequency.getFrequency())
+			try:
+				self.apList[index]["Channel"] = frequencies.index(self.apList[index]["Frequency"]) + 1
+			except:
+				self.apList[index]["Channel"] = "Unknown"
+
+			self.apList[index]["Quality"] = "%s/%s" % \
+				( ap.quality.quality, wirelessObj.getQualityMax().quality )
+			self.apList[index]["Signal Level"] = "%s/%s" % \
+				( ap.quality.getSignallevel(), "100" )
+			self.apList[index]["Noise Level"] = "%s/%s" % \
+				( ap.quality.getNoiselevel(), "100" )
 
 # get encryption key on/off
-				key_status = "Unknown"
-				if (ap.encode.flags & pythonwifi.flags.IW_ENCODE_DISABLED):
-					key_status = "off"
-				elif (ap.encode.flags & pythonwifi.flags.IW_ENCODE_NOKEY):
-					if (ap.encode.length <= 0):
-						key_status = "on"
-				self.apList[index]["Encryption key"] = key_status
-				self.apList[index]["BitRate"] = wirelessObj._formatBitrate(ap.rate[-1][-1])
-				index += 1
+			key_status = "Unknown"
+			if (ap.encode.flags & wifi_flags.IW_ENCODE_DISABLED):
+				key_status = "off"
+			elif (ap.encode.flags & wifi_flags.IW_ENCODE_NOKEY):
+				if (ap.encode.length <= 0):
+					key_status = "on"
+			self.apList[index]["Encryption key"] = key_status
+
+# get bitrate
+			if len(ap.rate) > 0:
+				if len(ap.rate[0]) > 0:
+					self.apList[index]["BitRate"] = wirelessObj._formatBitrate(ap.rate[0][0])
+			else:
+				self.apList[index]["BitRate"] = ""
+			index += 1
+
 #		print self.apList
-#		print self.setApList
+
+		# update menu list
+		ap_index = 0
+		for (ap_index, ap_info) in self.apList.items():
+			essid = ap_info.get("ESSID", None)
+			if essid is None:
+				global SHOW_HIDDEN_NETWORK
+				if SHOW_HIDDEN_NETWORK:
+					essid = "# Hidden Network"
+				else:
+					continue
+			self.setApList.append( (essid, int(ap_index)) )
+
+		self["aplist"].setList(self.setApList)
+#		print "menu aplist : ", self.setApList
+		self["Status"].setText(("%d AP detected" % len(self.setApList)))
 		self.displayApInfo()
-		if len(self.apList) == 0:
-			self.emptyListMsgTimer.start(100,True)
+
+		self.updateAPList()
 
 	def displayApInfo(self):
-		if len(self.apList) >0:
-			self["menulist"].setList(self.setApList)
-			if self["menulist"].getCurrent() is not None:
-				index = self["menulist"].getCurrent()[1]
-				for key in ["Address", "ESSID", "Protocol", "Frequency", "Encryption key", "BitRate"]:
-					if self.apList[index].has_key(key) and self.apList[index][key] is not None:
-						self[key].setText((key+":  "+self.apList[index][key]))
-					else:
-						self[key].setText((key+": None"))
-
-	def emptyListMsg(self):
-		self.session.open(MessageBox, _("No AP detected."), type = MessageBox.TYPE_INFO, timeout = 10)
-		self["Address"].setText(_("No AP detected."))
-		self["ESSID"].setText(_(""))
-
-	def restartScanAP(self):
-		self.getAplistTimer.start(100,True)
+		if self["aplist"].getCurrent() is not None:
+			index = self["aplist"].getCurrent()[1]
+			for key in ["Address", "ESSID", "Protocol", "Frequency", "Encryption key", "BitRate", "Channel"]:
+				if self.apList[index].has_key(key) and self.apList[index][key] is not None:
+					value = str(self.apList[index][key])
+				else:
+					value = "None"
+				self[key].setText(( "%s:  %s" % (key, value) ))	
 
 	def __onClose(self):
-		if self.oldInterfaceState is False:
+		if self.oldInterfaceState is not True:
+			os_system("ifconfig "+self.iface+" down")
 			iNetwork.setAdapterAttribute(self.iface, "up", False)
-			iNetwork.deactivateInterface(self.iface)
 
 class NetworkAdapterTest(Screen):
 	def __init__(self, session,iface):
@@ -1377,7 +1375,7 @@ class NetworkAdapterTest(Screen):
 			self["key_red"].setText(_("Back"))
 		if self.activebutton == 6: # Edit Settings
 			self.cleanup()
-			self.session.open(WlanConfig,self.iface)
+			self.session.open(WlanConfig, self.iface)
 			self["shortcuts"].setEnabled(True)		
 			self["infoshortcuts"].setEnabled(False)
 
