@@ -57,10 +57,8 @@ class CIselectMainMenu(Screen):
 					appname = _("Slot %d") %(slot+1) + " - " + _("init modules")
 				elif state == 2:
 					appname = _("Slot %d") %(slot+1) + " - " + eDVBCI_UI.getInstance().getAppName(slot)
-				#	ikseong					
 				else :
 					appname = _("Slot %d") %(slot+1) + " - " + _("no module found")
-				#
 				self.list.append( (appname, ConfigNothing(), 0, slot) )
 		else:
 			self.list.append( (_("no CI slots found") , ConfigNothing(), 1, -1) )

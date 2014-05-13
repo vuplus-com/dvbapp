@@ -90,7 +90,6 @@
 			<key id="KEY_RECORD" mapto="instantRecord" flags="m" />
 		</device>
 		<device name="dreambox remote control (native)">
-<!--	ikseong insert KEY_RECORD action	-->
 			<key id="KEY_RECORD" mapto="instantRecord" flags="m" />
 			<key id="KEY_RED" mapto="instantRecord" flags="b" />
 		</device>
@@ -175,12 +174,6 @@
 		<key id="KEY_ENTER" mapto="ok" flags="m" />
 		<key id="KEY_EXIT" mapto="back" flags="m" />
 		<key id="KEY_ESC" mapto="back" flags="m" />
-<!--	ikseong for factory test	-->
-		<key id="KEY_SUBTITLE" mapto="test" flags="m" />
-		<key id="KEY_RADIO" mapto="testexit" flags="m" />
-		<key id="KEY_PAUSE" mapto="agingend" flags="m" />
-		<key id="KEY_STOP" mapto="agingfinish" flags="m" />		
-		<key id="KEY_GREEN" mapto="agingstart" flags="m" />
 	</map>
 	
 	<map context="InfobarMenuActions">
@@ -204,7 +197,6 @@
 		<key id="KEY_VIDEO" mapto="showMovies" flags="m" />
 		<key id="KEY_RADIO" mapto="showRadio" flags="m" />
 		<key id="KEY_TV" mapto="showTv" flags="m" />
-<!--	ikseong insert KEY_SUBTITLE action for subtitle hotkey	-->
 		<key id="KEY_SUBTITLE" mapto="showSubtitle" flags="m" />
 	</map>
 
@@ -297,7 +289,6 @@
 			<key id="KEY_BLUE" mapto="seekFwd" flags="b" />
 			<key id="KEY_RED" mapto="seekBackManual" flags="l" />
 			<key id="KEY_BLUE" mapto="seekFwdManual" flags="l" />
-<!--	ikseong insert KEY_PAUSE, KEY_PLAY	-->
 			<key id="KEY_PAUSE" mapto="pauseService" flags="m" />
 			<key id="KEY_PLAY" mapto="playpauseService" flags="m" />
 		</device>
@@ -373,7 +364,6 @@
 		<device name="dreambox remote control (native)">
 			<key id="KEY_YELLOW" mapto="timeshiftStart" flags="b" />
 			<key id="KEY_TV" mapto="timeshiftStop" flags="m" />
-<!--	ikseong insert KEY_PAUSE, KEY_PLAY, KEY_STOP	-->
 			<key id="KEY_PLAY" mapto="timeshiftStart" flags="m" />
 			<key id="KEY_PAUSE" mapto="timeshiftStart" flags="m" />
 			<key id="KEY_STOP" mapto="timeshiftStop" flags="m" />
@@ -395,7 +385,6 @@
 		<device name="dreambox remote control (native)">
 			<key id="KEY_RED" mapto="timeshiftActivateEnd" flags="b" />
 			<key id="KEY_YELLOW" mapto="timeshiftActivateEndAndPause" flags="b" />
-<!--	ikseong insert KEY_PAUSE, KEY_PLAY, KEY_REWIND	-->
 			<key id="KEY_PLAY" mapto="timeshiftActivateEndAndPause" flags="m" />
 			<key id="KEY_PAUSE" mapto="timeshiftActivateEndAndPause" flags="m" />
 		</device>
@@ -427,7 +416,6 @@
 		<device name="dreambox remote control (native)">
 			<key id="KEY_TV" mapto="leavePlayer" flags="m" />
 			<key id="KEY_STOP" mapto="leavePlayer" flags="m" />
-<!--	ikseong insert KEY_SUBTITLE action for subtitle hotkey	-->
 			<key id="KEY_SUBTITLE" mapto="showSubtitle" flags="m" />		
 		</device>
 		<device name="dreambox advanced remote control (native)">
@@ -668,7 +656,6 @@
 			<key id="KEY_RADIO" mapto="shift_record" flags="l" />
 			<key id="KEY_PREVIOUS" mapto="previous" flags="m" />
 			<key id="KEY_NEXT" mapto="next" flags="m" />
-<!--	ikseong insert KEY_PAUSE, KEY_PLAY, KEY_STOP, KEY_RECORD, KEY_REWIND, KEY_FASTFORWARD	-->
 			<key id="KEY_PAUSE" mapto="pause" flags="m" />
 			<key id="KEY_PLAY" mapto="play" flags="m" />
 			<key id="KEY_STOP" mapto="stop" flags="b" />

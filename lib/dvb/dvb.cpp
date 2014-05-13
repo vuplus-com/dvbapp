@@ -1215,7 +1215,7 @@ void eDVBChannel::frontendStateChanged(iDVBFrontend*fe)
 		}
 	} else if (state == iDVBFrontend::stateFailed)
 	{
-#ifdef BUILD_VUPLUS /* ikseong  */
+#ifdef BUILD_VUPLUS
 		if (m_current_frontend_parameters)
 		{
 			eDebug("OURSTATE: lost lock, trying to retune");

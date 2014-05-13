@@ -60,8 +60,6 @@ class TunerInfo(GUIComponent):
 			value = self.getValue(self.LOCK)
 
 		if self.type == self.SNR_DB:
-#	ikseong		
-#			if value != 0x12345678:
 			if value is not None and value != 0x12345678:
 				self.setText("%3.02f dB" % (value / 100.0))
 			else:

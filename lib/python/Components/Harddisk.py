@@ -1,5 +1,5 @@
 from os import system, listdir, statvfs, popen, makedirs, stat, major, minor, path, access
-#	ikseong
+
 from Tools.Directories import SCOPE_HDD, resolveFilename, fileExists
 
 from Tools.CList import CList
@@ -97,7 +97,6 @@ class Harddisk:
 		return ret
 
 	def diskSize(self):
-		#	ikseong
 		try:
 			line = readFile(self.sysfsPath('size'))
 		except:
@@ -117,7 +116,6 @@ class Harddisk:
 		return "%d.%03d GB" % (cap/1000, cap%1000)
 
 	def model(self):
-		#	ikseong
 		try:
 			if self.device[:2] == "hd":
 				return readFile('/proc/ide/' + self.device + '/model')
@@ -278,12 +276,11 @@ class Harddisk:
 		return (res >> 8)
 
 	def createMovieFolder(self):
-#	ikseong
 		try:
 			if not fileExists("/hdd", 0):
 				print "not found /hdd"
 				system("ln -s /media/hdd /hdd")
-#				
+	
 			makedirs(resolveFilename(SCOPE_HDD))
 		except OSError:
 			return -1
@@ -392,7 +389,7 @@ class Harddisk:
 		idle_time = t - self.last_access
 
 		stats = self.readStats()
-		#	ikseong
+
 		if stats == -1:
 			self.setIdleTime(0)
 			return
@@ -661,7 +658,6 @@ class HarddiskManager:
 	def HDDList(self):
 		list = [ ]
 		for hd in self.hdd:
-			#	ikseong
 			if hd.model() == -1:
 				continue
 			hdd = hd.model() + " - " + hd.bus()

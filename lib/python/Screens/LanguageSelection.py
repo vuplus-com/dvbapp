@@ -1,7 +1,6 @@
 from Screen import Screen
 
-#	ikseong
-from Components.ActionMap import ActionMap,NumberActionMap
+from Components.ActionMap import ActionMap
 from Components.Language import language
 from Components.config import config
 from Components.Sources.List import List
@@ -24,8 +23,6 @@ def LanguageEntryComponent(file, name, index):
 		png = LoadPixmap(resolveFilename(SCOPE_CURRENT_SKIN, "countries/missing.png"))
 	res = (index, name, png)
 	return res
-#	ikseong
-from Plugins.SystemPlugins.FactoryTest.plugin import FactoryTest
 
 class LanguageSelection(Screen):
 	def __init__(self, session):
@@ -39,32 +36,11 @@ class LanguageSelection(Screen):
 
 		self.updateList()
 		self.onLayoutFinish.append(self.selectActiveLanguage)
-#	ikseong
-		self["actions"] = NumberActionMap(["OkCancelActions","NumberActions"], 
+		self["actions"] = ActionMap(["OkCancelActions"],
 		{
 			"ok": self.save,
 			"cancel": self.cancel,
-			"1": self.keyNumberGlobal,
-			"2": self.keyNumberGlobal,
-			"3": self.keyNumberGlobal,
-			"4": self.keyNumberGlobal,
-			"5": self.keyNumberGlobal,
-			"6": self.keyNumberGlobal,
-			"7": self.keyNumberGlobal,
-			"8": self.keyNumberGlobal,
-			"9": self.keyNumberGlobal,
-			"0": self.keyNumberGlobal,
 		}, -1)
-		self.testkey=0
-		
-#	ikseong
-	def keyNumberGlobal(self, number):
-		self.testkey = self.testkey * 10 + number
-		if self.testkey > 10000:
-			self.testkey = self.testkey%10000
-		if self.testkey == 4599:
-			self.session.open(FactoryTest)
-		print "testkey", self.testkey
 
 	def selectActiveLanguage(self):
 		activeLanguage = language.getActiveLanguage()

@@ -99,7 +99,6 @@ class SleepTimerEdit(Screen):
 
 	def select(self):
 		if self.status:
-#	ikseong
 			if self["input"].getText()=='':
 				self.session.nav.SleepTimer.clear()
 				self.session.openWithCallback(self.close, MessageBox, _("The sleep timer is invalid."), MessageBox.TYPE_INFO)
@@ -116,7 +115,6 @@ class SleepTimerEdit(Screen):
 			self.session.openWithCallback(self.close, MessageBox, _("The sleep timer has been disabled."), MessageBox.TYPE_INFO)
 
 	def keyNumberGlobal(self, number):
-#	ikseong
 		if self["input"].getText() == '' :
 			inputtime=0
 		else:

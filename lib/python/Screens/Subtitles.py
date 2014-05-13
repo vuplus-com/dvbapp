@@ -7,7 +7,6 @@ from enigma import iPlayableService
 
 from Tools.ISO639 import LanguageCodes
 
-#	ikseong for subtitle hotkey
 from Screens.InfoBar import InfoBar
 
 class Subtitles(Screen, ConfigListScreen):
@@ -22,13 +21,12 @@ class Subtitles(Screen, ConfigListScreen):
 
 		self.list = []
 		ConfigListScreen.__init__(self, self.list)
-#	ikseong for subtitle hotkey
 		if self.session.infobar is None:	
 			if InfoBar.instance:
 				self.infobar = InfoBar.instance
 		else:
 			self.infobar = self.session.infobar
-#
+
 		self.fillList()
 
 		self.__event_tracker = ServiceEventTracker(screen=self, eventmap=

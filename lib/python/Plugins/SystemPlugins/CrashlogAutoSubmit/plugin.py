@@ -333,7 +333,6 @@ def mxServerFound(mxServer,session):
 		if crashlog.startswith("enigma2_crash_") and crashlog.endswith(".log"):
 			print "[CrashlogAutoSubmit] - found crashlog: ",os.path.basename(crashlog)
 			crashLogFilelist.append('/media/hdd/' + crashlog)
-#	ikseong
 #	if len(crashLogFilelist):
 #		if config.plugins.crashlogautosubmit.sendmail.value == "send":
 #			session.openWithCallback(handleAnswer, ChoiceBox, title=_("Crashlogs found!\nSend them to Dream Multimedia ?"), list = list)

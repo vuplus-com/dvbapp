@@ -137,7 +137,6 @@ class MediaPlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarAudioSelection, InfoB
 
 		self.seek_target = None
 
-#	ikseong
 #		from Plugins.SystemPlugins.Hotplug.plugin import hotplugNotifier
 #		hotplugNotifier.append(self.hotplugCB)
 
@@ -169,7 +168,6 @@ class MediaPlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarAudioSelection, InfoB
 				"prevBouquet": (self.switchToPlayList, _("switch to playlist")),
 				"nextBouquet": (self.switchToFileList, _("switch to filelist")),
 				"delete": (self.deletePlaylistEntry, _("delete playlist entry")),
-#ikseong				
 #				"shift_stop": (self.clear_playlist, _("clear playlist")),
 #				"shift_record": (self.playlist.PlayListShuffle, _("shuffle playlist")),
 				"shift_stop": self.clear_playlist,
@@ -252,7 +250,6 @@ class MediaPlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarAudioSelection, InfoB
 		if config.mediaplayer.saveDirOnExit.getValue():
 			config.mediaplayer.defaultDir.setValue(self.filelist.getCurrentDirectory())
 			config.mediaplayer.defaultDir.save()
-#	ikseong			
 #	from Plugins.SystemPlugins.Hotplug.plugin import hotplugNotifier
 #	hotplugNotifier.remove(self.hotplugCB)
 		del self["coverArt"].picload

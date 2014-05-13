@@ -189,7 +189,7 @@ eDBoxLCD *eDBoxLCD::getInstance()
 
 void eDBoxLCD::update()
 {
-#ifdef BUILD_VUPLUS /* ikseong  */
+#ifdef BUILD_VUPLUS
 	return ;
 #endif
 	if (lcdfd >= 0)

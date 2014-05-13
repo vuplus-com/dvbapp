@@ -1654,7 +1654,7 @@ class InfoBarInstantRecord:
 		dir = preferredInstantRecordPath()
 		if not dir or not fileExists(dir, 'w'):
 			dir = defaultMoviePath()
-#	ikseong
+
 		if not fileExists("/hdd", 0):
 			print "not found /hdd"
 			system("ln -s /media/hdd /hdd")

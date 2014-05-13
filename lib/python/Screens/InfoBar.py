@@ -45,7 +45,6 @@ class InfoBar(InfoBarBase, InfoBarShowHide,
 				"showMovies": (self.showMovies, _("Play recorded movies...")),
 				"showRadio": (self.showRadio, _("Show the radio player...")),
 				"showTv": (self.showTv, _("Show the tv player...")),
-				#	ikseong action for subtitle hotkey
 				"showSubtitle":(self.showSubtitle, _("Show the Subtitle...")),
 			}, prio=2)
 		
@@ -125,7 +124,6 @@ class InfoBar(InfoBarBase, InfoBarShowHide,
 		if service is not None:
 			self.session.open(MoviePlayer, service)
 
-	#	ikseong action for subtitle hotkey
 	def showSubtitle(self):
 		from Screens.Subtitles import Subtitles
 		self.session.open(Subtitles)
@@ -145,7 +143,6 @@ class MoviePlayer(InfoBarBase, InfoBarShowHide, \
 		
 		self["actions"] = HelpableActionMap(self, "MoviePlayerActions",
 			{
-				#	ikseong action for subtitle hotkey
 				"showSubtitle":(self.showSubtitle, _("Show the Subtitle...")),
 				"leavePlayer": (self.leavePlayer, _("leave movie player..."))
 			})
@@ -251,8 +248,7 @@ class MoviePlayer(InfoBarBase, InfoBarShowHide, \
 			self.returning = False
 		elif self.returning:
 			self.close()
-			
-	#	ikseong action for subtitle hotkey
+
 	def showSubtitle(self):
 		from Screens.Subtitles import Subtitles
 		self.session.open(Subtitles)

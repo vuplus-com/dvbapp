@@ -18,7 +18,7 @@
 
 /************************************************/
 
-#ifdef BUILD_VUPLUS /* ikseong  */
+#ifdef BUILD_VUPLUS
 #define CRASH_EMAILADDR "crashlog"
 #else
 #define CRASH_EMAILADDR "crashlog@dream-multimedia-tv.de"

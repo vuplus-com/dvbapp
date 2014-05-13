@@ -786,7 +786,7 @@ void eDVBFrontend::timeout()
 	m_tuning = 0;
 	if (m_state == stateTuning)
 	{
-#ifdef BUILD_VUPLUS /* ikseong  */
+#ifdef BUILD_VUPLUS
 		eDVBFrontend *sec_fe = this;
 		sec_fe->m_data[CSW] = sec_fe->m_data[UCSW] = sec_fe->m_data[TONEBURST] = -1; // reset diseqc
 #endif
