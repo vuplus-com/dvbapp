@@ -83,6 +83,9 @@ class HdmiCec:
 			"solo": "VU+ Solo",
 			"uno": "VU+ Uno",
 			"ultimo": "VU+ Ultimo",
+			"solo2": "VU+ Solo2",
+			"duo2": "VU+ Duo2",
+			"solose": "VU+ SoloSE",
 		}
 		if fileExists("/proc/stb/info/vumodel"):
 			vumodel = open("/proc/stb/info/vumodel")

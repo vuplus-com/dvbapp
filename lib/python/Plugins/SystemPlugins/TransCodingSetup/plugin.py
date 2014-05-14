@@ -76,7 +76,8 @@ def setAttr(attr, encoder, value):
 
 def createTransCodingConfig(encoder):
 	if fileExists( getProcPath(encoder ,"bitrate") ):
-		if getModel() == "solo2":
+		vumodel = getModel()
+		if vumodel in ("solo2", "solose"):
 			choice = TconfigInteger(encoder, default = 400000, limits = (50000, 1000000))
 		else:
 			choice = TconfigInteger(encoder, default = 2000000, limits = (100000, 10000000))
