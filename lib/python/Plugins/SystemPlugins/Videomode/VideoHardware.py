@@ -56,8 +56,10 @@ class VideoHardware:
 	}
 
 	widescreen_modes = set(["720p", "1080i", "1080p"])
-	hdmi_hw_types = set(["dm500", "dm800se", "dm7020hd", "bm750", "solo", "uno", "ultimo", "solo2", "duo2"])
-	hdmi_pc_hw_types = set(["dm500", "dm800se", "dm7020hd", "bm750", "solo", "uno", "ultimo", "solo2", "duo2"])
+	hdmi_hw_types = set(["dm500", "dm800se", "dm7020hd", "bm750", "solo", "uno", "ultimo", "solo2", "duo2", "solose"])
+	hdmi_pc_hw_types = set(["dm500", "dm800se", "dm7020hd", "bm750", "solo", "uno", "ultimo", "solo2", "duo2", "solose"])
+	noscart_hw_types = set(["solose"])
+	noypbpr_hw_types = set(["solose"])
 
 	def getDeviceName(self):
 		device_name = "unknown"
@@ -72,7 +74,7 @@ class VideoHardware:
 		return device_name
 
 	def isVumodel(self, hw_type):
-		return hw_type in set(["bm750", "solo", "uno", "ultimo", "solo2", "duo2"])
+		return hw_type in set(["bm750", "solo", "uno", "ultimo", "solo2", "duo2", "solose"])
 
 	# re-define AVSwitch.getOutputAspect
 	def getOutputAspect(self):
@@ -109,6 +111,16 @@ class VideoHardware:
 		if self.modes.has_key("DVI-PC") and not self.getModeList("DVI-PC"):
 			print "remove DVI-PC because it does not exist."
 			del self.modes["DVI-PC"]
+
+		if self.isNoScart(self.getDeviceName()):
+			if self.modes.has_key("Scart"):
+				print "remove Scart because it does not exist."
+				del self.modes["Scart"]
+
+		if self.isNoYPbPr(self.getDeviceName()):
+			if self.modes.has_key("YPbPr"):
+				print "remove YPbPr because it does not exist."
+				del self.modes["YPbPr"]
 
 		self.createConfig()
 
@@ -167,6 +179,14 @@ class VideoHardware:
 	# check if mode is always widescreen
 	def isWidescreenMode(self, mode):
 		return mode in self.widescreen_modes
+
+	# check if Scart is not available
+	def isNoScart(self, hw_type):
+		return hw_type in self.noscart_hw_types
+
+	# check if YPbPr is not available
+	def isNoYPbPr(self, hw_type):
+		return hw_type in self.noypbpr_hw_types
 
 	# check if rate is available for mode
 	def isModeAvailable(self, port, mode, rate):
