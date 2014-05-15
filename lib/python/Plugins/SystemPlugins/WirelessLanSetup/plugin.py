@@ -977,7 +977,7 @@ class WlanScanAp(Screen,HelpableScreen):
 	def activateIface(self):
 		os_system("ifconfig "+self.iface+" up")
 		iNetwork.setAdapterAttribute(self.iface, "up", True)
-		self.updateStatusTimer.start(2000, True)
+		self.updateStatusTimer.start(10, True)
 		
 
 	def updateStatus(self):
@@ -987,7 +987,7 @@ class WlanScanAp(Screen,HelpableScreen):
 
 	def updateAPList(self):
 		self.updateStatusTimer.stop()
-		self.updateStatusTimer.start(8000, True)
+		self.updateStatusTimer.start(5000, True)
 
 	def left(self):
 		self["aplist"].pageUp()
@@ -1034,6 +1034,7 @@ class WlanScanAp(Screen,HelpableScreen):
 
 		if Iwscanresult is None or len(Iwscanresult.aplist) == 0:
 			self["Status"].setText(("NO AP detected"))
+			self.updateAPList()
 			return
 
 		try:
