@@ -58,7 +58,7 @@ class VideoHardware:
 	widescreen_modes = set(["720p", "1080i", "1080p"])
 	hdmi_hw_types = set(["dm500", "dm800se", "dm7020hd", "bm750", "solo", "uno", "ultimo", "solo2", "duo2", "solose"])
 	hdmi_pc_hw_types = set(["dm500", "dm800se", "dm7020hd", "bm750", "solo", "uno", "ultimo", "solo2", "duo2", "solose"])
-	noscart_hw_types = set(["solose"])
+	noscart_hw_types = set()
 	noypbpr_hw_types = set(["solose"])
 
 	def getDeviceName(self):
