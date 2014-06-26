@@ -1,0 +1,16 @@
+<default>
+	<prerequisites>
+		<tag type="Network" />
+	</prerequisites>
+	<info>
+		<author>smlee</author>
+		<name>Vbrowser</name>
+		<packagename>enigma2-plugin-extensions-vbrowser</packagename>
+		<shortdescription>this is hbbtv plugin</shortdescription>
+		<description>this is hbbtv plugin</description>
+	</info>
+	<files type="package"> <!-- without version, without .ipk -->
+		<file type="package" name="enigma2-plugin-extensions-vbrowser" />
+		<file type="package" name="vbrowser" />
+	</files>
+</default>
