@@ -7,6 +7,9 @@ install_PYTHON = \
 	__init__.py \
 	aitreader.py \
 	bookmark.py \
-	plugin.py 
-
-
+	browser.py \
+	hbbtv.py \
+	plugin.py \
+	vbcfg.py \
+	vbipc.py \
+	youtube.py

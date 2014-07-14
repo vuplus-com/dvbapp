@@ -201,9 +201,6 @@ lib/python/Plugins/Extensions/BackupSuiteHDD/meta/Makefile
 lib/python/Plugins/Extensions/BackupSuiteHDD/locale/Makefile
 lib/python/Plugins/Extensions/BackupSuiteUSB/Makefile
 lib/python/Plugins/Extensions/BackupSuiteUSB/meta/Makefile
-lib/python/Plugins/Extensions/Vbrowser/Makefile
-lib/python/Plugins/Extensions/Vbrowser/meta/Makefile
-lib/python/Plugins/Extensions/Vbrowser/locale/Makefile
 lib/python/Plugins/SystemPlugins/CleanupWizard/Makefile
 lib/python/Plugins/SystemPlugins/CleanupWizard/meta/Makefile
 lib/python/Plugins/SystemPlugins/CommonInterfaceAssignment/Makefile

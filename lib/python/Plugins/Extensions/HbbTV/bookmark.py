@@ -1,3 +1,5 @@
+import vbcfg
+
 class BookmarkData:
 	def __init__(self, _id, _title, _url, _parent, _type):
 		self.mId 	= _id
@@ -38,7 +40,6 @@ class SimpleConfigParser:
 	def _read(self):
 		if self.mDataValid:
 			return
-		print "populate!!"
 		self.mConfig.read(self.mFileName)
 
 		self.mCategoryCurrentIdx = self.getNumber('__SYS__', 'category_current_idx')
@@ -52,7 +53,6 @@ class SimpleConfigParser:
 		self.mPopulateValid = False
 
 	def _del(self, _section, _option=None):
-		#print _section, ' :', _option
 		if _option is None:
 			if not self.exist(_section):
 				return
@@ -66,7 +66,7 @@ class SimpleConfigParser:
 		try:
 			data = self.mConfig.get(_section, _option)
 		except Exception, e:
-			#print e
+			vbcfg.ERR(e)
 			return _default
 		else :	return data
 
@@ -153,8 +153,9 @@ class BookmarkManager(SimpleConfigParser):
 		if not self.mDebugEnable:
 			return
 		if params is None:
-			print format
-		else:	print format % (params)
+			vbcfg.DEBUG(format)
+		else:
+			vbcfg.DEBUG(format % (params))
 
 	def getBookmark(self, _title):
 		self.populate()
@@ -287,6 +288,6 @@ class BookmarkManager(SimpleConfigParser):
 
 	@staticmethod
 	def getInstance():
-		return BookmarkManager('/usr/lib/enigma2/python/Plugins/Extensions/HbbTV/bookmark.ini')
+		return BookmarkManager(vbcfg.PLUGINROOT + "/bookmark.ini")
 
 

@@ -825,7 +825,7 @@ class Browser(Screen):
 	WIDTH  = int(size.width())
 	HEIGHT = int(size.height())
 	skin =	"""
-		<screen name="VuplusBrowser" position="0,0" size="%(width)d,%(height)d" backgroundColor="transparent" flags="wfNoBorder" title="Vuplus Browser">
+		<screen name="OperaBrowser" position="0,0" size="%(width)d,%(height)d" backgroundColor="transparent" flags="wfNoBorder" title="Opera Browser">
 			<widget name="topArea" zPosition="-1" position="0,0" size="1280,60" font="Regular;20" valign="center" halign="center" backgroundColor="#000000" />
 			<widget name="menuitemFile" position="30,20" size="150,30" font="Regular;20" valign="center" halign="center" backgroundColor="#000000" foregroundColors="#9f1313,#a08500" />
 			<widget name="menuitemTool" position="180,20" size="150,30" font="Regular;20" valign="center" halign="center" backgroundColor="#000000" foregroundColors="#9f1313,#a08500" />
@@ -892,7 +892,7 @@ class Browser(Screen):
 		self["menulist"].hide()
 		self["submenulist"].hide()
 
-		self["bottomArea"].setText(_("Vuplus Web Browser Plugin v1.0"))
+		self["bottomArea"].setText(_("Opera Web Browser Plugin v2.0"))
 		self.setTitle(_("BrowserMain"))
 		self.set_menu_item()
 		vbcfg.LOG("Starting Browser")
@@ -932,7 +932,7 @@ class Browser(Screen):
 		self._close_timer.start(1000)
 
 	def _cb_start_browser(self, data=None, mode=0, opcode='BROWSER_OPENURL'):
-		if not vbcfg.g_main.check_vbrowser():
+		if not vbcfg.g_main.check_browser():
 			if self.m_url is not None:
 				if vbcfg.g_service:
 					self.session.nav.playService(vbcfg.g_service)
@@ -965,6 +965,8 @@ class Browser(Screen):
 		else:
 			self.is_browser_opened = False
 			vbcfg.ERR("Failed to open url: %s" % data)
+
+		vbcfg.g_main.vbhandler.soft_volume = -1
 
 	def _cb_stop_browser(self):
 		self._close_timer.stop()
@@ -1005,16 +1007,16 @@ class Browser(Screen):
 	def _cb_update_bookmark(self, data=None):
 		if data is None:
 			return
-		if not vbcfg.g_main.check_vbrowser():
-			message = _("Vuplus Browser was not running.\nPlease running browser using [File]>[Start/Stop] menu.")
+		if not vbcfg.g_main.check_browser():
+			message = _("Opera Browser was not running.\nPlease running browser using [File]>[Start/Stop] menu.")
 			self.session.open(MessageBox, message, MessageBox.TYPE_INFO)
 			return
 		(url, mode) = data
 		self._cb_start_browser(url, mode)
 
 	def _cmd_OpenStartpage(self):
-		if not vbcfg.g_main.check_vbrowser():
-			message = _("Vuplus Browser was not running.\nPlease running browser using [File]>[Start/Stop] menu.")
+		if not vbcfg.g_main.check_browser():
+			message = _("Opera Browser was not running.\nPlease running browser using [File]>[Start/Stop] menu.")
 			self.session.open(MessageBox, message, MessageBox.TYPE_INFO)
 			return
 		mode = 0
@@ -1028,8 +1030,8 @@ class Browser(Screen):
 		self._cb_start_browser(start, mode)
 
 	def _cmd_OpenURL(self):
-		if not vbcfg.g_main.check_vbrowser():
-			message = _("Vuplus Browser was not running.\nPlease running browser using [File]>[Start/Stop] menu.")
+		if not vbcfg.g_main.check_browser():
+			message = _("Opera Browser was not running.\nPlease running browser using [File]>[Start/Stop] menu.")
 			self.session.open(MessageBox, message, MessageBox.TYPE_INFO)
 			return
 		self.session.openWithCallback(self._cb_start_browser, VirtualKeyBoard, title=(_("Please enter URL here")), text='http://')
@@ -1037,7 +1039,7 @@ class Browser(Screen):
 	def _cmd_StartStop(self):
 		if vbcfg.g_main is None:
 			return
-		vbcfg.g_main.menu_toggle_vbrowser(self.keyMenu())
+		vbcfg.g_main.menu_toggle_browser(self.keyMenu())
 
 	def _cmd_Exit(self):
 		self.close()
@@ -1061,7 +1063,7 @@ class Browser(Screen):
 		self.session.open(BrowserPositionWindow)
 
 	def _cmd_About(self):
-		self.session.open(MessageBox, _('Vuplus Web Browser Plugin v1.0'), type = MessageBox.TYPE_INFO)
+		self.session.open(MessageBox, _('Opera Web Browser Plugin v2.0'), type = MessageBox.TYPE_INFO)
 
 	def _cmd_Help(self):
 		self.session.open(BrowserHelpWindow)

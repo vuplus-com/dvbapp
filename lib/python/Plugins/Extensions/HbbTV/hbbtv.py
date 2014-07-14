@@ -48,6 +48,7 @@ class HbbTVWindow(Screen):
 		self._close_timer.start(1000)
 
 	def start_hbbtv_application(self):
+		vbcfg.g_main.vbhandler.soft_volume = -1
 		self.setTitle(_('HbbTV Plugin'))
 		vbcfg.LOG("Starting HbbTV")
 
