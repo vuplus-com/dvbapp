@@ -165,7 +165,7 @@ class VBHandler(VBHandlers):
 	def _CB_OOIF_GET_CURRENT_CHANNEL(self, result, packet):
 		if (vbcfg.g_channel_info):
 			try:
-				data = struct.pack('iiii', vbcfg.g_channel_info[1], vbcfg.g_channel_info[2], vbcfg.g_channel_info[0], len(vbcfg.g_channel_info[3])) + vbcfg.g_channel_info[3]
+				data = struct.pack('iiii', vbcfg.g_channel_info[0], vbcfg.g_channel_info[1], vbcfg.g_channel_info[2], len(vbcfg.g_channel_info[3])) + vbcfg.g_channel_info[3]
 			except Exception, err:
 				vbcfg.ERR(err)
 				return (False, None)

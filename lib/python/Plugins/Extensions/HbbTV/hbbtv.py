@@ -57,7 +57,7 @@ class HbbTVWindow(Screen):
 
 		if self._info and self._info["control"] == 1 and vbcfg.g_channel_info is not None:
 			(sid, onid, tsid, name) = vbcfg.g_channel_info
-			params = struct.pack('iiiiii', 0, self._info["orgid"], sid, onid, tsid, 0)
+			params = struct.pack('iiiiii', 0, self._info["orgid"], sid, onid, tsid, 0) + vbcfg.g_channel_info[3]
 			ret = VBController.command('HBBTV_LOADAIT', params)
 		else:
 			ret = VBController.command('HBBTV_OPENURL', self._url)
