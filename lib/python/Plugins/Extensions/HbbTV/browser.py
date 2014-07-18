@@ -929,7 +929,7 @@ class Browser(Screen):
 		self.setTitle(title)
 
 	def _cb_close_window(self):
-		self._close_timer.start(1000)
+		self._close_timer.start(2000)
 
 	def _cb_start_browser(self, data=None, mode=0, opcode='BROWSER_OPENURL'):
 		if not vbcfg.g_main.check_browser():

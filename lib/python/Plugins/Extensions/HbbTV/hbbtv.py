@@ -45,7 +45,7 @@ class HbbTVWindow(Screen):
 		self.setTitle(title)
 
 	def _cb_close_window(self):
-		self._close_timer.start(1000)
+		self._close_timer.start(2000)
 
 	def start_hbbtv_application(self):
 		vbcfg.g_main.vbhandler.soft_volume = -1
