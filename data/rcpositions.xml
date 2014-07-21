@@ -38,8 +38,6 @@
 		<button name="BLUE" pos="110,206" />
 		<button name="REWIND" pos="41,392" />
 		<button name="PLAYPAUSE" pos="86,392" />
-		<button name="PAUSE" pos="86,392" />
-                <button name="PLAY" pos="64,392" />
 		<button name="STOP" pos="86,412" />
 		<button name="FORWARD" pos="109,392" />
 		<button name="TV" pos="41,412" />

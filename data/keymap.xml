@@ -283,12 +283,12 @@
 
 	<map context="InfobarSeekActions">
 		<device name="dreambox remote control (native)">
-			<key id="KEY_PAUSE" mapto="pauseService" flags="b" />
-			<key id="KEY_PLAY" mapto="unPauseService" flags="b" />
-			<key id="KEY_REWIND" mapto="seekBack" flags="b" />
-			<key id="KEY_FORWARD" mapto="seekFwd" flags="b" />
-			<key id="KEY_REWIND" mapto="seekBackManual" flags="l" />
-			<key id="KEY_FORWARD" mapto="seekFwdManual" flags="l" />
+			<key id="KEY_YELLOW" mapto="pauseService" flags="b" />
+			<key id="KEY_GREEN" mapto="unPauseService" flags="b" />
+			<key id="KEY_RED" mapto="seekBack" flags="b" />
+			<key id="KEY_BLUE" mapto="seekFwd" flags="b" />
+			<key id="KEY_RED" mapto="seekBackManual" flags="l" />
+			<key id="KEY_BLUE" mapto="seekFwdManual" flags="l" />
 			<key id="KEY_PAUSE" mapto="pauseService" flags="m" />
 			<key id="KEY_PLAY" mapto="playpauseService" flags="m" />
 		</device>
