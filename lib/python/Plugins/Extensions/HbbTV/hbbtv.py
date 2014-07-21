@@ -13,6 +13,7 @@ class HbbTVWindow(Screen):
 		</screen>
 		"""
 	def __init__(self, session, url=None, app_info=None):
+		vbcfg.g_position = vbcfg.getPosition()
 		fbClass.getInstance().lock()
 		eRCInput.getInstance().lock()
 
@@ -86,6 +87,7 @@ class HbbTVWindow(Screen):
 		desktop_size = getDesktop(0).size()
 		gMainDC.getInstance().setResolution(desktop_size.width(), desktop_size.height())
 
+		vbcfg.setPosition(vbcfg.g_position)
 		fbClass.getInstance().unlock()
 		eRCInput.getInstance().unlock()
 

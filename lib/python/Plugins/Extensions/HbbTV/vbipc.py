@@ -46,6 +46,7 @@ class VBController:
 			os.write(cmd_fd, send_data)
 		except Exception, err:
 			vbcfg.ERR("VBHController: %s" % err)
+			vbcfg.setPosition(vbcfg.g_position)
 			fbClass.getInstance().unlock()
 			eRCInput.getInstance().unlock()
 			return False
