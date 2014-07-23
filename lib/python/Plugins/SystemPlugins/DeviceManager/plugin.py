@@ -799,6 +799,9 @@ class DeviceInit(Screen):
 				cmd = "/usr/sbin/mkfs.vfat -I -S4096 " + fulldevicename
 			else:
 				cmd = "/usr/sbin/mkfs.vfat -I " + fulldevicename
+				if partitionsize > 2 * 1024 * 1024: # if partiton size larger then 2GB, use FAT32
+					cmd += " -F 32"
+
 		else:
 			self.createFilesystemFinished(None, -1, (self.device, fulldevicename))
 			return
@@ -1095,6 +1098,8 @@ class DeviceFormat(Screen):
 					cmd = "/usr/sbin/mkfs.vfat -I -S4096 /dev/" + partition
 				else:
 					cmd = "/usr/sbin/mkfs.vfat -I /dev/" + partition
+					if size > 2 * 1024: # if partiton size larger then 2GB, use FAT32
+						cmd += " -F 32"
 			self.deviceFormatConsole.ePopen(cmd, self.mkfsFinished)
 		else:
 			errorMsg = _("Can not format device /dev/%s.\nrefresh partition information failed!")%partition
