@@ -35,6 +35,8 @@ _OPCODE_LIST = [
 		'CONTROL_TITLE',
 		'CONTROL_OK',
 		'CONTROL_OUT_OF_MEMORY',
+		'CONTROL_INVALIDATE',
+		'CONTROL_GET_FBSIZE',
 		'CONTROL_GET_VOLUME',
 		'CONTROL_SET_VOLUME',
 		'CONTROL_VOLUME_UP',
@@ -122,6 +124,18 @@ class VBHandler(VBHandlers):
 	def _CB_CONTROL_OUT_OF_MEMORY(self, result, packet):
 		vbcfg.need_restart = True;
 		return (True, None)
+
+	def _CB_CONTROL_INVALIDATE(self, result, packet):
+		# redraw enigma
+		from enigma import getDesktop
+		getDesktop(0).paint()
+		return (True, None)
+
+	def _CB_CONTROL_GET_FBSIZE(self, result, packet):
+		from enigma import getDesktop
+		desktop_size = getDesktop(0).size()
+		data = "%dx%d" % (desktop_size.width(), desktop_size.height())
+		return (True, data)
 
 	def _CB_CONTROL_SET_VOLUME(self, result, packet):
 		if self.max_volume < 0:
