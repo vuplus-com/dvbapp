@@ -46,7 +46,7 @@ class HbbTVWindow(Screen):
 		self.setTitle(title)
 
 	def _cb_close_window(self):
-		self._close_timer.start(2000)
+		self._close_timer.start(1000)
 
 	def start_hbbtv_application(self):
 		vbcfg.g_main.vbhandler.soft_volume = -1
@@ -84,12 +84,14 @@ class HbbTVWindow(Screen):
 			pass
 
 		from enigma import getDesktop, gMainDC
-		desktop_size = getDesktop(0).size()
+		dsk = getDesktop(0)
+		desktop_size = dsk.size()
 		gMainDC.getInstance().setResolution(desktop_size.width(), desktop_size.height())
 
 		vbcfg.setPosition(vbcfg.g_position)
 		fbClass.getInstance().unlock()
 		eRCInput.getInstance().unlock()
+		dsk.paint()
 
 		vbcfg.LOG("Stop HbbTV")
 		self.close()

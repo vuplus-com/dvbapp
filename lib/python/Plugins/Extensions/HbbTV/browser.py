@@ -929,7 +929,7 @@ class Browser(Screen):
 		self.setTitle(title)
 
 	def _cb_close_window(self):
-		self._close_timer.start(2000)
+		self._close_timer.start(1000)
 
 	def _cb_start_browser(self, data=None, mode=0, opcode='BROWSER_OPENURL'):
 		if not vbcfg.g_main.check_browser():
@@ -985,13 +985,13 @@ class Browser(Screen):
 
 		self.toggle_top()
 
-		from enigma import getDesktop, gMainDC
-		desktop_size = getDesktop(0).size()
-		gMainDC.getInstance().setResolution(desktop_size.width(), desktop_size.height())
+		from enigma import gMainDC
+		gMainDC.getInstance().setResolution(self.WIDTH, self.HEIGHT)
 		vbcfg.setPosition(vbcfg.g_position)
 
 		fbClass.getInstance().unlock()
 		eRCInput.getInstance().unlock()
+		getDesktop(0).paint()
 		self.is_browser_opened = False
 
 		vbcfg.LOG("Stop Browser")
