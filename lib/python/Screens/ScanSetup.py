@@ -98,6 +98,70 @@ cable_bands = {
 	"DVBC_BAND_US_HYPER" : 1 << 11,
 }
 
+class SimpleNimSockets:
+    def __init__(self):
+        self.nim_sockets = []
+        
+    def Parse(self):
+        self.nim_sockets = []
+    
+        nim_slot_idx = -1
+        fp = file('/proc/bus/nim_sockets')
+        for line in fp:
+            line = line.strip()
+            if line == "": continue
+    
+            if line.startswith('NIM Socket '):
+                nim_slot_idx += 1
+                self.nim_sockets.append({'slot_idx':str(nim_slot_idx)})
+            elif line.startswith('Type:'):
+                line_token = line.split(":")
+                self.nim_sockets[nim_slot_idx]["type"] = line_token[1].strip()
+            elif line.startswith('Name:'):
+                line_token = line.split(":")
+                self.nim_sockets[nim_slot_idx]["name"] = line_token[1].strip()
+            elif line.startswith('Frontend_Device:'):
+                line_token = line.split(":")
+                self.nim_sockets[nim_slot_idx]["frontend_device"] = line_token[1].strip()
+            elif line.startswith('Mode '):
+                line_token = line.split(":")
+                mode=[]
+                try:    mode=self.nim_sockets[nim_slot_idx]["mode"]
+                except: mode=[]
+                mode.append(line_token[1].strip())
+                self.nim_sockets[nim_slot_idx]["mode"] = mode
+            elif line.startswith('I2C_Device:'):
+                line_token = line.split(":")
+                self.nim_sockets[nim_slot_idx]["i2c_device"] = line_token[1].strip()
+        fp.close()
+
+    def GetTunerName(self, socket_id, type):
+        if len(self.nim_sockets) == 0:
+            return None
+        try:
+            nim_socket = self.nim_sockets[socket_id]
+            if nim_socket['type'] in type:
+                name_token = nim_socket['name'].split(' ')
+                return name_token[2][4:-1]
+        except Exception, err: 
+            print "SimpleNimSockets ->", err
+        return ""
+
+    def GetDeviceId(self, filter):
+        tuners={}
+        device_id = 0
+        socket_id = 0
+        for nim_socket in self.nim_sockets:
+            name_token = nim_socket['name'].split(' ')
+            name = name_token[2][4:-1]
+            if name == filter:
+                #print nim_socket['type'], name, device_id
+                tuners[str(socket_id)] = {'id' : device_id, 'type' : nim_socket['type']}
+                if device_id: device_id = 0
+                else:         device_id = 1
+            socket_id += 1
+        return tuners
+
 class CableTransponderSearchSupport:
 #	def setCableTransponderSearchResult(self, tlist):
 #		pass
@@ -174,31 +238,28 @@ class CableTransponderSearchSupport:
 
 	def startCableTransponderSearch(self, nim_idx):
 		def GetCommand(nimIdx):
-			_supportNimType   = { 'SSH108':'ssh108' }
-			_nimSocket = {}
-			fp = file('/proc/bus/nim_sockets')
-
-			sNo, sName = -1, ""
-			for line in fp:
-				line = line.strip()
-				if line.startswith('NIM Socket'):
-					try:	sNo = line.split()[2][:-1]
-					except: sNo = -1
-				elif line.startswith('Name:'):
-					try:	sName = line.split()[3][4:-1]
-					except: sName = ""
-				if sNo >= 0 and sName != "":
-					_nimSocket[sNo] = sName
-					sNo, sName = -1, ''
-			fp.close()
-			print 'parsed nim_sockets :', _nimSocket
-
-			try:
-				sName = _nimSocket[str(nimIdx)]
-				sType = _supportNimType[sName]
-				return sType
-			except: pass
-			return 'tda1002x'
+		    _supportNimType   = { 'SSH108':'ssh108', 'TT3L10':'tt3l10' }
+		    
+		    simple_ns = SimpleNimSockets()
+		    try:
+			    simple_ns.Parse()
+			    nim_name = simple_ns.GetTunerName(nimIdx, ['DVB-C'])
+			    if nim_name is not None and nim_name != "":
+			        device_id = ""
+			        if nim_name == 'TT3L10':
+			            try:
+			                device_id = simple_ns.GetDeviceId('TT3L10')[str(nimIdx)]['id']
+			                device_id = "--device=%s" % (device_id)
+			            except: device_id = ""
+			            if device_id == "":
+			                return "tda1002x"
+			        #print nimIdx, nim_name, _supportNimType[nim_name], device_id
+			        try:
+				        command = "%s %s" % (_supportNimType[nim_name], device_id)
+				        return command
+			       	except: pass
+		    except: pass
+		    return "tda1002x"
 
 		if not self.tryGetRawFrontend(nim_idx):
 			self.session.nav.stopService()
@@ -411,13 +472,28 @@ class TerrestrialTransponderSearchSupport:
 
 	def startTerrestrialTransponderSearch(self, nim_idx, region):
 		def GetCommand(nimIdx):
-			_supportNimType   = { 'SSH108':'ssh108_t2_scan' }
-			description = nimmanager.getNimName(nimIdx)
-			try:
-				tunername = description.split()[2][4:-1]
-			except:
-				tunername = description
-			return	_supportNimType.get(tunername, 'ssh108_t2_scan')
+		    _supportNimType   = { 'SSH108':'ssh108_t2_scan', 'TT3L10':'tt3l10_t2_scan' }
+		    
+		    simple_ns = SimpleNimSockets()
+		    try:
+			    simple_ns.Parse()
+			    nim_name = simple_ns.GetTunerName(nimIdx, ['DVB-T','DVB-T2'])
+			    if nim_name is not None and nim_name != "":
+			        device_id = ""
+			        if nim_name == 'TT3L10':
+			            try:
+			                device_id = simple_ns.GetDeviceId('TT3L10')[str(nimIdx)]['id']
+			                device_id = "--device %s" % (device_id)
+			            except: device_id = ""
+			            if device_id == "":
+			                return "ssh108_t2_scan"
+			        #print nimIdx, nim_name, _supportNimType[nim_name], device_id
+			        try:
+				        command = "%s %s" % (_supportNimType[nim_name], device_id)
+				        return command
+			       	except: pass
+		    except: pass
+		    return "ssh108_t2_scan"
 
 		if not self.tryGetRawFrontend(nim_idx):
 			self.session.nav.stopService()
