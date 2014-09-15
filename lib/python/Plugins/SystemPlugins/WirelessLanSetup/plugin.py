@@ -708,7 +708,7 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 			self.getWpaPhrase()
 
 	def getWpaPhrase(self):
-		cmd = "wpa_passphrase '%s' %s" % (self.ssidConfigEntry.value, self.keyConfigEntry.value)
+		cmd = "wpa_passphrase '%s' '%s'" % (self.ssidConfigEntry.value, self.keyConfigEntry.value)
 #		print cmd
 		data = popen(cmd).readlines()
 		plainpwd = None
