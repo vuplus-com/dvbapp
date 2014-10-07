@@ -77,6 +77,9 @@ def getInitialTerrestrialTransponderList(tlist, region):
 
 	for x in list:
 		if x[0] == 2: #TERRESTRIAL
+			if x[10] == eDVBFrontendParametersTerrestrial.System_DVB_T2:
+				# Should be searching on TerrestrialTransponderSearchSupport.
+				continue
 			parm = buildTerTransponder(x[1], x[9], x[2], x[4], x[5], x[3], x[7], x[6], x[8], x[10], x[11])
 			tlist.append(parm)
 
@@ -362,7 +365,7 @@ class TerrestrialTransponderSearchSupport:
 						parm.plpid = int(plp_id)
 						self.__tlist.append(parm)
 
-			tmpstr = _("Try to find used Transponders in cable network.. please wait...")
+			tmpstr = _("Try to find used Transponders in terrestrial network.. please wait...")
 			tmpstr += "\n\n"
 			tmpstr += data[1][:-3]
 			tmpstr += " kHz "
