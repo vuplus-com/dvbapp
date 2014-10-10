@@ -1312,27 +1312,27 @@ class DeviceInfo():
 				if not x.startswith('/'):
 					continue
 				_devPart, _mountpoint  = x.split()[:2]
-				if devPart == _devPart:
+				if devpath == _devPart:
 					return True
 		except:
 			pass
 		return False
 
-	# check partition ID in extended or swap.
+	# check partition type is extended or swap.
 	def checkSwapExtended(self, partition):
-		partID_Extended = ("5", "0f", "85", "c5", "d5")
-		partID_swap = ("82", "42")
-		data = os.popen("fdisk -l /dev/%s |grep %s" % (partition[:-1], partition )).readline().split()
-		if data[1] == '*':
-			partID = str(data[5])
-		else:
-			partID = str(data[4])
-#		print "partID: " ,partID
-#		print "checkIDS : ", partID_Extended + partID_swap
-		if partID in partID_Extended + partID_swap:
-			return True
-		else:
-			return False
+		blockName = partition[:-1]
+		partNum = partition[-1]
+		data = os.popen("parted /dev/%s print" % blockName).readlines()
+		for x in data:
+			info = x.strip().split()
+
+			if len(info) > 0 and info[0] == str(partNum):
+				if len(info) >= 5 and info[4].find('extended') != -1: # check Type is extended
+					return True
+				elif len(info) >= 6 and info[5].find('swap') != -1: # check File System is swap
+					return True
+
+		return False
 
 	def isMountable(self, partition):
 		if self.checkSwapExtended(partition):
