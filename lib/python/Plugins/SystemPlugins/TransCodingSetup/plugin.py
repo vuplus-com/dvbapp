@@ -169,6 +169,13 @@ class TranscodingSetupInit:
 					if hasAttr("framerate", encoder):
 						getAttr("framerate", encoder).addNotifier(self.setFramerate)
 
+			else:
+				if hasAttr("bitrate", encoder):
+					getAttr("bitrate", encoder).addNotifier(self.setBitrate)
+
+				if hasAttr("framerate", encoder):
+					getAttr("framerate", encoder).addNotifier(self.setFramerate)
+
 			if hasAttr("resolution", encoder):
 				getAttr("resolution", encoder).addNotifier(self.setResolution)
 
@@ -379,7 +386,7 @@ class TranscodingSetup(Screen, ConfigListScreen):
 		else:
 			self.skin = TranscodingSetup.skin_normal
 
-		if getModel() == "solo2":
+		if getModel() in ("solo2", "solose"):
 			TEXT = _("Transcoding and PIP are mutually exclusive.")
 		else:
 			TEXT = _("2nd transcoding and PIP are mutually exclusive.")
