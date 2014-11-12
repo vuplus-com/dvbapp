@@ -17,6 +17,18 @@ def readFile(filename):
 	file.close()
 	return data
 
+def getProcMounts():
+	try:
+		mounts = open("/proc/mounts", 'r')
+	except IOError, ex:
+		print "[Harddisk] Failed to open /proc/mounts", ex
+		return []
+	result = [line.strip().split(' ') for line in mounts]
+	for item in result:
+		# Spaces are encoded as \040 in mounts
+		item[1] = item[1].replace('\\040', ' ')
+	return result
+
 DEVTYPE_UDEV = 0
 DEVTYPE_DEVFS = 1
 
@@ -37,6 +49,8 @@ class Harddisk:
 
 		self.dev_path = ''
 		self.disk_path = ''
+		self.mount_path = None
+		self.mount_device = None
 		self.phys_path = path.realpath(self.sysfsPath('device'))
 
 		if self.type == DEVTYPE_UDEV:
@@ -174,6 +188,18 @@ class Harddisk:
 				if filename.startswith("part"):
 					numPart += 1
 		return numPart
+
+	def mountDevice(self):
+		for parts in getProcMounts():
+			if path.realpath(parts[0]).startswith(self.dev_path):
+				self.mount_device = parts[0]
+				self.mount_path = parts[1]
+				return parts[1]
+
+	def findMount(self):
+		if self.mount_path is None:
+			return self.mountDevice()
+		return self.mount_path
 
 	def unmount(self):
 		try:
