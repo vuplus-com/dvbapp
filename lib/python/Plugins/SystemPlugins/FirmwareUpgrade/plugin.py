@@ -71,6 +71,15 @@ if os.path.exists("/proc/stb/info/vumodel"):
 			 "fpga" : ["http://archive.vuplus.com/download/fpga", "fpga.files", "/dev/fpga_dp;/dev/misc/dp;"]
 			,"fp"   : ["http://archive.vuplus.com/download/fp", "fp.files", "/dev/bcm_mu;"]
 			}
+	elif info == "zero":
+		fwlist= [
+			 ("fpga", _("FPGA"))
+			,("fp", _("Front Processor"))
+			]
+		fwdata= { 
+			 "fpga" : ["http://archive.vuplus.com/download/fpga", "fpga.files", "/dev/fpga_dp;/dev/misc/dp;"]
+			,"fp"   : ["http://archive.vuplus.com/download/fp", "fp.files", "/dev/bcm_mu;"]
+			}
 
 import os, fcntl, thread
 STATUS_READY 		= 0
