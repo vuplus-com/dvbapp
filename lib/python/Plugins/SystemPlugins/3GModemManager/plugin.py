@@ -33,6 +33,84 @@ def printInfoModemMgr(msg):
 
 isEmpty = lambda x: x is None or len(x)==0
 
+
+def read_file(path, key):
+    if os.path.exists(path):
+        return key + open(path).read()
+    return ""
+
+def parse_usb_uevent(datas):
+    uevent_map = {}
+    datas_lines = datas.splitlines()
+    for data in datas_lines:
+        kv = data.split('=')
+        if kv[0] in ('BUSNUM', 'DRIVER', 'PRODUCT', 'SERIAL', 'PNAME', 'MANUFACTUER', 'PRODUCTID', 'VENDORID'):
+            uevent_map[kv[0]] = kv[1]
+    return uevent_map
+
+
+def read_usb_uevent(dir_path):
+    uevent_data = open(dir_path + "/uevent").read()
+    if uevent_data.find('DRIVER=hub') == -1:
+        uevent_data += read_file(dir_path + "/serial", "SERIAL=")
+        uevent_data += read_file(dir_path + "/product", "PNAME=")
+        uevent_data += read_file(dir_path + "/idProduct", "PRODUCTID=")
+        uevent_data += read_file(dir_path + "/idVendor", "VENDORID=")
+        uevent_data += read_file(dir_path + "/manufacturer", "MANUFACTUER=")
+        return uevent_data
+    return None
+
+def make_script(item):
+    script = ""
+    try:
+        script += 'T:  Bus=%s\n' % (item['BUSNUM'])
+    except: pass
+    try:
+        script += 'P:  Vendor=%s ProdID=%s\n' % (item['VENDORID'], item['PRODUCTID'])
+    except: pass
+    try:
+        script += 'S:  Manufacturer=%s\n' % (item['MANUFACTUER'])
+    except: pass
+    try:
+        script += 'S:  Product=%s\n' % (item['PNAME'])
+    except: pass
+    try:
+        script += 'S:  SerialNumber=%s\n' % (item['SERIAL'])
+    except: pass
+    try:
+        script += 'I:* Driver=%s\n' % (item['DRIVER'])
+    except: pass
+    script += "\n"
+    return script
+
+def lsusb_devices():
+    all_script = ""
+
+    devices_list = []
+    for root, dirs, files in os.walk('/sys/bus/usb/devices', topdown=False):
+        for name in dirs:
+            if name.startswith('usb'):
+                continue
+            uevnet_data = read_usb_uevent(os.path.join(root, name))
+            if uevnet_data is not None:
+                uevent_map = parse_usb_uevent(uevnet_data)
+                devices_list.append(uevent_map)
+
+    usbstorage_list = []
+    for item in devices_list:
+        try:
+            if item['DRIVER'] == 'usb-storage':
+                usbstorage_list.append(item['PRODUCT'])
+        except: pass
+
+    for item1 in usbstorage_list:
+        for item2 in devices_list:
+            try:
+                if item2['PRODUCT'] == item1 and item2['DRIVER'] == 'usb':
+                    all_script += make_script(item2)
+            except: pass
+    return all_script
+
 class DeviceEventListener:
 	notifyCallbackFunctionList = []
 	def __init__(self):
@@ -934,11 +1012,12 @@ class ModemManager(Screen):
 			for x in self.getUSBList():
 				lv_usb_items.append((x.get("Product"),x))
 		except: pass
+		printDebugModemMgr(str(lv_usb_items))
 		return lv_usb_items
 
 	def getUSBList(self):
 		parsed_usb_list = []
-		usb_devices = os.popen('cat /proc/bus/usb/devices').read()
+		usb_devices = lsusb_devices()
 		tmp_device = {}
 		for x in usb_devices.splitlines():
 			if x is None or len(x) == 0:
