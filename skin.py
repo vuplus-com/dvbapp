@@ -140,6 +140,17 @@ def applySingleAttribute(guiObject, desktop, attrib, value, scale = ((1,1),(1,1)
 			guiObject.move(parsePosition(value, scale, desktop, guiObject.csize()))
 		elif attrib == 'size':
 			guiObject.resize(parseSize(value, scale))
+		elif attrib == 'animationPaused':
+			pass
+		elif attrib == 'animationMode':
+			guiObject.setAnimationMode(
+				{ "disable": 0x00,
+					"off": 0x00,
+					"offshow": 0x10,
+					"offhide": 0x01,
+					"onshow": 0x01,
+					"onhide": 0x10,
+				}[value])
 		elif attrib == 'title':
 			guiObject.setTitle(_(value))
 		elif attrib == 'text':

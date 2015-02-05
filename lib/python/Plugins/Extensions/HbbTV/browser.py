@@ -296,8 +296,9 @@ class BrowserPreferenceWindow(ConfigListScreen, Screen):
 			mode = 1
 		self._keymapType = self.menuItemKeyboardLayout.value
 		BrowserSetting().setData(url, mode, self._keymapType)
-
-		VBController.command('CONTROL_RELOAD_KEYMAP')
+		# send contorller
+		#command_util = getCommandUtil()
+		#command_util.sendCommand('OP_BROWSER_NEED_RELOAD_KEYMAP')
 		self.close()
 
 	def keyRed(self):

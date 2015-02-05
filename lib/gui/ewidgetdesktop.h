@@ -73,6 +73,8 @@ public:
 	
 	void resize(eSize size);
 	eSize size() const { return m_screen.m_screen_size; }
+	void sendShow(ePoint point, eSize size);
+	void sendHide(ePoint point, eSize size);
 private:
 	ePtrList<eWidget> m_root;
 	void calcWidgetClipRegion(eWidget *widget, gRegion &parent_visible);

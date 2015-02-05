@@ -345,6 +345,8 @@ extern int getPrevAsciiCode();
 extern void addFont(const char *filename, const char *alias, int scale_factor, int is_replacement);
 extern const char *getEnigmaVersionString();
 extern void dump_malloc_stats(void);
+extern void setAnimation_current(int a);
+extern void setAnimation_speed(int speed);
 %}
 
 extern void addFont(const char *filename, const char *alias, int scale_factor, int is_replacement);
@@ -354,3 +356,5 @@ extern void quitMainloop(int exit_code);
 extern eApplication *getApplication();
 extern const char *getEnigmaVersionString();
 extern void dump_malloc_stats(void);
+extern void setAnimation_current(int a);
+extern void setAnimation_speed(int speed);
