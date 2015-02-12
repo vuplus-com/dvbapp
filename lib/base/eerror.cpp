@@ -72,6 +72,7 @@ void DumpUnfreed()
 };
 #endif
 
+SigC::Connection logConnection;
 Signal2<void, int, const std::string&> logOutput;
 int logOutputConsole=1;
 
@@ -103,8 +104,10 @@ void eDebug(const char* fmt, ...)
 	va_start(ap, fmt);
 	vsnprintf(buf, 1024, fmt, ap);
 	va_end(ap);
-	singleLock s(DebugLock);
-	logOutput(lvlDebug, std::string(buf) + "\n");
+	if (logConnection.connected()) {
+		singleLock s(DebugLock);
+		logOutput(lvlDebug, std::string(buf) + "\n");
+	}
 	if (logOutputConsole)
 		fprintf(stderr, "%s\n", buf);
 }
@@ -116,8 +119,10 @@ void eDebugNoNewLine(const char* fmt, ...)
 	va_start(ap, fmt);
 	vsnprintf(buf, 1024, fmt, ap);
 	va_end(ap);
-	singleLock s(DebugLock);
-	logOutput(lvlDebug, buf);
+	if (logConnection.connected()) {
+		singleLock s(DebugLock);
+		logOutput(lvlDebug, buf);
+	}
 	if (logOutputConsole)
 		fprintf(stderr, "%s", buf);
 }
@@ -129,8 +134,10 @@ void eWarning(const char* fmt, ...)
 	va_start(ap, fmt);
 	vsnprintf(buf, 1024, fmt, ap);
 	va_end(ap);
-	singleLock s(DebugLock);
-	logOutput(lvlWarning, std::string(buf) + "\n");
+	if (logConnection.connected()) {
+		singleLock s(DebugLock);
+		logOutput(lvlWarning, std::string(buf) + "\n");
+	}
 	if (logOutputConsole)
 		fprintf(stderr, "%s\n", buf);
 }
@@ -139,8 +146,10 @@ void eWarning(const char* fmt, ...)
 void ePythonOutput(const char *string)
 {
 #ifdef DEBUG
-	singleLock s(DebugLock);
-	logOutput(lvlWarning, string);
+	if (logConnection.connected()) {
+		singleLock s(DebugLock);
+		logOutput(lvlWarning, string);
+	}
 	if (logOutputConsole)
 		fwrite(string, 1, strlen(string), stderr);
 #endif

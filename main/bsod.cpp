@@ -320,5 +320,5 @@ void bsodCatchSignals()
 
 void bsodLogInit()
 {
-	logOutput.connect(addToLogbuffer);
+	logConnection = logOutput.connect(addToLogbuffer);
 }

@@ -32,6 +32,9 @@ eInit::~eInit()
 	setRunlevel(-1);
 	delete cl;
 	cl=0;
+	if (logConnection.connected()) {
+		logConnection.disconnect();
+	}
 }
 
 void eInit::setRunlevel(int nrl)
