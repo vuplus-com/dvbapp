@@ -125,9 +125,15 @@ class VBServerThread(threading.Thread):
 					finally:
 						if conn is not None:
 							conn.close()
+		self.mSock.close()
 
 	def kill(self):
 		self.mFlag = False
+		addr = vbcfg.SOCKETFILE
+		try:
+			os.unlink(addr)
+		except:
+			pass
 
 class VBHandlers:
 	def __init__(self, opcode_list, szcbh):
