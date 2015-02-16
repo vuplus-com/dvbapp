@@ -98,69 +98,33 @@ cable_bands = {
 	"DVBC_BAND_US_HYPER" : 1 << 11,
 }
 
-class SimpleNimSockets:
-    def __init__(self):
-        self.nim_sockets = []
-        
-    def Parse(self):
-        self.nim_sockets = []
-    
-        nim_slot_idx = -1
-        fp = file('/proc/bus/nim_sockets')
-        for line in fp:
-            line = line.strip()
-            if line == "": continue
-    
-            if line.startswith('NIM Socket '):
-                nim_slot_idx += 1
-                self.nim_sockets.append({'slot_idx':str(nim_slot_idx)})
-            elif line.startswith('Type:'):
-                line_token = line.split(":")
-                self.nim_sockets[nim_slot_idx]["type"] = line_token[1].strip()
-            elif line.startswith('Name:'):
-                line_token = line.split(":")
-                self.nim_sockets[nim_slot_idx]["name"] = line_token[1].strip()
-            elif line.startswith('Frontend_Device:'):
-                line_token = line.split(":")
-                self.nim_sockets[nim_slot_idx]["frontend_device"] = line_token[1].strip()
-            elif line.startswith('Mode '):
-                line_token = line.split(":")
-                mode=[]
-                try:    mode=self.nim_sockets[nim_slot_idx]["mode"]
-                except: mode=[]
-                mode.append(line_token[1].strip())
-                self.nim_sockets[nim_slot_idx]["mode"] = mode
-            elif line.startswith('I2C_Device:'):
-                line_token = line.split(":")
-                self.nim_sockets[nim_slot_idx]["i2c_device"] = line_token[1].strip()
-        fp.close()
+cable_autoscan_nimtype = {
+'SSH108' : 'ssh108',
+'TT3L10' : 'tt3l10',
+'TURBO' : 'vuplus_turbo_c'
+}
 
-    def GetTunerName(self, socket_id, type):
-        if len(self.nim_sockets) == 0:
-            return None
-        try:
-            nim_socket = self.nim_sockets[socket_id]
-            if nim_socket['type'] in type:
-                name_token = nim_socket['name'].split(' ')
-                return name_token[2][4:-1]
-        except Exception, err: 
-            print "SimpleNimSockets ->", err
-        return ""
+terrestrial_autoscan_nimtype = {
+'SSH108' : 'ssh108_t2_scan',
+'TT3L10' : 'tt3l10_t2_scan',
+'TURBO' : 'vuplus_turbo_t'
+}
 
-    def GetDeviceId(self, filter):
-        tuners={}
-        device_id = 0
-        socket_id = 0
-        for nim_socket in self.nim_sockets:
-            name_token = nim_socket['name'].split(' ')
-            name = name_token[2][4:-1]
-            if name == filter:
-                #print nim_socket['type'], name, device_id
-                tuners[str(socket_id)] = {'id' : device_id, 'type' : nim_socket['type']}
-                if device_id: device_id = 0
-                else:         device_id = 1
-            socket_id += 1
-        return tuners
+def GetDeviceId(filter, nim_idx):
+	tuners={}
+	device_id = 0
+	socket_id = 0
+	for nim in nimmanager.nim_slots:
+		name_token = nim.description.split(' ')
+		name = name_token[-1][4:-1]
+		if name == filter:
+			if socket_id == nim_idx:
+				break
+
+			if device_id:	device_id = 0
+			else:			device_id = 1
+		socket_id += 1
+	return device_id
 
 class CableTransponderSearchSupport:
 #	def setCableTransponderSearchResult(self, tlist):
@@ -238,27 +202,26 @@ class CableTransponderSearchSupport:
 
 	def startCableTransponderSearch(self, nim_idx):
 		def GetCommand(nimIdx):
-		    _supportNimType   = { 'SSH108':'ssh108', 'TT3L10':'tt3l10' }
-		    
-		    simple_ns = SimpleNimSockets()
+		    global cable_autoscan_nimtype
 		    try:
-			    simple_ns.Parse()
-			    nim_name = simple_ns.GetTunerName(nimIdx, ['DVB-C'])
+			    nim_name = nimmanager.getNimName(nim_idx)
 			    if nim_name is not None and nim_name != "":
 			        device_id = ""
+			        nim_name = nim_name.split(' ')[-1][4:-1]
 			        if nim_name == 'TT3L10':
 			            try:
-			                device_id = simple_ns.GetDeviceId('TT3L10')[str(nimIdx)]['id']
+			                device_id = GetDeviceId('TT3L10', nimIdx)
 			                device_id = "--device=%s" % (device_id)
 			            except: device_id = ""
 			            if device_id == "":
 			                return "tda1002x"
-			        #print nimIdx, nim_name, _supportNimType[nim_name], device_id
+#			        print nimIdx, nim_name, cable_autoscan_nimtype[nim_name], device_id
 			        try:
-				        command = "%s %s" % (_supportNimType[nim_name], device_id)
+				        command = "%s %s" % (cable_autoscan_nimtype[nim_name], device_id)
 				        return command
 			       	except: pass
-		    except: pass
+		    except Exception, err:
+		    	print "GetCommand ->", err
 		    return "tda1002x"
 
 		if not self.tryGetRawFrontend(nim_idx):
@@ -386,6 +349,7 @@ class TerrestrialTransponderSearchSupport:
 		print self.terrestrial_search_data
 		data = self.terrestrial_search_data.split()
 		if len(data):
+#			print "[setTerrestrialTransponderData] data : ", data
 			if data[0] == 'OK':
 				# DVB-T : OK frequency bandwidth delivery system -1
 				# DVB-T2 : OK frequency bandwidth delivery system number_of_plp plp_id0:plp_type0
@@ -405,7 +369,7 @@ class TerrestrialTransponderSearchSupport:
 					self.__tlist.append(parm)
 				else:
 					plp_list = data[5:]
-					plp_num = data[4]
+					plp_num = int(data[4])
 					if len(plp_list) > plp_num:
 						plp_list = plp_list[:plp_num]
 					for plp in plp_list:
@@ -472,28 +436,28 @@ class TerrestrialTransponderSearchSupport:
 
 	def startTerrestrialTransponderSearch(self, nim_idx, region):
 		def GetCommand(nimIdx):
-		    _supportNimType   = { 'SSH108':'ssh108_t2_scan', 'TT3L10':'tt3l10_t2_scan' }
-		    
-		    simple_ns = SimpleNimSockets()
-		    try:
-			    simple_ns.Parse()
-			    nim_name = simple_ns.GetTunerName(nimIdx, ['DVB-T','DVB-T2'])
-			    if nim_name is not None and nim_name != "":
-			        device_id = ""
-			        if nim_name == 'TT3L10':
-			            try:
-			                device_id = simple_ns.GetDeviceId('TT3L10')[str(nimIdx)]['id']
-			                device_id = "--device %s" % (device_id)
-			            except: device_id = ""
-			            if device_id == "":
-			                return "ssh108_t2_scan"
-			        #print nimIdx, nim_name, _supportNimType[nim_name], device_id
-			        try:
-				        command = "%s %s" % (_supportNimType[nim_name], device_id)
-				        return command
-			       	except: pass
-		    except: pass
-		    return "ssh108_t2_scan"
+			global terrestrial_autoscan_nimtype
+			try:
+				nim_name = nimmanager.getNimName(nim_idx)
+				print "nim_name : ", nim_name
+				if nim_name is not None and nim_name != "":
+					device_id = ""
+					nim_name = nim_name.split(' ')[-1][4:-1]
+					if nim_name == 'TT3L10':
+						try:
+							device_id = GetDeviceId('TT3L10', nimIdx)
+							device_id = "--device %s" % (device_id)
+						except: device_id = ""
+						if device_id == "":
+							return "ssh108_t2_scan"
+#					print nimIdx, nim_name, terrestrial_autoscan_nimtype[nim_name], device_id
+					try:
+						command = "%s %s" % (terrestrial_autoscan_nimtype[nim_name], device_id)
+						return command
+					except: pass
+			except Exception, err:
+				print "GetCommand ->", err
+			return ""
 
 		if not self.tryGetRawFrontend(nim_idx):
 			self.session.nav.stopService()
@@ -513,7 +477,7 @@ class TerrestrialTransponderSearchSupport:
 
 		self.terrestrial_search_bus = nimmanager.getI2CDevice(nim_idx)
 		if self.terrestrial_search_bus is None:
-			print "ERROR: could not get I2C device for nim", nim_idx, "for terrestrial transponder search"
+#			print "ERROR: could not get I2C device for nim", nim_idx, "for terrestrial transponder search"
 			self.terrestrial_search_bus = 2
 
 		self.terrestrial_search_list = []
@@ -1251,7 +1215,7 @@ class ScanSimple(ConfigListScreen, Screen, CableTransponderSearchSupport, Terres
 		if nim.isCompatible("DVB-S"):
 			networks = nimmanager.getSatListForNim(nim.slot)
 		elif not nim.empty:
-			networks = [ nim.type ] # "DVB-C" or "DVB-T". TODO: seperate networks for different C/T tuners, if we want to support that.
+			networks = [ nim.getType() ] # "DVB-C" or "DVB-T". TODO: seperate networks for different C/T tuners, if we want to support that.
 		else:
 			# empty tuners provide no networks.
 			networks = [ ]
@@ -1301,7 +1265,7 @@ class ScanSimple(ConfigListScreen, Screen, CableTransponderSearchSupport, Terres
 		if "DVB-T2" in known_networks: # we need to remove "DVB-T" when networks have "DVB-T2"
 			nims_dvb_t = []
 			for nim in nims_to_scan:
-				if nim.type == "DVB-T":
+				if nim.getType() == "DVB-T":
 					nims_dvb_t.append(nim)
 
 			for nim in nims_dvb_t:
