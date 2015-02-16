@@ -71,15 +71,13 @@ private:
 	DECLARE_REF(eDVBFrontend);
 	bool m_simulate;
 	bool m_enabled;
-	int m_type;
 	eDVBFrontend *m_simulate_fe; // only used to set frontend type in dvb.cpp
 	int m_dvbid;
 	int m_slotid;
 	int m_fd;
 	bool m_rotor_mode;
 	bool m_need_rotor_workaround;
-	bool m_can_handle_dvbs2;
-	bool m_can_handle_dvbt2;
+	std::map<fe_delivery_system_t, bool> m_delsys, m_delsys_whitelist;
 	char m_filename[128];
 	char m_description[128];
 #if HAVE_DVB_API_VERSION < 3
@@ -87,11 +85,7 @@ private:
 	char m_sec_filename[128];
 #endif
 	FRONTENDPARAMETERS parm;
-	union {
-		eDVBFrontendParametersSatellite sat;
-		eDVBFrontendParametersCable cab;
-		eDVBFrontendParametersTerrestrial ter;
-	} oparm;
+	eDVBFrontendParameters oparm;
 
 	int m_state;
 	ePtr<iDVBSatelliteEquipmentControl> m_sec;
@@ -122,7 +116,6 @@ public:
 	virtual ~eDVBFrontend();
 
 	int readInputpower();
-	RESULT getFrontendType(int &type);
 	RESULT tune(const iDVBFrontendParameters &where);
 	RESULT prepare_sat(const eDVBFrontendParametersSatellite &, unsigned int timeout);
 	RESULT prepare_cable(const eDVBFrontendParametersCable &);
@@ -151,6 +144,8 @@ public:
 	static int getTypePriorityOrder() { return PriorityOrder; }
 	static void setPreferredFrontend(int index) { PreferredFrontendIndex = index; }
 	static int getPreferredFrontend() { return PreferredFrontendIndex; }
+	bool supportsDeliverySystem(const fe_delivery_system_t &sys, bool obeywhitelist);
+	void setDeliverySystemWhitelist(const std::vector<fe_delivery_system_t> &whitelist);
 
 	void reopenFrontend();
 	int openFrontend();
