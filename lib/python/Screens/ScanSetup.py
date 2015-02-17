@@ -67,7 +67,7 @@ def getInitialCableTransponderList(tlist, nim):
 			#print "inversion:", 2
 			tlist.append(parm)
 
-def getInitialTerrestrialTransponderList(tlist, region):
+def getInitialTerrestrialTransponderList(tlist, region, skip_t2 = False):
 	list = nimmanager.getTranspondersTerrestrial(region)
 
 	#self.transponders[self.parsedTer].append((2,freq,bw,const,crh,crl,guard,transm,hierarchy,inv,system,plpid))
@@ -77,7 +77,7 @@ def getInitialTerrestrialTransponderList(tlist, region):
 
 	for x in list:
 		if x[0] == 2: #TERRESTRIAL
-			if x[10] == eDVBFrontendParametersTerrestrial.System_DVB_T2:
+			if skip_t2 and x[10] == eDVBFrontendParametersTerrestrial.System_DVB_T2:
 				# Should be searching on TerrestrialTransponderSearchSupport.
 				continue
 			parm = buildTerTransponder(x[1], x[9], x[2], x[4], x[5], x[3], x[7], x[6], x[8], x[10], x[11])
@@ -201,7 +201,7 @@ class CableTransponderSearchSupport:
 			self.cable_search_session["text"].setText(tmpstr)
 
 	def startCableTransponderSearch(self, nim_idx):
-		def GetCommand(nimIdx):
+		def GetCommand(nim_idx):
 		    global cable_autoscan_nimtype
 		    try:
 			    nim_name = nimmanager.getNimName(nim_idx)
@@ -434,31 +434,30 @@ class TerrestrialTransponderSearchSupport:
 		else:
 			return None
 
-	def startTerrestrialTransponderSearch(self, nim_idx, region):
-		def GetCommand(nimIdx):
-			global terrestrial_autoscan_nimtype
-			try:
-				nim_name = nimmanager.getNimName(nim_idx)
-				print "nim_name : ", nim_name
-				if nim_name is not None and nim_name != "":
-					device_id = ""
-					nim_name = nim_name.split(' ')[-1][4:-1]
-					if nim_name == 'TT3L10':
-						try:
-							device_id = GetDeviceId('TT3L10', nimIdx)
-							device_id = "--device %s" % (device_id)
-						except: device_id = ""
-						if device_id == "":
-							return "ssh108_t2_scan"
-#					print nimIdx, nim_name, terrestrial_autoscan_nimtype[nim_name], device_id
+	def terrestrialTransponderGetCmd(self, nim_idx):
+		global terrestrial_autoscan_nimtype
+		try:
+			nim_name = nimmanager.getNimName(nim_idx)
+			if nim_name is not None and nim_name != "":
+				device_id = ""
+				nim_name = nim_name.split(' ')[-1][4:-1]
+				if nim_name == 'TT3L10':
 					try:
-						command = "%s %s" % (terrestrial_autoscan_nimtype[nim_name], device_id)
-						return command
-					except: pass
-			except Exception, err:
-				print "GetCommand ->", err
-			return ""
+						device_id = GetDeviceId('TT3L10', nimIdx)
+						device_id = "--device %s" % (device_id)
+					except: device_id = ""
+					if device_id == "":
+						return "ssh108_t2_scan"
+#					print nimIdx, nim_name, terrestrial_autoscan_nimtype[nim_name], device_id
+				try:
+					command = "%s %s" % (terrestrial_autoscan_nimtype[nim_name], device_id)
+					return command
+				except: pass
+		except Exception, err:
+			print "terrestrialTransponderGetCmd ->", err
+		return ""
 
+	def startTerrestrialTransponderSearch(self, nim_idx, region):
 		if not self.tryGetRawFrontend(nim_idx):
 			self.session.nav.stopService()
 			if not self.tryGetRawFrontend(nim_idx):
@@ -473,7 +472,7 @@ class TerrestrialTransponderSearchSupport:
 		self.terrestrial_search_container.appClosed.append(self.terrestrialTransponderSearchClosed)
 		self.terrestrial_search_container.dataAvail.append(self.getTerrestrialTransponderData)
 
-		self.terrestrial_search_binName = GetCommand(nim_idx)
+		self.terrestrial_search_binName = self.terrestrialTransponderGetCmd(nim_idx)
 
 		self.terrestrial_search_bus = nimmanager.getI2CDevice(nim_idx)
 		if self.terrestrial_search_bus is None:
@@ -1138,9 +1137,15 @@ class ScanSetup(ConfigListScreen, Screen, CableTransponderSearchSupport, Terrest
 							plpid = self.scan_ter.plp_id.value)
 				removeAll = False
 			elif self.scan_typeterrestrial.value == "complete":
-				getInitialTerrestrialTransponderList(tlist, nimmanager.getTerrestrialDescription(index_to_scan))
+				skip_t2 = True
 				if nim.isCompatible("DVB-T2"):
-					action = SEARCH_TERRESTRIAL2_TRANSPONDERS
+					scan_util = len(self.terrestrialTransponderGetCmd(self.feid)) and True or False
+					if scan_util:
+						action = SEARCH_TERRESTRIAL2_TRANSPONDERS
+					else:
+						skip_t2 = False
+
+				getInitialTerrestrialTransponderList(tlist, nimmanager.getTerrestrialDescription(index_to_scan), skip_t2)
 
 		flags = self.scan_networkScan.value and eComponentScan.scanNetworkSearch or 0
 
@@ -1326,9 +1331,14 @@ class ScanSimple(ConfigListScreen, Screen, CableTransponderSearchSupport, Terres
 					else:
 						action = SEARCH_CABLE_TRANSPONDERS
 				elif nim.isCompatible("DVB-T"):
-					getInitialTerrestrialTransponderList(tlist, nimmanager.getTerrestrialDescription(nim.slot))
+					skip_t2 = True
 					if nim.isCompatible("DVB-T2"):
-						action = SEARCH_TERRESTRIAL2_TRANSPONDERS
+						scan_util = len(self.terrestrialTransponderGetCmd(nim.slot)) and True or False
+						if scan_util:
+							action = SEARCH_TERRESTRIAL2_TRANSPONDERS
+						else:
+							skip_t2 = False
+					getInitialTerrestrialTransponderList(tlist, nimmanager.getTerrestrialDescription(nim.slot), skip_t2)
 				else:
 					assert False
 
