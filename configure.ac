@@ -193,8 +193,6 @@ lib/python/Plugins/Extensions/WebBrowser/Makefile
 lib/python/Plugins/Extensions/WebBrowser/meta/Makefile
 lib/python/Plugins/Extensions/WebBrowser/keymap/Makefile
 lib/python/Plugins/Extensions/WebBrowser/desc/Makefile
-lib/python/Plugins/Extensions/VuplusEvent/Makefile
-lib/python/Plugins/Extensions/VuplusEvent/meta/Makefile
 lib/python/Plugins/Extensions/StreamTV/Makefile
 lib/python/Plugins/Extensions/StreamTV/meta/Makefile
 lib/python/Plugins/Extensions/StreamTV/icons/Makefile
