@@ -210,16 +210,14 @@ class CableTransponderSearchSupport:
 			        nim_name = nim_name.split(' ')[-1][4:-1]
 			        if nim_name == 'TT3L10':
 			            try:
-			                device_id = GetDeviceId('TT3L10', nimIdx)
+			                device_id = GetDeviceId('TT3L10', nim_idx)
 			                device_id = "--device=%s" % (device_id)
-			            except: device_id = ""
-			            if device_id == "":
-			                return "tda1002x"
-#			        print nimIdx, nim_name, cable_autoscan_nimtype[nim_name], device_id
-			        try:
-				        command = "%s %s" % (cable_autoscan_nimtype[nim_name], device_id)
-				        return command
-			       	except: pass
+			            except Exception, err:
+			                print "GetCommand ->", err
+			                device_id = "--device=0"
+#			            print nim_idx, nim_name, cable_autoscan_nimtype[nim_name], device_id
+			        command = "%s %s" % (cable_autoscan_nimtype[nim_name], device_id)
+			        return command
 		    except Exception, err:
 		    	print "GetCommand ->", err
 		    return "tda1002x"
@@ -443,16 +441,14 @@ class TerrestrialTransponderSearchSupport:
 				nim_name = nim_name.split(' ')[-1][4:-1]
 				if nim_name == 'TT3L10':
 					try:
-						device_id = GetDeviceId('TT3L10', nimIdx)
+						device_id = GetDeviceId('TT3L10', nim_idx)
 						device_id = "--device %s" % (device_id)
-					except: device_id = ""
-					if device_id == "":
-						return "ssh108_t2_scan"
-#					print nimIdx, nim_name, terrestrial_autoscan_nimtype[nim_name], device_id
-				try:
-					command = "%s %s" % (terrestrial_autoscan_nimtype[nim_name], device_id)
-					return command
-				except: pass
+					except Exception, err:
+						print "terrestrialTransponderGetCmd ->", err
+						device_id = "--device 0"
+#					print nim_idx, nim_name, terrestrial_autoscan_nimtype[nim_name], device_id
+				command = "%s %s" % (terrestrial_autoscan_nimtype[nim_name], device_id)
+				return command
 		except Exception, err:
 			print "terrestrialTransponderGetCmd ->", err
 		return ""
