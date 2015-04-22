@@ -1135,7 +1135,7 @@ class ScanSetup(ConfigListScreen, Screen, CableTransponderSearchSupport, Terrest
 			elif self.scan_typeterrestrial.value == "complete":
 				skip_t2 = True
 				if nim.isCompatible("DVB-T2"):
-					scan_util = len(self.terrestrialTransponderGetCmd(self.feid)) and True or False
+					scan_util = len(self.terrestrialTransponderGetCmd(nim.slot)) and True or False
 					if scan_util:
 						action = SEARCH_TERRESTRIAL2_TRANSPONDERS
 					else:
