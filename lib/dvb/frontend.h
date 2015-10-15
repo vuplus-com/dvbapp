@@ -73,6 +73,7 @@ private:
 	DECLARE_REF(eDVBFrontend);
 	bool m_simulate;
 	bool m_enabled;
+	bool m_fbc;
 	eDVBFrontend *m_simulate_fe; // only used to set frontend type in dvb.cpp
 	int m_dvbid;
 	int m_slotid;
@@ -146,6 +147,7 @@ public:
 	static int getTypePriorityOrder() { return PriorityOrder; }
 	static void setPreferredFrontend(int index) { PreferredFrontendIndex = index; }
 	static int getPreferredFrontend() { return PreferredFrontendIndex; }
+
 	bool supportsDeliverySystem(const fe_delivery_system_t &sys, bool obeywhitelist);
 	void setDeliverySystemWhitelist(const std::vector<fe_delivery_system_t> &whitelist);
 
@@ -154,6 +156,9 @@ public:
 	int closeFrontend(bool force=false, bool no_delayed=false);
 	const char *getDescription() const { return m_description; }
 	bool is_simulate() const { return m_simulate; }
+	bool is_FBCTuner() { return m_fbc; }
+	bool getEnabled() { return m_enabled; }
+	void setEnabled(bool enable) { m_enabled = enable; }
 };
 
 #endif // SWIG

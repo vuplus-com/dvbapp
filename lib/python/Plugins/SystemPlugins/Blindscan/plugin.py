@@ -149,9 +149,7 @@ class Blindscan(ConfigListScreen, Screen):
 		else:   self.i2c_mapping_table = {0:2, 1:3, 2:1, 3:0}
 
 	def getNimSocket(self, slot_number):
-		if slot_number < 0 or slot_number > 3:
-			return -1
-		return self.i2c_mapping_table[slot_number]
+		return self.i2c_mapping_table.get(slot_number, -1)
 
 	def keyNone(self):
 		None

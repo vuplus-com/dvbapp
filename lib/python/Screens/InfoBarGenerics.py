@@ -1322,6 +1322,9 @@ class InfoBarExtensions:
 				"extensions": (self.showExtensionSelection, _("view extensions...")),
 			}, 1) # lower priority
 
+		for p in plugins.getPlugins(PluginDescriptor.WHERE_EXTENSIONSINGLE):
+			p(self)
+
 	def addExtension(self, extension, key = None, type = EXTENSION_SINGLE):
 		self.list.append((type, extension, key))
 

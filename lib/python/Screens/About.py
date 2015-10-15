@@ -25,11 +25,37 @@ class About(Screen):
 		self["FPVersion"] = StaticText(fp_version)
 
 		nims = nimmanager.nimList()
-		for count in (0, 1, 2, 3):
-			if count < len(nims):
-				self["Tuner" + str(count)] = StaticText(nims[count])
-			else:
-				self["Tuner" + str(count)] = StaticText("")
+		if len(nims) <= 4 :
+			for count in (0, 1, 2, 3):
+				if count < len(nims):
+					self["Tuner" + str(count)] = StaticText(nims[count])
+				else:
+					self["Tuner" + str(count)] = StaticText("")
+		else:
+			desc_list = []
+			count = 0
+			cur_idx = -1
+			while count < len(nims):
+				data = nims[count].split(":")
+				idx = data[0].strip('Tuner').strip()
+				desc = data[1].strip()
+				if desc_list and desc_list[cur_idx]['desc'] == desc:
+					desc_list[cur_idx]['end'] = idx
+				else:
+					desc_list.append({'desc' : desc, 'start' : idx, 'end' : idx})
+					cur_idx += 1
+				count += 1
+
+			for count in (0, 1, 2, 3):
+				if count < len(desc_list):
+					if desc_list[count]['start'] == desc_list[count]['end']:
+						text = "Tuner %s: %s" % (desc_list[count]['start'], desc_list[count]['desc'])
+					else:
+						text = "Tuner %s-%s: %s" % (desc_list[count]['start'], desc_list[count]['end'], desc_list[count]['desc'])
+				else:
+					text = ""
+
+				self["Tuner" + str(count)] = StaticText(text)
 
 		self["HDDHeader"] = StaticText(_("Detected HDD:"))
 		hddlist = harddiskmanager.HDDList()

@@ -280,7 +280,7 @@ static unsigned char *png_load(const char *file, int *ox, int *oy, int *_bypp)
 		return NULL;
 	}
 
-	if (setjmp(png_ptr->jmpbuf))
+	if (setjmp(png_jmpbuf(png_ptr)))
 	{
 		png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);
 		fclose(fh);

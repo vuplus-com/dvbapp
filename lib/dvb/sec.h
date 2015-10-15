@@ -4,6 +4,8 @@
 #include <lib/dvb/idvb.h>
 #include <list>
 
+#include <lib/dvb/fbc.h>
+
 #ifndef SWIG
 class eSecCommand
 {
@@ -379,6 +381,8 @@ public:
 	void setRotorMoving(int, bool); // called from the frontend's
 	bool isRotorMoving();
 	bool canMeasureInputPower() { return m_canMeasureInputPower; }
+
+	friend class eFBCTunerManager;
 };
 
 #endif

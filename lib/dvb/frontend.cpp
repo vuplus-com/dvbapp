@@ -502,7 +502,7 @@ int eDVBFrontend::PreferredFrontendIndex=-1;
 eDVBFrontend::eDVBFrontend(int adap, int fe, int &ok, bool simulate, eDVBFrontend *simulate_fe)
 	:m_simulate(simulate), m_enabled(false), m_simulate_fe(simulate_fe), m_dvbid(fe), m_slotid(fe)
 	,m_fd(-1), m_rotor_mode(false), m_need_rotor_workaround(false)
-	,m_state(stateClosed), m_timeout(0), m_tuneTimer(0)
+	,m_state(stateClosed), m_timeout(0), m_tuneTimer(0), m_fbc(false)
 #if HAVE_DVB_API_VERSION < 3
 	,m_secfd(-1)
 #endif
@@ -524,6 +524,11 @@ eDVBFrontend::eDVBFrontend(int adap, int fe, int &ok, bool simulate, eDVBFronten
 		m_data[i] = -1;
 
 	m_idleInputpower[0]=m_idleInputpower[1]=0;
+
+	char fileName[32] = {0};
+	sprintf(fileName, "/proc/stb/frontend/%d/fbc_id", m_slotid);
+	if (access(fileName, F_OK) == 0)
+		m_fbc = true;
 
 	ok = !openFrontend();
 	closeFrontend();
@@ -2961,7 +2966,6 @@ RESULT eDVBFrontend::connectStateChange(const Slot1<void,iDVBFrontend*> &stateCh
 
 RESULT eDVBFrontend::setVoltage(int voltage)
 {
-
 #if HAVE_DVB_API_VERSION < 3
 	secVoltage vlt;
 #else
@@ -3050,6 +3054,7 @@ RESULT eDVBFrontend::sendDiseqc(const eDVBDiseqcCommand &diseqc)
 {
 	if (m_simulate)
 		return 0;
+
 #if HAVE_DVB_API_VERSION < 3
 	struct secCommand cmd;
 	cmd.type = SEC_CMDTYPE_DISEQC_RAW;
@@ -3269,7 +3274,7 @@ bool eDVBFrontend::setSlotInfo(ePyObject obj)
 //			m_slotid, m_description);
 		return false;
 	}
-	m_enabled = Enabled == Py_True;
+	m_enabled = (Enabled == Py_True);
 	// HACK.. the rotor workaround is neede for all NIMs with LNBP21 voltage regulator...
 	m_need_rotor_workaround = !!strstr(m_description, "Alps BSBE1") ||
 		!!strstr(m_description, "Alps BSBE2") ||
@@ -3285,8 +3290,9 @@ bool eDVBFrontend::setSlotInfo(ePyObject obj)
 		/* HACK for legacy dvb api without DELSYS support */
 		m_delsys[SYS_DVBT2] = true;
 	}
+
 	eDebugNoSimulate("setSlotInfo for dvb frontend %d to slotid %d, descr %s, need rotorworkaround %s, enabled %s, DVB-S2 %s, DVB-T2 %s",
-		m_dvbid, m_slotid, m_description, m_need_rotor_workaround ? "Yes" : "No", m_enabled == Py_True ? "Yes" : "No", IsDVBS2 == Py_True ? "Yes" : "No", IsDVBT2 == Py_True ? "Yes" : "No" );
+		m_dvbid, m_slotid, m_description, m_need_rotor_workaround ? "Yes" : "No", Enabled == Py_True ? "Yes" : "No", IsDVBS2 == Py_True ? "Yes" : "No", IsDVBT2 == Py_True ? "Yes" : "No" );
 	return true;
 arg_error:
 	PyErr_SetString(PyExc_StandardError,

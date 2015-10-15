@@ -49,7 +49,7 @@ private:
 	Signal1<void, struct iTSMPEGDecoder::videoEvent> m_event;
 	int m_width, m_height, m_framerate, m_aspect, m_progressive;
 public:
-	enum { MPEG2, MPEG4_H264, MPEG1, MPEG4_Part2, VC1, VC1_SM };
+	enum { MPEG2, MPEG4_H264, MPEG1, MPEG4_Part2, VC1, VC1_SM, H265_HEVC };
 	eDVBVideo(eDVBDemux *demux, int dev);
 	void stop();
 #if HAVE_DVB_API_VERSION < 3

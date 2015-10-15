@@ -4,7 +4,7 @@ from Components.config import config, ConfigSelection, getConfigListEntry, Confi
 from Components.ConfigList import ConfigListScreen
 from Components.Console import Console
 from Components.GUIComponent import GUIComponent
-from Components.Harddisk import harddiskmanager
+from Components.Harddisk import harddiskmanager, CheckSfdiskVer, enableUdevEvent
 from Components.MenuList import MenuList
 from Components.Pixmap import Pixmap, MultiPixmap
 from Components.Sources.List import List
@@ -549,8 +549,10 @@ class DeviceInit(Screen):
 		self.maxPartNum = 4
 		self.inputbox_partitionSizeRemain = self.inputbox_partitionSizeTotal
 		self.unit = "MB"
+		self.onClose.append(enableUdevEvent)
 
 	def timerStart(self):
+		enableUdevEvent(False)
 		self.initStartTimer.start(100,True)
 
 	def confirmMessage(self):
@@ -680,62 +682,66 @@ class DeviceInit(Screen):
 			try:
 				ver = float(ver)
 			except:
-				print "[CheckPartedVer] check parted version Failed!"
+				print "[DeviceManager] check parted version Failed!"
 				return 0
 			return ver
 
 		partitions = len(self.inputbox_partitionSizeList) # get num of partition
 		set = ""
-		if self.partitionType == "MBR":
-			if partitions == 1:
-				cmd = 'printf "8,\n;0,0\n;0,0\n;0,0\ny\n" | sfdisk -f -uS /dev/' + self.device
+
+		setAlign = ""
+		partedVer = CheckPartedVer()
+		if partedVer >= 2.1: # align option is supported in version 2.1 or later
+			setAlign = "--align optimal"
+			if self.devicesize < 1024 * 1000 * 1000: # 1GB
+				setAlign = "-a min"
 			else:
-				for p in range(4):
-					if partitions > p+1:
-						set += ",%s\n"%(self.inputbox_partitionSizeList[p])
-					else:
-						set +=";\n"
-				set+="y\n"
-				cmd = 'printf "%s" | sfdisk -f -uM /dev/%s'%(set,self.device)
+				setAlign = "-a opt"
 
-		elif self.partitionType == "GPT": # partition type is GPT
-			setAlign = ""
-			partedVer = CheckPartedVer()
-			if partedVer >= 2.1: # align option is supported in version 2.1 or later
-				setAlign = "--align optimal"
-
-			if partitions == 1:
-				cmd = 'parted %s /dev/%s --script mklabel gpt mkpart disk ext2 0%% 100%%' % (setAlign, self.device)
-			else: # has multiple partitions
-				p_current = 0
-				for p in range(partitions):
-					if p == 0:
-						p_start = p_current
-						p_end = int( (long(self.inputbox_partitionSizeList[p]) * 100) / 100 )
-						p_current = p_end
-					elif p > 0 and partitions > (p + 1):
-						p_start = p_current
-						p_end = int( (long(self.inputbox_partitionSizeList[p]) * 100) / 100 )+ p_start
-						p_current = p_end
-					elif partitions == (p + 1):
-						p_start = p_current
-						p_end = 100
-					if p_start == p_end:
-						p_end +=1
-					if p_end > 100:
-						continue
-					set += 'mkpart disk%d ext2 %d%% %d%% ' % (p + 1, p_start, p_end)
-				cmd = 'parted %s /dev/%s --script mklabel gpt %s' % (setAlign, self.device, set)
+		if self.partitionType == "GPT": # partition type is GPT
+			parttype = 'gpt'
 		else:
-			errorMsg = "Invalid partitioning type"
-			self.msgWaiting.run_close(False, errorMsg)
-			return
+			parttype = 'msdos'
+
+		if partitions == 1:
+			cmd = 'parted %s /dev/%s --script mklabel %s mkpart primary 0%% 100%%' % (setAlign, self.device, parttype)
+		else: # has multiple partitions
+			p_current = 0
+			for p in range(partitions):
+				if p == 0:
+					p_start = p_current
+					p_end = int( (long(self.inputbox_partitionSizeList[p]) * 100) / self.inputbox_partitionSizeTotal )
+					p_current = p_end
+				elif p > 0 and partitions > (p + 1):
+					p_start = p_current
+					p_end = int( (long(self.inputbox_partitionSizeList[p]) * 100) / self.inputbox_partitionSizeTotal )+ p_start
+					p_current = p_end
+				elif partitions == (p + 1):
+					p_start = p_current
+					p_end = 100
+
+				if p_start == p_end:
+					p_end +=1
+				if p_end > 100:
+					continue
+
+				set += 'mkpart primary ext2 %d%% %d%% ' % (p_start, p_end)
+			cmd = 'parted %s /dev/%s --script mklabel %s %s' % (setAlign, self.device, parttype, set)
+
 		self.deviceInitConsole.ePopen(cmd, self.initInitializeFinished)
 
 	def initInitializeFinished(self, result, retval, extra_args = None):
 		if retval == 0:
 			if self.partitionType == "MBR":
-				cmd = "sfdisk -R /dev/%s ; sleep 5" % (self.device)
+				sfdiskVer = CheckSfdiskVer()
+				if sfdiskVer < 2.26: # sfdisk -R option is deprecated at sfdiskVer >= 2.26
+					cmd = 'sfdisk -R /dev/%s; sleep 5' % (self.device)
+				elif path.exists('/usr/sbin/partprobe'):
+					cmd = 'partprobe /dev/%s; sleep 5' % (self.device)
+				elif path.exists('/usr/sbin/partx'):
+					cmd = 'partx -u /dev/%s; sleep 5' % (self.device)
+				else:
+					cmd = 'sfdisk -R /dev/%s; sleep 5' % (self.device)
 			else: # is GPT
 				cmd = "sleep 5"
 			self.deviceInitConsole.ePopen(cmd, self.initInitializingRefreshFinished)
@@ -780,25 +786,25 @@ class DeviceInit(Screen):
 		partitions.close()
 
 		if self.fstype == "ext4":
-			cmd = "/sbin/mkfs.ext4 -F "
+			cmd = "mkfs.ext4 -F "
 			if partitionsize > 2 * 1024 * 1024: # 2GB
 				cmd += "-T largefile "
 			cmd += "-O extent,flex_bg,large_file,uninit_bg -m1 " + fulldevicename
 		elif self.fstype == "ext3":
-			cmd = "/sbin/mkfs.ext3 -F "
+			cmd = "mkfs.ext3 -F "
 			if partitionsize > 2 * 1024 * 1024:
 				cmd += "-T largefile "
 			cmd += "-m0 " + fulldevicename
 		elif self.fstype == "ext2":
-			cmd = "/sbin/mkfs.ext2 -F "
+			cmd = "mkfs.ext2 -F "
 			if partitionsize > 2 * 1024 * 1024:
 				cmd += "-T largefile "
 			cmd += "-m0 " + fulldevicename
 		elif self.fstype == "vfat":
 			if partitionsize > 4 * 1024 * 1024 * 1024:
-				cmd = "/usr/sbin/mkfs.vfat -I -S4096 " + fulldevicename
+				cmd = "mkfs.vfat -I -S4096 " + fulldevicename
 			else:
-				cmd = "/usr/sbin/mkfs.vfat -I " + fulldevicename
+				cmd = "mkfs.vfat -I " + fulldevicename
 				if partitionsize > 2 * 1024 * 1024: # if partiton size larger then 2GB, use FAT32
 					cmd += " -F 32"
 
@@ -990,8 +996,10 @@ class DeviceFormat(Screen):
 		self.setHotplugDisabled = False
 		self.umountTimer = eTimer()
 		self.umountTimer.callback.append(self.doUnmount)
+		self.onClose.append(enableUdevEvent)
 
 	def timerStart(self):
+		enableUdevEvent(False)
 		self.formatStartTimer.start(100,True)
 
 	def DeviceFormatStart(self):
@@ -1041,7 +1049,12 @@ class DeviceFormat(Screen):
 			if oldfstype == newfstype:
 				self.changePartitionIDFinished("NORESULT", 0)
 			else:
-				cmd = "sfdisk --change-id /dev/%s %s" % (partition[:3], partition[3:])
+				sfdiskVer = CheckSfdiskVer()
+				if sfdiskVer >= 2.26:
+					cmd = "sfdisk --part-type /dev/%s %s" % (partition[:3], partition[3:])
+				else:
+					cmd = "sfdisk --change-id /dev/%s %s" % (partition[:3], partition[3:])
+
 				if newfstype[:3] == "ext":
 					cmd += " 83"
 				else:
@@ -1060,7 +1073,16 @@ class DeviceFormat(Screen):
 			if oldfstype == newfstype:
 				self.refreshPartitionFinished("NORESULT", 0)
 			else:
-				cmd = "sfdisk -R /dev/%s; sleep 5"%(device)
+				sfdiskVer = CheckSfdiskVer()
+				if sfdiskVer < 2.26: # sfdisk -R option is deprecated at sfdiskVer >= 2.26
+					cmd = "sfdisk -R /dev/%s; sleep 5" % (device)
+				elif path.exists('/usr/sbin/partprobe'):
+					cmd = 'partprobe /dev/%s; sleep 5' % (device)
+				elif path.exists('/usr/sbin/partx'):
+					cmd = 'partx -u /dev/%s; sleep 5' % (device)
+				else:
+					cmd = "sfdisk -R /dev/%s; sleep 5" % (device)
+
 				self.deviceFormatConsole.ePopen(cmd, self.refreshPartitionFinished)
 		else:
 			if result and result.find("Use GNU Parted") > 0:
@@ -1079,25 +1101,25 @@ class DeviceFormat(Screen):
 		newfstype = self.newfstype
 		if retval == 0:
 			if newfstype == "ext4":
-				cmd = "/sbin/mkfs.ext4 -F "
+				cmd = "mkfs.ext4 -F "
 				if size > 2 * 1024:
 					cmd += "-T largefile "
 				cmd += "-O extent,flex_bg,large_file,uninit_bg -m1 /dev/" + partition
 			elif newfstype == "ext3":
-				cmd = "/sbin/mkfs.ext3 -F "
+				cmd = "mkfs.ext3 -F "
 				if size > 2 * 1024:
 					cmd += "-T largefile "
 				cmd += "-m0 /dev/" + partition
 			elif newfstype == "ext2":
-				cmd = "/sbin/mkfs.ext2 -F "
+				cmd = "mkfs.ext2 -F "
 				if size > 2 * 1024:
 					cmd += "-T largefile "
 				cmd += "-m0 /dev/" + partition
 			elif newfstype == "vfat":
 				if size > 4 * 1024 * 1024:
-					cmd = "/usr/sbin/mkfs.vfat -I -S4096 /dev/" + partition
+					cmd = "mkfs.vfat -I -S4096 /dev/" + partition
 				else:
-					cmd = "/usr/sbin/mkfs.vfat -I /dev/" + partition
+					cmd = "mkfs.vfat -I /dev/" + partition
 					if size > 2 * 1024: # if partiton size larger then 2GB, use FAT32
 						cmd += " -F 32"
 			self.deviceFormatConsole.ePopen(cmd, self.mkfsFinished)
@@ -1668,6 +1690,28 @@ class deviceManagerHotplug:
 			self.doMount(uuid, devpath, mountpoint, filesystem)
 
 	def removeHotplugDevice(self, partition):
+		device = partition.device
+		devpath = "/dev/"+device
+# get BlkidInfo
+		(uuid, filesystem) = deviceinfo.getPartitionBlkidInfo(device)
+		if uuid == "":
+# retry..
+			os.system("sleep 1")
+			(uuid, filesystem) = deviceinfo.getPartitionBlkidInfo(device)
+		if uuid == "":
+			print "[DeviceManagerHotplug] getBlkidInfo failed!"
+			return
+# get configList
+		devicemanagerconfig.loadConfig()
+		configList = devicemanagerconfig.getConfigList()
+		mountpoint = None
+		for line in configList:
+			if uuid == line[0].strip():
+				mountpoint = line[1].strip()
+				break
+		if mountpoint is None:
+			return
+# do umount
 		self.doUmount(partition.device, partition.mountpoint)
 
 	def getHotplugAction(self, action, partition):

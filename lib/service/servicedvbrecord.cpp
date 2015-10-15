@@ -15,7 +15,7 @@
 
 DEFINE_REF(eDVBServiceRecord);
 
-eDVBServiceRecord::eDVBServiceRecord(const eServiceReferenceDVB &ref, bool isstreamclient = false):
+eDVBServiceRecord::eDVBServiceRecord(const eServiceReferenceDVB &ref, bool isstreamclient):
 	m_ref(ref),m_is_stream_client(isstreamclient)
 {
 	CONNECT(m_service_handler.serviceEvent, eDVBServiceRecord::serviceEvent);

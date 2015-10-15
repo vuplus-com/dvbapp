@@ -29,6 +29,33 @@ def getProcMounts():
 		item[1] = item[1].replace('\\040', ' ')
 	return result
 
+def CheckSfdiskVer():
+	cmd = 'sfdisk --version'
+	lines = popen(cmd).readlines()
+	for l in lines:
+		if l.find("sfdisk from util-linux") != -1:
+			ver = l.split()[-1].strip()
+			break
+	try:
+		vs = ver.split('.')
+		if len(vs) > 2:
+			ver = '.'.join(vs[:2])
+
+		ver = float(ver)
+	except:
+		print "[CheckSfdiskVer] check parted version Failed!"
+		return 0
+	return ver
+
+def enableUdevEvent(enable = True):
+	if enable:
+		option = '--start-exec-queue'
+	else:
+		option = '--stop-exec-queue'
+	cmd = "udevadm control %s" % option
+	print "CMD : ", cmd
+	system(cmd)
+
 DEVTYPE_UDEV = 0
 DEVTYPE_DEVFS = 1
 
@@ -225,6 +252,7 @@ class Harddisk:
 				pass
 
 		res = system(cmd)
+		print "CMD : ", cmd
 		return (res >> 8)
 
         def checkPartionPath(self, path):
@@ -234,6 +262,22 @@ class Harddisk:
                                 return True
                         time.sleep(1)
                 return False
+
+	def updatePartition(self):
+		sfdiskVer = CheckSfdiskVer()
+		if sfdiskVer < 2.26: # sfdisk -R option is deprecated at sfdiskVer >= 2.26
+			cmd = 'sfdisk -R %s; sleep 5' % (self.disk_path)
+		elif path.exists('/usr/sbin/partprobe'):
+			cmd = 'partprobe %s; sleep 5' % (self.disk_path)
+		elif path.exists('/usr/sbin/partx'):
+			cmd = 'partx -u %s' % (self.disk_path)
+		else:
+			return -1
+
+		print "CMD : ", cmd
+		res = system(cmd)
+
+		return (res >> 8)
 
 	def createPartition(self):
 		def CheckPartedVer():
@@ -260,9 +304,15 @@ class Harddisk:
 			cmd = 'parted %s %s --script mklabel gpt mkpart disk ext2 0%% 100%%' % ( setAlign, self.disk_path )
 
 		else:
-			cmd = 'printf "8,\n;0,0\n;0,0\n;0,0\ny\n" | sfdisk -f -uS ' + self.disk_path
+			sfdiskVer = CheckSfdiskVer()
+			if sfdiskVer <= 2.21:
+				cmd = 'printf "8,\n;0,0\n;0,0\n;0,0\ny\n" | sfdisk -f -uS ' + self.disk_path
+			else:
+				cmd = 'printf "8,\nquit\nY\n" | sfdisk -f -uS ' + self.disk_path
 
+		print "CMD : ", cmd
 		res = system(cmd)
+
 		if not self.checkPartionPath(self.partitionPath("1")):
 			print "no exist : ", self.partitionPath("1")
 			return 1
@@ -273,6 +323,7 @@ class Harddisk:
 		if self.diskSize() > 4 * 1024:
 			cmd += "-T largefile "
 		cmd += "-m0 -O dir_index " + self.partitionPath("1")
+		print "CMD : ", cmd
 		res = system(cmd)
 		return (res >> 8)
 
@@ -286,20 +337,33 @@ class Harddisk:
 		fstab.close()
 
 		res = -1
+		mount_point = None
 		for line in lines:
 			parts = line.strip().split(" ")
-                        real_path = path.realpath(parts[0])                                                 
-                        if not real_path[-1].isdigit():                                                     
-                                continue                                                                    
-                        try:                                                                                
-                                if MajorMinor(real_path) == MajorMinor(self.partitionPath(real_path[-1])):
-					cmd = "mount -t ext3 " + parts[0]
-					res = system(cmd)
+			real_path = path.realpath(parts[0])
+			if not real_path[-1].isdigit():
+				continue
+			try:
+				if MajorMinor(real_path) == MajorMinor(self.partitionPath(real_path[-1])):
+					mount_point = parts[0]
 					break
 			except OSError:
 				pass
 
-		return (res >> 8)
+		if mount_point is None:
+			return 0
+
+		cmd = "mount -t ext3 " + mount_point
+		print "CMD : ", cmd
+		res = system(cmd)
+
+		if (res >> 8) != 0:
+			return -3
+
+		if self.createMovieFolder() != 0:
+			return -4
+
+		return 0
 
 	def createMovieFolder(self):
 		try:
@@ -324,15 +388,17 @@ class Harddisk:
 
 		if access(part, 0):
 			cmd = 'dd bs=512 count=3 if=/dev/zero of=' + part
+			print "CMD : ", cmd
 			res = system(cmd)
 		else:
 			res = 0
 
 		return (res >> 8)
 
-	errorList = [ _("Everything is fine"), _("Creating partition failed"), _("Mkfs failed"), _("Mount failed"), _("Create movie folder failed"), _("Fsck failed"), _("Please Reboot"), _("Filesystem contains uncorrectable errors"), _("Unmount failed")]
+	errorList = [ _("Everything is fine"), _("Creating partition failed"), _("Mkfs failed"), _("Mount failed"), _("Create movie folder failed"), _("Fsck failed"), _("Please Reboot"), _("Filesystem contains uncorrectable errors"), _("Unmount failed"), _("partx failed")]
 
 	def initialize(self):
+		enableUdevEvent(False)
 		self.unmount()
 
 		# Udev tries to mount the partition immediately if there is an
@@ -342,19 +408,23 @@ class Harddisk:
 		# ext3 at least.
 		self.killPartition("1")
 
-		if self.createPartition() != 0:
-			return -1
+		if self.updatePartition() != 0:
+			res = -9
 
-		if self.mkfs() != 0:
-			return -2
+		elif self.createPartition() != 0:
+			res = -1
 
-		if self.mount() != 0:
-			return -3
+		elif self.updatePartition() != 0:
+			res = -9
 
-		if self.createMovieFolder() != 0:
-			return -4
+		elif self.mkfs() != 0:
+			res = -2
 
-		return 0
+		else:
+			res = self.mount()
+
+		enableUdevEvent(True)
+		return res
 
 	def check(self):
 		self.unmount()
@@ -571,7 +641,7 @@ class HarddiskManager:
 		try:
 			removable = bool(int(readFile(devpath + "/removable")))
 			dev = int(readFile(devpath + "/dev").split(':')[0])
-			if dev in (7, 31): # loop, mtdblock
+			if dev in (7, 31, 179): # loop, mtdblock, mmcblock
 				blacklisted = True
 			if blockdev[0:2] == 'sr':
 				is_cdrom = True

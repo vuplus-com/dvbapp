@@ -268,7 +268,7 @@ void eDVBServicePMTHandler::AITready(int error)
 				std::string boundaryExtension = "";
 				
 				int controlCode = (*i)->getApplicationControlCode();
-				ApplicationIdentifier * applicationIdentifier = (*i)->getApplicationIdentifier();
+				const ApplicationIdentifier * applicationIdentifier = (*i)->getApplicationIdentifier();
 				profilecode = 0;
 				orgid = applicationIdentifier->getOrganisationId();
 				appid = applicationIdentifier->getApplicationId();
@@ -285,7 +285,7 @@ void eDVBServicePMTHandler::AITready(int error)
 						case APPLICATION_DESCRIPTOR:
 						{
 							ApplicationDescriptor* applicationDescriptor = (ApplicationDescriptor*)(*desc);
-							ApplicationProfileList* applicationProfiles = applicationDescriptor->getApplicationProfiles();
+							const ApplicationProfileList* applicationProfiles = applicationDescriptor->getApplicationProfiles();
 							ApplicationProfileConstIterator interactionit = applicationProfiles->begin();
 							for(; interactionit != applicationProfiles->end(); ++interactionit)
 							{
@@ -353,7 +353,7 @@ void eDVBServicePMTHandler::AITready(int error)
 				}
 				if(!hbbtvUrl.empty())
 				{
-					char* uu = hbbtvUrl.c_str();
+					const char* uu = hbbtvUrl.c_str();
 					if(!strncmp(uu, "http://", 7) || !strncmp(uu, "dvb://", 6) || !strncmp(uu, "https://", 8))
 					{
 						if(controlCode == 1) m_HBBTVUrl = hbbtvUrl;
@@ -420,7 +420,7 @@ void eDVBServicePMTHandler::OCready(int error)
 	{
 		for (std::vector<OCSection*>::const_iterator it = ptr->getSections().begin(); it != ptr->getSections().end(); ++it)
 		{
-			unsigned char* sectionData = (*it)->getData();
+			unsigned char* sectionData = (unsigned char*)(*it)->getData();
 		}
 	}
 	/* for now, do not keep listening for table updates */
@@ -570,6 +570,13 @@ int eDVBServicePMTHandler::getProgramInfo(program &program)
 					case 0x1b: // AVC Video Stream (MPEG4 H264)
 						video.type = videoStream::vtMPEG4_H264;
 						isvideo = 1;
+						//break; fall through !!!
+					case 0x24: // H265 HEVC
+						if (!isvideo)
+						{
+							video.type = videoStream::vtH265_HEVC;
+							isvideo = 1;
+						}
 						//break; fall through !!!
 					case 0x10: // MPEG 4 Part 2
 						if (!isvideo)

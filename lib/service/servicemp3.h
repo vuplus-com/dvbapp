@@ -189,8 +189,6 @@ private:
 	std::vector<subtitleStream> m_subtitleStreams;
 	eSubtitleWidget *m_subtitle_widget;
 	int m_currentTrickRatio;
-	ePtr<eTimer> m_seekTimeout;
-	void seekTimeoutCB();
 	friend class eServiceFactoryMP3;
 	eServiceReference m_ref;
 	int m_buffer_size;
@@ -222,9 +220,15 @@ private:
                 {
                         d.pad=pad;
                 }
+				Message(int type, GstBuffer *buffer)
+                        :type(type)
+                {
+                        d.buffer=buffer;
+                }
 
                 int type;
                 union {
+                        GstBuffer *buffer; // for msg type 2
                         GstPad *pad; // for msg type 3
                 } d;
         };
@@ -232,12 +236,16 @@ private:
         eFixedMessagePump<Message> m_pump;
 
         audiotype_t gstCheckAudioPad(GstStructure* structure);
+#if GST_VERSION_MAJOR < 1
         static gint match_sinktype(GstElement *element, gpointer type);
+#else
+        static gint match_sinktype(const GValue *velement, const gchar *type);
+#endif
         void gstBusCall(GstBus *bus, GstMessage *msg);
         static GstBusSyncReply gstBusSyncHandler(GstBus *bus, GstMessage *message, gpointer user_data);
 	static void gstTextpadHasCAPS(GstPad *pad, GParamSpec * unused, gpointer user_data);
 	void gstTextpadHasCAPS_synced(GstPad *pad);
-        static void gstCBsubtitleAvail(GstElement *element, gpointer user_data);
+        static void gstCBsubtitleAvail(GstElement *element, GstBuffer *buffer, gpointer user_data);
         GstPad* gstCreateSubtitleSink(eServiceMP3* _this, subtype_t type);
 	void gstPoll(const Message&);
         static void gstHTTPSourceSetAgent(GObject *source, GParamSpec *unused, gpointer user_data);
@@ -257,11 +265,9 @@ private:
         int m_decoder_time_valid_state;
 
         void pushSubtitles();
-        void pullSubtitle();
+        void pullSubtitle(GstBuffer *buffer);
         void sourceTimeout();
-        int m_subs_to_pull;
         sourceStream m_sourceinfo;
-	eSingleLock m_subs_to_pull_lock;
 	gulong m_subs_to_pull_handler_id;
 
 	RESULT seekToImpl(pts_t to);

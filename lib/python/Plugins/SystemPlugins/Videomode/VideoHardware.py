@@ -38,6 +38,11 @@ class VideoHardware:
 			"60Hz" : {60: "1080p"},
 			"multi": {50: "1080p50", 60: "1080p"}
 		},
+		"2160p": {
+			"50Hz" : {50: "2160p50"},
+			"60Hz" : {60: "2160p"},
+			"multi": {50: "2160p50", 60: "2160p"}
+		},
 		"PC": {
 			"1024x768": {60: "1024x768"},
 			"800x600" : {60: "800x600"},
@@ -55,11 +60,11 @@ class VideoHardware:
 		}
 	}
 
-	widescreen_modes = set(["720p", "1080i", "1080p"])
-	hdmi_hw_types = set(["dm500", "dm800se", "dm7020hd", "bm750", "solo", "uno", "ultimo", "solo2", "duo2", "solose", "zero"])
-	hdmi_pc_hw_types = set(["dm500", "dm800se", "dm7020hd", "bm750", "solo", "uno", "ultimo", "solo2", "duo2", "solose", "zero"])
-	noscart_hw_types = set(["zero"])
-	noypbpr_hw_types = set(["solose", "zero"])
+	widescreen_modes = set(["720p", "1080i", "1080p", "2160p"])
+	hdmi_hw_types = set(["dm500", "dm800se", "dm7020hd", "bm750", "solo", "uno", "ultimo", "solo2", "duo2", "solose", "zero", "solo4k"])
+	hdmi_pc_hw_types = set(["dm500", "dm800se", "dm7020hd", "bm750", "solo", "uno", "ultimo", "solo2", "duo2", "solose", "zero", "solo4k"])
+	noscart_hw_types = set(["zero", "solo4k"])
+	noypbpr_hw_types = set(["solose", "zero", "solo4k"])
 
 	def getDeviceName(self):
 		device_name = "unknown"
@@ -74,7 +79,10 @@ class VideoHardware:
 		return device_name
 
 	def isVumodel(self, hw_type):
-		return hw_type in set(["bm750", "solo", "uno", "ultimo", "solo2", "duo2", "solose", "zero"])
+		return hw_type in set(["bm750", "solo", "uno", "ultimo", "solo2", "duo2", "solose", "zero", "solo4k"])
+
+	def isVumodel4K(self, hw_type):
+		return hw_type in set(["solo4k"])
 
 	# re-define AVSwitch.getOutputAspect
 	def getOutputAspect(self):
@@ -232,6 +240,9 @@ class VideoHardware:
 		# vu+ support 1080p
 		if self.isVumodel(hw_type):
 			self.modes["DVI"].insert(self.modes["DVI"].index("1080i")+1, "1080p")
+			# 4K support 2160p
+			if self.isVumodel4K(hw_type):
+				self.modes["DVI"].insert(self.modes["DVI"].index("1080p")+1, "2160p")
 
 		portlist = [ ]
 		port_choices = self.getPortList()
