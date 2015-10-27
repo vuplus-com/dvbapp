@@ -682,6 +682,23 @@ int eMPEGStreamParserTS::processPacket(const unsigned char *pkt, off_t offset)
 						/*eDebug("MPEG4 AVC UAD but no valid PTS value.")*/;
 				}
 			}
+			if (m_streamtype == 6) /* H.265 */
+			{
+				int nal_unit_type = (sc >> 1);
+				if (nal_unit_type == 35) /* H265 NAL unit access delimiter */
+				{
+					unsigned long long data = sc | (pkt[4] << 8);
+					m_streaminfo.writeStructureEntry(offset + pkt_offset, data);
+
+					if ((pkt[4] >> 5) == 0) /* check pic_type for I-frame */
+					{
+						if (ptsvalid)
+						{
+							m_streaminfo.m_access_points[offset] = pts;
+						}
+					}
+				}
+			}
 		}
 		++pkt;
 	}

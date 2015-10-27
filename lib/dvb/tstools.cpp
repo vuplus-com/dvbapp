@@ -691,12 +691,14 @@ int eDVBTSTools::findFrame(off_t &_iframe_offset, off_t &_new_offset, size_t &le
 		int is_start = 0;
 		if ((data & 0xE0FF) == 0x0009) /* H.264 NAL unit access delimiter with I-frame*/
 			is_start =1;
+		else if ((data & 0xE07E) == 0x0046) /* H.265 NAL unit access delimiter with I-frame*/
+			is_start = 1;
 		else if((data & 0x3800FF) == 0x080000) /* MPEG2 picture start code with I-frame */
 		{
 			is_start =1;
 			is_mpeg =1;
 		}
-		int is_frame = ((data & 0xFF) == 0x0009) || ((data & 0xFF) == 0x00); /* H.264 UAD or MPEG2 start code */
+		int is_frame = ((data & 0xFF) == 0x0009) || ((data & 0x7E) == 0x0046) || ((data & 0xFF) == 0x00); /* H.264 UAD or H.265 UAD or MPEG2 start code */
 		
 		if (is_frame)
 		{
@@ -747,7 +749,7 @@ int eDVBTSTools::findFrame(off_t &_iframe_offset, off_t &_new_offset, size_t &le
 			return -1;
 		}
 //		eDebug("%08llx@%llu (next frame)", data, offset);
-	} while (((data & 0xFF) != 9) && ((data & 0xFF) != 0x00)); /* next frame */
+	} while (((data & 0xFF) != 9) && ((data & 0x7E) != 0x46) && ((data & 0xFF) != 0x00)); /* next frame */
 
 	if (is_mpeg) //MPEG2 picture start code with I-frame
 	{
