@@ -1,6 +1,7 @@
-from Components.config import config, ConfigSubDict, ConfigSelection
+from Components.config import config, ConfigSubDict, ConfigSelection, ConfigNothing, NoSave
 from Tools.CList import CList
 from Tools.HardwareInfo import HardwareInfo
+import os
 
 # VideoHardware is the interface to /proc/stb/video.
 class VideoHardware:
@@ -272,6 +273,23 @@ class VideoHardware:
 				config.av.videorate[mode[0]] = ConfigSelection(choices = ratelist)
 			config.av.videomode[port] = ConfigSelection(choices = modelist)
 		config.av.videoport = ConfigSelection(choices = portlist)
+
+		if os.path.exists("/proc/stb/video/hdmi_colorspace"):
+			def setHdmiColorspace(config):
+				try:
+					print "set HDMI Colorspace : ",config.value
+					f = open("/proc/stb/video/hdmi_colorspace", "w")
+					f.write(config.value)
+					f.close()
+				except IOError:
+					print "set HDMI Colorspace failed!"
+			hdmicolorspace_choices = {}
+			hdmicolorspace_choices["Edid(Auto)"] = _("Auto")
+			hdmicolorspace_choices["Hdmi_Rgb"] = _("RGB")
+			config.av.hdmicolorspace = ConfigSelection(choices = hdmicolorspace_choices, default = "Edid(Auto)")
+			config.av.hdmicolorspace.addNotifier(setHdmiColorspace)
+		else:
+			config.av.hdmicolorspace = NoSave(ConfigNothing())
 
 	def changedVideomode(self, configElement):
 		if self.is_init:
