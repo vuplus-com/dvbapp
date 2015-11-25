@@ -956,6 +956,8 @@ eDVBServicePlay::eDVBServicePlay(const eServiceReference &ref, eDVBService *serv
 
 	m_subtitle_sync_timer = eTimer::create(eApp);
 
+	m_current_video_pid_type = 0;
+
 	CONNECT(m_subtitle_sync_timer->timeout, eDVBServicePlay::checkSubtitleTiming);
 }
 
@@ -1324,7 +1326,18 @@ RESULT eDVBServicePlay::setFastForward_internal(int ratio, bool final_seek)
 	{
 		eDebug("setting cue skipmode to %d", skipmode);
 		if (m_cue)
-			m_cue->setSkipmode(skipmode * 90000); /* convert to 90000 per second */
+		{
+			long long _skipmode = skipmode;
+			if (!m_timeshift_active && (m_current_video_pid_type == eDVBServicePMTHandler::videoStream::vtH265_HEVC))
+			{
+				if (ratio < 0)
+					_skipmode = skipmode * 3;
+				else
+					_skipmode = skipmode * 4;
+			}
+
+			m_cue->setSkipmode(_skipmode * 90000); /* convert to 90000 per second */
+		}
 	}
 
 	m_skipmode = skipmode;
@@ -2591,6 +2604,7 @@ void eDVBServicePlay::updateDecoder(bool sendSeekableStateChanged)
 		setPCMDelay(pcm_delay == -1 ? 0 : pcm_delay);
 
 		m_decoder->setVideoPID(vpid, vpidtype);
+		m_current_video_pid_type = vpidtype;
 		selectAudioStream();
 
 		//if (!(m_is_pvr || m_is_stream || m_timeshift_active || !m_is_primary))
