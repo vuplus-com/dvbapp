@@ -395,6 +395,10 @@ eServiceMP3::eServiceMP3(eServiceReference ref)
 		if ( m_sourceinfo.is_streaming )
 		{
 			g_signal_connect (G_OBJECT (m_gst_playbin), "notify::source", G_CALLBACK (gstHTTPSourceSetAgent), this);
+
+			flags |= GST_PLAY_FLAG_BUFFERING;
+			g_object_set(G_OBJECT(m_gst_playbin), "buffer-duration", 5LL * GST_SECOND, NULL);
+			g_object_set(G_OBJECT(m_gst_playbin), "buffer-size", m_buffer_size, NULL);
 		}
 	} else
 	{
@@ -407,8 +411,6 @@ eServiceMP3::eServiceMP3(eServiceReference ref)
 		eDebug("eServiceMP3::sorry, can't play: %s",m_errorInfo.error_message.c_str());
 		m_gst_playbin = 0;
 	}
-
-	setBufferSize(m_buffer_size);
 }
 
 eServiceMP3::~eServiceMP3()
@@ -1713,10 +1715,19 @@ GstBusSyncReply eServiceMP3::gstBusSyncHandler(GstBus *bus, GstMessage *message,
 void eServiceMP3::gstHTTPSourceSetAgent(GObject *object, GParamSpec *unused, gpointer user_data)
 {
 	eServiceMP3 *_this = (eServiceMP3*)user_data;
-	GstElement *source;
+	GstElement *source = NULL;
 	g_object_get(_this->m_gst_playbin, "source", &source, NULL);
-	g_object_set (G_OBJECT (source), "user-agent", _this->m_useragent.c_str(), NULL);
-	gst_object_unref(source);
+	if (source)
+	{
+#if GST_VERSION_MAJOR >= 1
+		if (g_object_class_find_property(G_OBJECT_GET_CLASS(source), "ssl-strict") != 0)
+		{
+			g_object_set(G_OBJECT(source), "ssl-strict", FALSE, NULL);
+		}
+#endif
+		g_object_set (G_OBJECT (source), "user-agent", _this->m_useragent.c_str(), NULL);
+		gst_object_unref(source);
+	}
 }
 
 audiotype_t eServiceMP3::gstCheckAudioPad(GstStructure* structure)
