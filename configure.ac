@@ -302,8 +302,6 @@ lib/python/Plugins/SystemPlugins/AudioEffect/Makefile
 lib/python/Plugins/SystemPlugins/AudioEffect/meta/Makefile
 lib/python/Plugins/SystemPlugins/AnimationSetup/Makefile
 lib/python/Plugins/SystemPlugins/AnimationSetup/meta/Makefile
-lib/python/Plugins/SystemPlugins/FastZapSupport/Makefile
-lib/python/Plugins/SystemPlugins/FastZapSupport/meta/Makefile
 lib/python/Plugins/SystemPlugins/BoxModeConfig/Makefile
 lib/python/Plugins/SystemPlugins/BoxModeConfig/meta/Makefile
 lib/python/Tools/Makefile
