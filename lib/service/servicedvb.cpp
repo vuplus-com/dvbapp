@@ -1328,7 +1328,7 @@ RESULT eDVBServicePlay::setFastForward_internal(int ratio, bool final_seek)
 		if (m_cue)
 		{
 			long long _skipmode = skipmode;
-			if (!m_timeshift_active && (m_current_video_pid_type == eDVBServicePMTHandler::videoStream::vtH265_HEVC))
+			if (m_current_video_pid_type == eDVBServicePMTHandler::videoStream::vtH265_HEVC)
 			{
 				if (ratio < 0)
 					_skipmode = skipmode * 3;
@@ -2228,6 +2228,8 @@ RESULT eDVBServicePlay::startTimeshift()
 	}
 		
 	m_record->setTargetFD(m_timeshift_fd);
+	m_record->setTargetFilename(m_timeshift_file.c_str());
+	m_record->enableAccessPoints(false);
 
 	m_timeshift_enabled = 1;
 	
@@ -2253,6 +2255,11 @@ RESULT eDVBServicePlay::stopTimeshift(bool swToLive)
 	close(m_timeshift_fd);
 	eDebug("remove timeshift file");
 	eBackgroundFileEraser::getInstance()->erase(m_timeshift_file.c_str());
+
+	{
+		std::string timeshift_file_sc = m_timeshift_file + ".sc";
+		eBackgroundFileEraser::getInstance()->erase(timeshift_file_sc.c_str());
+	}
 	
 	return 0;
 }
@@ -2349,6 +2356,8 @@ void eDVBServicePlay::updateTimeshiftPids()
 		return;
 	else
 	{
+		int timing_pid = -1;
+		int timing_pid_type = -1;
 		std::set<int> pids_to_record;
 		pids_to_record.insert(0); // PAT
 		if (program.pmtPid != -1)
@@ -2360,12 +2369,28 @@ void eDVBServicePlay::updateTimeshiftPids()
 		for (std::vector<eDVBServicePMTHandler::videoStream>::const_iterator
 			i(program.videoStreams.begin()); 
 			i != program.videoStreams.end(); ++i)
+		{
 			pids_to_record.insert(i->pid);
+
+			if (timing_pid == -1)
+			{
+				timing_pid = i->pid;
+				timing_pid_type = i->type;
+			}
+		}
 
 		for (std::vector<eDVBServicePMTHandler::audioStream>::const_iterator
 			i(program.audioStreams.begin()); 
 			i != program.audioStreams.end(); ++i)
-				pids_to_record.insert(i->pid);
+		{
+			pids_to_record.insert(i->pid);
+
+			if (timing_pid == -1)
+			{
+				timing_pid = i->pid;
+				timing_pid_type = -1;
+			}
+		}
 
 		for (std::vector<eDVBServicePMTHandler::subtitleStream>::const_iterator
 			i(program.subtitleStreams.begin());
@@ -2389,6 +2414,9 @@ void eDVBServicePlay::updateTimeshiftPids()
 
 		for (std::set<int>::iterator i(obsolete_pids.begin()); i != obsolete_pids.end(); ++i)
 			m_record->removePID(*i);
+
+		if (timing_pid != -1)
+			m_record->setTimingPID(timing_pid, timing_pid_type);
 	}
 }
 

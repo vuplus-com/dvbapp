@@ -47,8 +47,10 @@ public:
 	off_t getAccessPoint(pts_t ts, int marg=0);
 	
 	int getNextAccessPoint(pts_t &ts, const pts_t &start, int direction);
-	
-	bool empty();
+
+	bool hasAccessPoint() { return !m_access_points.empty(); }
+
+	bool hasStructure() { return !m_structure_read ? false : true; }
 	
 	typedef unsigned long long structure_data;
 		/* this is usually:
@@ -66,7 +68,7 @@ public:
 	int update_structure_cache_entries(off_t offset);
 
 	std::string m_filename;
-	int m_structure_cache_valid;
+	int m_structure_cache_entries;
 	unsigned long long m_structure_cache[1024];
 	FILE *m_structure_read, *m_structure_write;
 };
@@ -79,6 +81,7 @@ public:
 	void parseData(off_t offset, const void *data, unsigned int len);
 	void setPid(int pid, int streamtype);
 	int getLastPTS(pts_t &last_pts);
+	void enableAccessPoints(bool enable) { m_enable_accesspoints = enable; }
 private:
 	eMPEGStreamInformation &m_streaminfo;
 	unsigned char m_pkt[188];
@@ -90,6 +93,7 @@ private:
 	int m_skip;
 	int m_last_pts_valid;
 	pts_t m_last_pts;
+	bool m_enable_accesspoints;
 };
 
 #endif

@@ -453,6 +453,7 @@ public:
 	
 	void startSaveMetaInformation(const std::string &filename);
 	void stopSaveMetaInformation();
+	void enableAccessPoints(bool enable);
 	int getLastPTS(pts_t &pts);
 protected:
 	int filterRecordData(const unsigned char *data, int len, size_t &current_span_remaining);
@@ -483,6 +484,11 @@ void eDVBRecordFileThread::startSaveMetaInformation(const std::string &filename)
 void eDVBRecordFileThread::stopSaveMetaInformation()
 {
 	m_stream_info.stopSave();
+}
+
+void eDVBRecordFileThread::enableAccessPoints(bool enable)
+{
+	m_ts_parser.enableAccessPoints(enable);
 }
 
 int eDVBRecordFileThread::getLastPTS(pts_t &pts)
@@ -645,6 +651,12 @@ RESULT eDVBTSRecorder::setTargetFD(int fd)
 RESULT eDVBTSRecorder::setTargetFilename(const char *filename)
 {
 	m_target_filename = filename;
+	return 0;
+}
+
+RESULT eDVBTSRecorder::enableAccessPoints(bool enable)
+{
+	m_thread->enableAccessPoints(enable);
 	return 0;
 }
 

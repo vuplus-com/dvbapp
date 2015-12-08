@@ -57,7 +57,7 @@ void eDVBTSTools::setSource(ePtr<iTsSource> &source, const char *stream_info_fil
 		m_streaminfo.load(stream_info_filename);
 	}
 	
-	if (!m_streaminfo.empty())
+	if (m_streaminfo.hasAccessPoint())
 		m_use_streaminfo = 1;
 	else
 	{
@@ -655,7 +655,7 @@ int eDVBTSTools::findFrame(off_t &_iframe_offset, off_t &_new_offset, size_t &le
 	int is_mpeg = 0;
 //	eDebug("trying to find iFrame at %lld", offset);
 
-	if (!m_use_streaminfo)
+	if (!m_streaminfo.hasStructure())
 	{
 //		eDebug("can't get next iframe without streaminfo");
 		return -1;

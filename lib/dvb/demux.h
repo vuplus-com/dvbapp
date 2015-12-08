@@ -101,6 +101,7 @@ public:
 	
 	RESULT setTargetFD(int fd);
 	RESULT setTargetFilename(const char *filename);
+	RESULT enableAccessPoints(bool enable);
 	RESULT setBoundary(off_t max);
 	
 	RESULT stop();

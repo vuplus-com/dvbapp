@@ -7,7 +7,7 @@
 #endif
 
 eMPEGStreamInformation::eMPEGStreamInformation()
-	: m_structure_cache_valid(0), m_structure_read(0), m_structure_write(0)
+	: m_structure_cache_entries(0), m_structure_read(0), m_structure_write(0)
 {
 }
 
@@ -33,6 +33,10 @@ int eMPEGStreamInformation::stopSave(void)
 		fclose(m_structure_write);
 		m_structure_write = 0;
 	}
+
+	if (m_access_points.empty())
+		return 0;
+
 	if (m_filename == "")
 		return -1;
 	FILE *f = fopen((m_filename + ".ap").c_str(), "wb");
@@ -62,11 +66,12 @@ int eMPEGStreamInformation::load(const char *filename)
 	if (m_structure_read)
 		fclose(m_structure_read);
 	m_structure_read = fopen((std::string(m_filename) + ".sc").c_str(), "rb");
+	m_access_points.clear();
+	m_pts_to_offset.clear();
+	m_timestamp_deltas.clear();
 	FILE *f = fopen((std::string(m_filename) + ".ap").c_str(), "rb");
 	if (!f)
 		return -1;
-	m_access_points.clear();
-	m_pts_to_offset.clear();
 	while (1)
 	{
 		unsigned long long d[2];
@@ -83,11 +88,6 @@ int eMPEGStreamInformation::load(const char *filename)
 	fclose(f);
 	fixupDiscontinuties();
 	return 0;
-}
-
-bool eMPEGStreamInformation::empty()
-{
-	return m_access_points.empty();
 }
 
 void eMPEGStreamInformation::fixupDiscontinuties()
@@ -338,75 +338,21 @@ int eMPEGStreamInformation::getStructureEntry(off_t &offset, unsigned long long 
 		return -1;
 	}
 
-	const int struture_cache_entries = sizeof(m_structure_cache) / 16;
-	if ((!m_structure_cache_valid) || ((off_t)m_structure_cache[0] > offset) || ((off_t)m_structure_cache[(struture_cache_entries - (get_next ? 2 : 1)) * 2] <= offset))
+	off_t _offset = offset;
+	const int struture_cache_size = sizeof(m_structure_cache) / 16;
+	if ((m_structure_cache_entries == 0) || ((off_t)m_structure_cache[0] > offset) || ((off_t)m_structure_cache[(m_structure_cache_entries - (get_next ? 2 : 1)) * 2] <= offset))
 	{
-		fseek(m_structure_read, 0, SEEK_END);
-		int l = ftell(m_structure_read);
-		unsigned long long d[2];
-		const int entry_size = sizeof d;
-
-			/* do a binary search */
-		int count = l / entry_size;
-		int i = 0;
-		
-		while (count)
+		if(update_structure_cache_entries(_offset))
 		{
-			int step = count >> 1;
-			
-			fseek(m_structure_read, (i + step) * entry_size, SEEK_SET);
-			if (!fread(d, 1, entry_size, m_structure_read))
-			{
-				eDebug("read error at entry %d", i);
-				return -1;
-			}
-			
-#if BYTE_ORDER != BIG_ENDIAN
-			d[0] = bswap_64(d[0]);
-			d[1] = bswap_64(d[1]);
-#endif
-//			eDebug("%d: %08llx > %llx", i, d[0], d[1]);
-			
-			if (d[0] < (unsigned long long)offset)
-			{
-				i += step + 1;
-				count -= step + 1;
-			} else
-				count = step;
+			return -1;
 		}
-		
-		eDebug("found %d", i);
-		
-			/* put that in the middle */
-		i -= struture_cache_entries / 2;
-		if (i < 0)
-			i = 0;
-		eDebug("cache starts at %d", i);
-		fseek(m_structure_read, i * entry_size, SEEK_SET);
-		int num = fread(m_structure_cache, entry_size, struture_cache_entries, m_structure_read);
-		eDebug("%d entries", num);
-		for (i = 0; i < struture_cache_entries; ++i)
-		{
-			if (i < num)
-			{
-#if BYTE_ORDER != BIG_ENDIAN
-				m_structure_cache[i * 2] = bswap_64(m_structure_cache[i * 2]);
-				m_structure_cache[i * 2 + 1] = bswap_64(m_structure_cache[i * 2 + 1]);
-#endif
-			} else
-			{
-				m_structure_cache[i * 2] = 0x7fffffffffffffffULL; /* fill with harmless content */
-				m_structure_cache[i * 2 + 1] = 0;
-			}
-		}
-		m_structure_cache_valid = 1;
 	}
 	
 	int i = 0;
 	while ((off_t)m_structure_cache[i * 2] <= offset)
 	{
 		++i;
-		if (i == struture_cache_entries)
+		if (i == m_structure_cache_entries)
 		{
 			eDebug("structure data consistency fail!, we are looking for %llx, but last entry is %llx", offset, m_structure_cache[i*2-2]);
 			return -1;
@@ -436,8 +382,7 @@ int eMPEGStreamInformation::getStructureEntry_next(off_t &offset, unsigned long 
 	}
 
 	off_t _offset = offset;
-	const int struture_cache_entries = sizeof(m_structure_cache) / 16;
-	if ((!m_structure_cache_valid) || ((off_t)m_structure_cache[0] > offset) || ((off_t)m_structure_cache[(struture_cache_entries - 1)*2] <= offset))
+	if ((m_structure_cache_entries == 0) || ((off_t)m_structure_cache[0] > offset) || ((off_t)m_structure_cache[(m_structure_cache_entries - 1)*2] <= offset))
 	{
 		if(update_structure_cache_entries(_offset))
 		{
@@ -449,9 +394,9 @@ int eMPEGStreamInformation::getStructureEntry_next(off_t &offset, unsigned long 
 	while ((off_t)m_structure_cache[i * 2] <= offset)
 	{
 		++i;
-		if (i == struture_cache_entries)
+		if (i == m_structure_cache_entries)
 		{
-			eDebug("structure data consistency fail!, we are looking for %llu, but last entry is %llu", offset, m_structure_cache[(struture_cache_entries-1)*2]);
+			eDebug("structure data consistency fail!, we are looking for %llu, but last entry is %llu", offset, m_structure_cache[(m_structure_cache_entries-1)*2]);
 			return -1;
 		}
 	}
@@ -476,8 +421,7 @@ int eMPEGStreamInformation::getStructureEntry_prev(off_t &offset, unsigned long 
 	}
 
 	off_t _offset = offset;
-	const int struture_cache_entries = sizeof(m_structure_cache) / 16;
-	if ((!m_structure_cache_valid) || ((off_t)m_structure_cache[0] >= offset) || ((off_t)m_structure_cache[(struture_cache_entries - 1)*2] < offset))
+	if ((m_structure_cache_entries == 0) || ((off_t)m_structure_cache[0] >= offset) || ((off_t)m_structure_cache[(m_structure_cache_entries - 1)*2] < offset))
 	{
 		if(update_structure_cache_entries(_offset))
 		{
@@ -485,7 +429,7 @@ int eMPEGStreamInformation::getStructureEntry_prev(off_t &offset, unsigned long 
 		}
 	}
 
-	int i = struture_cache_entries-1;
+	int i = m_structure_cache_entries-1;
 	while ((off_t)m_structure_cache[i * 2] >= offset)
 	{
 		if (i <= 0)
@@ -495,7 +439,7 @@ int eMPEGStreamInformation::getStructureEntry_prev(off_t &offset, unsigned long 
 		}
 		--i;
 	}
-	if (i == struture_cache_entries-1)
+	if (i == m_structure_cache_entries-1)
 	{
 		eDebug("structure data (first entry) consistency fail!");
 		return -1;
@@ -509,7 +453,7 @@ int eMPEGStreamInformation::getStructureEntry_prev(off_t &offset, unsigned long 
 
 int eMPEGStreamInformation::update_structure_cache_entries(off_t offset)
 {
-	const int struture_cache_entries = sizeof(m_structure_cache) / 16;
+	const int struture_cache_size = sizeof(m_structure_cache) / 16;
 	fseek(m_structure_read, 0, SEEK_END);
 	int l = ftell(m_structure_read);
 	unsigned long long d[2];
@@ -543,14 +487,14 @@ int eMPEGStreamInformation::update_structure_cache_entries(off_t offset)
 	eDebug("found %d", i);
 
 	/* put that in the middle */
-	i -= struture_cache_entries / 2;
+	i -= struture_cache_size / 2;
 	if (i < 0)
 		i = 0;
 	eDebug("cache starts at %d", i);
 	fseek(m_structure_read, i * entry_size, SEEK_SET);
-	int num = fread(m_structure_cache, entry_size, struture_cache_entries, m_structure_read);
+	int num = fread(m_structure_cache, entry_size, struture_cache_size, m_structure_read);
 	eDebug("%d entries", num);
-	for (i = 0; i < struture_cache_entries; ++i)
+	for (i = 0; i < struture_cache_size; ++i)
 	{
 		if (i < num)
 		{
@@ -564,11 +508,18 @@ int eMPEGStreamInformation::update_structure_cache_entries(off_t offset)
 			m_structure_cache[i * 2 + 1] = 0x7fffffffffffffffULL;
 		}
 	}
-	m_structure_cache_valid = 1;
+	m_structure_cache_entries = num;
 	return 0;
 }
 
-eMPEGStreamParserTS::eMPEGStreamParserTS(eMPEGStreamInformation &streaminfo): m_streaminfo(streaminfo), m_pktptr(0), m_pid(-1), m_need_next_packet(0), m_skip(0), m_last_pts_valid(0)
+eMPEGStreamParserTS::eMPEGStreamParserTS(eMPEGStreamInformation &streaminfo):
+	m_streaminfo(streaminfo),
+	m_pktptr(0),
+	m_pid(-1),
+	m_need_next_packet(0),
+	m_skip(0),
+	m_last_pts_valid(0),
+	m_enable_accesspoints(true)
 {
 }
 
@@ -652,14 +603,17 @@ int eMPEGStreamParserTS::processPacket(const unsigned char *pkt, off_t offset)
 					unsigned long long data = sc | (pkt[4] << 8) | (pkt[5] << 16) | (pkt[6] << 24);
 					m_streaminfo.writeStructureEntry(offset + pkt_offset, data  & 0xFFFFFFFFULL);
 				}
-				if (pkt[3] == 0xb3) /* sequence header */
+				if (m_enable_accesspoints)
 				{
-					if (ptsvalid)
+					if (pkt[3] == 0xb3) /* sequence header */
 					{
-						m_streaminfo.m_access_points[offset] = pts;
-	//					eDebug("Sequence header at %llx, pts %llx", offset, pts);
-					} else
-						/*eDebug("Sequence header but no valid PTS value.")*/;
+						if (ptsvalid)
+						{
+							m_streaminfo.m_access_points[offset] = pts;
+		//					eDebug("Sequence header at %llx, pts %llx", offset, pts);
+						} else
+							/*eDebug("Sequence header but no valid PTS value.")*/;
+					}
 				}
 			}
 
@@ -671,15 +625,18 @@ int eMPEGStreamParserTS::processPacket(const unsigned char *pkt, off_t offset)
 					unsigned long long data = sc | (pkt[4] << 8);
 					m_streaminfo.writeStructureEntry(offset + pkt_offset, data);
 				}
-				if (pkt[3] == 0x09 &&   /* MPEG4 AVC NAL unit access delimiter */
-					 (pkt[4] >> 5) == 0) /* and I-frame */
+				if (m_enable_accesspoints)
 				{
-					if (ptsvalid)
+					if (pkt[3] == 0x09 &&   /* MPEG4 AVC NAL unit access delimiter */
+						 (pkt[4] >> 5) == 0) /* and I-frame */
 					{
-						m_streaminfo.m_access_points[offset] = pts;
-	//				eDebug("MPEG4 AVC UAD at %llx, pts %llx", offset, pts);
-					} else
-						/*eDebug("MPEG4 AVC UAD but no valid PTS value.")*/;
+						if (ptsvalid)
+						{
+							m_streaminfo.m_access_points[offset] = pts;
+		//				eDebug("MPEG4 AVC UAD at %llx, pts %llx", offset, pts);
+						} else
+							/*eDebug("MPEG4 AVC UAD but no valid PTS value.")*/;
+					}
 				}
 			}
 			if (m_streamtype == 6) /* H.265 */
@@ -690,11 +647,14 @@ int eMPEGStreamParserTS::processPacket(const unsigned char *pkt, off_t offset)
 					unsigned long long data = sc | (pkt[5] << 8);
 					m_streaminfo.writeStructureEntry(offset + pkt_offset, data);
 
-					if ((pkt[5] >> 5) == 0) /* check pic_type for I-frame */
+					if (m_enable_accesspoints)
 					{
-						if (ptsvalid)
+						if ((pkt[5] >> 5) == 0) /* check pic_type for I-frame */
 						{
-							m_streaminfo.m_access_points[offset] = pts;
+							if (ptsvalid)
+							{
+								m_streaminfo.m_access_points[offset] = pts;
+							}
 						}
 					}
 				}
