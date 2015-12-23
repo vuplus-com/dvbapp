@@ -876,6 +876,10 @@ class NimManager:
 			for slot in self.getNimListOfType(type, exception = slotid):
 				if self.hasOutputs(slot):
 					slots.append(slot)
+
+		# remove duplicates from list
+		slots = list(set(slots))
+
 		# remove nims, that have a conntectedTo reference on
 		for testnim in slots[:]:
 			for nim in self.getNimListOfType("DVB-S", slotid):
@@ -883,6 +887,17 @@ class NimManager:
 				if nimConfig.content.items.has_key("configMode") and nimConfig.configMode.value == "loopthrough" and int(nimConfig.connectedTo.value) == testnim:
 					slots.remove(testnim)
 					break 
+
+				if nimConfig.content.items.has_key("configMode") and nimConfig.configMode.value == "advanced":
+					try:
+						if (nimConfig.advanced.unicableconnected is not None) and (nimConfig.advanced.unicableconnected.value == True):
+							if int(nimConfig.advanced.unicableconnectedTo.value) == testnim:
+								slots.remove(testnim)
+								break
+					except:
+						pass
+
+
 		slots.sort()
 		
 		return slots
