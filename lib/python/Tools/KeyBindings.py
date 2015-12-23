@@ -4,6 +4,8 @@ keyBindings = { }
 from keyids import KEYIDS
 from Components.config import config
 
+deviceName = None
+
 keyDescriptions = [{
 		KEYIDS["BTN_0"]: ("UP", "fp"),
 		KEYIDS["BTN_1"]: ("DOWN", "fp"),
@@ -26,10 +28,10 @@ keyDescriptions = [{
 		KEYIDS["KEY_TEXT"]: ("TEXT",),
 		KEYIDS["KEY_NEXT"]: ("ARROWRIGHT",),
 		KEYIDS["KEY_PREVIOUS"]: ("ARROWLEFT",),
-		KEYIDS["KEY_PREVIOUSSONG"]: ("BLUE", "SHIFT"),
+		KEYIDS["KEY_PREVIOUSSONG"]: ("REWIND",),
 		KEYIDS["KEY_PLAYPAUSE"]: ("PLAYPAUSE",),
-		KEYIDS["KEY_PLAY"]: ("PLAYPAUSE",),
-		KEYIDS["KEY_NEXTSONG"]: ("RED", "SHIFT"),
+		KEYIDS["KEY_PLAY"]: ("PLAY",),
+		KEYIDS["KEY_NEXTSONG"]: ("FORWARD",),
 		KEYIDS["KEY_CHANNELUP"]: ("BOUQUET+",),
 		KEYIDS["KEY_CHANNELDOWN"]: ("BOUQUET-",),
 		KEYIDS["KEY_0"]: ("0",),
@@ -43,7 +45,7 @@ keyDescriptions = [{
 		KEYIDS["KEY_8"]: ("8",),
 		KEYIDS["KEY_9"]: ("9",),
 		KEYIDS["KEY_EXIT"]: ("EXIT",),
-		KEYIDS["KEY_STOP"]: ("TV", "SHIFT"),
+		KEYIDS["KEY_STOP"]: ("STOP",),
 		KEYIDS["KEY_RECORD"]: ("RECORD",),
 		KEYIDS["KEY_SUBTITLE"]: ("SUBTITLE",)
 	},
@@ -71,7 +73,7 @@ keyDescriptions = [{
 		KEYIDS["KEY_PREVIOUS"]: ("ARROWLEFT",),
 		KEYIDS["KEY_PREVIOUSSONG"]: ("BLUE", "SHIFT"),
 		KEYIDS["KEY_PLAYPAUSE"]: ("YELLOW", "SHIFT"),
-		KEYIDS["KEY_PLAY"]: ("GREEN", "SHIFT"),
+		KEYIDS["KEY_PLAY"]: ("PLAY",),
 		KEYIDS["KEY_NEXTSONG"]: ("RED", "SHIFT"),
 		KEYIDS["KEY_CHANNELUP"]: ("BOUQUET+",),
 		KEYIDS["KEY_CHANNELDOWN"]: ("BOUQUET-",),
@@ -91,14 +93,36 @@ keyDescriptions = [{
 		KEYIDS["KEY_SUBTITLE"]: ("SUBTITLE",)
 	}
 ]
+def getRCUName():
+	rcu_name = None
+	f = open("/proc/bus/input/devices")
+	for line in f:
+		if line.startswith("N: Name="):
+			try:
+				line = line.strip()
+				name = line.split("=")[1][1:-1]
+				if name.find("remote control (native)"):
+					rcu_name = name
+			except:
+				rcu_name = None
+	return rcu_name
 
-def addKeyBinding(domain, key, context, action, flags):
-	keyBindings.setdefault((context, action), []).append((key, domain, flags))
+def addKeyBinding(domain, key, context, action, flags, device):
+	keyBindings.setdefault((context, action), []).append((key, domain, flags, device))
 
 # returns a list of (key, flags) for a specified action
 def queryKeyBinding(context, action):
+	global deviceName
+
+	if deviceName == None:
+		deviceName = getRCUName()
+
+	buttons = []
 	if (context, action) in keyBindings:
-		return [(x[0], x[2]) for x in keyBindings[(context, action)]]
+		for x in keyBindings[(context, action)]:
+			if x[3] == deviceName or x[3] == "generic":
+				buttons.append((x[0],x[2]))
+		return buttons
 	else:
 		return [ ]
 

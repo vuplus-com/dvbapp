@@ -44,7 +44,7 @@ def parseKeys(context, filename, actionmap, device, keys):
 				raise KeymapError("key id '" + str(id) + "' is illegal")
 #				print context + "::" + mapto + " -> " + device + "." + hex(keyid)
 		actionmap.bindKey(filename, device, keyid, flags, context, mapto)
-		addKeyBinding(filename, keyid, context, mapto, flags)
+		addKeyBinding(filename, keyid, context, mapto, flags, device)
 
 def readKeymap(filename):
 	p = enigma.eActionMap.getInstance()
