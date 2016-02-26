@@ -490,7 +490,10 @@ int eDVBServicePMTHandler::getProgramInfo(program &program)
 {
 	ePtr<eTable<ProgramMapSection> > ptr;
 	int cached_apid_ac3 = -1;
+	int cached_apid_ddp = -1;
 	int cached_apid_mpeg = -1;
+	int cached_apid_aache = -1;
+	int cached_apid_aac = -1;
 	int cached_vpid = -1;
 	int cached_tpid = -1;
 	int ret = -1;
@@ -509,8 +512,11 @@ int eDVBServicePMTHandler::getProgramInfo(program &program)
 	if ( m_service && !m_service->cacheEmpty() )
 	{
 		cached_vpid = m_service->getCacheEntry(eDVBService::cVPID);
-		cached_apid_mpeg = m_service->getCacheEntry(eDVBService::cAPID);
+		cached_apid_mpeg = m_service->getCacheEntry(eDVBService::cMPEGAPID);
 		cached_apid_ac3 = m_service->getCacheEntry(eDVBService::cAC3PID);
+		cached_apid_ddp = m_service->getCacheEntry(eDVBService::cDDPPID);
+		cached_apid_aache = m_service->getCacheEntry(eDVBService::cAACHEAPID);
+		cached_apid_aac = m_service->getCacheEntry(eDVBService::cAACAPID);
 		cached_tpid = m_service->getCacheEntry(eDVBService::cTPID);
 	}
 
@@ -912,11 +918,11 @@ int eDVBServicePMTHandler::getProgramInfo(program &program)
 						audio.pid = (*es)->getPid();
 
 							/* if we find the cached pids, this will be our default stream */
-						if (audio.pid == cached_apid_ac3 || audio.pid == cached_apid_mpeg)
+						if (audio.pid == cached_apid_ac3 || audio.pid == cached_apid_ddp || audio.pid == cached_apid_mpeg || audio.pid == cached_apid_aache || audio.pid == cached_apid_aac)
 							program.defaultAudioStream = program.audioStreams.size();
 
 							/* also, we need to know the first non-mpeg (i.e. "ac3"/dts/...) stream */
-						if ((audio.type != audioStream::atMPEG) && ((first_ac3 == -1) || (audio.pid == cached_apid_ac3)))
+						if ((audio.type != audioStream::atMPEG) && ((first_ac3 == -1) || (audio.pid == cached_apid_ac3) || (audio.pid == cached_apid_ddp)))
 							first_ac3 = program.audioStreams.size();
 
 						program.audioStreams.push_back(audio);
@@ -964,6 +970,33 @@ int eDVBServicePMTHandler::getProgramInfo(program &program)
 			audioStream s;
 			s.type = audioStream::atAC3;
 			s.pid = cached_apid_ac3;
+			s.rdsPid = -1;
+			program.audioStreams.push_back(s);
+			++cnt;
+		}
+		if ( cached_apid_ddp != -1 )
+		{
+			audioStream s;
+			s.type = audioStream::atDDP;
+			s.pid = cached_apid_ddp;
+			s.rdsPid = -1;
+			program.audioStreams.push_back(s);
+			++cnt;
+		}
+		if ( cached_apid_aache != -1 )
+		{
+			audioStream s;
+			s.type = audioStream::atAACHE;
+			s.pid = cached_apid_aache;
+			s.rdsPid = -1;
+			program.audioStreams.push_back(s);
+			++cnt;
+		}
+		if ( cached_apid_aac != -1 )
+		{
+			audioStream s;
+			s.type = audioStream::atAAC;
+			s.pid = cached_apid_aac;
 			s.rdsPid = -1;
 			program.audioStreams.push_back(s);
 			++cnt;

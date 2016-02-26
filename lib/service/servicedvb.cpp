@@ -1729,10 +1729,19 @@ int eDVBServicePlay::getInfo(int w)
 	case sAudioPID:
 		if (m_dvb_service)
 		{
-			int apid = m_dvb_service->getCacheEntry(eDVBService::cAPID);
+			int apid = m_dvb_service->getCacheEntry(eDVBService::cMPEGAPID);
 			if (apid != -1)
 				return apid;
 			apid = m_dvb_service->getCacheEntry(eDVBService::cAC3PID);
+			if (apid != -1)
+				return apid;
+			apid = m_dvb_service->getCacheEntry(eDVBService::cDDPPID);
+			if (apid != -1)
+				return apid;
+			apid = m_dvb_service->getCacheEntry(eDVBService::cAACHEAPID);
+			if (apid != -1)
+				return apid;
+			apid = m_dvb_service->getCacheEntry(eDVBService::cAACAPID);
 			if (apid != -1)
 				return apid;
 		}
@@ -1966,23 +1975,17 @@ int eDVBServicePlay::selectAudioStream(int i)
 				    case the real default is not yet available.)
 			*/
 	if (m_dvb_service && ((i != -1)
-		|| ((m_dvb_service->getCacheEntry(eDVBService::cAPID) == -1) && (m_dvb_service->getCacheEntry(eDVBService::cAC3PID)==-1))))
+		|| ((m_dvb_service->getCacheEntry(eDVBService::cMPEGAPID) == -1)
+		&& (m_dvb_service->getCacheEntry(eDVBService::cAC3PID)==-1)
+		&& (m_dvb_service->getCacheEntry(eDVBService::cDDPPID)==-1)
+		&& (m_dvb_service->getCacheEntry(eDVBService::cAACHEAPID)==-1)
+		&& (m_dvb_service->getCacheEntry(eDVBService::cAACAPID)==-1))))
 	{
-		if (apidtype == eDVBAudio::aMPEG)
-		{
-			m_dvb_service->setCacheEntry(eDVBService::cAPID, apid);
-			m_dvb_service->setCacheEntry(eDVBService::cAC3PID, -1);
-		}
-		else if (apidtype == eDVBAudio::aAC3)
-		{
-			m_dvb_service->setCacheEntry(eDVBService::cAPID, -1);
-			m_dvb_service->setCacheEntry(eDVBService::cAC3PID, apid);
-		}
-		else
-		{
-			m_dvb_service->setCacheEntry(eDVBService::cAPID, -1);
-			m_dvb_service->setCacheEntry(eDVBService::cAC3PID, -1);
-		}
+		m_dvb_service->setCacheEntry(eDVBService::cMPEGAPID, apidtype == eDVBAudio::aMPEG ? apid : -1);
+		m_dvb_service->setCacheEntry(eDVBService::cAC3PID, apidtype == eDVBAudio::aAC3 ? apid : -1);
+		m_dvb_service->setCacheEntry(eDVBService::cDDPPID, apidtype == eDVBAudio::aDDP ? apid : -1);
+		m_dvb_service->setCacheEntry(eDVBService::cAACHEAPID, apidtype == eDVBAudio::aAACHE ? apid : -1);
+		m_dvb_service->setCacheEntry(eDVBService::cAACAPID, apidtype == eDVBAudio::aAAC ? apid : -1);
 	}
 
 	h.resetCachedProgram();
