@@ -340,6 +340,7 @@ RESULT eDVBSatelliteEquipmentControl::prepare(iDVBFrontend &frontend, FRONTENDPA
 				}
 				if (satposDependPtr != -1)  // we dont need uncommitted switch and rotor cmds on second output of a rotor lnb
 					diseqc_mode = eDVBSatelliteDiseqcParameters::V1_0;
+#if 0 // Since following code causes lock fail for linked tuners in certain conditions, it does not apply.
 				else {
 					// in eDVBFrontend::tuneLoop we call closeFrontend and ->inc_use() in this this condition (to put the kernel frontend thread into idle state)
 					// so we must resend all diseqc stuff (voltage is disabled when the frontend is closed)
@@ -348,6 +349,7 @@ RESULT eDVBSatelliteEquipmentControl::prepare(iDVBFrontend &frontend, FRONTENDPA
 					if (!linked_fe->m_inuse && state != eDVBFrontend::stateIdle)
 						forceChanged = true;
 				}
+#endif
 			}
 
 			sec_fe->getData(eDVBFrontend::CSW, lastcsw);
