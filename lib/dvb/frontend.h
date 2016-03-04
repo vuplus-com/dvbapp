@@ -47,6 +47,9 @@ class eDVBFrontend: public iDVBFrontend, public Object
 {
 public:
 	enum {
+		LINKABLE_CSW,
+		LINKABLE_UCSW,
+		LINKABLE_TONEBURST,
 		NEW_CSW,
 		NEW_UCSW,
 		NEW_TONEBURST,
@@ -159,6 +162,8 @@ public:
 	bool is_FBCTuner() { return m_fbc; }
 	bool getEnabled() { return m_enabled; }
 	void setEnabled(bool enable) { m_enabled = enable; }
+	bool isLoopTimerActive() { return m_tuneTimer->isActive(); }
+	bool isScheduledSendDiseqc();
 };
 
 #endif // SWIG

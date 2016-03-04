@@ -55,7 +55,7 @@ int eDVBSatelliteEquipmentControl::canTune(const eDVBFrontendParametersSatellite
 	bool simulate = ((eDVBFrontend*)fe)->is_simulate();
 	bool direct_connected = m_not_linked_slot_mask & slot_id;
 	int score=0, satcount=0;
-	long linked_prev_ptr=-1, linked_next_ptr=-1, linked_csw=-1, linked_ucsw=-1, linked_toneburst=-1,
+	long linked_prev_ptr=-1, linked_next_ptr=-1, linkable_csw=-1, linkable_ucsw=-1, linkable_toneburst=-1,
 		fe_satpos_depends_ptr=-1, fe_rotor_pos=-1;
 	bool linked_in_use = false;
 
@@ -89,9 +89,9 @@ int eDVBSatelliteEquipmentControl::canTune(const eDVBFrontendParametersSatellite
 	// when a linked in use tuner is found we get the tuner data...
 	if (linked_in_use)
 	{
-		fe->getData(eDVBFrontend::CSW, linked_csw);
-		fe->getData(eDVBFrontend::UCSW, linked_ucsw);
-		fe->getData(eDVBFrontend::TONEBURST, linked_toneburst);
+		fe->getData(eDVBFrontend::LINKABLE_CSW, linkable_csw);
+		fe->getData(eDVBFrontend::LINKABLE_UCSW, linkable_ucsw);
+		fe->getData(eDVBFrontend::LINKABLE_TONEBURST, linkable_toneburst);
 	}
 
 	if (highest_score_lnb)
@@ -164,8 +164,8 @@ int eDVBSatelliteEquipmentControl::canTune(const eDVBFrontendParametersSatellite
 				if (linked_in_use && !is_unicable)
 				{
 					// compare tuner data
-					if ( (csw != linked_csw) ||
-						( diseqc && (ucsw != linked_ucsw || toneburst != linked_toneburst) ) ||
+					if ( (csw != linkable_csw) ||
+						( diseqc && (ucsw != linkable_ucsw || toneburst != linkable_toneburst) ) ||
 						( rotor && rotor_pos != sat.orbital_position ) )
 					{
 						ret = 0;
@@ -318,6 +318,8 @@ RESULT eDVBSatelliteEquipmentControl::prepare(iDVBFrontend &frontend, FRONTENDPA
 			int RotorCmd=-1;
 			int send_mask = 0;
 
+			bool direct_connected = m_not_linked_slot_mask & slot_id;
+
 			lnb_param.guard_offset = 0; //HACK
 
 
@@ -326,7 +328,7 @@ RESULT eDVBSatelliteEquipmentControl::prepare(iDVBFrontend &frontend, FRONTENDPA
 
 			frontend.getData(eDVBFrontend::SATPOS_DEPENDS_PTR, satposDependPtr);
 
-			if (!(m_not_linked_slot_mask & slot_id))  // frontend with direct connection?
+			if (!direct_connected)  // frontend with direct connection?
 			{
 				long linked_prev_ptr;
 				frontend.getData(eDVBFrontend::LINKED_PREV_PTR, linked_prev_ptr);
@@ -448,15 +450,22 @@ RESULT eDVBSatelliteEquipmentControl::prepare(iDVBFrontend &frontend, FRONTENDPA
 
 				bool send_csw =
 					(di_param.m_committed_cmd != eDVBSatelliteDiseqcParameters::SENDNO);
-				bool changed_csw = send_csw && (forceChanged || csw != lastcsw);
 
 				bool send_ucsw =
 					(di_param.m_uncommitted_cmd && diseqc_mode > eDVBSatelliteDiseqcParameters::V1_0);
-				bool changed_ucsw = send_ucsw && (forceChanged || ucsw != lastucsw);
 
 				bool send_burst =
 					(di_param.m_toneburst_param != eDVBSatelliteDiseqcParameters::NO);
-				bool changed_burst = send_burst && (forceChanged || toneburst != lastToneburst);
+
+				bool changed_csw = false;
+				bool changed_ucsw = false;
+				bool changed_burst = false;
+				if (direct_connected || (!linked_fe->m_frontend->isLoopTimerActive() || !linked_fe->m_frontend->isScheduledSendDiseqc()))
+				{
+					changed_csw = send_csw && (forceChanged || csw != lastcsw);
+					changed_ucsw = send_ucsw && (forceChanged || ucsw != lastucsw);
+					changed_burst = send_burst && (forceChanged || toneburst != lastToneburst);
+				}
 
 				/* send_mask
 					1 must send csw
@@ -717,6 +726,9 @@ RESULT eDVBSatelliteEquipmentControl::prepare(iDVBFrontend &frontend, FRONTENDPA
 			sec_fe->setData(eDVBFrontend::NEW_CSW, csw);
 			sec_fe->setData(eDVBFrontend::NEW_UCSW, ucsw);
 			sec_fe->setData(eDVBFrontend::NEW_TONEBURST, di_param.m_toneburst_param);
+			sec_fe->setData(eDVBFrontend::LINKABLE_CSW, csw);
+			sec_fe->setData(eDVBFrontend::LINKABLE_UCSW, ucsw);
+			sec_fe->setData(eDVBFrontend::LINKABLE_TONEBURST, di_param.m_toneburst_param);
 
 			if(is_unicable)
 			{

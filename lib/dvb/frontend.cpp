@@ -787,7 +787,10 @@ void eDVBFrontend::feEvent(int w)
 				eDebug("stateLostLock");
 				state = stateLostLock;
 				if (!m_rotor_mode)
+				{
 					sec_fe->m_data[CSW] = sec_fe->m_data[UCSW] = sec_fe->m_data[TONEBURST] = -1; // reset diseqc
+					sec_fe->m_data[LINKABLE_CSW] = sec_fe->m_data[LINKABLE_UCSW] = sec_fe->m_data[LINKABLE_TONEBURST] = -1;
+				}
 			}
 		}
 		if (m_state != state)
@@ -806,6 +809,7 @@ void eDVBFrontend::timeout()
 #ifdef BUILD_VUPLUS
 		eDVBFrontend *sec_fe = this;
 		sec_fe->m_data[CSW] = sec_fe->m_data[UCSW] = sec_fe->m_data[TONEBURST] = -1; // reset diseqc
+		sec_fe->m_data[LINKABLE_CSW] = sec_fe->m_data[LINKABLE_UCSW] = sec_fe->m_data[LINKABLE_TONEBURST] = -1;
 #endif
 		m_state = stateFailed;
 		m_stateChanged(this);
@@ -3113,6 +3117,24 @@ RESULT eDVBFrontend::setSecSequence(eSecCommandList &list)
 	else
 		m_sec_sequence = list;
 	return 0;
+}
+
+bool eDVBFrontend::isScheduledSendDiseqc()
+{
+	bool has_senddiseqc = false;
+	if ( m_sec_sequence && m_sec_sequence.current() != m_sec_sequence.end() )
+	{
+		eSecCommandList::iterator cur = m_sec_sequence.current();
+		while(cur != m_sec_sequence.end())
+		{
+			if (((cur++)->cmd == eSecCommand::SEND_DISEQC))
+			{
+				has_senddiseqc = true;
+				break;
+			}
+		}
+	}
+	return has_senddiseqc;
 }
 
 RESULT eDVBFrontend::getData(int num, long &data)
