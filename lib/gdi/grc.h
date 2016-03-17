@@ -89,6 +89,8 @@ struct gOpcode
 			eRect area;
 			char *text;
 			int flags;
+			int border;
+			gRGB bordercolor;
 		} *renderText;
 
 		struct prenderPara
@@ -243,7 +245,7 @@ public:
 		
 		RT_WRAP = 32
 	};
-	void renderText(const eRect &position, const std::string &string, int flags=0);
+	void renderText(const eRect &position, const std::string &string, int flags=0, gRGB bordercolor=gRGB(), int border=0);
 	
 	void renderPara(eTextPara *para, ePoint offset=ePoint(0, 0));
 

@@ -12,6 +12,8 @@ public:
 	static void setQueryFunc(SWIG_PYOBJECT(ePyObject) func);
 #ifndef SWIG
 	static RESULT getConfigValue(const char *key, std::string &value);
+	static int getConfigIntValue(const char *key, int defaultvalue = 0);
+	static bool getConfigBoolValue(const char *key, bool defaultvalue = false);
 #endif
 };
 

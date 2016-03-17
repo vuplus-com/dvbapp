@@ -331,7 +331,7 @@ void gPainter::setFont(gFont *font)
 	m_rc->submit(o);
 }
 
-void gPainter::renderText(const eRect &pos, const std::string &string, int flags)
+void gPainter::renderText(const eRect &pos, const std::string &string, int flags, gRGB bordercolor, int border)
 {
 	if ( m_dc->islocked() )
 		return;
@@ -342,6 +342,8 @@ void gPainter::renderText(const eRect &pos, const std::string &string, int flags
 	o.parm.renderText->area = pos;
 	o.parm.renderText->text = string.empty()?0:strdup(string.c_str());
 	o.parm.renderText->flags = flags;
+	o.parm.renderText->border = border;
+	o.parm.renderText->bordercolor = bordercolor;
 	m_rc->submit(o);
 }
 
@@ -699,7 +701,7 @@ void gDC::exec(const gOpcode *o)
 		int flags = o->parm.renderText->flags;
 		ASSERT(m_current_font);
 		para->setFont(m_current_font);
-		para->renderString(o->parm.renderText->text, (flags & gPainter::RT_WRAP) ? RS_WRAP : 0);
+		para->renderString(o->parm.renderText->text, (flags & gPainter::RT_WRAP) ? RS_WRAP : 0, o->parm.renderText->border);
 		if (o->parm.renderText->text)
 			free(o->parm.renderText->text);
 		if (flags & gPainter::RT_HALIGN_RIGHT)
@@ -718,8 +720,14 @@ void gDC::exec(const gOpcode *o)
 			int correction = vcentered_top - bbox.top();
 			offset += ePoint(0, correction);
 		}
-		
-		para->blit(*this, offset, m_background_color_rgb, m_foreground_color_rgb);
+
+		if (o->parm.renderText->border)
+		{
+			para->blit(*this, offset, m_background_color_rgb, o->parm.renderText->bordercolor, true);
+			para->blit(*this, offset, o->parm.renderText->bordercolor, m_foreground_color_rgb);
+		}
+		else
+			para->blit(*this, offset, m_background_color_rgb, m_foreground_color_rgb);
 		delete o->parm.renderText;
 		break;
 	}

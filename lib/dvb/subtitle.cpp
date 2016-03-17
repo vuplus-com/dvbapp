@@ -9,6 +9,7 @@
 #include <lib/dvb/subtitle.h>
 #include <lib/base/smartptr.h>
 #include <lib/base/eerror.h>
+#include <lib/base/nconfig.h>
 #include <lib/gdi/gpixmap.h>
 
 void bitstream_init(bitstream *bit, const void *buffer, int size)
@@ -56,7 +57,8 @@ static int extract_pts(pts_t &pts, __u8 *pkt)
 
 void eDVBSubtitleParser::subtitle_process_line(subtitle_region *region, subtitle_region_object *object, int line, __u8 *data, int len)
 {
-	int x = object->object_horizontal_position;
+	bool subcentered = ePythonConfigQuery::getConfigBoolValue("config.subtitles.dvb_subtitles_centered");
+	int x = subcentered ? (region->width - len) /2 : object->object_horizontal_position;
 	int y = object->object_vertical_position + line;
 	if (x + len > region->width)
 	{
@@ -72,6 +74,14 @@ void eDVBSubtitleParser::subtitle_process_line(subtitle_region *region, subtitle
 	}
 //	eDebug("inserting %d bytes (into region %d)", len, region->region_id);
 //	eDebug("put data to buffer %p", &(*region->buffer));
+	if (subcentered && region->region_id && line < 3)
+	{
+		for (int i = 0; i < len; i++)
+			if(data[i] <= 8)
+			{
+				data[i] = 0;
+			}
+	}
 	memcpy((__u8*)region->buffer->surface->data + region->buffer->surface->stride * y + x, data, len);
 }
 
@@ -1173,6 +1183,8 @@ void eDVBSubtitleParser::subtitle_redraw(int page_id)
 					break;
 			}
 
+			int bgopacity = ePythonConfigQuery::getConfigIntValue("config.subtitles.subtitle_bgopacity");
+			int fontcolor = ePythonConfigQuery::getConfigIntValue("config.subtitles.subtitle_fontcolor");
 			for (int i=0; i<clut_size; ++i)
 			{
 				if (entries && entries[i].valid)
@@ -1185,10 +1197,71 @@ void eDVBSubtitleParser::subtitle_redraw(int page_id)
 						y -= 16;
 						cr -= 128;
 						cb -= 128;
+
+						if (fontcolor == FONTCOLOR_WHITE || fontcolor == FONTCOLOR_BLACK)
+						{
+							cr = 0;
+							cb = 0;
+						}
+
 						palette[i].r = MAX(MIN(((298 * y            + 460 * cr) / 256), 255), 0);
 						palette[i].g = MAX(MIN(((298 * y -  55 * cb - 137 * cr) / 256), 255), 0);
 						palette[i].b = MAX(MIN(((298 * y + 543 * cb           ) / 256), 255), 0);
-						palette[i].a = (entries[i].T) & 0xFF;
+						switch (fontcolor)
+						{
+							case FONTCOLOR_YELLOW:
+								palette[i].b = 0;
+								break;
+							case FONTCOLOR_GREEN:
+								palette[i].r =
+								palette[i].b = 0;
+								break;
+							case FONTCOLOR_CYAN:
+								palette[i].r = 0;
+								break;
+							case FONTCOLOR_BLUE:
+								palette[i].r =
+								palette[i].g = 0;
+								break;
+							case FONTCOLOR_MAGNETA:
+								palette[i].g = 0;
+								break;
+							case FONTCOLOR_RED:
+								palette[i].g =
+								palette[i].b = 0;
+								break;
+							case FONTCOLOR_BLACK:
+								palette[i].r = 255 - palette[i].r;
+								palette[i].g = 255 - palette[i].g;
+								palette[i].b = 255 - palette[i].b;
+								break;
+
+							default:
+								break;
+						}
+						if (bgopacity)
+						{
+							if (palette[i].r || palette[i].g || palette[i].b)
+								palette[i].a = (entries[i].T) & 0xFF;
+							else
+								palette[i].a = bgopacity;
+						}
+						else
+							palette[i].a = 0x1;
+
+						if (fontcolor == FONTCOLOR_BLACK)
+						{
+							if (bgopacity)
+							{
+								if (255 - palette[i].r || 255 - palette[i].g || 255 - palette[i].b)
+									palette[i].a = (entries[i].T) & 0xFF;
+								else
+									palette[i].a = bgopacity;
+							}
+							else
+								palette[i].a = 0x1;
+						}
+
 //						eDebug("override clut entry %d RGBA %02x%02x%02x%02x", i,
 //							palette[i].r, palette[i].g, palette[i].b, palette[i].a);
 					}

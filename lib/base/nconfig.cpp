@@ -33,3 +33,25 @@ RESULT ePythonConfigQuery::getConfigValue(const char *key, std::string &value)
 	}
 	return -1;
 }
+
+int ePythonConfigQuery::getConfigIntValue(const char *key, int defaultvalue)
+{
+	int result = defaultvalue;
+	std::string value;
+
+	if (!getConfigValue(key, value))
+		result = (value != "") ? atoi(value.c_str()) : result;
+
+	return result;
+}
+
+bool ePythonConfigQuery::getConfigBoolValue(const char *key, bool defaultvalue)
+{
+	bool result = defaultvalue;
+	std::string value;
+
+	if (!getConfigValue(key, value))
+		result = (value == "True" || value == "true");
+
+	return result;
+}

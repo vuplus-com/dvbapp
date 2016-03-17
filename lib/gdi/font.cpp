@@ -118,6 +118,32 @@ FT_Error fontRenderClass::getGlyphBitmap(FTC_Image_Desc *font, FT_ULong glyph_in
 	return res;
 }
 
+FT_Error fontRenderClass::getGlyphImage(FTC_Image_Desc *font, FT_ULong glyph_index, FT_Glyph *glyph, FT_Glyph *borderglyph, int bordersize)
+{
+	FT_Glyph image;
+	FT_Error err = FTC_ImageCache_Lookup(imageCache, font, glyph_index, &image, NULL);
+	if (err) return err;
+
+	if (glyph)
+	{
+		err = FT_Glyph_Copy(image, glyph);
+		if (err) return err;
+	}
+
+	if (borderglyph && bordersize)
+	{
+		err = FT_Glyph_Copy(image, borderglyph);
+		if (err) return err;
+		if (bordersize != strokerRadius)
+		{
+			strokerRadius = bordersize;
+			FT_Stroker_Set(stroker, strokerRadius, FT_STROKER_LINECAP_ROUND, FT_STROKER_LINEJOIN_ROUND, 0);
+		}
+		err = FT_Glyph_Stroke(borderglyph, stroker, 1);
+	}
+	return err;
+}
+
 std::string fontRenderClass::AddFont(const std::string &filename, const std::string &name, int scale)
 {
 	eDebugNoNewLine("[FONT] adding font %s...", filename.c_str());
@@ -185,7 +211,12 @@ fontRenderClass::fontRenderClass(): fb(fbClass::getInstance())
 		{
 			eDebug("[FONT] initializing font cache imagecache failed!");
 		}
+		if (FT_Stroker_New(library, &stroker))
+		{
+			eDebug("[FONT] initializing font stroker failed!");
+		}
 	}
+	strokerRadius = -1;
 	return;
 }
 
@@ -267,21 +298,79 @@ FT_Error Font::getGlyphBitmap(FT_ULong glyph_index, FTC_SBit *sbit)
 	return renderer->getGlyphBitmap(&font, glyph_index, sbit);
 }
 
+FT_Error Font::getGlyphImage(FT_ULong glyph_index, FT_Glyph *glyph, FT_Glyph *borderglyph, int bordersize)
+{
+	return renderer->getGlyphImage(&font, glyph_index, glyph, borderglyph, bordersize);
+}
+
 Font::~Font()
 {
 }
 
 DEFINE_REF(eTextPara);
 
-int eTextPara::appendGlyph(Font *current_font, FT_Face current_face, FT_UInt glyphIndex, int flags, int rflags)
+int eTextPara::appendGlyph(Font *current_font, FT_Face current_face, FT_UInt glyphIndex, int flags, int rflags, int border, bool activate_newcolor, unsigned long newcolor)
 {
-	FTC_SBit glyph;
-	if (current_font->getGlyphBitmap(glyphIndex, &glyph))
-		return 1;
+	int xadvance, left, top, height;
+	pGlyph ng;
+	int xborder = 0;
+
+	if (border)
+	{
+		/* TODO: scale border radius with current_font scaling */
+		if (current_font->getGlyphImage(glyphIndex, &ng.image, &ng.borderimage, 64 * border))
+			return 1;
+		if (ng.image && ng.image->format != FT_GLYPH_FORMAT_BITMAP)
+		{
+			FT_Glyph_To_Bitmap(&ng.image, FT_RENDER_MODE_NORMAL, NULL, 1);
+			if (ng.image->format != FT_GLYPH_FORMAT_BITMAP) return 1;
+		}
+		if (ng.borderimage && ng.borderimage->format != FT_GLYPH_FORMAT_BITMAP)
+		{
+			FT_Glyph_To_Bitmap(&ng.borderimage, FT_RENDER_MODE_NORMAL, NULL, 1);
+			if (ng.borderimage->format != FT_GLYPH_FORMAT_BITMAP) return 1;
+		}
+		FT_BitmapGlyph glyph = NULL;
+		if (ng.borderimage)
+		{
+			xadvance = ng.borderimage->advance.x;
+			if (!previous)
+			{
+				/* Move the first character, to make sure the border does not get cut off by the boundingbox (xborder is in pixel units, so just divide the width difference by two)  */
+				xborder = (((FT_BitmapGlyph)ng.borderimage)->bitmap.width - ((FT_BitmapGlyph)ng.image)->bitmap.width) / 2;
+			}
+			glyph = (FT_BitmapGlyph)ng.borderimage;
+		}
+		else if (ng.image)
+		{
+			xadvance = ng.image->advance.x;
+			glyph = (FT_BitmapGlyph)ng.image;
+		}
+		else
+		{
+			return 1;
+		}
+		xadvance >>= 16;
+
+		left = glyph->left;
+		top = glyph->top;
+		height = glyph->bitmap.rows;
+	}
+	else
+	{
+		FTC_SBit glyph;
+		if (current_font->getGlyphBitmap(glyphIndex, &glyph))
+			return 1;
+
+		xadvance = glyph->xadvance;
+		left = glyph->left;
+		top = glyph->top;
+		height = glyph->height;
+	}
 
 	int nx=cursor.x();
 
-	nx+=glyph->xadvance;
+	nx+=xadvance;
 
 	if (
 			(rflags&RS_WRAP) && 
@@ -338,8 +427,7 @@ int eTextPara::appendGlyph(Font *current_font, FT_Face current_face, FT_UInt gly
 		}
 	}
 
-	int xadvance=glyph->xadvance, kern=0;
-
+	int kern=0;
 	if (previous && use_kerning)
 	{
 		FT_Vector delta;
@@ -347,21 +435,26 @@ int eTextPara::appendGlyph(Font *current_font, FT_Face current_face, FT_UInt gly
 		kern=delta.x>>6;
 	}
 
-	pGlyph ng;
-	ng.bbox.setLeft( ((flags&GS_ISFIRST)|(cursor.x()-1))+glyph->left );
-	ng.bbox.setTop( cursor.y() - glyph->top );
-	ng.bbox.setWidth( glyph->width );
-	ng.bbox.setHeight( glyph->height );
+	ng.bbox.setLeft( ((flags&GS_ISFIRST)|(cursor.x()-1))+left );
+	ng.bbox.setTop( cursor.y() - top );
+	ng.bbox.setHeight( height );
 
-	xadvance += kern;
+	xadvance += kern + xborder;
 	ng.bbox.setWidth(xadvance);
 
-	ng.x = cursor.x()+kern;
+	ng.x = cursor.x()+kern+xborder;
 	ng.y = cursor.y();
 	ng.w = xadvance;
 	ng.font = current_font;
 	ng.glyph_index = glyphIndex;
 	ng.flags = flags;
+
+	if (activate_newcolor)
+	{
+		ng.flags |= GS_COLORCHANGE;
+		ng.newcolor = newcolor;
+	}
+
 	glyphs.push_back(ng);
 	++charCount;
 
@@ -483,7 +576,7 @@ void eTextPara::setFont(Font *fnt, Font *replacement)
 void
 shape (std::vector<unsigned long> &string, const std::vector<unsigned long> &text);
 
-int eTextPara::renderString(const char *string, int rflags)
+int eTextPara::renderString(const char *string, int rflags, int border)
 {
 	singleLock s(ftlock);
 	
@@ -572,7 +665,9 @@ int eTextPara::renderString(const char *string, int rflags)
 	uc_visual.assign(target, target+size);
 
 	glyphs.reserve(size);
-	
+
+	unsigned long newcolor = 0;
+	bool activate_newcolor = false;
 	int nextflags = 0;
 	
 	for (std::vector<unsigned long>::const_iterator i(uc_visual.begin());
@@ -601,6 +696,24 @@ int eTextPara::renderString(const char *string, int rflags)
 					case 'r':
 						i++;
 						goto nprint;
+					case 'c':
+					{
+						char color[8];
+						int codeidx;
+						for (codeidx = 0; codeidx < 8; codeidx++)
+						{
+							if ((i + 2 + codeidx) == uc_visual.end()) break;
+							color[codeidx] = (char)((*(i + 2 + codeidx)) & 0xff);
+						}
+						if (codeidx == 8)
+						{
+							newcolor = gRGB(color).argb();
+							activate_newcolor = true;
+							isprintable = 0;
+							i += 1 + codeidx;
+						}
+						break;
+					}
 					default:
 					;
 				}
@@ -656,9 +769,11 @@ nprint:	isprintable=0;
 				if (!index)
 					eDebug("unicode U+%4lx not present", chr);
 				else
-					appendGlyph(replacement_font, replacement_face, index, flags, rflags);
+					appendGlyph(replacement_font, replacement_face, index, flags, rflags, border, activate_newcolor, newcolor);
 			} else
-				appendGlyph(current_font, current_face, index, flags, rflags);
+				appendGlyph(current_font, current_face, index, flags, rflags, border, activate_newcolor, newcolor);
+
+			activate_newcolor = false;
 		}
 	}
 	bboxValid=false;
@@ -679,8 +794,10 @@ nprint:	isprintable=0;
 	return 0;
 }
 
-void eTextPara::blit(gDC &dc, const ePoint &offset, const gRGB &background, const gRGB &foreground)
+void eTextPara::blit(gDC &dc, const ePoint &offset, const gRGB &background, const gRGB &foreground, bool border)
 {
+	if (glyphs.empty()) return;
+
 	singleLock s(ftlock);
 	
 	if (!current_font)
@@ -700,8 +817,9 @@ void eTextPara::blit(gDC &dc, const ePoint &offset, const gRGB &background, cons
 	ePtr<gPixmap> target;
 	dc.getPixmap(target);
 	gSurface *surface = target->surface;
+	gRGB currentforeground = foreground;
 
-	register int opcode;
+	register int opcode = -1;
 
 	gColor *lookup8, lookup8_invert[16];
 	gColor *lookup8_normal=0;
@@ -709,115 +827,152 @@ void eTextPara::blit(gDC &dc, const ePoint &offset, const gRGB &background, cons
 	__u16 lookup16_normal[16], lookup16_invert[16], *lookup16;
 	__u32 lookup32_normal[16], lookup32_invert[16], *lookup32;
 
-	if (surface->bpp == 8)
-	{
-		if (surface->clut.data)
-		{
-			lookup8_normal=getColor(surface->clut, background, foreground).lookup;
-			
-			int i;
-			for (i=0; i<16; ++i)
-				lookup8_invert[i] = lookup8_normal[i^0xF];
-			
-			opcode=0;
-		} else
-			opcode=1;
-	} else if (surface->bpp == 16)
-	{
-		opcode=2;
-		for (int i=0; i<16; ++i)
-		{
-#define BLEND(y, x, a) (y + (((x-y) * a)>>8))
-			unsigned char da = background.a, dr = background.r, dg = background.g, db = background.b;
-			int sa = i * 16;
-			if (sa < 256)
-			{
-				dr = BLEND(background.r, foreground.r, sa) & 0xFF;
-				dg = BLEND(background.g, foreground.g, sa) & 0xFF;
-				db = BLEND(background.b, foreground.b, sa) & 0xFF;
-			}
-#undef BLEND
-#if BYTE_ORDER == LITTLE_ENDIAN
-			lookup16_normal[i] = bswap_16(((db >> 3) << 11) | ((dg >> 2) << 5) | (dr >> 3));
-#else
-			lookup16_normal[i] = ((db >> 3) << 11) | ((dg >> 2) << 5) | (dr >> 3);
-#endif
-			da ^= 0xFF;
-		}
-		for (int i=0; i<16; ++i)
-			lookup16_invert[i]=lookup16_normal[i^0xF];
-	} else if (surface->bpp == 32)
-	{
-		opcode=3;
-		for (int i=0; i<16; ++i)
-		{
-#define BLEND(y, x, a) (y + (((x-y) * a)>>8))
-
-			unsigned char da = background.a, dr = background.r, dg = background.g, db = background.b;
-			int sa = i * 16;
-			if (sa < 256)
-			{
-				da = BLEND(background.a, foreground.a, sa) & 0xFF;
-				dr = BLEND(background.r, foreground.r, sa) & 0xFF;
-				dg = BLEND(background.g, foreground.g, sa) & 0xFF;
-				db = BLEND(background.b, foreground.b, sa) & 0xFF;
-			}
-#undef BLEND
-			da ^= 0xFF;
-			lookup32_normal[i]=db | (dg << 8) | (dr << 16) | (da << 24);;
-		}
-		for (int i=0; i<16; ++i)
-			lookup32_invert[i]=lookup32_normal[i^0xF];
-	} else
-	{
-		eWarning("can't render to %dbpp", surface->bpp);
-		return;
-	}
-
 	gRegion area(eRect(0, 0, surface->x, surface->y));
 	gRegion clip = dc.getClip() & area;
 
 	int buffer_stride=surface->stride;
 
-	for (unsigned int c = 0; c < clip.rects.size(); ++c)
+	bool setcolor = true;
+	std::list<int>::reverse_iterator line_offs_it(lineOffsets.rbegin());
+	std::list<int>::iterator line_chars_it(lineChars.begin());
+	int line_offs=0;
+	int line_chars=0;
+	for (glyphString::iterator i(glyphs.begin()); i != glyphs.end(); ++i, --line_chars)
 	{
-		std::list<int>::reverse_iterator line_offs_it(lineOffsets.rbegin());
-		std::list<int>::iterator line_chars_it(lineChars.begin());
-		int line_offs=0;
-		int line_chars=0;
-		for (glyphString::iterator i(glyphs.begin()); i != glyphs.end(); ++i, --line_chars)
+		while(!line_chars)
 		{
-			while(!line_chars)
+			line_offs = *(line_offs_it++);
+			line_chars = *(line_chars_it++);
+		}
+		if (i->flags & GS_COLORCHANGE)
+		{
+			/* don't do colorchanges in borders */
+			if (!border)
 			{
-				line_offs = *(line_offs_it++);
-				line_chars = *(line_chars_it++);
+				currentforeground = i->newcolor;
+				setcolor = true;
 			}
-
-			if (i->flags & GS_SOFTHYPHEN)
-				continue;
-
-			if (!(i->flags & GS_INVERT))
+		}
+		if (setcolor)
+		{
+			setcolor = false;
+			if (surface->bpp == 8)
 			{
-				lookup8 = lookup8_normal;
-				lookup16 = lookup16_normal;
-				lookup32 = lookup32_normal;
+				if (surface->clut.data)
+				{
+					lookup8_normal=getColor(surface->clut, background, currentforeground).lookup;
+
+					int i;
+					for (i=0; i<16; ++i)
+						lookup8_invert[i] = lookup8_normal[i^0xF];
+
+					opcode=0;
+				} else
+					opcode=1;
+			} else if (surface->bpp == 16)
+			{
+				opcode=2;
+				for (int i = 0; i != 16; ++i)
+				{
+#define BLEND(y, x, a) (y + (((x-y) * a)>>8))
+					unsigned char da = background.a, dr = background.r, dg = background.g, db = background.b;
+					int sa = i * 16;
+					if (sa < 256)
+					{
+						dr = BLEND(background.r, foreground.r, sa) & 0xFF;
+						dg = BLEND(background.g, foreground.g, sa) & 0xFF;
+						db = BLEND(background.b, foreground.b, sa) & 0xFF;
+					}
+#undef BLEND
+#if BYTE_ORDER == LITTLE_ENDIAN
+					lookup16_normal[i] = bswap_16(((db >> 3) << 11) | ((dg >> 2) << 5) | (dr >> 3));
+#else
+					lookup16_normal[i] = ((db >> 3) << 11) | ((dg >> 2) << 5) | (dr >> 3);
+#endif
+					da ^= 0xFF;
+				}
+				for (int i=0; i<16; ++i)
+					lookup16_invert[i]=lookup16_normal[i^0xF];
+			} else if (surface->bpp == 32)
+			{
+				opcode=3;
+				for (int i=0; i<16; ++i)
+				{
+#define BLEND(y, x, a) (y + (((x-y) * a)>>8))
+
+					unsigned char da = background.a, dr = background.r, dg = background.g, db = background.b;
+					int sa = i * 16;
+					if (sa < 256)
+					{
+						da = BLEND(background.a, currentforeground.a, sa) & 0xFF;
+						dr = BLEND(background.r, currentforeground.r, sa) & 0xFF;
+						dg = BLEND(background.g, currentforeground.g, sa) & 0xFF;
+						db = BLEND(background.b, currentforeground.b, sa) & 0xFF;
+					}
+#undef BLEND
+					da ^= 0xFF;
+					lookup32_normal[i]=db | (dg << 8) | (dr << 16) | (da << 24);;
+				}
+				for (int i=0; i<16; ++i)
+					lookup32_invert[i]=lookup32_normal[i^0xF];
 			} else
 			{
-				lookup8 = lookup8_invert;
-				lookup16 = lookup16_invert;
-				lookup32 = lookup32_invert;
+				eWarning("can't render to %dbpp", surface->bpp);
+				return;
 			}
+		}
+		if (i->flags & GS_SOFTHYPHEN)
+			continue;
 
+		if (!(i->flags & GS_INVERT))
+		{
+			lookup8 = lookup8_normal;
+			lookup16 = lookup16_normal;
+			lookup32 = lookup32_normal;
+		} else
+		{
+			lookup8 = lookup8_invert;
+			lookup16 = lookup16_invert;
+			lookup32 = lookup32_invert;
+		}
+
+		int rxbase, rybase;
+		__u8 *dbase;
+		__u8 *sbase;
+		int sxbase;
+		int sybase;
+		int pitch;
+		if (i->image)
+		{
+			FT_BitmapGlyph glyph = border ? (FT_BitmapGlyph)i->borderimage : (FT_BitmapGlyph)i->image;
+			if (!glyph->bitmap.buffer) continue;
+			rxbase = i->x + glyph->left + offset.x();
+			rybase = (doTopBottomReordering ? line_offs : i->y) - glyph->top + offset.y();
+			sbase = glyph->bitmap.buffer;
+			sxbase = glyph->bitmap.width;
+			sybase = glyph->bitmap.rows;
+			pitch = glyph->bitmap.pitch;
+		}
+		else
+		{
 			static FTC_SBit glyph_bitmap;
 			if (fontRenderClass::instance->getGlyphBitmap(&i->font->font, i->glyph_index, &glyph_bitmap))
 				continue;
-			int rx=i->x+glyph_bitmap->left + offset.x();
-			int ry=(doTopBottomReordering ? line_offs : i->y) - glyph_bitmap->top + offset.y();
-
-			__u8 *d=(__u8*)(surface->data)+buffer_stride*ry+rx*surface->bypp;
-			__u8 *s=glyph_bitmap->buffer;
-			register int sx=glyph_bitmap->width;
-			int sy=glyph_bitmap->height;
+			rxbase=i->x+glyph_bitmap->left + offset.x();
+			rybase=(doTopBottomReordering ? line_offs : i->y) - glyph_bitmap->top + offset.y();
+			sbase=glyph_bitmap->buffer;
+			sxbase=glyph_bitmap->width;
+			sybase=glyph_bitmap->height;
+			pitch = glyph_bitmap->pitch;
+		}
+		dbase = (__u8*)(surface->data)+buffer_stride*rybase+rxbase*surface->bypp;
+		for (unsigned int c = 0; c < clip.rects.size(); ++c)
+		{
+			int rx = rxbase, ry = rybase;
+			__u8 *d = dbase;
+			__u8 *s = sbase;
+			register int sx = sxbase;
+			int sy = sybase;
 			if ((sy+ry) >= clip.rects[c].bottom())
 				sy=clip.rects[c].bottom()-ry;
 			if ((sx+rx) >= clip.rects[c].right())
@@ -833,78 +988,90 @@ void eTextPara::blit(gDC &dc, const ePoint &offset, const gRGB &background, cons
 			if (ry < clip.rects[c].top())
 			{
 				int diff=clip.rects[c].top()-ry;
-				s+=diff*glyph_bitmap->pitch;
+				s+=diff*pitch;
 				sy-=diff;
 				ry+=diff;
 				d+=diff*buffer_stride;
 			}
-			if (sx>0)
+			if ((sx>0) && (sy>0))
 			{
-				switch(opcode) {
+				int extra_source_stride = pitch - sx;
+				switch (opcode)
+				{
 				case 0: // 4bit lookup to 8bit
-					for (int ay=0; ay<sy; ay++)
 					{
-						register __u8 *td=d;
+					register int extra_buffer_stride = buffer_stride - sx;
+					register __u8 *td=d;
+					for (int ay = 0; ay < sy; ay++)
+					{
 						register int ax;
 						for (ax=0; ax<sx; ax++)
 						{
 							register int b=(*s++)>>4;
 							if(b)
-								*td++=lookup8[b];
-							else
-								td++;
+								*td=lookup8[b];
+							++td;
 						}
-						s+=glyph_bitmap->pitch-sx;
-						d+=buffer_stride;
+						s += extra_source_stride;
+						td += extra_buffer_stride;
+					}
 					}
 					break;
 				case 1: // 8bit direct
-					for (int ay=0; ay<sy; ay++)
 					{
-						register __u8 *td=d;
+					register int extra_buffer_stride = buffer_stride - sx;
+					register __u8 *td=d;
+					for (int ay = 0; ay < sy; ay++)
+					{
 						register int ax;
 						for (ax=0; ax<sx; ax++)
 						{
 							register int b=*s++;
 							*td++^=b;
 						}
-						s+=glyph_bitmap->pitch-sx;
-						d+=buffer_stride;
+						s += extra_source_stride;
+						td += extra_buffer_stride;
+					}
 					}
 					break;
 				case 2: // 16bit
-					for (int ay=0; ay<sy; ay++)
 					{
-						register __u16 *td=(__u16*)d;
-						register int ax;
-						for (ax=0; ax<sx; ax++)
-						{
-							register int b=(*s++)>>4;
-							if(b)
-								*td++=lookup16[b];
-							else
-								td++;
-						}
-						s+=glyph_bitmap->pitch-sx;
-						d+=buffer_stride;
+					int extra_buffer_stride = (buffer_stride >> 1) - sx;
+					register __u16 *td = (__u16*)d;
+					for (int ay = 0; ay != sy; ay++)
+					{
+							register int ax;
+							for (ax = 0; ax != sx; ax++)
+							{
+								register int b = (*s++) >> 4;
+								if (b)
+									*td = lookup16[b];
+								++td;
+							}
+							s += extra_source_stride;
+							td += extra_buffer_stride;
+					}
 					}
 					break;
 				case 3: // 32bit
-					for (int ay=0; ay<sy; ay++)
 					{
-						register __u32 *td=(__u32*)d;
+					register int extra_buffer_stride = (buffer_stride >> 2) - sx;
+					register __u32 *td=(__u32*)d;
+					for (int ay = 0; ay < sy; ay++)
+					{
 						register int ax;
 						for (ax=0; ax<sx; ax++)
 						{
 							register int b=(*s++)>>4;
 							if(b)
-								*td++=lookup32[b];
-							else
-								td++;
+								*td=lookup32[b];
+							++td;
 						}
-						s+=glyph_bitmap->pitch-sx;
-						d+=buffer_stride;
+						s += extra_source_stride;
+						td += extra_buffer_stride;
 					}
+					}
+					break;
 				default:
 					break;
 				}
@@ -1002,6 +1169,11 @@ void eTextPara::clear()
 	current_font = 0;
 	replacement_font = 0;
 
+	for (unsigned int i = 0; i < glyphs.size(); i++)
+	{
+		if (glyphs[i].image) FT_Done_Glyph(glyphs[i].image);
+		if (glyphs[i].borderimage) FT_Done_Glyph(glyphs[i].borderimage);
+	}
 	glyphs.clear();
 }
 

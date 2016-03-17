@@ -3051,11 +3051,30 @@ void eDVBServicePlay::newSubtitlePage(const eDVBTeletextSubtitlePage &page)
 {
 	if (m_subtitle_widget)
 	{
+		int subtitledelay = 0;
 		pts_t pos = 0;
 		if (m_decoder)
 			m_decoder->getPTS(0, pos);
+		if (m_is_pvr || m_timeshift_enabled)
+		{
+			eDebug("Subtitle in recording/timeshift");
+			subtitledelay = ePythonConfigQuery::getConfigIntValue("config.subtitles.subtitle_noPTSrecordingdelay", 315000);
+		}
+		else
+		{
+			/* check the setting for subtitle delay in live playback, either with pos, or without pos */
+			subtitledelay = ePythonConfigQuery::getConfigIntValue("config.subtitles.subtitle_bad_timing_delay", 0);
+		}
+
 		eDebug("got new subtitle page %lld %lld %d", pos, page.m_pts, page.m_have_pts);
-		m_subtitle_pages.push_back(page);
+		eDVBTeletextSubtitlePage tmppage = page;
+		tmppage.m_have_pts = true;
+
+		if (abs(tmppage.m_pts - pos) > 20*90000)
+			tmppage.m_pts = pos; // fix abnormal pos diffs
+
+		tmppage.m_pts += subtitledelay;
+		m_subtitle_pages.push_back(tmppage);
 		checkSubtitleTiming();
 	}
 }
@@ -3139,7 +3158,29 @@ void eDVBServicePlay::newDVBSubtitlePage(const eDVBSubtitlePage &p)
 		if (m_decoder)
 			m_decoder->getPTS(0, pos);
 		eDebug("got new subtitle page %lld %lld", pos, p.m_show_time);
-		m_dvb_subtitle_pages.push_back(p);
+		if ( abs(pos-p.m_show_time)>1800000 && (m_is_pvr || m_timeshift_enabled))
+		{
+			eDebug("[eDVBServicePlay] Subtitle without PTS and recording");
+			int subtitledelay = ePythonConfigQuery::getConfigIntValue("config.subtitles.subtitle_noPTSrecordingdelay", 315000);
+
+			eDVBSubtitlePage tmppage;
+			tmppage = p;
+			tmppage.m_show_time = pos + subtitledelay;
+			m_dvb_subtitle_pages.push_back(tmppage);
+		}
+		else
+		{
+			int subtitledelay = ePythonConfigQuery::getConfigIntValue("config.subtitles.subtitle_bad_timing_delay", 0);
+			if (subtitledelay != 0)
+			{
+				eDVBSubtitlePage tmppage;
+				tmppage = p;
+				tmppage.m_show_time += subtitledelay;
+				m_dvb_subtitle_pages.push_back(tmppage);
+			}
+			else
+				m_dvb_subtitle_pages.push_back(p);
+		}
 		checkSubtitleTiming();
 	}
 }

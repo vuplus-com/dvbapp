@@ -8,6 +8,7 @@
 #include FT_CACHE_H
 #include FT_CACHE_IMAGE_H
 #include FT_CACHE_SMALL_BITMAPS_H
+#include FT_STROKER_H
 typedef FTC_ImageCache FTC_Image_Cache;
 typedef FTC_ImageTypeRec FTC_Image_Desc;
 typedef FTC_SBitCache FTC_SBit_Cache;
@@ -48,9 +49,12 @@ class fontRenderClass
 	FTC_Manager			cacheManager;				/* the cache manager							 */
 	FTC_Image_Cache	imageCache;					/* the glyph image cache					 */
 	FTC_SBit_Cache	 sbitsCache;				/* the glyph small bitmaps cache	 */
+	FT_Stroker stroker;
+	int strokerRadius;
 
 	FTC_FaceID getFaceID(const std::string &face);
 	FT_Error getGlyphBitmap(FTC_Image_Desc *font, FT_ULong glyph_index, FTC_SBit *sbit);
+	FT_Error getGlyphImage(FTC_Image_Desc *font, FT_ULong glyph_index, FT_Glyph *glyph, FT_Glyph *borderglyph, int bordersize);
 	static fontRenderClass *instance;
 #else
 	fontRenderClass();
@@ -81,15 +85,23 @@ public:
 #define GS_INVERT   8
 #define GS_SOFTHYPHEN 16
 #define GS_HYPHEN   32
+#define GS_COLORCHANGE 64
 #define GS_CANBREAK (GS_ISSPACE|GS_SOFTHYPHEN|GS_HYPHEN)
 
 struct pGlyph
 {
 	int x, y, w;
+	unsigned long newcolor;
 	ePtr<Font> font;
 	FT_ULong glyph_index;
 	int flags;
 	eRect bbox;
+	FT_Glyph image, borderimage;
+	pGlyph()
+	{
+		image = NULL;
+		borderimage = NULL;
+	}
 };
 
 typedef std::vector<pGlyph> glyphString;
@@ -117,7 +129,7 @@ class eTextPara: public iObject
 	int charCount;
 	bool doTopBottomReordering;
 
-	int appendGlyph(Font *current_font, FT_Face current_face, FT_UInt glyphIndex, int flags, int rflags);
+	int appendGlyph(Font *current_font, FT_Face current_face, FT_UInt glyphIndex, int flags, int rflags, int border, bool activate_newcolor, unsigned long newcolor);
 	void newLine(int flags);
 	void setFont(Font *font, Font *replacement_font);
 	eRect boundBox;
@@ -137,11 +149,11 @@ public:
 	static void forceReplacementGlyph(int unicode) { forced_replaces.insert(unicode); }
 
 	void setFont(const gFont *font);
-	int renderString(const char *string, int flags=0);
+	int renderString(const char *string, int flags=0, int border=0);
 
 
 
-	void blit(gDC &dc, const ePoint &offset, const gRGB &background, const gRGB &foreground);
+	void blit(gDC &dc, const ePoint &offset, const gRGB &background, const gRGB &foreground, bool border = false);
 
 	enum
 	{
@@ -193,6 +205,7 @@ public:
 	FTC_Image_Desc font;
 	fontRenderClass *renderer;
 	FT_Error getGlyphBitmap(FT_ULong glyph_index, FTC_SBit *sbit);
+	FT_Error getGlyphImage(FT_ULong glyph_index, FT_Glyph *glyph, FT_Glyph *borderglyph, int bordersize);
 	FT_Face face;
 	FT_Size size;
 	

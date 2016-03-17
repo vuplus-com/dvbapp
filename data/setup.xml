@@ -62,6 +62,27 @@
 			<item level="2" text="Limited character set for recording filenames">config.recording.ascii_filenames</item>
 			<item level="2" text="Composition of the recording filenames">config.recording.filename_composition</item>
 		</setup>
+		<setup key="subtitlesetup" title="Subtitle settings">
+			<item level="2" text="Subtitle font color" description="Configure the color of the subtitles.">config.subtitles.subtitle_fontcolor</item>
+			<item level="2" text="Subtitle font size" description="Configure the font size of the subtitles.">config.subtitles.subtitle_fontsize</item>
+			<item level="2" text="Background color" description="Configure the color of the background of subtitles.">config.subtitles.subtitle_bgcolor</item>
+			<item level="2" text="Background transparency" description="Configure the transparency of the background of subtitles.">config.subtitles.subtitle_bgopacity</item>
+			<item level="2" text="Character edge style" description="Configure the character style of the subtitles.">config.subtitles.subtitle_edgestyle</item>
+			<item level="2" text="Character style level" description="Configure the level of the character styles. The character style makes the subtitles easier to read on a light background.">config.subtitles.subtitle_edgestyle_level</item>
+			<item level="2" text="Subtitle text transparency" description="Configure the transparency of the subtitles.">config.subtitles.subtitle_opacity</item>
+			<item level="2" text="Use original position" description="When enabled, teletext subtitles will be displayed at their original position.">config.subtitles.subtitle_original_position</item>
+			<item level="2" text="Subtitle alignment" description="Configure the horizontal alignment of the subtitles.">config.subtitles.subtitle_alignment</item>
+			<item level="2" text="Subtitle position" description="Configure the vertical position of the subtitles, measured from the bottom of the screen.">config.subtitles.subtitle_position</item>
+			<item level="2" text="Center DVB subtitles" description="When enabled, graphical DVB subtitles will be centered horizontally.">config.subtitles.dvb_subtitles_centered</item>
+			<item level="2" text="Subtitle delay when timing lacks" description="Configure the subtitle delay when timing information is not available.">config.subtitles.subtitle_noPTSrecordingdelay</item>
+			<item level="2" text="Subtitle delay when timing is bad" description="Configure an additional delay to improve subtitle synchronisation.">config.subtitles.subtitle_bad_timing_delay</item>
+			<item level="2" text="External subtitle switch fonts" description="Configure if the subtitle should switch between normal, italic, bold and bolditalic">config.subtitles.pango_subtitle_fontswitch</item>
+			<item level="2" text="External subtitle dialog colorisation" description="Replace `- ` in dialogs with colored text per speaker (like teletext subtitles for the hearing impaired)">config.subtitles.colourise_dialogs</item>
+			<item level="2" text="Rewrap external subtitles" description="When enabled, reformat subtitles to match the width of the screen.">config.subtitles.subtitle_rewrap</item>
+			<item level="2" text="Delay for external subtitles" description="Configure an additional delay to improve external subtitle synchronisation.">config.subtitles.pango_subtitles_delay</item>
+			<item level="2" text="Set fps for external subtitles" description="Can be used for different fps between external subtitles and video.">config.subtitles.pango_subtitles_fps</item>
+			<item level="2" text="Automatically turn on external subtitles" description="When enabled, external subtitles will be always turned on for playback movie.">config.subtitles.pango_autoturnon</item>
+		</setup>
 		<setup key="harddisk" title="Harddisk setup" >
 			<item level="0" text="Harddisk standby after">config.usage.hdd_standby</item>
 		</setup>

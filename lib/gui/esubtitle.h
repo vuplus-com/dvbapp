@@ -5,6 +5,14 @@
 #include <lib/dvb/teletext.h>
 #include <lib/dvb/subtitle.h>
 
+enum
+{
+	FONTSTYLE_NONE = 0,
+	FONTSTYLE_RAISED,
+	FONTSTYLE_DEPRESSED,
+	FONTSTYLE_UNIFORM,
+};
+
 struct ePangoSubtitlePageElement
 {
 	gRGB m_color;

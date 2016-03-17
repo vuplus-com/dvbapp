@@ -142,6 +142,76 @@ def InitUsageConfig():
 
 	config.seek.speeds_backward.addNotifier(updateEnterBackward, immediate_feedback = False)
 
+	config.subtitles = ConfigSubsection()
+	config.subtitles.subtitle_fontcolor = ConfigSelection(default = "0", choices = [
+		("0", _("default")),
+		("1", _("white")),
+		("2", _("yellow")),
+		("3", _("green")),
+		("4", _("cyan")),
+		("5", _("blue")),
+		("6", _("magneta")),
+		("7", _("red")),
+		("8", _("black")) ])
+	config.subtitles.subtitle_fontsize  = ConfigSelection(choices = ["%d" % x for x in range(16,101) if not x % 2], default = "20")
+	config.subtitles.subtitle_bgcolor = ConfigSelection(default = "0", choices = [
+		("0", _("black")),
+		("1", _("red")),
+		("2", _("magneta")),
+		("3", _("blue")),
+		("4", _("cyan")),
+		("5", _("green")),
+		("6", _("yellow")),
+		("7", _("white"))])
+	config.subtitles.subtitle_bgopacity = ConfigSelection(default = "225", choices = [
+		("0", _("No transparency")),
+		("25", "10%"),
+		("50", "20%"),
+		("75", "30%"),
+		("100", "40%"),
+		("125", "50%"),
+		("150", "60%"),
+		("175", "70%"),
+		("200", "80%"),
+		("225", "90%"),
+		("255", _("Full transparency"))])
+	config.subtitles.subtitle_edgestyle = ConfigSelection(default = "2", choices = [
+		("0", "None"),
+		("1", "Raised"),
+		("2", "Depressed"),
+		("3", "Uniform")])
+	config.subtitles.subtitle_edgestyle_level = ConfigSelection(choices = ["0", "1", "2", "3", "4", "5"], default = "3")
+	config.subtitles.subtitle_opacity = ConfigSelection(default = "0", choices = [
+		("0", _("No transparency")),
+		("75", "25%"),
+		("150", "50%")])
+	config.subtitles.subtitle_original_position = ConfigYesNo(default = True)
+	config.subtitles.subtitle_alignment = ConfigSelection(choices = [("left", _("left")), ("center", _("center")), ("right", _("right"))], default = "center")
+	config.subtitles.subtitle_position = ConfigSelection( choices = ["0", "50", "100", "150", "200", "250", "300", "350", "400", "450", "500", "550", "600"], default = "50")
+
+	config.subtitles.dvb_subtitles_centered = ConfigYesNo(default = False)
+
+	subtitle_delay_choicelist = []
+	for i in range(-900000, 1845000, 45000):
+		if i == 0:
+			subtitle_delay_choicelist.append(("0", _("No delay")))
+		else:
+			subtitle_delay_choicelist.append((str(i), "%2.1f sec" % (i / 90000.)))
+	config.subtitles.subtitle_noPTSrecordingdelay = ConfigSelection(default = "315000", choices = subtitle_delay_choicelist)
+	config.subtitles.subtitle_bad_timing_delay = ConfigSelection(default = "0", choices = subtitle_delay_choicelist)
+	config.subtitles.subtitle_rewrap = ConfigYesNo(default = False)
+	config.subtitles.colourise_dialogs = ConfigYesNo(default = False)
+	config.subtitles.pango_subtitle_fontswitch = ConfigYesNo(default = True)
+	config.subtitles.pango_subtitles_delay = ConfigSelection(default = "0", choices = subtitle_delay_choicelist)
+	config.subtitles.pango_subtitles_fps = ConfigSelection(default = "1", choices = [
+		("1", _("Original")),
+		("23976", _("23.976")),
+		("24000", _("24")),
+		("25000", _("25")),
+		("29970", _("29.97")),
+		("30000", _("30"))])
+	config.subtitles.pango_autoturnon = ConfigYesNo(default = True)
+
 def updateChoices(sel, choices):
 	if choices:
 		defval = None

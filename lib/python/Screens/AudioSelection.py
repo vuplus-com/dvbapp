@@ -1,15 +1,17 @@
 from Screen import Screen
+from Screens.Setup import getConfigMenuItem
 from Components.ServiceEventTracker import ServiceEventTracker
 from Components.ActionMap import NumberActionMap
 from Components.ConfigList import ConfigListScreen
 from Components.ChoiceList import ChoiceList, ChoiceEntryComponent
 from Components.config import config, ConfigSubsection, getConfigListEntry, ConfigNothing, ConfigSelection, ConfigOnOff
+from Components.Label import Label
 from Components.MultiContent import MultiContentEntryText
 from Components.Sources.List import List
 from Components.Sources.Boolean import Boolean
 from Components.SystemInfo import SystemInfo
 
-from enigma import iPlayableService
+from enigma import iPlayableService, eTimer, eSize
 
 from Tools.ISO639 import LanguageCodes
 from Tools.BoundFunction import boundFunction
@@ -129,9 +131,13 @@ class AudioSelection(Screen, ConfigListScreen):
 		elif self.settings.menupage.getValue() == PAGE_SUBTITLES:
 			self.setTitle(_("Subtitle selection"))
 			conflist.append(('',))
-			conflist.append(('',))
 			self["key_red"].setBoolean(False)
-			self["key_green"].setBoolean(False)
+			if self.infobar.selected_subtitle:
+				conflist.append(getConfigListEntry(_("Subtitle Quickmenu"), ConfigNothing()))
+				self["key_green"].setBoolean(True)
+			else:
+				conflist.append(('',))
+				self["key_green"].setBoolean(False)
 
 			if self.subtitlesEnabled():
 				sel = self.infobar.selected_subtitle
@@ -249,7 +255,10 @@ class AudioSelection(Screen, ConfigListScreen):
 	def keyRight(self, config = False):
 		if config or self.focus == FOCUS_CONFIG:
 			if self["config"].getCurrentIndex() < 3:
-				ConfigListScreen.keyRight(self)
+				if self["config"].getCurrentIndex() == 1 and self.settings.menupage.getValue() == PAGE_SUBTITLES and self.infobar.selected_subtitle:
+					self.session.open(QuickSubtitlesConfigMenu, self.infobar)
+				else:
+					ConfigListScreen.keyRight(self)
 			elif hasattr(self, "plugincallfunc"):
 				self.plugincallfunc()
 		if self.focus == FOCUS_STREAMS and self["streams"].count() and config == False:
@@ -329,3 +338,106 @@ class SubtitleSelection(AudioSelection):
 	def __init__(self, session, infobar=None):
 		AudioSelection.__init__(self, session, infobar, page=PAGE_SUBTITLES)
 		self.skinName = ["AudioSelection"]
+
+class QuickSubtitlesConfigMenu(ConfigListScreen, Screen):
+	skin = """
+	<screen position="50,80" size="480,425" title="Subtitle settings">
+		<widget name="config" position="5,5" size="470,395" scrollbarMode="showOnDemand" />
+		<widget name="videofps" position="5,405" size="470,25" zPosition="10" font="Regular;20" backgroundColor="#25062748" transparent="1" />
+	</screen>"""
+
+	def __init__(self, session, infobar):
+		Screen.__init__(self, session)
+		self.skin = QuickSubtitlesConfigMenu.skin
+		self.infobar = infobar or self.session.infobar
+
+		self.wait = eTimer()
+		self.wait.timeout.get().append(self.resyncSubtitles)
+
+		self["videofps"] = Label("")
+
+		sub = self.infobar.selected_subtitle
+		if sub[0] == 0:  # dvb
+			menu = [
+				getConfigMenuItem("config.subtitles.subtitle_fontcolor"),
+				getConfigMenuItem("config.subtitles.dvb_subtitles_centered"),
+				getConfigMenuItem("config.subtitles.subtitle_bgopacity"),
+				getConfigMenuItem("config.subtitles.subtitle_original_position"),
+				getConfigMenuItem("config.subtitles.subtitle_position"),
+				getConfigMenuItem("config.subtitles.subtitle_bad_timing_delay"),
+				getConfigMenuItem("config.subtitles.subtitle_noPTSrecordingdelay"),
+			]
+		elif sub[0] == 1: # teletext
+			menu = [
+				getConfigMenuItem("config.subtitles.subtitle_fontcolor"),
+				getConfigMenuItem("config.subtitles.subtitle_fontsize"),
+				getConfigMenuItem("config.subtitles.subtitle_opacity"),
+				getConfigMenuItem("config.subtitles.subtitle_bgcolor"),
+				getConfigMenuItem("config.subtitles.subtitle_bgopacity"),
+				getConfigMenuItem("config.subtitles.subtitle_edgestyle"),
+				getConfigMenuItem("config.subtitles.subtitle_edgestyle_level"),
+				getConfigMenuItem("config.subtitles.subtitle_original_position"),
+				getConfigMenuItem("config.subtitles.subtitle_alignment"),
+				getConfigMenuItem("config.subtitles.subtitle_position"),
+				getConfigMenuItem("config.subtitles.subtitle_bad_timing_delay"),
+				getConfigMenuItem("config.subtitles.subtitle_noPTSrecordingdelay"),
+			]
+		else: 		# pango
+			menu = [
+				getConfigMenuItem("config.subtitles.subtitle_fontcolor"),
+				getConfigMenuItem("config.subtitles.subtitle_fontsize"),
+				getConfigMenuItem("config.subtitles.subtitle_opacity"),
+				getConfigMenuItem("config.subtitles.subtitle_bgcolor"),
+				getConfigMenuItem("config.subtitles.subtitle_bgopacity"),
+				getConfigMenuItem("config.subtitles.subtitle_edgestyle"),
+				getConfigMenuItem("config.subtitles.subtitle_edgestyle_level"),
+				getConfigMenuItem("config.subtitles.subtitle_original_position"),
+				getConfigMenuItem("config.subtitles.subtitle_alignment"),
+				getConfigMenuItem("config.subtitles.subtitle_position"),
+				getConfigMenuItem("config.subtitles.pango_subtitle_fontswitch"),
+				getConfigMenuItem("config.subtitles.colourise_dialogs"),
+				getConfigMenuItem("config.subtitles.subtitle_rewrap"),
+				getConfigMenuItem("config.subtitles.pango_subtitles_delay"),
+				getConfigMenuItem("config.subtitles.pango_subtitles_fps"),
+			]
+			self["videofps"].setText(_("Video: %s fps") % (self.getFps().rstrip(".000")))
+
+		ConfigListScreen.__init__(self, menu, self.session, on_change = self.changedEntry)
+
+		self["actions"] = NumberActionMap(["SetupActions"],
+		{
+			"cancel": self.cancel,
+			"ok": self.ok,
+		},-2)
+
+		self.onLayoutFinish.append(self.layoutFinished)
+
+	def layoutFinished(self):
+		if not self["videofps"].text:
+			self.instance.resize(eSize(self.instance.size().width(), self["config"].l.getItemSize().height()*len(self["config"].getList()) + 10))
+
+	def changedEntry(self):
+		if self["config"].getCurrent() in [getConfigMenuItem("config.subtitles.pango_subtitles_delay"),getConfigMenuItem("config.subtitles.pango_subtitles_fps")]:
+			self.wait.start(500, True)
+
+	def resyncSubtitles(self):
+		self.infobar.setSeekState(self.infobar.SEEK_STATE_PAUSE)
+		self.infobar.setSeekState(self.infobar.SEEK_STATE_PLAY)
+
+	def getFps(self):
+		from enigma import iServiceInformation
+		service = self.session.nav.getCurrentService()
+		info = service and service.info()
+		if not info:
+			return ""
+		fps = info.getInfo(iServiceInformation.sFrameRate)
+		if fps > 0:
+			return "%6.3f" % (fps/1000.)
+		return ""
+
+	def cancel(self):
+		self.close()
+
+	def ok(self):
+		config.subtitles.save()
+		self.close()

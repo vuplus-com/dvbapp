@@ -1593,7 +1593,7 @@ void eServiceMP3::gstBusCall(GstBus *bus, GstMessage *msg)
 				m_subtitleStreams.push_back(subs);
 				g_free (g_lang);
 			}
-			m_event((iPlayableService*)this, evUpdatedEventInfo);
+			m_event((iPlayableService*)this, evUpdatedInfo);
 
 			if ( m_errorInfo.missing_codec != "" )
 			{
@@ -1913,6 +1913,13 @@ void eServiceMP3::pullSubtitle(GstBuffer *buffer)
 		{
 			if ( subType < stVOB )
 			{
+				int delay = ePythonConfigQuery::getConfigIntValue("config.subtitles.pango_subtitles_delay");
+				int subtitle_fps = ePythonConfigQuery::getConfigIntValue("config.subtitles.pango_subtitles_fps");
+
+				double convert_fps = 1.0;
+				if (subtitle_fps > 1 && m_framerate > 0)
+					convert_fps = subtitle_fps / (double)m_framerate;
+
 				unsigned char line[len+1];
 				SubtitlePage page;
 #if GST_VERSION_MAJOR < 1
@@ -1927,7 +1934,7 @@ void eServiceMP3::pullSubtitle(GstBuffer *buffer)
 				gRGB rgbcol(0xD0,0xD0,0xD0);
 				page.type = SubtitlePage::Pango;
 				page.pango_page.m_elements.push_back(ePangoSubtitlePageElement(rgbcol, (const char*)line));
-				page.pango_page.m_show_pts = buf_pos / 11111LL;
+				page.pango_page.m_show_pts = buf_pos / 11111LL + convert_fps + delay;
 				page.pango_page.m_timeout = duration_ns / 1000000;
 				m_subtitle_pages.push_back(page);
 				m_subtitle_sync_timer->start(1, true);
@@ -2110,6 +2117,26 @@ RESULT eServiceMP3::disableSubtitles(eWidget *parent)
 PyObject *eServiceMP3::getCachedSubtitle()
 {
 // 	eDebug("eServiceMP3::getCachedSubtitle");
+	bool autoturnon = ePythonConfigQuery::getConfigBoolValue("config.subtitles.pango_autoturnon", true);
+	if (!autoturnon)
+		Py_RETURN_NONE;
+
+	if (!m_subtitleStreams.empty())
+	{
+		int index = 0;
+		if (m_currentSubtitleStream >= 0 && m_currentSubtitleStream < (int)m_subtitleStreams.size())
+		{
+			index = m_currentSubtitleStream;
+		}
+		ePyObject tuple = PyTuple_New(5);
+		PyTuple_SET_ITEM(tuple, 0, PyInt_FromLong(2));
+		PyTuple_SET_ITEM(tuple, 1, PyInt_FromLong(index));
+		PyTuple_SET_ITEM(tuple, 2, PyInt_FromLong(int(m_subtitleStreams[index].type)));
+		PyTuple_SET_ITEM(tuple, 3, PyInt_FromLong(0));
+		PyTuple_SET_ITEM(tuple, 4, PyString_FromString(m_subtitleStreams[index].language_code.c_str()));
+		return tuple;
+	}
+
 	Py_RETURN_NONE;
 }
 
