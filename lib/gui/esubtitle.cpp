@@ -26,6 +26,7 @@ eSubtitleWidget::eSubtitleWidget(eWidget *parent)
 }
 
 #define startX 50
+#define paddingY 10
 void eSubtitleWidget::setPage(const eDVBTeletextSubtitlePage &p)
 {
 	eDVBTeletextSubtitlePage newpage = p;
@@ -38,13 +39,13 @@ void eSubtitleWidget::setPage(const eDVBTeletextSubtitlePage &p)
 	unsigned int elements = newpage.m_elements.size();
 	if (elements)
 	{
-		int startY = elements > 1
-			? size().height() / 2
-			: size().height() / 3 * 2;
+		int fontsize = ePythonConfigQuery::getConfigIntValue("config.subtitles.subtitle_fontsize", 34) * getDesktop(0)->size().width()/1280;
+		int startY = size().height() - (size().height() / 3 * 1) / 2 - ((fontsize + paddingY) * elements) / 2;
 		int width = size().width() - startX * 2;
 		int height = size().height() - startY;
-		int size_per_element = height / (elements ? elements : 1);
+		int size_per_element = fontsize + paddingY;
 		bool original_position = ePythonConfigQuery::getConfigBoolValue("config.subtitles.subtitle_original_position");
+		bool rewrap = ePythonConfigQuery::getConfigBoolValue("config.subtitles.subtitle_rewrap");
 		gRGB color;
 		bool original_colors = false;
 		switch (ePythonConfigQuery::getConfigIntValue("config.subtitles.subtitle_fontcolor", 0))
@@ -96,8 +97,11 @@ void eSubtitleWidget::setPage(const eDVBTeletextSubtitlePage &p)
 			if (line != newpage.m_elements[i].m_source_line)
 			{
 				line = newpage.m_elements[i].m_source_line;
-				m_page.m_elements.push_back(eDVBTeletextSubtitlePageElement(color, "", line));
-				currentelement++;
+				if (!rewrap)
+				{
+					m_page.m_elements.push_back(eDVBTeletextSubtitlePageElement(color, "", line));
+					currentelement++;
+				}
 			}
 			m_page.m_elements[currentelement].m_text += newpage.m_elements[i].m_text;
 		}
@@ -108,11 +112,7 @@ void eSubtitleWidget::setPage(const eDVBTeletextSubtitlePage &p)
 			if (!original_position)
 			{
 				int lowerborder = ePythonConfigQuery::getConfigIntValue("config.subtitles.subtitle_position", 50);
-				if (lowerborder == 0)
-					lowerborder -= 100 * getDesktop(0)->size().height()/720;
-				else if (lowerborder == 50)
-					lowerborder -= 50 * getDesktop(0)->size().height()/720;
-				area.setTop(size_per_element * i + startY - lowerborder);
+				area.setTop(size().height() - size_per_element * (m_page.m_elements.size() - i) - lowerborder * getDesktop(0)->size().height()/720);
 			}
 			else
 				area.setTop(size_per_element * i + startY);
@@ -318,7 +318,6 @@ int eSubtitleWidget::event(int event, void *data, void *data2)
 				int bg_r, bg_g, bg_b, bg_a;
 				if (ePythonConfigQuery::getConfigIntValue("config.subtitles.subtitle_bgopacity") < 0xFF)
 				{
-					unsigned int padding = 10;
 					eTextPara *para = new eTextPara(area);
 					para->setFont(subtitleStyles[Subtitle_TTX].font);
 					para->renderString(element.m_text.c_str(), RS_WRAP);
@@ -327,14 +326,14 @@ int eSubtitleWidget::event(int event, void *data, void *data2)
 					int bgboxWidth = bgbox.width();
 					int bgboxHeight = bgbox.height();
 					if (alignmentValue == "left")
-						bgbox.setLeft(area.left() - padding - borderwidth);
+						bgbox.setLeft(area.left() - paddingY - borderwidth);
 					else if (alignmentValue == "right")
-						bgbox.setLeft(area.left() + area.width() - bgboxWidth - padding - borderwidth);
+						bgbox.setLeft(area.left() + area.width() - bgboxWidth - paddingY - borderwidth);
 					else
-						bgbox.setLeft(area.left() + area.width() / 2 - bgboxWidth / 2 - padding - borderwidth);
-					bgbox.setTop(area.top() + area.height() / 2 - bgboxHeight / 2 - padding * 2 - borderwidth);
-					bgbox.setWidth(bgboxWidth + padding * 2 + borderwidth * 2);
-					bgbox.setHeight(bgboxHeight + padding * 3 + borderwidth * 2);
+						bgbox.setLeft(area.left() + area.width() / 2 - bgboxWidth / 2 - paddingY - borderwidth);
+					bgbox.setTop(area.top());
+					bgbox.setWidth(bgboxWidth + paddingY * 2 + borderwidth * 2);
+					bgbox.setHeight(area.height());
 
 					switch (ePythonConfigQuery::getConfigIntValue("config.subtitles.subtitle_bgcolor", 0))
 					{

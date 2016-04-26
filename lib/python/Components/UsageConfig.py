@@ -187,7 +187,7 @@ def InitUsageConfig():
 		("150", "50%")])
 	config.subtitles.subtitle_original_position = ConfigYesNo(default = True)
 	config.subtitles.subtitle_alignment = ConfigSelection(choices = [("left", _("left")), ("center", _("center")), ("right", _("right"))], default = "center")
-	config.subtitles.subtitle_position = ConfigSelection( choices = ["0", "50", "100", "150", "200", "250", "300", "350", "400", "450", "500", "550", "600"], default = "50")
+	config.subtitles.subtitle_position = ConfigSelection( choices = ["0", "50", "100", "150", "200", "250", "300", "350", "400", "450", "500", "550", "600"], default = "100")
 
 	config.subtitles.dvb_subtitles_centered = ConfigYesNo(default = False)
 

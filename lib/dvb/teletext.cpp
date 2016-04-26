@@ -659,6 +659,14 @@ void eDVBTeletextParser::connectNewPage(const Slot1<void, const eDVBTeletextSubt
 
 void eDVBTeletextParser::addSubtitleString(int color, std::string string, int source_line)
 {
+#if 1
+	const gRGB pal[8] = { gRGB(102, 102, 102), gRGB(255, 0, 0), gRGB(0, 255, 0), gRGB(255, 255, 0),
+		gRGB(102, 102, 255), gRGB(255, 0, 255), gRGB(0, 255, 255), gRGB(255, 255, 255) };
+
+	if (string.empty()) return;
+
+	m_subtitle_page.m_elements.push_back(eDVBTeletextSubtitlePageElement(pal[color], string, source_line));
+#else
 //	eDebug("(%d)add subtitle string: %s, col %d", m_Y, string.c_str(), color);
 	int force_cell = 0;
 
@@ -689,6 +697,7 @@ void eDVBTeletextParser::addSubtitleString(int color, std::string string, int so
 			m_subtitle_color = color;
 		m_subtitle_text += string;
 	}
+#endif
 }
 
 void eDVBTeletextParser::sendSubtitlePage()

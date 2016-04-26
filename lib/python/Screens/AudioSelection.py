@@ -379,6 +379,7 @@ class QuickSubtitlesConfigMenu(ConfigListScreen, Screen):
 				getConfigMenuItem("config.subtitles.subtitle_original_position"),
 				getConfigMenuItem("config.subtitles.subtitle_alignment"),
 				getConfigMenuItem("config.subtitles.subtitle_position"),
+				getConfigMenuItem("config.subtitles.subtitle_rewrap"),
 				getConfigMenuItem("config.subtitles.subtitle_bad_timing_delay"),
 				getConfigMenuItem("config.subtitles.subtitle_noPTSrecordingdelay"),
 			]
