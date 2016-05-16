@@ -306,6 +306,8 @@ lib/python/Plugins/SystemPlugins/BoxModeConfig/Makefile
 lib/python/Plugins/SystemPlugins/BoxModeConfig/meta/Makefile
 lib/python/Plugins/SystemPlugins/Solo4kMiscControl/Makefile
 lib/python/Plugins/SystemPlugins/Solo4kMiscControl/meta/Makefile
+lib/python/Plugins/SystemPlugins/FastChannelChange/Makefile
+lib/python/Plugins/SystemPlugins/FastChannelChange/meta/Makefile
 lib/python/Tools/Makefile
 lib/service/Makefile
 lib/components/Makefile

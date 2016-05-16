@@ -841,6 +841,8 @@ public:
 		evStopped,
 		evHBBTVInfo,
 
+		evFccFailed,
+
 		evUser = 0x100
 	};
 };
@@ -896,7 +898,8 @@ public:
 		evNewProgramInfo,
 		evRecordFailed,
 		evRecordWriteError,
-		evNewEventInfo
+		evNewEventInfo,
+		evTuneStart,
 	};
 	enum {
 		NoError=0,

@@ -113,6 +113,7 @@ class Navigation:
 		print "stopService"
 		if self.pnav:
 			self.pnav.stopService()
+		self.currentlyPlayingServiceReference = None
 
 	def pause(self, p):
 		return self.pnav and self.pnav.pause(p)
@@ -124,3 +125,4 @@ class Navigation:
 
 	def stopUserServices(self):
 		self.stopService()
+

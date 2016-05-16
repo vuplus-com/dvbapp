@@ -31,7 +31,9 @@ libenigma_dvb_a_SOURCES = \
 	teletext.cpp \
 	tstools.cpp \
 	volume.cpp \
-	fbc.cpp
+	fbc.cpp \
+	fcc.cpp \
+	fccdecoder.cpp
 
 dvbincludedir = $(pkgincludedir)/lib/dvb
 dvbinclude_HEADERS = \
@@ -63,4 +65,6 @@ dvbinclude_HEADERS = \
 	teletext.h \
 	tstools.h \
 	volume.h \
-	fbc.h
+	fbc.h \
+	fcc.h \
+	fccdecoder.h

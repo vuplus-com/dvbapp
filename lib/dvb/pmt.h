@@ -158,6 +158,9 @@ class eDVBServicePMTHandler: public Object
 	uint8_t m_decode_demux_num;
 	ePtr<eTimer> m_no_pat_entry_delay;
 	uint8_t mDemuxId;
+
+	bool m_pmt_ready;
+	bool m_ca_disabled;
 public:
 	eDVBServicePMTHandler();
 	~eDVBServicePMTHandler();
@@ -254,6 +257,8 @@ public:
 		int pmtPid;
 		int textPid;
 		int aitPid;
+		int pmtVersion;
+		bool isCached;
 		bool isCrypted() { return !caids.empty(); }
 		PyObject *createPythonObject();
 	};
@@ -274,6 +279,7 @@ public:
 
 	void getHBBTVUrl(std::string &ret) { ret = m_HBBTVUrl; }
 	void getDemuxID(int &id) { id = mDemuxId; }
+	void setCaDisable(bool disable) { m_ca_disabled = disable; }
 
 	/* deprecated interface */
 	int tune(eServiceReferenceDVB &ref, int use_decode_demux, eCueSheet *sg=0, bool simulate=false, eDVBService *service = 0);
@@ -282,6 +288,8 @@ public:
 	int tuneExt(eServiceReferenceDVB &ref, int use_decode_demux, ePtr<iTsSource> &, const char *streaminfo_file, eCueSheet *sg=0, bool simulate=false, eDVBService *service = 0, bool isstreamclient=false);
 
 	void free();
+	void addCaHandler();
+	void removeCaHandler();
 private:
 	bool m_have_cached_program;
 	program m_cached_program;

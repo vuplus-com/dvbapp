@@ -62,11 +62,6 @@ class ServiceScan(Screen):
 			})
 
 		self.onFirstExecBegin.append(self.doServiceScan)
-		self.onClose.append(self.doPluginCB)
-
-	def doPluginCB(self):
-		for p in plugins.getPlugins(PluginDescriptor.WHERE_SERVICESCAN):
-			p()
 
 	def doServiceScan(self):
 		self["scan"] = CScan(self["scan_progress"], self["scan_state"], self["servicelist"], self["pass"], self.scanList, self["network"], self["transponder"], self["FrontendInfo"], self.session.summary)

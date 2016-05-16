@@ -40,6 +40,7 @@ class eDVBVideo: public iObject, public Object
 private:
 	ePtr<eDVBDemux> m_demux;
 	int m_fd, m_fd_demux, m_dev;
+	bool m_fcc_enable;
 #if HAVE_DVB_API_VERSION < 3
 	m_fd_video;
 #endif
@@ -50,7 +51,7 @@ private:
 	int m_width, m_height, m_framerate, m_aspect, m_progressive;
 public:
 	enum { MPEG2, MPEG4_H264, MPEG1, MPEG4_Part2, VC1, VC1_SM, H265_HEVC };
-	eDVBVideo(eDVBDemux *demux, int dev);
+	eDVBVideo(eDVBDemux *demux, int dev, bool fcc_enable=false);
 	void stop();
 #if HAVE_DVB_API_VERSION < 3
 	int setPid(int pid);
@@ -120,6 +121,16 @@ private:
 	ePtr<eDVBPCR> m_pcr;
 	ePtr<eDVBTText> m_text;
 	int m_vpid, m_vtype, m_apid, m_atype, m_pcrpid, m_textpid;
+
+	int m_fcc_fd;
+	bool m_fcc_enable;
+	int m_fcc_state;
+
+	int m_fcc_feid;
+	int m_fcc_vpid;
+	int m_fcc_vtype;
+	int m_fcc_pcrpid;
+
 	enum
 	{
 		changeVideo = 1, 
@@ -167,6 +178,7 @@ public:
 		 - trickmode, highspeed reverse: data source fast forwards / reverses, decoder just displays frames as fast as it can
 		 - slow motion: decoder displays frames multiple times
 		*/
+
 	enum {
 		stateStop,
 		statePause,
@@ -195,6 +207,23 @@ public:
 	int getVideoAspect();
 	static RESULT setHwPCMDelay(int delay);
 	static RESULT setHwAC3Delay(int delay);
+
+	enum 
+	{
+		fcc_state_stop,
+		fcc_state_ready,
+		fcc_state_decoding
+	};
+
+	RESULT prepareFCC(int fe_id, int vpid, int vtype, int pcrpid);
+	RESULT fccStart();
+	RESULT fccStop();
+	RESULT fccDecoderStart();
+	RESULT fccDecoderStop();
+	RESULT fccUpdatePids(int fe_id, int vpid, int vtype, int pcrpid);
+	RESULT fccSetPids(int fe_id, int vpid, int vtype, int pcrpid);
+	RESULT fccGetFD();
+	RESULT fccFreeFD();
 };
 
 #endif

@@ -15,6 +15,7 @@ libenigma_service_a_SOURCES = \
 	service.cpp \
 	servicedvb.cpp \
 	servicedvbrecord.cpp \
+	servicedvbfcc.cpp \
 	servicefs.cpp \
 	servicemp3.cpp \
 	servicem2ts.cpp
@@ -27,6 +28,7 @@ serviceinclude_HEADERS = \
 	service.h \
 	servicedvb.h \
 	servicedvbrecord.h \
+	servicedvbfcc.h \
 	servicefs.h \
 	servicemp3.h \
 	servicem2ts.h

@@ -8,7 +8,7 @@ SUBDIRS = SoftwareManager FrontprocessorUpgrade PositionerSetup Satfinder \
 	Blindscan RemoteControlCode UI3DSetup UIPositionSetup HDMICEC LEDBrightnessSetup \
 	FirmwareUpgrade CrashReport 3GModemManager WirelessAccessPoint ZappingModeSelection \
 	DeviceManager TransCodingSetup WOLSetup NetDrive AudioEffect AnimationSetup \
-	BoxModeConfig Solo4kMiscControl
+	BoxModeConfig Solo4kMiscControl FastChannelChange
 
 install_PYTHON =	\
 	__init__.py

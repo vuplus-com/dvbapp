@@ -544,9 +544,6 @@ class NimSetup(Screen, ConfigListScreen, ServiceStopScreen):
 			self.nimConfig.connectedTo.setChoices(choices)
 		for x in self["config"].list:
 			x[1].save()
-
-		for p in plugins.getPlugins(PluginDescriptor.WHERE_SATCONFIGCHANGED):
-			p()
 			
 	def cancelConfirm(self, result):
 		if not result:

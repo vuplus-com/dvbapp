@@ -202,7 +202,7 @@ protected:
 	int m_current_audio_pid;
 	int m_current_video_pid_type;
 	
-	eDVBServicePlay(const eServiceReference &ref, eDVBService *service);
+	eDVBServicePlay(const eServiceReference &ref, eDVBService *service, bool connect_event=true);
 	
 		/* events */
 	void gotNewEvent();
@@ -230,7 +230,7 @@ protected:
 	std::set<int> m_pids_active;
 
 	void updateTimeshiftPids();
-	void switchToLive();
+	virtual void switchToLive();
 
 	void resetTimeshift(int start);
 	void switchToTimeshift();

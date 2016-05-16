@@ -1,6 +1,7 @@
 #include <lib/nav/core.h>
 #include <lib/base/eerror.h>
 #include <lib/python/python.h>
+#include <lib/dvb/fcc.h>
 
 void eNavigation::serviceEvent(iPlayableService* service, int event)
 {
@@ -24,10 +25,15 @@ void eNavigation::recordEvent(iRecordableService* service, int event)
 
 RESULT eNavigation::playService(const eServiceReference &service)
 {
-	stopService();
-	
-	ASSERT(m_servicehandler);
-	RESULT res = m_servicehandler->play(service, m_runningService);
+	RESULT res = -1;
+
+	if (m_fccmgr->tryFCCService(service, m_runningService) == -1)
+	{
+		stopService();
+		ASSERT(m_servicehandler);
+		res = m_servicehandler->play(service, m_runningService);
+	}
+
 	if (m_runningService)
 	{
 		m_runningService->connectEvent(slot(*this, &eNavigation::serviceEvent), m_service_event_conn);
@@ -69,6 +75,8 @@ RESULT eNavigation::stopService(void)
 
 		/* kill service. */
 	m_service_event_conn = 0;
+
+	m_fccmgr->cleanupFCCService();
 	return 0;
 }
 
@@ -150,6 +158,7 @@ eNavigation::eNavigation(iServiceHandler *serviceHandler)
 {
 	ASSERT(serviceHandler);
 	m_servicehandler = serviceHandler;
+	m_fccmgr = new eFCCServiceManager(this);
 }
 
 eNavigation::~eNavigation()

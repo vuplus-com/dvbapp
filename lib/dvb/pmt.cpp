@@ -33,6 +33,8 @@ eDVBServicePMTHandler::eDVBServicePMTHandler()
 	m_pmt_pid = -1;
 	m_dsmcc_pid = -1;
 	m_isstreamclient = false;
+	m_ca_disabled = false;
+	m_pmt_ready = false;
 	eDVBResourceManager::getInstance(m_resourceManager);
 	CONNECT(m_PMT.tableReady, eDVBServicePMTHandler::PMTready);
 	CONNECT(m_PAT.tableReady, eDVBServicePMTHandler::PATready);
@@ -115,6 +117,7 @@ void eDVBServicePMTHandler::PMTready(int error)
 		serviceEvent(eventNoPMT);
 	else
 	{
+		m_pmt_ready = true;
 		m_have_cached_program = false;
 		serviceEvent(eventNewProgramInfo);
 		mDemuxId = m_decode_demux_num;
@@ -132,9 +135,11 @@ void eDVBServicePMTHandler::PMTready(int error)
 				else
 					demuxes[1]=demuxes[0];
 				eDVBCAService::register_service(m_reference, demuxes, m_ca_servicePtr);
-				eDVBCIInterfaces::getInstance()->recheckPMTHandlers();
+				if (!m_ca_disabled)
+					eDVBCIInterfaces::getInstance()->recheckPMTHandlers();
 			}
-			eDVBCIInterfaces::getInstance()->gotPMT(this);
+			if (!m_ca_disabled)
+				eDVBCIInterfaces::getInstance()->gotPMT(this);
 		}
 		if (m_ca_servicePtr)
 		{
@@ -504,6 +509,8 @@ int eDVBServicePMTHandler::getProgramInfo(program &program)
 	program.pmtPid = -1;
 	program.textPid = -1;
 	program.aitPid = -1;
+	program.isCached = false;
+	program.pmtVersion = -1;
 
 	int first_ac3 = -1;
 	program.defaultAudioStream = 0;
@@ -532,6 +539,7 @@ int eDVBServicePMTHandler::getProgramInfo(program &program)
 			eDVBTableSpec table_spec;
 			ptr->getSpec(table_spec);
 			program.pmtPid = table_spec.pid < 0x1fff ? table_spec.pid : -1;
+			program.pmtVersion = table_spec.version;
 			std::vector<ProgramMapSection*>::const_iterator i;
 			for (i = ptr->getSections().begin(); i != ptr->getSections().end(); ++i)
 			{
@@ -955,6 +963,9 @@ int eDVBServicePMTHandler::getProgramInfo(program &program)
 		int cached_pcrpid = m_service->getCacheEntry(eDVBService::cPCRPID),
 			vpidtype = m_service->getCacheEntry(eDVBService::cVTYPE),
 			cnt=0;
+
+		program.isCached = true;
+
 		if ( vpidtype == -1 )
 			vpidtype = videoStream::vtMPEG2;
 		if ( cached_vpid != -1 )
@@ -1139,7 +1150,7 @@ int eDVBServicePMTHandler::tuneExt(eServiceReferenceDVB &ref, int use_decode_dem
 		if (!m_resourceManager->getChannelList(db))
 			db->getService((eServiceReferenceDVB&)m_reference, m_service);
 
-		if (!res && !simulate)
+		if (!res && !simulate && !m_ca_disabled)
 			eDVBCIInterfaces::getInstance()->addPMTHandler(this);
 	} else if (!simulate) // no simulation of playback services
 	{
@@ -1265,6 +1276,28 @@ void eDVBServicePMTHandler::free()
 	m_pvr_channel = 0;
 	m_demux = 0;
 }
+
+void eDVBServicePMTHandler::addCaHandler()
+{
+	m_ca_disabled = false;
+	if (m_channel)
+	{
+		eDVBCIInterfaces::getInstance()->addPMTHandler(this);
+		if (m_pmt_ready)
+		{
+			eDVBCIInterfaces::getInstance()->recheckPMTHandlers();
+			eDVBCIInterfaces::getInstance()->gotPMT(this);
+		}
+	}
+}
+
+void eDVBServicePMTHandler::removeCaHandler()
+{
+	m_ca_disabled = true;
+	if (m_channel)
+		eDVBCIInterfaces::getInstance()->removePMTHandler(this);
+}
+
 
 CAServiceMap eDVBCAService::exist;
 ChannelMap eDVBCAService::exist_channels;

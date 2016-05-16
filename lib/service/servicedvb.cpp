@@ -19,6 +19,8 @@
 #include <lib/base/nconfig.h> // access to python config
 #include <lib/base/httpstream.h>
 
+#include <lib/service/servicedvbfcc.h>
+
 		/* for subtitles */
 #include <lib/gui/esubtitle.h>
 
@@ -27,6 +29,8 @@
 
 #include <byteswap.h>
 #include <netinet/in.h>
+
+#include <lib/dvb/fcc.h>
 
 #ifndef BYTE_ORDER
 #error no byte order defined!
@@ -814,11 +818,15 @@ RESULT eDVBServiceList::setListName(const std::string &name)
 RESULT eServiceFactoryDVB::play(const eServiceReference &ref, ePtr<iPlayableService> &ptr)
 {
 	ePtr<eDVBService> service;
+
 	int r = lookupService(service, ref);
 	if (r)
 		service = 0;
 		// check resources...
-	ptr = new eDVBServicePlay(ref, service);
+	if (eFCCServiceManager::checkAvailable(ref))
+		ptr = new eDVBServiceFCCPlay(ref, service);
+	else
+		ptr = new eDVBServicePlay(ref, service);
 	return 0;
 }
 
@@ -933,17 +941,19 @@ RESULT eServiceFactoryDVB::lookupService(ePtr<eDVBService> &service, const eServ
 	return 0;
 }
 
-eDVBServicePlay::eDVBServicePlay(const eServiceReference &ref, eDVBService *service):
+eDVBServicePlay::eDVBServicePlay(const eServiceReference &ref, eDVBService *service, bool connect_event):
 	m_reference(ref), m_dvb_service(service), m_have_video_pid(0), m_is_paused(0)
 {
 	m_is_primary = 1;
 	m_is_stream = m_reference.path.substr(0, 7) == "http://";
 	m_is_pvr = (!m_reference.path.empty() && !m_is_stream);
-	
+
 	m_timeshift_enabled = m_timeshift_active = 0, m_timeshift_changed = 0;
 	m_skipmode = m_fastforward = m_slowmotion = 0;
-	
-	CONNECT(m_service_handler.serviceEvent, eDVBServicePlay::serviceEvent);
+
+	if (connect_event)
+		CONNECT(m_service_handler.serviceEvent, eDVBServicePlay::serviceEvent);
+
 	CONNECT(m_service_handler_timeshift.serviceEvent, eDVBServicePlay::serviceEventTimeshift);
 	CONNECT(m_event_handler.m_eit_changed, eDVBServicePlay::gotNewEvent);
 

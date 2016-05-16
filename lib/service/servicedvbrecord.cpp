@@ -255,6 +255,10 @@ int eDVBServiceRecord::doPrepare()
 				source = ePtr<iTsSource>(f);
 			}
 		}
+		else
+		{
+			m_event((iRecordableService*)this, evTuneStart);
+		}
 		return m_service_handler.tuneExt(m_ref, 0, source, m_ref.path.c_str(), 0, m_simulate, 0, isstreamclient);
 	}
 	return 0;
