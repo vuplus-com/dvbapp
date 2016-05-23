@@ -462,7 +462,7 @@ RESULT eDVBSatelliteEquipmentControl::prepare(iDVBFrontend &frontend, FRONTENDPA
 				bool changed_csw = false;
 				bool changed_ucsw = false;
 				bool changed_burst = false;
-				if (direct_connected || (!linked_fe->m_frontend->isLoopTimerActive() || !linked_fe->m_frontend->isScheduledSendDiseqc()))
+				if (direct_connected || (linked_fe && (!linked_fe->m_frontend->isLoopTimerActive() || !linked_fe->m_frontend->isScheduledSendDiseqc())))
 				{
 					changed_csw = send_csw && (forceChanged || csw != lastcsw);
 					changed_ucsw = send_ucsw && (forceChanged || ucsw != lastucsw);
