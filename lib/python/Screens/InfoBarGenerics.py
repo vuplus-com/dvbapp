@@ -36,7 +36,7 @@ from enigma import eTimer, eServiceCenter, eDVBServicePMTHandler, iServiceInform
 	iPlayableService, eServiceReference, eEPGCache, eActionMap
 
 from time import time, localtime, strftime
-from os import stat as os_stat
+from os import stat as os_stat, system as os_system
 from bisect import insort
 
 from RecordTimer import RecordTimerEntry, RecordTimer
@@ -1665,7 +1665,7 @@ class InfoBarInstantRecord:
 
 		if not fileExists("/hdd", 0):
 			print "not found /hdd"
-			system("ln -s /media/hdd /hdd")
+			os_system("ln -s /media/hdd /hdd")
 #
 		try:
 			stat = os_stat(dir)
