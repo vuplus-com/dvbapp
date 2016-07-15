@@ -410,15 +410,23 @@ void eDVBServiceFCCPlay::FCCDecoderStop()
 {
 	eDebug("[eDVBServiceFCCPlay::FCCDecoderStop][%s]", m_reference.toString().c_str());
 
-	if ((m_fcc_flag & fcc_ready) && m_decoder)
+	if (m_decoder)
 	{
 		m_teletext_parser = 0;
 		m_new_subtitle_page_connection = 0;
 		m_subtitle_parser = 0;
 		m_new_dvb_subtitle_page_connection = 0;
 
-		m_decoder->fccDecoderStop();
-		m_fcc_flag &=~fcc_decoding;
+		if (m_fcc_flag & fcc_ready)
+		{
+			m_decoder->fccDecoderStop();
+			m_fcc_flag &=~fcc_decoding;
+		}
+		else if (m_fcc_flag & fcc_novideo)
+		{
+			m_video_event_connection = 0;
+			m_decoder = 0;
+		}
 	}
 }
 
