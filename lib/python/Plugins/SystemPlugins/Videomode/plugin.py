@@ -22,6 +22,7 @@ class avSetupScreen(ConfigListScreen, Screen):
 		{"idx":8, "level":1, "text":"WSS on 4:3", "item":"config.av.wss"},
 		{"idx":9, "level":1, "text":"Auto scart switching", "requires":"ScartSwitch", "item":"config.av.vcrswitch"},
 		{"idx":10, "level":1, "text":"HDMI Colorspace", "item":"config.av.hdmicolorspace"},
+		{"idx":11, "level":1, "text":"HDMI Colordepth", "item":"config.av.hdmicolordepth"},
 		{"idx":0, "level":1, "text":"Dolby Digital default", "item":"config.av.defaultac3"},
 		{"idx":0, "level":1, "text":"Dolby Digital / DTS downmix", "requires":"CanDownmixAC3", "item":"config.av.downmix_ac3"},
 		{"idx":0, "level":1, "text":"PCM Multichannel", "requires":"CanPcmMultichannel", "item":"config.av.pcm_multichannel"},
@@ -131,7 +132,7 @@ class avSetupScreen(ConfigListScreen, Screen):
 				# Color Format, WSS on 4:3, Auto scart switching
 				elif (idx == 7 or idx == 8 or idx == 9) and not current_port == "Scart":
 					continue
-				elif (idx == 10) and not current_port == "DVI": # HDMI Colorspace
+				elif (idx == 10 or idx == 11) and not current_port == "DVI": # HDMI Colorspace/Colordepth
 					continue
 			if idx == 0 and item_level == 1: # audio
 				self.audio_cfg.append(item_text)

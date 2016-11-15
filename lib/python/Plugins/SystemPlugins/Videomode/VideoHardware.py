@@ -286,10 +286,32 @@ class VideoHardware:
 			hdmicolorspace_choices = {}
 			hdmicolorspace_choices["Edid(Auto)"] = _("Auto")
 			hdmicolorspace_choices["Hdmi_Rgb"] = _("RGB")
+			hdmicolorspace_choices["444"] = _("YCbCr444")
+			hdmicolorspace_choices["422"] = _("YCbCr422")
+			hdmicolorspace_choices["420"] = _("YCbCr420")
 			config.av.hdmicolorspace = ConfigSelection(choices = hdmicolorspace_choices, default = "Edid(Auto)")
 			config.av.hdmicolorspace.addNotifier(setHdmiColorspace)
 		else:
 			config.av.hdmicolorspace = NoSave(ConfigNothing())
+
+		if os.path.exists("/proc/stb/video/hdmi_colordepth"):
+			def setHdmiColordepth(config):
+				try:
+					print "set HDMI Colordepth : ",config.value
+					f = open("/proc/stb/video/hdmi_colordepth", "w")
+					f.write(config.value)
+					f.close()
+				except IOError:
+					print "set HDMI Colordepth failed!"
+			hdmicolordepth_choices = {}
+			hdmicolordepth_choices["auto"] = _("Auto")
+			hdmicolordepth_choices["8bit"] = _("8bit")
+			hdmicolordepth_choices["10bit"] = _("10bit")
+			hdmicolordepth_choices["12bit"] = _("12bit")
+			config.av.hdmicolordepth = ConfigSelection(choices = hdmicolordepth_choices, default = "auto")
+			config.av.hdmicolordepth.addNotifier(setHdmiColordepth)
+		else:
+			config.av.hdmicolordepth = NoSave(ConfigNothing())
 
 	def changedVideomode(self, configElement):
 		if self.is_init:
