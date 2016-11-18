@@ -137,6 +137,9 @@ void eDVBServiceFCCPlay::changeFCCMode()
 		eDebug("[eDVBServiceFCCPlay::changeFCCMode][%s] disable FCC decoding.", m_reference.toString().c_str());
 		m_fcc_mode = fcc_mode_preparing;
 
+		/* stop timeshift */
+		eDVBServicePlay::stopTimeshift();
+
 		/* remove CaHandler */
 		m_service_handler.removeCaHandler();
 
