@@ -1426,6 +1426,10 @@ void eDVBChannel::pvrEvent(int event)
 		eDebug("SOF");
 		m_event(this, evtSOF);
 		break;
+	case eFilePushThread::evtUser+3: /* limit space */
+		eDebug("Too large file");
+		m_event(this, evtFailed+3);
+		break;
 	}
 }
 

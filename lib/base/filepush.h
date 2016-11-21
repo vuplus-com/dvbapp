@@ -63,6 +63,7 @@ private:
 	ePtr<iTsSource> m_source;
 
 	eFixedMessagePump<int> m_messagepump;
+	bool m_hdd_connected;
 
 	void recvEvent(const int &evt);
 };

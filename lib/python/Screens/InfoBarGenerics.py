@@ -1204,7 +1204,8 @@ class InfoBarTimeshift:
 		self.__event_tracker = ServiceEventTracker(screen=self, eventmap=
 			{
 				iPlayableService.evStart: self.__serviceStarted,
-				iPlayableService.evSeekableStatusChanged: self.__seekableStatusChanged
+				iPlayableService.evSeekableStatusChanged: self.__seekableStatusChanged,
+				iPlayableService.evUser+3: self.__lowDiskspaceMessage
 			})
 
 	def getTimeshift(self):
@@ -1307,6 +1308,9 @@ class InfoBarTimeshift:
 	def __serviceStarted(self):
 		self.timeshift_enabled = False
 		self.__seekableStatusChanged()
+
+	def __lowDiskspaceMessage(self):
+		Notifications.AddPopup(text = _("Write error. Not enough space for writing.\n"), type = MessageBox.TYPE_ERROR, timeout = 0, id = "DiskFullMessage")
 
 from Screens.PiPSetup import PiPSetup
 

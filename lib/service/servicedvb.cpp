@@ -1169,6 +1169,10 @@ void eDVBServicePlay::serviceEventTimeshift(int event)
 			}
 		}
 		break;
+	case eDVBServicePMTHandler::eventNoDiskSpace:
+		eDebug("No space!");
+		m_event((iPlayableService*)this, evUser+3);
+		break;
 	}
 }
 

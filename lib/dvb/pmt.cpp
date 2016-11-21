@@ -106,6 +106,9 @@ void eDVBServicePMTHandler::channelEvent(iDVBChannel *channel, int event)
 	case iDVBChannel::evtSOF:
 		serviceEvent(eventSOF);
 		break;
+	case iDVBChannel::evtFailed+3:
+		serviceEvent(eventNoDiskSpace);
+		break;
 	default:
 		break;
 	}

@@ -1,12 +1,24 @@
 #include <lib/base/filepush.h>
 #include <lib/base/eerror.h>
+#include <lib/base/nconfig.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
+#include <sys/vfs.h>
+#if 0
+#include <dirent.h>
+#else
+#include <sys/types.h>
+#endif
 
 #define PVR_COMMIT 1
 
+#define MAJORSD_	8
+#define MAJORMMCBLK	179
+#define LIMIT_FILESIZE_NOHDD	2*1024*1024*1024LL	// 2GBytes
+
 //FILE *f = fopen("/log.ts", "wb");
+static bool g_is_diskfull = false;
 
 eFilePushThread::eFilePushThread(int io_prio_class, int io_prio_level, int blocksize)
 	:prio_class(io_prio_class), prio(io_prio_level), m_messagepump(eApp, 0)
@@ -19,6 +31,7 @@ eFilePushThread::eFilePushThread(int io_prio_class, int io_prio_level, int block
 	flush();
 	enablePVRCommit(0);
 	CONNECT(m_messagepump.recv_msg, eFilePushThread::recvEvent);
+	m_hdd_connected = false;
 }
 
 static void signal_handler(int x)
@@ -36,6 +49,39 @@ void eFilePushThread::thread()
 	size_t current_span_remaining = 0;
 	
 	size_t written_since_last_sync = 0;
+
+	std::string tspath;
+	if(ePythonConfigQuery::getConfigValue("config.usage.timeshift_path", tspath) == -1) {
+		eDebug("could not query ts path from config");
+	}
+	tspath.append("/");
+
+#if 0
+	DIR *tsdir_info;
+	struct dirent *tsdir_entry;
+	tsdir_info = opendir("/sys/block");
+	if (tsdir_info != NULL) {
+		m_hdd_connected = false;
+		while (tsdir_entry = readdir(tsdir_info)) {
+			if (strncmp(tsdir_entry->d_name, "sd", 2) == 0) {
+				eDebug("HDD found: %s", tsdir_entry->d_name);
+				m_hdd_connected = true;
+				break;
+			}
+		}
+	}
+#else
+	struct stat tspath_st;
+	if (stat(tspath.c_str(), &tspath_st) == 0) {
+		if (major(tspath_st.st_dev) == MAJORSD_) {
+			eDebug("Timeshift location on HDD!");
+			m_hdd_connected = true;
+		} else if (major(tspath_st.st_dev) == MAJORMMCBLK) {
+			eDebug("Timeshift location on eMMC!");
+			m_hdd_connected = false;
+		}
+	}
+#endif
 
 	eDebug("FILEPUSH THREAD START");
 	
@@ -110,6 +156,15 @@ void eFilePushThread::thread()
 					continue;
 				eDebug("eFilePushThread WRITE ERROR");
 				sendEvent(evtWriteError);
+
+				struct statfs fs;
+				if (statfs(tspath.c_str(), &fs) < 0) {
+					eDebug("statfs failed!");
+				}
+				if ((off_t)fs.f_bavail < 1) {
+					eDebug("not enough diskspace for timeshift!");
+					g_is_diskfull = true;
+				}
 				break;
 				// ... we would stop the thread
 			}
@@ -129,6 +184,19 @@ void eFilePushThread::thread()
 //			printf("FILEPUSH: wrote %d bytes\n", w);
 			m_buf_start += w;
 			continue;
+		}
+
+		if (!m_hdd_connected) {
+			struct stat limit_filesize;
+			if (fstat(m_fd_dest, &limit_filesize) == 0) {
+				if (limit_filesize.st_size > LIMIT_FILESIZE_NOHDD) {
+					eDebug("eFilePushThread %lld > %lld LIMIT FILESIZE", limit_filesize.st_size, LIMIT_FILESIZE_NOHDD);
+					sendEvent(evtWriteError);
+
+					g_is_diskfull = true;
+					break;
+				}
+			}
 		}
 
 			/* now fill our buffer. */
@@ -218,6 +286,11 @@ void eFilePushThread::thread()
 				current_span_remaining -= m_buf_end;
 		}
 //		printf("FILEPUSH: read %d bytes\n", m_buf_end);
+
+		if (g_is_diskfull) {
+			sendEvent(evtUser+3);
+			g_is_diskfull = false;
+		}
 	}
 	fdatasync(m_fd_dest);
 

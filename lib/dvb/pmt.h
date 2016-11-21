@@ -189,6 +189,7 @@ public:
 		eventHBBTVInfo, /* HBBTV information was detected in the AIT */
 		
 		eventMisconfiguration, // a channel was not found in any list, or no frontend was found which could provide this channel
+		eventNoDiskSpace,  // no disk space available
 	};
 #ifndef SWIG
 	Signal1<void,int> serviceEvent;
