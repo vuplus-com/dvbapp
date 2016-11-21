@@ -2071,7 +2071,10 @@ void eDVBChannel::stopSource()
 		m_pvr_thread = 0;
 	}
 	if (m_pvr_fd_dst >= 0)
+	{
 		::close(m_pvr_fd_dst);
+		m_pvr_fd_dst = -1;
+	}
 	ePtr<iTsSource> d;
 	m_tstools.setSource(d);
 }
