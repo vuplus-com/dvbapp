@@ -31,6 +31,7 @@ eFilePushThread::eFilePushThread(int io_prio_class, int io_prio_level, int block
 	flush();
 	enablePVRCommit(0);
 	CONNECT(m_messagepump.recv_msg, eFilePushThread::recvEvent);
+	m_is_timeshift = false;
 	m_hdd_connected = false;
 }
 
@@ -50,12 +51,6 @@ void eFilePushThread::thread()
 	
 	size_t written_since_last_sync = 0;
 
-	std::string tspath;
-	if(ePythonConfigQuery::getConfigValue("config.usage.timeshift_path", tspath) == -1) {
-		eDebug("could not query ts path from config");
-	}
-	tspath.append("/");
-
 #if 0
 	DIR *tsdir_info;
 	struct dirent *tsdir_entry;
@@ -71,15 +66,20 @@ void eFilePushThread::thread()
 		}
 	}
 #else
+	if (m_tspath.empty())
+		defaultTSPath(m_is_timeshift);
+
 	struct stat tspath_st;
-	if (stat(tspath.c_str(), &tspath_st) == 0) {
+	if (stat(m_tspath.c_str(), &tspath_st) == 0) {
 		if (major(tspath_st.st_dev) == MAJORSD_) {
-			eDebug("Timeshift location on HDD!");
+			eDebug("%s location on HDD!", m_tspath.c_str());
 			m_hdd_connected = true;
 		} else if (major(tspath_st.st_dev) == MAJORMMCBLK) {
-			eDebug("Timeshift location on eMMC!");
+			eDebug("%s location on eMMC!", m_tspath.c_str());
 			m_hdd_connected = false;
 		}
+	} else {
+		eDebug("stat failed!");
 	}
 #endif
 
@@ -158,11 +158,11 @@ void eFilePushThread::thread()
 				sendEvent(evtWriteError);
 
 				struct statfs fs;
-				if (statfs(tspath.c_str(), &fs) < 0) {
+				if (statfs(m_tspath.c_str(), &fs) < 0) {
 					eDebug("statfs failed!");
 				}
 				if ((off_t)fs.f_bavail < 1) {
-					eDebug("not enough diskspace for timeshift!");
+					eDebug("not enough diskspace!");
 					g_is_diskfull = true;
 				}
 				break;
@@ -362,6 +362,16 @@ void eFilePushThread::setStreamMode(int s)
 	m_stream_mode = s;
 }
 
+void eFilePushThread::setTimeshift(bool s)
+{
+	m_is_timeshift = s;
+}
+
+void eFilePushThread::setTSPath(const std::string s)
+{
+	m_tspath = s;
+}
+
 void eFilePushThread::setScatterGather(iFilePushScatterGather *sg)
 {
 	m_sg = sg;
@@ -375,6 +385,36 @@ void eFilePushThread::sendEvent(int evt)
 void eFilePushThread::recvEvent(const int &evt)
 {
 	m_event(evt);
+}
+
+void eFilePushThread::defaultTSPath(bool s)
+{
+	std::string tspath;
+
+	if (s) {
+		if (ePythonConfigQuery::getConfigValue("config.usage.timeshift_path", tspath) == -1)
+			eDebug("could not query ts path from config");
+	} else {
+		if (ePythonConfigQuery::getConfigValue("config.usage.instantrec_path", tspath) == -1) {
+			eDebug("could not query ts path from config");
+		} else {
+			if (tspath == "<default>") {
+				if (ePythonConfigQuery::getConfigValue("config.usage.default_path", tspath) == -1)
+					eDebug("could not query ts path from config");
+			} else if (tspath == "<current>") {
+				if (ePythonConfigQuery::getConfigValue("config.movielist.last_videodir", tspath) == -1)
+					eDebug("could not query ts path from config");
+			} else if (tspath == "<timer>") {
+				if (ePythonConfigQuery::getConfigValue("config.movielist.last_timer_videodir", tspath) == -1)
+					eDebug("could not query ts path from config");
+			}
+		}
+	}
+
+	if (!tspath.empty())
+		tspath.append("/");
+
+	m_tspath = tspath;
 }
 
 int eFilePushThread::filterRecordData(const unsigned char *data, int len, size_t &current_span_remaining)

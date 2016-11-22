@@ -103,6 +103,7 @@ public:
 	RESULT setTargetFilename(const char *filename);
 	RESULT enableAccessPoints(bool enable);
 	RESULT setBoundary(off_t max);
+	RESULT setTimeshift(bool enable);
 	
 	RESULT stop();
 

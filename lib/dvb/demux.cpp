@@ -654,6 +654,11 @@ RESULT eDVBTSRecorder::setTargetFD(int fd)
 RESULT eDVBTSRecorder::setTargetFilename(const char *filename)
 {
 	m_target_filename = filename;
+
+	std::string target_path = m_target_filename;
+	std::string::size_type filePos = target_path.rfind('/');
+	m_thread->setTSPath(target_path.erase(filePos));
+
 	return 0;
 }
 
@@ -666,6 +671,11 @@ RESULT eDVBTSRecorder::enableAccessPoints(bool enable)
 RESULT eDVBTSRecorder::setBoundary(off_t max)
 {
 	return -1; // not yet implemented
+}
+
+RESULT eDVBTSRecorder::setTimeshift(bool enable)
+{
+	m_thread->setTimeshift(enable);
 }
 
 RESULT eDVBTSRecorder::stop()

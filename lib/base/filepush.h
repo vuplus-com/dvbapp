@@ -36,6 +36,8 @@ public:
 	
 		/* stream mode will wait on EOF until more data is available. */
 	void setStreamMode(int);
+	void setTimeshift(bool);
+	void setTSPath(const std::string);
 	
 	void setScatterGather(iFilePushScatterGather *);
 	
@@ -63,9 +65,12 @@ private:
 	ePtr<iTsSource> m_source;
 
 	eFixedMessagePump<int> m_messagepump;
+	std::string m_tspath;
+	bool m_is_timeshift;
 	bool m_hdd_connected;
 
 	void recvEvent(const int &evt);
+	void defaultTSPath(bool);
 };
 
 #endif

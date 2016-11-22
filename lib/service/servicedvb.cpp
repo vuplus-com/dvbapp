@@ -2247,6 +2247,7 @@ RESULT eDVBServicePlay::startTimeshift()
 	m_record->setTargetFD(m_timeshift_fd);
 	m_record->setTargetFilename(m_timeshift_file.c_str());
 	m_record->enableAccessPoints(false);
+	m_record->setTimeshift(true);
 
 	m_timeshift_enabled = 1;
 	

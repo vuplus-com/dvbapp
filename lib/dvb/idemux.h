@@ -40,6 +40,7 @@ public:
 	virtual RESULT setTargetFilename(const char *filename) = 0;
 	virtual RESULT enableAccessPoints(bool enable) = 0;
 	virtual RESULT setBoundary(off_t max) = 0;
+	virtual RESULT setTimeshift(bool enable) = 0;
 	
 	virtual RESULT stop() = 0;
 
