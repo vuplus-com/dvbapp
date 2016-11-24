@@ -1,4 +1,4 @@
-from skin import parseColor
+from skin import parseColor, parseFont, parseSize
 from Components.config import config, ConfigClock, ConfigInteger
 from Components.Pixmap import Pixmap
 from Components.Button import Button
@@ -36,7 +36,6 @@ class EPGList(HTMLComponent, GUIComponent):
 			self.onSelChanged.append(selChangedCB)
 		GUIComponent.__init__(self)
 		self.l = eListboxPythonMultiContent()
-		self.l.setItemHeight(54);
 		self.l.setBuildFunc(self.buildEntry)
 		if overjump_empty:
 			self.l.setSelectableFunc(self.isSelectable)
@@ -58,28 +57,41 @@ class EPGList(HTMLComponent, GUIComponent):
 		self.backColorSelected = 0x808080
 		self.foreColorService = None
 		self.backColorService = None
+		self.serviceFont = gFont("Regular", 20)
+		self.entryFont = gFont("Regular", 14)
+		self.itemHeight = 54
 
 	def applySkin(self, desktop, screen):
-		if self.skinAttributes is not None:
-			attribs = [ ]
-			for (attrib, value) in self.skinAttributes:
-				if attrib == "EntryForegroundColor":
-					self.foreColor = parseColor(value).argb()
-				elif attrib == "EntryForegroundColorSelected":
-					self.foreColorSelected = parseColor(value).argb()
-				elif attrib == "EntryBorderColor":
-					self.borderColor = parseColor(value).argb()
-				elif attrib == "EntryBackgroundColor":
-					self.backColor = parseColor(value).argb()
-				elif attrib == "EntryBackgroundColorSelected":
-					self.backColorSelected = parseColor(value).argb()
-				elif attrib == "ServiceNameForegroundColor":
-					self.foreColorService = parseColor(value).argb()
-				elif attrib == "ServiceNameBackgroundColor":
-					self.backColorService = parseColor(value).argb()
-				else:
-					attribs.append((attrib,value))
-			self.skinAttributes = attribs
+		def EntryForegroundColor(value):
+			self.foreColor = parseColor(value).argb()
+		def EntryForegroundColorSelected(value):
+			self.foreColorSelected = parseColor(value).argb()
+		def EntryBackgroundColor(value):
+			self.backColor = parseColor(value).argb()
+		def EntryBackgroundColorSelected(value):
+			self.backColorSelected = parseColor(value).argb()
+		def EntryBorderColor(value):
+			self.borderColor = parseColor(value).argb()
+		def EntryItemHeight(value):
+			self.itemHeight = int(value)
+		def ServiceNameForegroundColor(value):
+			self.foreColorService = parseColor(value).argb()		
+		def ServiceNameBackgroundColor(value):
+			self.backColorService = parseColor(value).argb()
+		def ServiceFont(value):
+			self.serviceFont = parseFont(value, ((1,1),(1,1)) )
+		def EntryFont(value):
+			self.entryFont = parseFont(value, ((1,1),(1,1)) )
+
+		for (attrib, value) in list(self.skinAttributes):
+			try:
+				locals().get(attrib)(value)
+				self.skinAttributes.remove((attrib, value))
+			except:
+				pass
+		self.l.setFont(0, self.serviceFont)
+		self.l.setFont(1, self.entryFont)
+		self.l.setItemHeight(self.itemHeight)
 		return GUIComponent.applySkin(self, desktop, screen)
 
 	def isSelectable(self, service, sname, event_list):
@@ -190,8 +202,6 @@ class EPGList(HTMLComponent, GUIComponent):
 		instance.setWrapAround(True)
 		instance.selectionChanged.get().append(self.serviceChanged)
 		instance.setContent(self.l)
-		self.l.setFont(0, gFont("Regular", 20))
-		self.l.setFont(1, gFont("Regular", 14))
 		self.l.setSelectionClip(eRect(0,0,0,0), False)
 
 	def preWidgetRemove(self, instance):
@@ -382,21 +392,44 @@ class TimelineText(HTMLComponent, GUIComponent):
 		GUIComponent.__init__(self)
 		self.l = eListboxPythonMultiContent()
 		self.l.setSelectionClip(eRect(0,0,0,0))
-		self.l.setItemHeight(25);
-		self.l.setFont(0, gFont("Regular", 20))
+		self.foreColor = 0xffc000
+		self.backColor = 0x000000
+		self.font = gFont("Regular", 20)
+		self.itemHeight = 25
 
 	GUI_WIDGET = eListbox
+
+	def applySkin(self, desktop, screen):
+		def foregroundColor(value):
+			self.foreColor = parseColor(value).argb()
+		def backgroundColor(value):
+			self.backColor = parseColor(value).argb()
+		def font(value):
+			self.font = parseFont(value,  ((1, 1), (1, 1)) )
+		def itemHeight(value):
+			self.itemHeight = int(value)
+		for (attrib, value) in list(self.skinAttributes):
+			try:
+				locals().get(attrib)(value)
+				self.skinAttributes.remove((attrib, value))
+			except:
+				pass
+		self.l.setFont(0, self.font)
+		self.l.setItemHeight(self.itemHeight);
+		return GUIComponent.applySkin(self, desktop, screen)
 
 	def postWidgetCreate(self, instance):
 		instance.setContent(self.l)
 
 	def setEntries(self, entries):
+		ih = self.itemHeight
+		width = ih * 60 / 25
 		res = [ None ] # no private data needed
 		for x in entries:
 			tm = x[0]
 			xpos = x[1]
 			str = strftime("%H:%M", localtime(tm))
-			res.append((eListboxPythonMultiContent.TYPE_TEXT, xpos-30, 0, 60, 25, 0, RT_HALIGN_CENTER|RT_VALIGN_CENTER, str))
+			res.append((eListboxPythonMultiContent.TYPE_TEXT, xpos-30, 0, width, ih, 0, RT_HALIGN_CENTER|RT_VALIGN_CENTER, str))
 		self.l.setList([res])
 
 config.misc.graph_mepg_prev_time=ConfigClock(default = time())

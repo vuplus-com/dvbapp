@@ -525,11 +525,6 @@ eDVBFrontend::eDVBFrontend(int adap, int fe, int &ok, bool simulate, eDVBFronten
 
 	m_idleInputpower[0]=m_idleInputpower[1]=0;
 
-	char fileName[32] = {0};
-	sprintf(fileName, "/proc/stb/frontend/%d/fbc_id", m_slotid);
-	if (access(fileName, F_OK) == 0)
-		m_fbc = true;
-
 	ok = !openFrontend();
 	closeFrontend();
 }

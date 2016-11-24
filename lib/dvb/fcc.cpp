@@ -326,7 +326,7 @@ bool eFCCServiceManager::checkAvailable(const eServiceReference &ref)
 	int serviceType = ref.getData(0);
 	eFCCServiceManager *fcc_mng = eFCCServiceManager::getInstance();
 
-	if (ref.path.empty() && (serviceType != 2) && (serviceType != 10) && fcc_mng) // no PVR, streaming, radio channel..
+	if ((ref.type == 1) && ref.path.empty() && (serviceType != 2) && (serviceType != 10) && fcc_mng) // no PVR, streaming, radio channel..
 		return fcc_mng->isEnable();
 	return false;
 }

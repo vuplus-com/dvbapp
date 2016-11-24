@@ -945,6 +945,7 @@ eDVBServicePlay::eDVBServicePlay(const eServiceReference &ref, eDVBService *serv
 	m_reference(ref), m_dvb_service(service), m_have_video_pid(0), m_is_paused(0)
 {
 	m_is_primary = 1;
+	m_decoder_index = 0;
 	m_is_stream = m_reference.path.substr(0, 7) == "http://";
 	m_is_pvr = (!m_reference.path.empty() && !m_is_stream);
 
@@ -1268,6 +1269,7 @@ RESULT eDVBServicePlay::stop()
 RESULT eDVBServicePlay::setTarget(int target)
 {
 	m_is_primary = !target;
+	m_decoder_index = target;
 	return 0;
 }
 
@@ -2577,7 +2579,7 @@ void eDVBServicePlay::updateDecoder(bool sendSeekableStateChanged)
 		h.getDecodeDemux(m_decode_demux);
 		if (m_decode_demux)
 		{
-			m_decode_demux->getMPEGDecoder(m_decoder, m_is_primary);
+			m_decode_demux->getMPEGDecoder(m_decoder, m_decoder_index);
 			if (m_decoder)
 				m_decoder->connectVideoEvent(slot(*this, &eDVBServicePlay::video_event), m_video_event_connection);
 			if (m_is_primary)

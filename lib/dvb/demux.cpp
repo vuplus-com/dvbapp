@@ -58,12 +58,10 @@ typedef enum {
 #include "crc32.h"
 
 #include <lib/base/eerror.h>
-#include <lib/base/filepush.h>
 #include <lib/dvb/idvb.h>
 #include <lib/dvb/demux.h>
 #include <lib/dvb/esection.h>
 #include <lib/dvb/decoder.h>
-#include <lib/dvb/pvrparse.h>
 
 eDVBDemux::eDVBDemux(int adapter, int demux): adapter(adapter), demux(demux)
 {
@@ -151,9 +149,9 @@ RESULT eDVBDemux::createTSRecorder(ePtr<iDVBTSRecorder> &recorder)
 	return 0;
 }
 
-RESULT eDVBDemux::getMPEGDecoder(ePtr<iTSMPEGDecoder> &decoder, int primary)
+RESULT eDVBDemux::getMPEGDecoder(ePtr<iTSMPEGDecoder> &decoder, int index)
 {
-	decoder = new eTSMPEGDecoder(this, primary ? 0 : 1);
+	decoder = new eTSMPEGDecoder(this, index);
 	return 0;
 }
 
@@ -446,26 +444,6 @@ RESULT eDVBPESReader::connectRead(const Slot2<void,const __u8*,int> &r, ePtr<eCo
 	conn = new eConnection(this, m_read.connect(r));
 	return 0;
 }
-
-class eDVBRecordFileThread: public eFilePushThread
-{
-public:
-	eDVBRecordFileThread();
-	void setTimingPID(int pid, int type);
-	
-	void startSaveMetaInformation(const std::string &filename);
-	void stopSaveMetaInformation();
-	void enableAccessPoints(bool enable);
-	int getLastPTS(pts_t &pts);
-protected:
-	int filterRecordData(const unsigned char *data, int len, size_t &current_span_remaining);
-private:
-	eMPEGStreamParserTS m_ts_parser;
-	eMPEGStreamInformation m_stream_info;
-	off_t m_current_offset;
-	pts_t m_last_pcr; /* very approximate.. */
-	int m_pid;
-};
 
 eDVBRecordFileThread::eDVBRecordFileThread()
 	:eFilePushThread(IOPRIO_CLASS_RT, 7), m_ts_parser(m_stream_info)

@@ -236,7 +236,7 @@ void eDVBServiceFCCPlay::updateFCCDecoder(bool sendSeekableStateChanged)
 		h.getDecodeDemux(m_decode_demux);
 		if (m_decode_demux)
 		{
-			m_decode_demux->getMPEGDecoder(m_decoder, m_is_primary);
+			m_decode_demux->getMPEGDecoder(m_decoder, m_decoder_index);
 			if (m_decoder)
 				m_decoder->connectVideoEvent(slot(*this, &eDVBServiceFCCPlay::video_event), m_video_event_connection);
 		}

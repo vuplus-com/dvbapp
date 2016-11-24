@@ -9,6 +9,7 @@ from Tools.LoadPixmap import LoadPixmap
 from time import localtime, time
 from ServiceReference import ServiceReference
 from Tools.Directories import resolveFilename, SCOPE_CURRENT_SKIN
+import skin
 
 EPG_TYPE_SINGLE = 0
 EPG_TYPE_MULTI = 1
@@ -43,8 +44,10 @@ class EPGList(HTMLComponent, GUIComponent):
 		GUIComponent.__init__(self)
 		self.type=type
 		self.l = eListboxPythonMultiContent()
-		self.l.setFont(0, gFont("Regular", 22))
-		self.l.setFont(1, gFont("Regular", 16))
+		font = skin.fonts.get("EPGList0", ("Regular", 22))
+		self.l.setFont(0, gFont(font[0], font[1]))
+		font = skin.fonts.get("EPGList1", ("Regular", 16))
+		self.l.setFont(1, gFont(font[0], font[1]))
 		if type == EPG_TYPE_SINGLE:
 			self.l.setBuildFunc(self.buildSingleEntry)
 		elif type == EPG_TYPE_MULTI:

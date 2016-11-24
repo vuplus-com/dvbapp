@@ -8,8 +8,8 @@ from os import path as os_path, listdir, open as os_open, close as os_close, wri
 # asm-generic/ioctl.h
 IOC_NRBITS = 8L
 IOC_TYPEBITS = 8L
-IOC_SIZEBITS = 13L
-IOC_DIRBITS = 3L
+IOC_SIZEBITS = 14L
+IOC_DIRBITS = 2L
 
 IOC_NRSHIFT = 0L
 IOC_TYPESHIFT = IOC_NRSHIFT+IOC_NRBITS
@@ -33,6 +33,9 @@ class inputDevices:
 		devices = listdir("/dev/input/")
 
 		for evdev in devices:
+			if not evdev.startswith("event"):
+				continue
+
 			try:
 				buffer = "\0"*512
 				self.fd = os_open("/dev/input/" + evdev, O_RDWR | O_NONBLOCK)

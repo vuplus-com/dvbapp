@@ -160,6 +160,7 @@ public:
 	const char *getDescription() const { return m_description; }
 	bool is_simulate() const { return m_simulate; }
 	bool is_FBCTuner() { return m_fbc; }
+	void setFBCTuner(bool enable) { m_fbc = enable; }
 	bool getEnabled() { return m_enabled; }
 	void setEnabled(bool enable) { m_enabled = enable; }
 	bool isLoopTimerActive() { return m_tuneTimer->isActive(); }

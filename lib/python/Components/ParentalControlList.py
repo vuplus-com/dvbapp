@@ -4,6 +4,7 @@ from Tools.Directories import SCOPE_SKIN_IMAGE, resolveFilename
 
 from enigma import eListboxPythonMultiContent, gFont, RT_HALIGN_LEFT
 from Tools.LoadPixmap import LoadPixmap
+import skin
 
 #Now there is a list of pictures instead of one...
 entryPicture = {}
@@ -28,8 +29,9 @@ def ParentalControlEntryComponent(service, name, protectionType):
 class ParentalControlList(MenuList):
 	def __init__(self, list, enableWrapAround = False):
 		MenuList.__init__(self, list, enableWrapAround, eListboxPythonMultiContent)
-		self.l.setFont(0, gFont("Regular", 20))
-		self.l.setItemHeight(32)
+		font = skin.fonts.get("ParentalControlList", ("Regular", 20, 32))
+		self.l.setFont(0, gFont(font[0], font[1]))
+		self.l.setItemHeight(font[2])
 
 	def toggleSelectedLock(self):
 		from Components.ParentalControl import parentalControl

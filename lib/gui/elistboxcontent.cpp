@@ -138,7 +138,7 @@ void eListboxPythonStringContent::setSize(const eSize &size)
 
 void eListboxPythonStringContent::paint(gPainter &painter, eWindowStyle &style, const ePoint &offset, int selected)
 {
-	ePtr<gFont> fnt = new gFont("Regular", 20);
+	ePtr<gFont> fnt;
 	painter.clip(eRect(offset, m_itemsize));
 	style.setStyle(painter, selected ? eWindowStyle::styleListboxSelected : eWindowStyle::styleListboxNormal);
 
@@ -151,6 +151,7 @@ void eListboxPythonStringContent::paint(gPainter &painter, eWindowStyle &style, 
 
 	if (local_style)
 	{
+		fnt = local_style->m_font;
 		if (selected)
 		{
 			/* if we have a local background color set, use that. */
@@ -170,6 +171,7 @@ void eListboxPythonStringContent::paint(gPainter &painter, eWindowStyle &style, 
 				painter.setForegroundColor(local_style->m_foreground_color);
 		}
 	}
+	if (!fnt) fnt = new gFont("Regular", 20);
 
 	/* if we have no transparent background */
 	if (!local_style || !local_style->m_transparent_background)
@@ -273,8 +275,8 @@ void eListboxPythonStringContent::invalidate()
 
 void eListboxPythonConfigContent::paint(gPainter &painter, eWindowStyle &style, const ePoint &offset, int selected)
 {
-	ePtr<gFont> fnt = new gFont("Regular", 20);
-	ePtr<gFont> fnt2 = new gFont("Regular", 16);
+	ePtr<gFont> fnt;
+	ePtr<gFont> fnt2;
 	eRect itemrect(offset, m_itemsize);
 	eListboxStyle *local_style = 0;
 	bool cursorValid = this->cursorValid();
@@ -288,6 +290,7 @@ void eListboxPythonConfigContent::paint(gPainter &painter, eWindowStyle &style, 
 
 	if (local_style)
 	{
+		fnt = local_style->m_font;
 		if (selected)
 		{
 			/* if we have a local background color set, use that. */
@@ -306,6 +309,16 @@ void eListboxPythonConfigContent::paint(gPainter &painter, eWindowStyle &style, 
 			if (local_style->m_foreground_color_set)
 				painter.setForegroundColor(local_style->m_foreground_color);
 		}
+	}
+
+	if (fnt)
+	{
+		fnt2 = new gFont(fnt->family, fnt->pointSize - fnt->pointSize/5);
+	}
+	else
+	{
+		fnt = new gFont("Regular", 20);
+		fnt2 = new gFont("Regular", 16);
 	}
 
 	if (!local_style || !local_style->m_transparent_background)

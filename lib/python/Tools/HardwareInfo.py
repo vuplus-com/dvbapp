@@ -1,5 +1,8 @@
+import os
+
 class HardwareInfo:
 	device_name = None
+	vu_device_name = None
 
 	def __init__(self):
 		if HardwareInfo.device_name is not None:
@@ -30,5 +33,13 @@ class HardwareInfo:
 			except:
 				pass
 
+		HardwareInfo.vu_device_name = "unknown"
+		vumodel_path = "/proc/stb/info/vumodel"
+		if os.access(vumodel_path, os.F_OK):
+			HardwareInfo.vu_device_name = open(vumodel_path, "r").read().strip()
+
 	def get_device_name(self):
 		return HardwareInfo.device_name
+
+	def get_vu_device_name(self):
+		return HardwareInfo.vu_device_name

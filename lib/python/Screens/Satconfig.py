@@ -1,4 +1,4 @@
-from enigma import eDVBDB
+from enigma import eDVBDB, getLinkedSlotID, isFBCLink
 from Screen import Screen
 from Components.SystemInfo import SystemInfo
 from Components.ActionMap import ActionMap
@@ -17,21 +17,6 @@ from datetime import datetime
 
 from Components.PluginComponent import plugins
 from Plugins.Plugin import PluginDescriptor
-
-def isFBCTuner(nim):
-	if nim.description.find("FBC") == -1:
-		return False
-	return True
-
-def isFBCRoot(nim):
-	if nim.slot %8 < 2:
-		return True
-	return False
-
-def isFBCLink(nim):
-	if isFBCTuner(nim) and not isFBCRoot(nim):
-		return True
-	return False
 
 class NimSetup(Screen, ConfigListScreen, ServiceStopScreen):
 	def createSimpleSetup(self, list, mode):
@@ -88,7 +73,7 @@ class NimSetup(Screen, ConfigListScreen, ServiceStopScreen):
 				choices["satposdepends"] = _("second cable of motorized LNB")
 			if len(nimmanager.canConnectTo(self.slotid)) > 0:
 				choices["loopthrough"] = _("loopthrough to")
-			if isFBCLink(self.nim):
+			if isFBCLink(self.nim.slot):
 				choices = { "nothing": _("not configured"),
 						"advanced": _("advanced")}
 			self.nimConfig.configMode.setChoices(choices, default = "nothing")
@@ -268,7 +253,7 @@ class NimSetup(Screen, ConfigListScreen, ServiceStopScreen):
 		self.list.append(self.advancedLnbsEntry)
 
 		if currLnb:
-			if isFBCLink(self.nim):
+			if isFBCLink(self.nim.slot):
 				if currLnb.lof.value != "unicable":
 					currLnb.lof.value = "unicable"
 
@@ -336,7 +321,7 @@ class NimSetup(Screen, ConfigListScreen, ServiceStopScreen):
 				for id in connectable:
 					choices.append((str(id), nimmanager.getNimDescription(id)))
 				if len(choices):
-					if isFBCLink(self.nim):
+					if isFBCLink(self.nim.slot):
 						if self.nimConfig.advanced.unicableconnected.value != True:
 							self.nimConfig.advanced.unicableconnected.value = True
 
@@ -512,7 +497,7 @@ class NimSetup(Screen, ConfigListScreen, ServiceStopScreen):
 		self.createSetup()
 
 	def keyLeft(self):
-		if isFBCLink(self.nim):
+		if isFBCLink(self.nim.slot):
 			checkList = (self.advancedLof, self.advancedConnected)
 			curEntry = self["config"].getCurrent()
 			if curEntry in checkList:
@@ -522,7 +507,7 @@ class NimSetup(Screen, ConfigListScreen, ServiceStopScreen):
 		self.newConfig()
 
 	def keyRight(self):
-		if isFBCLink(self.nim):
+		if isFBCLink(self.nim.slot):
 			checkList = (self.advancedLof, self.advancedConnected)
 			curEntry = self["config"].getCurrent()
 			if curEntry in checkList:
@@ -587,8 +572,7 @@ class NimSelection(Screen):
 			configMode = nimConfig.configMode.value
 			if self.showNim(x):
 				if x.isCompatible("DVB-S"):
-					if isFBCLink(x) and configMode != "advanced":
-						from enigma import getLinkedSlotID
+					if isFBCLink(x.slot) and configMode != "advanced":
 						link = getLinkedSlotID(x.slot)
 
 						if link == -1:
@@ -605,7 +589,7 @@ class NimSelection(Screen):
 		nim = nim and nim[3]
 
 		nimConfig = nimmanager.getNimConfig(nim.slot)
-		if isFBCLink(nim) and nimConfig.configMode.value == "loopthrough":
+		if isFBCLink(nim.slot) and nimConfig.configMode.value == "loopthrough":
 			return
 
 		if nim is not None and not nim.empty and nim.isSupported():
@@ -664,7 +648,7 @@ class NimSelection(Screen):
 							text = _("simple")
 					elif nimConfig.configMode.value == "advanced":
 						text = _("advanced")
-					if isFBCLink(x) and nimConfig.configMode.value != "advanced":
+					if isFBCLink(x.slot) and nimConfig.configMode.value != "advanced":
 						text += _("\n<This tuner is configured automatically>")
 				elif x.isCompatible("DVB-T") or x.isCompatible("DVB-C"):
 					if nimConfig.configMode.value == "nothing":

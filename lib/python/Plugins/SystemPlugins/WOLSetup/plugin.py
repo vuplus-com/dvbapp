@@ -9,10 +9,12 @@ from Screens.ChoiceBox import ChoiceBox
 from Screens.MessageBox import MessageBox
 from Screens.Standby import TryQuitMainloop
 
+from Components.SystemInfo import SystemInfo
 from Components.PluginComponent import plugins
 
 from Components.ConfigList import ConfigListScreen
 from Components.config import config, getConfigListEntry, ConfigSubsection, ConfigYesNo, ConfigSelection
+from Components.Network import iNetwork
 
 import os
 
@@ -24,6 +26,8 @@ _flagSupportWol = _flagForceEnable and True or os.path.exists(_deviseWOL)
 _tryQuitTable = {"deepstandby":1, "reboot":2, "guirestart":3}
 
 _ethDevice = "eth0"
+if SystemInfo.get("WOWLSupport", False):
+	_ethDevice = "wlan3"
 
 config.plugins.wolconfig = ConfigSubsection()
 config.plugins.wolconfig.activate = ConfigYesNo(default = False)
@@ -46,7 +50,7 @@ class NetTool:
 
 class WOLSetup(ConfigListScreen, Screen):
 	skin = 	"""
-		<screen name="WOLSetup" position="center,120" size="600,390" title="WakeOnLan Setup">
+		<screen name="WOLSetup" position="center,center" size="600,390" title="WakeOnLan Setup">
 			<ePixmap pixmap="skin_default/buttons/red.png" position="5,0" size="140,40" alphatest="on" />
 			<ePixmap pixmap="skin_default/buttons/green.png" position="155,0" size="140,40" alphatest="on" />
 			<ePixmap pixmap="skin_default/buttons/yellow.png" position="305,0" size="140,40" alphatest="on" />
@@ -98,7 +102,13 @@ class WOLSetup(ConfigListScreen, Screen):
 			self.configlist.append(getConfigListEntry(_("WakeOnLan Enable"), config.plugins.wolconfig.activate))
 			if config.plugins.wolconfig.activate.value:
 				self.configlist.append(getConfigListEntry(_("Location"), config.plugins.wolconfig.location))
-				macaddr = "HWaddr of %s is %s" % (_ethDevice, NetTool.GetHardwareAddr(_ethDevice))
+				if SystemInfo.get("WOWLSupport", False):
+					if iNetwork.getAdapterAttribute(_ethDevice, 'up'):
+						macaddr = "HWaddr of %s is %s" % (_ethDevice, NetTool.GetHardwareAddr(_ethDevice))
+					else:
+						macaddr = "Wireless lan is not activated."
+				else:
+					macaddr = "HWaddr of %s is %s" % (_ethDevice, NetTool.GetHardwareAddr(_ethDevice))
 			else:	macaddr = "Wake on Lan disabled"
 			self["introduction"].setText(macaddr)
 

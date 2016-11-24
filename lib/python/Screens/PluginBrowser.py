@@ -46,6 +46,12 @@ class PluginBrowser(Screen):
 		self["SoftwareActions"].setEnabled(False)
 		self.onFirstExecBegin.append(self.checkWarnings)
 		self.onShown.append(self.updateList)
+		self.onLayoutFinish.append(self.saveListsize)
+
+	def saveListsize(self):
+		listsize = self["list"].instance.size()
+		self.listWidth = listsize.width()
+		self.listHeight = listsize.height()
 	
 	def checkWarnings(self):
 		if len(plugins.warnings):
@@ -64,7 +70,7 @@ class PluginBrowser(Screen):
 		
 	def updateList(self):
 		self.pluginlist = plugins.getPlugins(PluginDescriptor.WHERE_PLUGINMENU)
-		self.list = [PluginEntryComponent(plugin) for plugin in self.pluginlist]
+		self.list = [PluginEntryComponent(plugin, self.listWidth) for plugin in self.pluginlist]
 		self["list"].l.setList(self.list)
 		if fileExists(resolveFilename(SCOPE_PLUGINS, "SystemPlugins/SoftwareManager/plugin.py")):
 			self["red"].setText(_("Manage extensions"))
@@ -172,7 +178,10 @@ class PluginDownloadBrowser(Screen):
 		self.container.execute("opkg list enigma2-plugin-*")
 
 	def startRun(self):
+		listsize = self["list"].instance.size()
 		self["list"].instance.hide()
+		self.listWidth = listsize.width()
+		self.listHeight = listsize.height()
 		if self.type == self.DOWNLOAD:
 			if not PluginDownloadBrowser.lastDownloadDate or (time() - PluginDownloadBrowser.lastDownloadDate) > 3600:
 				# Only update from internet once per hour
@@ -256,10 +265,10 @@ class PluginDownloadBrowser(Screen):
 			
 		for x in self.plugins.keys():
 			if x in self.expanded:
-				list.append(PluginCategoryComponent(x, expandedIcon))
-				list.extend([PluginDownloadComponent(plugin[0], plugin[1]) for plugin in self.plugins[x]])
+				list.append(PluginCategoryComponent(x, expandedIcon, self.listWidth))
+				list.extend([PluginDownloadComponent(plugin[0], plugin[1], self.listWidth) for plugin in self.plugins[x]])
 			else:
-				list.append(PluginCategoryComponent(x, expandableIcon))
+				list.append(PluginCategoryComponent(x, expandableIcon, self.listWidth))
 		self.list = list
 		self["list"].l.setList(list)
 

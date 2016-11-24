@@ -2329,3 +2329,47 @@ class InfoBarServiceErrorPopupSupport:
 			Notifications.AddPopup(text = error, type = MessageBox.TYPE_ERROR, timeout = 5, id = "ZapError")
 		else:
 			Notifications.RemovePopup(id = "ZapError")
+
+class InfoBarHDMI:
+	def __init__(self):
+		self.hdmiInServiceRef = eServiceReference('8192:0:1:0:0:0:0:0:0:0:')
+		if SystemInfo.get("HdmiInSupport", False):
+			self.addExtension((self.getShowHdmiInName, self.HDMIIn, lambda: True), None)
+			self.addExtension((self.getShowHdmiInPIPName, self.HDMIInPIP, self.pipShown), None)
+
+	def getShowHdmiInName(self):
+		curref = self.session.nav.getCurrentlyPlayingServiceReference()
+		if curref and curref.type == 8192:
+			name = _("Disable HDMI-IN on Main Screen")
+		else:
+			name = _("Enable HDMI-IN on Main Screen")
+
+		return name
+
+	def getShowHdmiInPIPName(self):
+		curref = self.session.pip.getCurrentService()
+		if curref and curref.type == 8192:
+			name = _("Disable HDMI-IN on PIP")
+		else:
+			name = _("Enable HDMI-IN on PIP")
+
+		return name
+
+	def getCurrentServiceRef(self):
+		slist = self.servicelist
+		currentServiceSref = slist.servicelist.getCurrent()
+		return currentServiceSref
+
+	def HDMIIn(self):
+		curref = self.session.nav.getCurrentlyPlayingServiceReference()
+		if curref and curref.type == 8192:
+			self.session.nav.playService(self.getCurrentServiceRef())
+		else:
+			self.session.nav.playService(self.hdmiInServiceRef)
+
+	def HDMIInPIP(self):
+		curref = self.session.pip.getCurrentService()
+		if curref and curref.type == 8192:
+			self.session.pip.playService(self.getCurrentServiceRef())
+		else:
+			self.session.pip.playService(self.hdmiInServiceRef)

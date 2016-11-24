@@ -136,6 +136,8 @@ class WlanSelection(Screen,HelpableScreen):
 					return str(os_path.basename(os_path.realpath(driverdir))) + " " + _("WLAN adapter")
 			else:
 				return _("Unknown network adapter")
+		elif os_path.exists("/tmp/bcm/%s"%iface):
+			return _("BroadCom WLAN adapter")
 		else:
 			return _("Unknown network adapter")
 
@@ -300,20 +302,20 @@ class WlanSetup(Screen,HelpableScreen):
 			self.session.openWithCallback(self.checklist, WlanConfig, self.iface)
 
 	def restartLan(self, ret = False):
-		if (ret == True):
+		if ret:
 			iNetwork.restartNetwork(self.restartLanDataAvail)
 			self.restartLanRef = self.session.openWithCallback(self.restartfinishedCB, MessageBox, _("Please wait while your network is restarting..."), type = MessageBox.TYPE_INFO, enable_input = False)
 
 	def restartLanDataAvail(self, data):
-		if data is True:
+		if data:
 			iNetwork.getInterfaces(self.getInterfacesDataAvail)
 
 	def getInterfacesDataAvail(self, data):
-		if data is True:
+		if data:
 			self.restartLanRef.close(True)
 
 	def restartfinishedCB(self,data):
-		if data is True:
+		if data:
 			self.session.open(MessageBox, _("Finished restarting your network"), type = MessageBox.TYPE_INFO, timeout = 5, default = False)
 
 	def cleanup(self):
@@ -383,6 +385,8 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 		self.updateInterfaces(self.updateInterfaceCB)
 		self.onClose.append(self.cleanup)
 
+		self.useWlCommand = os_path.exists("/tmp/bcm/%s"%iface)
+
 	def updateInterfaces(self,callback = None):
 		iNetwork.config_ready = False
 		iNetwork.msgPlugins()
@@ -394,6 +398,45 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 
 		self.createConfig()
 		self.createSetup()
+
+	def getWlConfName(self, iface):
+		return "/etc/wl.conf.%s" % iface
+
+	def readWlConf(self):
+		wsconf = {}
+		wsconf["ssid"] = "Vuplus AP"
+		wsconf["hidden_ssid"] = False # not used
+		wsconf["encrypt_mothod"] = "wpa2"
+		wsconf["wep_keytype"] = "ascii" # not used
+		wsconf["key"] = "XXXXXXXX"
+
+		wlConfName = self.getWlConfName(self.iface)
+
+		if fileExists(wlConfName):
+			fd = open(wlConfName, "r")
+			lines = fd.readlines()
+			fd.close()
+
+			for line in lines:
+				try:
+					(key, value) = line.strip().split('=',1)
+				except:
+					continue
+
+				if key == 'ssid':
+					wsconf["ssid"] = value.strip()
+				if key == 'method':
+					wsconf["encrypt_mothod"] = value.strip()
+				elif key == 'key':
+					wsconf["key"] = value.strip()
+				else:
+					continue
+
+		print ""
+		for (k,v) in wsconf.items():
+			print "[wsconf][%s] %s" % (k , v)
+
+		return wsconf
 
 	def getWpaSupplicantName(self, iface):
 		return "/etc/wpa_supplicant.conf.%s" % iface
@@ -527,11 +570,16 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 		self.displayIP("DNS1", self.primaryDNS)
 		self.displayIP("DNS2", self.secondaryDNS)
 
-# readWPASupplicantConf
-		wsconf = self.readWpaSupplicantConf()
+# read old configuration
+		if self.useWlCommand:
+			wsconf = self.readWlConf()
+		else:
+			wsconf = self.readWpaSupplicantConf()
 
 # method setup
-		encryptionChoices = [("wep", _("WEP")), ("wpa", _("WPA")), ("wpa2", _("WPA2")), ("wpa/wpa2", _("WPA/WPA2")), ("None", _("No Encrypt"))  ]
+		encryptionChoices = [("wep", _("WEP")), ("wpa", _("WPA")), ("wpa2", _("WPA2")), ("None", _("No Encrypt"))  ]
+		if not self.useWlCommand:
+			encryptionChoices.append( ("wpa/wpa2", _("WPA/WPA2")) )
 		self.methodConfigEntry = NoSave(ConfigSelection(default = wsconf["encrypt_mothod"], choices = encryptionChoices))
 
 # key type setup
@@ -559,9 +607,11 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 		self.usedeviceEntry = getConfigListEntry(_("Use Device"), self.activateInterfaceEntry)
 		self.usedhcpEntry = getConfigListEntry(_("Use DHCP"), self.usedhcpConfigEntry)
 		self.essidEntry = getConfigListEntry(_("SSID"), self.ssidConfigEntry)
-		self.hiddenessidEntry = getConfigListEntry(_("Hidden Network"), self.hiddenssidConfigEntry)
+		if not self.useWlCommand:
+			self.hiddenessidEntry = getConfigListEntry(_("Hidden Network"), self.hiddenssidConfigEntry)
 		self.methodEntry = getConfigListEntry(_("Encrypt Method"), self.methodConfigEntry)
-		self.keytypeEntry = getConfigListEntry(_("Key Type"), self.keytypeConfigEntry)
+		if not self.useWlCommand:
+			self.keytypeEntry = getConfigListEntry(_("Key Type"), self.keytypeConfigEntry)
 		self.keyEntry = getConfigListEntry(_("KEY"), self.keyConfigEntry)
 
 		self.ipEntry = getConfigListEntry(_("IP"), self.IPConfigEntry)
@@ -596,12 +646,16 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 				self.configList.append(self.primaryDNSConfigEntry)
 				self.configList.append(self.secondaryDNSConfigEntry)
 
-			self.configList.append( self.hiddenessidEntry )
+			if not self.useWlCommand:
+				self.configList.append( self.hiddenessidEntry )
+
 			self.configList.append( self.essidEntry )
 			self.configList.append( self.methodEntry )
 
 			if self.methodConfigEntry.value =="wep":
-				self.configList.append( self.keytypeEntry )
+				if not self.useWlCommand:
+					self.configList.append( self.keytypeEntry )
+
 			if self.methodConfigEntry.value != "None":
 				self.configList.append( self.keyEntry )
 
@@ -702,10 +756,47 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 				iNetwork.setAdapterAttribute(interface, "up", False)
 				iNetwork.deactivateInterface(interface)
 
-		if not self.isWPAMethod(self.methodConfigEntry.value):
-			self.writeWpasupplicantConf()
+		plainpwd = None
+		psk = None
+
+		if self.isWPAMethod(self.methodConfigEntry.value) and (not self.useWlCommand):
+			(psk, plainpwd) = self.getWpaPhrase()
+
+		res = False
+		if self.useWlCommand:
+			res = self.writeWlConf()
 		else:
-			self.getWpaPhrase()
+			res = self.writeWpasupplicantConf(psk, plainpwd)
+
+		if res:
+			self.writeNetConfig()
+
+	def writeWlConf(self):
+		wsconf = {}
+		wsconf["ssid"] = "Vuplus AP"
+		wsconf["hidden_ssid"] = False # not used
+		wsconf["encrypt_mothod"] = "None"
+		wsconf["wep_keytype"] = "ascii" # not used
+		wsconf["key"] = "XXXXXXXX"
+		
+		wlConfName = self.getWlConfName(self.iface)
+
+		try:
+			fd = open(wlConfName, "w")
+		except:
+			self.session.open(MessageBox, _("%s open error." % wlConfName ), type = MessageBox.TYPE_ERROR, timeout = 10)
+			return False
+
+		contents = ""
+		contents += "ssid="+self.ssidConfigEntry.value+"\n"
+		contents += "method="+self.methodConfigEntry.value+"\n"
+		contents += "key="+self.keyConfigEntry.value+"\n"
+
+		print "content = \n"+contents
+		fd.write(contents)
+		fd.close()
+
+		return True
 
 	def getWpaPhrase(self):
 		cmd = "wpa_passphrase '%s' '%s'" % (self.ssidConfigEntry.value, self.keyConfigEntry.value)
@@ -724,7 +815,8 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 				plainpwd = line
 			elif key == 'psk':
 				psk = line
-		self.writeWpasupplicantConf(psk, plainpwd)
+
+		return (psk, plainpwd)
 
 	def writeWpasupplicantConf(self, passphrasekey=None, plainpwd=None):
 		wpaSupplicantName = self.getWpaSupplicantName(self.iface)
@@ -732,7 +824,7 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 			wpafd = open(wpaSupplicantName, "w")
 		except:
 			self.session.open(MessageBox, _("%s open error." % wpaSupplicantName ), type = MessageBox.TYPE_ERROR, timeout = 10)
-			return
+			return False
 
 		contents = "#WPA Supplicant Configuration by STB\n"
 		contents += "ctrl_interface=/var/run/wpa_supplicant\n"
@@ -788,7 +880,8 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 #		print "content = \n"+contents
 		wpafd.write(contents)
 		wpafd.close()
-		self.writeNetConfig()
+
+		return True
 
 	def writeNetConfig(self):
 		if self.activateInterfaceEntry.value is True:
@@ -812,9 +905,13 @@ class WlanConfig(Screen, ConfigListScreen, HelpableScreen):
 			iNetwork.setAdapterAttribute(self.iface, "up", False)
 			iNetwork.deactivateInterface(self.iface)
 
-		wpaSupplicantName = self.getWpaSupplicantName(self.iface)
-		contents = "\tpre-up wpa_supplicant -i"+self.iface+" -c%s -B -D" % (wpaSupplicantName)  +iNetwork.detectWlanModule(self.iface)+"\n"
-		contents += "\tpost-down wpa_cli terminate\n"
+		if self.useWlCommand:
+			contents = '\tpre-up wl-config.sh -m %s -k %s -s "%s" \n' % (self.methodConfigEntry.value, self.keyConfigEntry.value, self.ssidConfigEntry.value)
+			contents += '\tpost-down wl-down.sh\n'
+		else:
+			wpaSupplicantName = self.getWpaSupplicantName(self.iface)
+			contents = "\tpre-up wpa_supplicant -i"+self.iface+" -c%s -B -D" % (wpaSupplicantName)  +iNetwork.detectWlanModule(self.iface)+"\n"
+			contents += "\tpost-down wpa_cli terminate\n"
 		iNetwork.setAdapterAttribute(self.iface, "configStrings", contents)
 		iNetwork.writeNetworkConfig()
 		iNetwork.restartNetwork(self.updateCurrentInterfaces)
@@ -967,6 +1064,8 @@ class WlanScanAp(Screen,HelpableScreen):
 		self.onClose.append(self.__onClose)
 		self.onShown.append(lambda: self.startupTimer.start(10, True))
 
+		self.useWlCommand = os_path.exists("/tmp/bcm/%s"%iface)
+
 	def startup(self):
 		if self.oldInterfaceState is not True:
 			self["Status"].setText(("Please wait for activating interface..."))
@@ -977,6 +1076,10 @@ class WlanScanAp(Screen,HelpableScreen):
 	def activateIface(self):
 		os_system("ifconfig "+self.iface+" up")
 		iNetwork.setAdapterAttribute(self.iface, "up", True)
+
+		if self.useWlCommand:
+			os_system("wl up")
+
 		self.updateStatusTimer.start(10, True)
 		
 
@@ -1117,6 +1220,9 @@ class WlanScanAp(Screen,HelpableScreen):
 		if self.oldInterfaceState is not True:
 			os_system("ifconfig "+self.iface+" down")
 			iNetwork.setAdapterAttribute(self.iface, "up", False)
+
+			if self.useWlCommand:
+				os_system("wl down")
 
 class NetworkAdapterTest(Screen):
 	def __init__(self, session,iface):

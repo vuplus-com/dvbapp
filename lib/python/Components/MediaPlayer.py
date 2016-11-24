@@ -6,6 +6,7 @@ from os import path
 from enigma import eListboxPythonMultiContent, RT_VALIGN_CENTER, gFont, eServiceCenter
 
 from Tools.LoadPixmap import LoadPixmap
+import skin
 
 STATE_PLAY = 0
 STATE_PAUSE = 1
@@ -25,7 +26,8 @@ def PlaylistEntryComponent(serviceref, state):
 	text = serviceref.getName()
 	if text is "":
 		text = path.split(serviceref.getPath().split('/')[-1])[1]
-	res.append((eListboxPythonMultiContent.TYPE_TEXT,25, 1, 470, 22, 0, RT_VALIGN_CENTER, text))
+	x, y, w, h = skin.parameters.get("PlayListName",(25, 1, 470, 22))
+	res.append((eListboxPythonMultiContent.TYPE_TEXT,x, y, w, h, 0, RT_VALIGN_CENTER, text))
 	png = None
 	if state == STATE_PLAY:
 		png = PlayIcon
@@ -39,15 +41,17 @@ def PlaylistEntryComponent(serviceref, state):
 		png = ForwardIcon
 
 	if png is not None:
-		res.append((eListboxPythonMultiContent.TYPE_PIXMAP_ALPHATEST, 5, 3, 16, 16, png))
+		x, y, w, h = skin.parameters.get("PlayListIcon",(5, 3, 16, 16))
+		res.append((eListboxPythonMultiContent.TYPE_PIXMAP_ALPHATEST, x, y, w, h, png))
 
 	return res
 
 class PlayList(MenuList):
 	def __init__(self, enableWrapAround = False):
 		MenuList.__init__(self, [], enableWrapAround, eListboxPythonMultiContent)
-		self.l.setFont(0, gFont("Regular", 18))
-		self.l.setItemHeight(23)
+		font = skin.fonts.get("PlayList", ("Regular", 18, 23))
+		self.l.setFont(0, gFont(font[0], font[1]))
+		self.l.setItemHeight(font[2])
 		self.currPlaying = -1
 		self.oldCurrPlaying = -1
 		self.serviceHandler = eServiceCenter.getInstance()

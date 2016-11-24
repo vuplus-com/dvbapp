@@ -71,6 +71,7 @@ struct eListboxStyle
 			{1 x 0} use transparent background
 			{1 x p} use transparent background picture
 		*/
+	ePtr<gFont> m_font;
 };
 #endif
 
@@ -127,6 +128,7 @@ public:
 	void setForegroundColorSelected(gRGB &col);
 	void setBackgroundPicture(ePtr<gPixmap> &pixmap);
 	void setSelectionPicture(ePtr<gPixmap> &pixmap);
+	void setFont(gFont *font);
 
 #ifndef SWIG
 	struct eListboxStyle *getLocalStyle(void);

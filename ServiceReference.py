@@ -32,4 +32,4 @@ class ServiceReference(eServiceReference):
 
 	def isRecordable(self):
 		ref = self.ref
-		return ref.flags & eServiceReference.isGroup or (ref.type == eServiceReference.idDVB)
+		return ref.flags & eServiceReference.isGroup or (ref.type == eServiceReference.idDVB) or (ref.type == 0x2000)

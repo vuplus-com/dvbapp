@@ -3,6 +3,8 @@
 
 #include <lib/dvb/idvb.h>
 #include <lib/dvb/idemux.h>
+#include <lib/dvb/pvrparse.h>
+#include <lib/base/filepush.h>
 
 class eDVBDemux: public iDVBDemux
 {
@@ -83,7 +85,25 @@ public:
 	RESULT connectRead(const Slot2<void,const __u8*, int> &read, ePtr<eConnection> &conn);
 };
 
-class eDVBRecordFileThread;
+class eDVBRecordFileThread: public eFilePushThread
+{
+public:
+	eDVBRecordFileThread();
+	void setTimingPID(int pid, int type);
+	
+	void startSaveMetaInformation(const std::string &filename);
+	void stopSaveMetaInformation();
+	void enableAccessPoints(bool enable);
+	int getLastPTS(pts_t &pts);
+protected:
+	int filterRecordData(const unsigned char *data, int len, size_t &current_span_remaining);
+private:
+	eMPEGStreamParserTS m_ts_parser;
+	eMPEGStreamInformation m_stream_info;
+	off_t m_current_offset;
+	pts_t m_last_pcr; /* very approximate.. */
+	int m_pid;
+};
 
 class eDVBTSRecorder: public iDVBTSRecorder, public Object
 {

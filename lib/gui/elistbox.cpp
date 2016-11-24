@@ -480,6 +480,11 @@ void eListbox::entryReset(bool selectionHome)
 	invalidate();
 }
 
+void eListbox::setFont(gFont *font)
+{
+	m_style.m_font = font;
+}
+
 void eListbox::setBackgroundColor(gRGB &col)
 {
 	m_style.m_background_color = col;

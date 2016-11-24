@@ -4,12 +4,14 @@ from config import KEY_LEFT, KEY_RIGHT, KEY_HOME, KEY_END, KEY_0, KEY_DELETE, KE
 from Components.ActionMap import NumberActionMap, ActionMap
 from enigma import eListbox, eListboxPythonConfigContent, eRCInput, eTimer
 from Screens.MessageBox import MessageBox
+import skin
 
 class ConfigList(HTMLComponent, GUIComponent, object):
 	def __init__(self, list, session = None):
 		GUIComponent.__init__(self)
 		self.l = eListboxPythonConfigContent()
-		self.l.setSeperation(200)
+		seperation, = skin.parameters.get("ConfigListSeperator", (200, ))
+		self.l.setSeperation(seperation)
 		self.timer = eTimer()
 		self.list = list
 		self.onSelectionChanged = [ ]

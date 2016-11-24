@@ -159,6 +159,8 @@ class eDVBResourceManager: public iObject, public Object
 	ePtr<iDVBChannelList> m_list;
 	ePtr<iDVBSatelliteEquipmentControl> m_sec;
 	static eDVBResourceManager *instance;
+
+	ePtr<eFBCTunerManager> m_fbc_mng;
  
 	friend class eDVBChannel;
 	friend class eFBCTunerManager;
