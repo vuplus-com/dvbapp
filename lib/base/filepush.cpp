@@ -32,7 +32,7 @@ eFilePushThread::eFilePushThread(int io_prio_class, int io_prio_level, int block
 	enablePVRCommit(0);
 	CONNECT(m_messagepump.recv_msg, eFilePushThread::recvEvent);
 	m_is_timeshift = false;
-	m_hdd_connected = false;
+	m_hdd_connected = true;
 }
 
 static void signal_handler(int x)
@@ -77,6 +77,8 @@ void eFilePushThread::thread()
 		} else if (major(tspath_st.st_dev) == MAJORMMCBLK) {
 			eDebug("%s location on eMMC!", m_tspath.c_str());
 			m_hdd_connected = false;
+		} else {
+			eDebug("%s location on other device", m_tspath.c_str());
 		}
 	} else {
 		eDebug("stat failed!");
