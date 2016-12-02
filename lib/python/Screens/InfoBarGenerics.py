@@ -2333,9 +2333,10 @@ class InfoBarServiceErrorPopupSupport:
 class InfoBarHDMI:
 	def __init__(self):
 		self.hdmiInServiceRef = eServiceReference('8192:0:1:0:0:0:0:0:0:0:')
+
 		if SystemInfo.get("HdmiInSupport", False):
 			self.addExtension((self.getShowHdmiInName, self.HDMIIn, lambda: True), None)
-			self.addExtension((self.getShowHdmiInPIPName, self.HDMIInPIP, self.pipShown), None)
+			self.addExtension((self.getShowHdmiInPIPName, self.HDMIInPIP, self.showHDMIPIPMenu), None)
 
 	def getShowHdmiInName(self):
 		curref = self.session.nav.getCurrentlyPlayingServiceReference()
@@ -2347,13 +2348,23 @@ class InfoBarHDMI:
 		return name
 
 	def getShowHdmiInPIPName(self):
-		curref = self.session.pip.getCurrentService()
-		if curref and curref.type == 8192:
-			name = _("Disable HDMI-IN on PIP")
-		else:
-			name = _("Enable HDMI-IN on PIP")
+		return _("Enable HDMI-IN on PIP")
 
-		return name
+	def showHDMIPIPMenu(self):
+		_pipAvailable = SystemInfo.get("NumVideoDecoders", 1) > 1
+
+		hdmiin_enabled = False
+		curref = self.session.nav.getCurrentlyPlayingServiceReference()
+		if curref and curref.type == 8192:
+			hdmiin_enabled = True
+
+		hdmiin_pip_shown = False
+		if self.session.pipshown:
+			pipref=self.session.pip.getCurrentService()
+			if pipref and pipref.type == 8192:
+				hdmiin_pip_shown = True
+
+		return _pipAvailable and not hdmiin_enabled and not hdmiin_pip_shown
 
 	def getCurrentServiceRef(self):
 		slist = self.servicelist
@@ -2368,8 +2379,17 @@ class InfoBarHDMI:
 			self.session.nav.playService(self.hdmiInServiceRef)
 
 	def HDMIInPIP(self):
-		curref = self.session.pip.getCurrentService()
-		if curref and curref.type == 8192:
-			self.session.pip.playService(self.getCurrentServiceRef())
+		if self.session.pipshown:
+			del self.session.pip
+
+		self.session.pip = self.session.instantiateDialog(PictureInPicture)
+		self.session.pip.setAnimationMode(0)
+		self.session.pip.show()
+		newservice = self.hdmiInServiceRef
+		if self.session.pip.playService(newservice):
+			self.session.pipshown = True
+			self.session.pip.servicePath = self.servicelist.getCurrentServicePath()
 		else:
-			self.session.pip.playService(self.hdmiInServiceRef)
+			self.session.pipshown = False
+			del self.session.pip
+			self.session.openWithCallback(self.close, MessageBox, _("Could not open Picture in Picture"), MessageBox.TYPE_ERROR)
