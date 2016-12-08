@@ -160,6 +160,9 @@ private:
 	ePtr<iListboxContent> m_content;
 	eSlider *m_scrollbar;
 	eListboxStyle m_style;
+#ifdef USE_LIBVUGLES2
+	long m_dir;
+#endif
 #endif
 };
 
