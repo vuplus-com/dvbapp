@@ -82,18 +82,19 @@ eFBCTunerManager::eFBCTunerManager(ePtr<eDVBResourceManager> res_mgr)
 		m_instance = this;
 
 	eSmartPtrList<eDVBRegisteredFrontend> &frontends = m_res_mgr->m_frontend;
-
+	eSmartPtrList<eDVBRegisteredFrontend> &frontends_simulate = m_res_mgr->m_simulate_frontend;
 	/* each FBC set has 8 tuners. */
 	/* first set : 0, 1, 2, 3, 4, 5, 6, 7 */
 	/* second set : 8, 9, 10, 11, 12, 13, 14, 15 */
 	/* first, second frontend is top on a set */
 
 	bool isRoot;
-	int fbcSetID = -1;
+	int fe_id = -1;
+	int fbcSetID = -2;
 	int fbcIndex = 0;
 	int initFbcId = -1;
 	int prevFbcSetID = -1;
-	char tmp[128];
+	char procFileName[128];
 	std::string proc_fe;
 	bool connect_choices[32] = {false};
 
@@ -103,17 +104,17 @@ eFBCTunerManager::eFBCTunerManager(ePtr<eDVBResourceManager> res_mgr)
 		if (!(it->m_frontend->supportsDeliverySystem(SYS_DVBS, false) || it->m_frontend->supportsDeliverySystem(SYS_DVBS2, false)))
 			continue;
 
-		int fe_id = feSlotID(it);
-		snprintf(tmp, sizeof(tmp), "/proc/stb/frontend/%d", fe_id);
-		proc_fe = tmp;
-		fbcSetID = getProcData(std::string(proc_fe + "/fbc_set_id").c_str());
+		fe_id = feSlotID(it);
+		snprintf(procFileName, sizeof(procFileName), "/proc/stb/frontend/%d/fbc_set_id", fe_id);
+		fbcSetID = getProcData(procFileName);
 		if (fbcSetID != -1)
 		{
 			if (prevFbcSetID != fbcSetID)
 			{
 				prevFbcSetID = fbcSetID;
 				memset(connect_choices, 0, sizeof(connect_choices));
-				loadConnectChoices(std::string(proc_fe + "/fbc_connect_choices").c_str(), connect_choices);
+				snprintf(procFileName, sizeof(procFileName), "/proc/stb/frontend/%d/fbc_connect_choices", fe_id);
+				loadConnectChoices(procFileName, connect_choices);
 				fbcIndex =0; // reset
 			}
 
@@ -135,6 +136,22 @@ eFBCTunerManager::eFBCTunerManager(ePtr<eDVBResourceManager> res_mgr)
 			it->m_frontend->setFBCTuner(true);
 
 			fbcIndex++;
+		}
+	}
+
+	for (eSmartPtrList<eDVBRegisteredFrontend>::iterator it(frontends_simulate.begin()); it != frontends_simulate.end(); ++it)
+	{
+		// continue for DVB-C FBC Tuner
+		if (!(it->m_frontend->supportsDeliverySystem(SYS_DVBS, false) || it->m_frontend->supportsDeliverySystem(SYS_DVBS2, false)))
+			continue;
+
+		fe_id = feSlotID(it);
+		snprintf(procFileName, sizeof(procFileName), "/proc/stb/frontend/%d/fbc_set_id", fe_id);
+		fbcSetID = getProcData(procFileName);
+		if (fbcSetID != -1)
+		{
+			/* enable fbc tuner */
+			it->m_frontend->setFBCTuner(true);
 		}
 	}
 }
