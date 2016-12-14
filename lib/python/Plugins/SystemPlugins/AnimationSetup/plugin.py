@@ -13,7 +13,7 @@ from enigma import setAnimation_current, setAnimation_speed, setAnimation_curren
 g_default = {
 	"current": 6,
 	"speed"  : 20,
-	"listbox": "2",
+	"listbox": "0",
 }
 g_max_speed = 30
 
