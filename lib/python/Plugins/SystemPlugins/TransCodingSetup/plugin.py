@@ -403,10 +403,14 @@ class TranscodingSetup(Screen, ConfigListScreen):
 		else:
 			self.skin = TranscodingSetup.skin_normal
 
-		if getModel() in ("solo2", "solose"):
+		vumodel = getModel()
+		if vumodel in ("solo2", "solose", "solo4k"):
 			TEXT = _("Transcoding and PIP are mutually exclusive.")
-		else:
+		elif vumodel == "duo2":
 			TEXT = _("2nd transcoding and PIP are mutually exclusive.")
+		else:
+			TEXT = _(" ")
+
 		self["text"] = StaticText(_("%s")%TEXT)
 
 		self["key_red"] = StaticText(_("Cancel"))
