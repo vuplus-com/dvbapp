@@ -134,9 +134,7 @@ eMP3ServiceOfflineOperations::eMP3ServiceOfflineOperations(const eServiceReferen
 
 RESULT eMP3ServiceOfflineOperations::deleteFromDisk(int simulate)
 {
-	if (simulate)
-		return 0;
-	else
+	if (!simulate)
 	{
 		std::list<std::string> res;
 		if (getListOfFilenames(res))
@@ -154,9 +152,8 @@ RESULT eMP3ServiceOfflineOperations::deleteFromDisk(int simulate)
 			else
 				::unlink(i->c_str());
 		}
-		
-		return 0;
 	}
+	return 0;
 }
 
 RESULT eMP3ServiceOfflineOperations::getListOfFilenames(std::list<std::string> &res)
@@ -251,8 +248,7 @@ eServiceMP3::eServiceMP3(eServiceReference ref)
 	m_prev_decoder_time = -1;
 	m_decoder_time_valid_state = 0;
 	m_errorInfo.missing_codec = "";
-	//vuplus
-	m_is_hls_stream = 0;
+
 	audioSink = videoSink = NULL;
 	CONNECT(m_subtitle_sync_timer->timeout, eServiceMP3::pushSubtitles);
 	CONNECT(m_pump.recv_msg, eServiceMP3::gstPoll);
@@ -315,9 +311,12 @@ eServiceMP3::eServiceMP3(eServiceReference ref)
 	if ( m_sourceinfo.is_streaming )
 	{
 		uri = g_strdup_printf ("%s", filename);
-		m_streamingsrc_timeout = eTimer::create(eApp);;
-		CONNECT(m_streamingsrc_timeout->timeout, eServiceMP3::sourceTimeout);
-
+		if (strstr(filename, "rtmp://") || strstr(filename, "rtsp://")) {
+			m_streamingsrc_timeout = eTimer::create(eApp);
+		}
+		if (m_streamingsrc_timeout) {
+			CONNECT(m_streamingsrc_timeout->timeout, eServiceMP3::sourceTimeout);
+		}
 		std::string config_str;
 		if( ePythonConfigQuery::getConfigValue("config.mediaplayer.useAlternateUserAgent", config_str) == 0 )
 		{
@@ -497,7 +496,7 @@ RESULT eServiceMP3::stop()
 {
 	ASSERT(m_state != stIdle);
 
-	if (m_state == stStopped)
+	if (!m_gst_playbin || m_state == stStopped)
 		return -1;
 	
 	//GST_DEBUG_BIN_TO_DOT_FILE(GST_BIN(m_gst_playbin),GST_DEBUG_GRAPH_SHOW_ALL,"e2-playbin");
@@ -567,10 +566,7 @@ RESULT eServiceMP3::seek(ePtr<iSeekableService> &ptr)
 
 RESULT eServiceMP3::getLength(pts_t &pts)
 {
-	if (!m_gst_playbin)
-		return -1;
-
-	if (m_state != stRunning)
+	if (!m_gst_playbin || m_state != stRunning)
 		return -1;
 
 	GstFormat fmt = GST_FORMAT_TIME;
@@ -706,9 +702,7 @@ RESULT eServiceMP3::getPlayPosition(pts_t &pts)
 	gint64 pos;
 	pts = 0;
 
-	if (!m_gst_playbin)
-		return -1;
-	if (m_state != stRunning)
+	if (!m_gst_playbin || m_state != stRunning)
 		return -1;
 
 	if (audioSink || videoSink)
@@ -1283,8 +1277,9 @@ void eServiceMP3::gstBusCall(GstBus *bus, GstMessage *msg)
 {
 	if (!msg)
 		return;
-	gchar *sourceName;
-	GstObject *source;
+	gchar *sourceName = NULL;
+	GstObject *source = NULL;
+	GstElement *subsink = NULL;
 	source = GST_MESSAGE_SRC(msg);
 	if (!GST_IS_OBJECT(source))
 		return;
@@ -1307,12 +1302,6 @@ void eServiceMP3::gstBusCall(GstBus *bus, GstMessage *msg)
 		{
 			if(GST_MESSAGE_SRC(msg) != GST_OBJECT(m_gst_playbin))
 			{
-				//vuplus
-				if(!strncmp(sourceName, "hls", 3))
-				{
-					//eDebug("HLS Protocol detected : source [%s]", sourceName);
-					m_is_hls_stream = 1;
-				}
 				break;
 			}
 
@@ -1337,9 +1326,9 @@ void eServiceMP3::gstBusCall(GstBus *bus, GstMessage *msg)
 					GValue result = { 0, };
 #endif
 					GstIterator *children;
-					GstElement *subsink = gst_bin_get_by_name(GST_BIN(m_gst_playbin), "subtitle_sink");
- 					if (subsink)
- 					{
+					subsink = gst_bin_get_by_name(GST_BIN(m_gst_playbin), "subtitle_sink");
+					if (subsink)
+					{
 #ifdef GSTREAMER_SUBTITLE_SYNC_MODE_BUG
 						g_object_set (G_OBJECT (subsink), "sync", FALSE, NULL);
 #endif
@@ -1383,6 +1372,7 @@ void eServiceMP3::gstBusCall(GstBus *bus, GstMessage *msg)
 
 					setAC3Delay(ac3_delay);
 					setPCMDelay(pcm_delay);
+
 				}	break;
 				case GST_STATE_CHANGE_PAUSED_TO_PLAYING:
 				{
@@ -1428,10 +1418,12 @@ void eServiceMP3::gstBusCall(GstBus *bus, GstMessage *msg)
 						m_event((iPlayableService*)this, evUser+10);
 				}
 			}
-			else //if( err->domain == 1232 )
+			else if ( err->domain == GST_RESOURCE_ERROR )
 			{
-				if ( err->code == 5 )
-        	                        m_event((iPlayableService*)this, evUser+20);
+				if ( err->code == GST_RESOURCE_ERROR_OPEN_READ || err->code == GST_RESOURCE_ERROR_READ )
+				{
+					sourceTimeout();
+				}
 			}
 			g_error_free(err);
 			break;
@@ -1681,16 +1673,11 @@ void eServiceMP3::gstBusCall(GstBus *bus, GstMessage *msg)
 					const gchar *name = gst_plugin_feature_get_name(GST_PLUGIN_FEATURE(factory));
 					if (!strcmp(name, "souphttpsrc"))
 					{
-						m_streamingsrc_timeout->start(HTTP_TIMEOUT*1000, true);
+						if (m_streamingsrc_timeout) {
+							m_streamingsrc_timeout->start(HTTP_TIMEOUT*1000, true);
+						}
 						g_object_set (G_OBJECT (owner), "timeout", HTTP_TIMEOUT, NULL);
 						eDebug("eServiceMP3::GST_STREAM_STATUS_TYPE_CREATE -> setting timeout on %s to %is", name, HTTP_TIMEOUT);
-					}
-					//vuplus
-					else if (m_is_hls_stream && !strncmp(name, "queue", 5))
-					{
-						m_streamingsrc_timeout->stop();
-						m_is_hls_stream = 0;
-						//eDebug("Stoped response timeout!! : HLS");
 					}
 				}
 				if ( GST_IS_PAD(source) )
@@ -1720,6 +1707,18 @@ void eServiceMP3::gstHTTPSourceSetAgent(GObject *object, GParamSpec *unused, gpo
 	if (source)
 	{
 #if GST_VERSION_MAJOR >= 1
+		if (g_object_class_find_property(G_OBJECT_GET_CLASS(source), "timeout") != 0)
+		{
+			GstElementFactory *factory = gst_element_get_factory(source);
+			if (factory)
+			{
+				const gchar *sourcename = gst_plugin_feature_get_name(GST_PLUGIN_FEATURE(factory));
+				if (!strcmp(sourcename, "souphttpsrc"))
+				{
+					g_object_set(G_OBJECT(source), "timeout", HTTP_TIMEOUT, NULL);
+				}
+			}
+		}
 		if (g_object_class_find_property(G_OBJECT_GET_CLASS(source), "ssl-strict") != 0)
 		{
 			g_object_set(G_OBJECT(source), "ssl-strict", FALSE, NULL);
