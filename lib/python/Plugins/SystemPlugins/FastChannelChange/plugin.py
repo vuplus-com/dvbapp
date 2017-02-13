@@ -233,10 +233,13 @@ class FCCSupport:
 		if isinstance(sref, str):
 			sref = eServiceReference(sref)
 
-		if sref.getPath(): # is PVR? or streaming?
+		if sref.type != 1:
 			playable = False
 
-		if int(sref.getData(0)) in (2, 10): # is RADIO?
+		elif sref.getPath(): # is PVR? or streaming?
+			playable = False
+
+		elif int(sref.getData(0)) in (2, 10): # is RADIO?
 			playable = False
 
 		return playable
