@@ -5,6 +5,7 @@ import NavigationInstance
 from Screens.Screen import Screen
 from Screens.InfoBar import InfoBar
 from Screens.MessageBox import MessageBox
+from Screens.PictureInPicture import on_pip_start_stop
 
 from Components.NimManager import nimmanager
 from Components.config import config, getConfigListEntry, ConfigSubsection, ConfigYesNo, ConfigSelection
@@ -60,7 +61,7 @@ class FCCSupport:
 		self.fccEventTimer.callback.append(self.FCCApplyEvent)
 
 		self.fccForceStartTimer = eTimer()
-		self.fccForceStartTimer.callback.append(self.FCCForceStartForREC)
+		self.fccForceStartTimer.callback.append(self.FCCForceStart)
 
 		self.fccResetTimer = eTimer()
 		self.fccResetTimer.callback.append(self.FCCResetTimerForREC)
@@ -89,6 +90,8 @@ class FCCSupport:
 		self.onClose = []
 		self.changeEventTracker()
 
+		on_pip_start_stop.append(self.FCCForceStopforPIP)
+
 	def setProcFCC(self, value):
 		procPath = "/proc/stb/frontend/fbc/fcc"
 		if os.access(procPath, os.W_OK):
@@ -108,29 +111,39 @@ class FCCSupport:
 			elif event == iRecordableService.evEnd:
 				self.getRecordings()
 				if not self.recordings:
-					self.FCCForceStartForREC()
+					self.FCCForceStart()
 		else:
 			if event == iRecordableService.evTuneStart:
-				self.fccResetTimer.stop()
-				self.FCCForceStopForREC()
-				self.fccForceStartTimer.start(2000, True)
+				self.FCCForceStopAndStart()
 
 			elif event == iRecordableService.evEnd:
 				self.fccForceStartTimer.stop()
 				self.fccResetTimer.start(2000, True)
 
-	def FCCForceStopForREC(self):
+	def FCCForceStart(self):
+		self.enableEventTracker(True)
+		self.getEvStart()
+		self.getEvTunedIn()
+
+	def FCCForceStop(self):
 		self.enableEventTracker(False)
 		self.FCCDisableServices()
 		self.FCCStopAllServices()
 
-	def FCCForceStartForREC(self):
-		self.enableEventTracker(True)
-		self.FCCForceStart()
+	def FCCForceStopAndStart(self):
+		self.fccResetTimer.stop()
+		self.FCCForceStop()
+		self.fccForceStartTimer.start(2000, True)
+
+	def FCCForceStopforPIP(self):
+		self.FCCForceStopAndStart()
+
+	def FCCForceStopForREC(self):
+		self.FCCForceStop()
 
 	def FCCResetTimerForREC(self):
 		self.FCCForceStopForREC()
-		self.FCCForceStartForREC()
+		self.FCCForceStart()
 
 	def FCCSetupChanged(self):
 		fcc_changed = False
@@ -413,10 +426,6 @@ class FCCSupport:
 		self.fccEventTimer.stop()
 		self.fccmgr.stopFCCService()
 		self.eventList = []
-
-	def FCCForceStart(self):
-		self.getEvStart()
-		self.getEvTunedIn()
 
 	def FCCCheckNoLocked(self):
 		for (sref, value) in self.fccmgr.getFCCServiceList().items():

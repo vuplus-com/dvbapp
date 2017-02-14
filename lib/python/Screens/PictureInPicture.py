@@ -5,6 +5,8 @@ from Components.config import config, ConfigPosition
 
 pip_config_initialized = False
 
+on_pip_start_stop = []
+
 class PictureInPicture(Screen):
 	def __init__(self, session):
 		global pip_config_initialized
@@ -15,6 +17,11 @@ class PictureInPicture(Screen):
 			config.av.pip = ConfigPosition(default=[-1, -1, -1, -1], args = (719, 567, 720, 568))
 			pip_config_initialized = True
 		self.onLayoutFinish.append(self.LayoutFinished)
+		self.dvbPipStarted = False
+
+	def __del__(self):
+		if self.dvbPipStarted:
+			self.onPipStartAndStop()
 
 	def LayoutFinished(self):
 		self.onLayoutFinish.remove(self.LayoutFinished)
@@ -53,6 +60,10 @@ class PictureInPicture(Screen):
 		if ref:
 			self.pipservice = eServiceCenter.getInstance().play(ref)
 			if self.pipservice and not self.pipservice.setTarget(1):
+				if ref.type == 1: # dvb service
+					self.dvbPipStarted = True
+					self.onPipStartAndStop()
+
 				self.pipservice.start()
 				self.currentService = service
 				return True
@@ -63,3 +74,7 @@ class PictureInPicture(Screen):
 	def getCurrentService(self):
 		return self.currentService
 
+	def onPipStartAndStop(self):
+		global on_pip_start_stop
+		for x in on_pip_start_stop:
+			x()
