@@ -8,10 +8,27 @@ from Plugins.Plugin import PluginDescriptor
 from Tools.Directories import fileExists
 from enigma import eTimer, quitMainloop
 
+def getModel():
+	ret = None
+	if fileExists("/proc/stb/info/vumodel"):
+		vumodel = open("/proc/stb/info/vumodel")
+		info=vumodel.read().strip()
+		vumodel.close()
+		ret = info
+
+	return ret
+
+def getRcuDefaultType():
+	if getModel() in ["ultimo4k"]:
+		return "new"
+	return "legacy"
+
 config.plugins.remotecontrolcode = ConfigSubsection()
 config.plugins.remotecontrolcode.systemcode = ConfigSelection(default = "2", choices = 
 	[ ("1", "1 "), ("2", "2 "), ("3", "3 "), ("4", "4 ") ] )
 config.plugins.remotecontrolcode.replytimeout = ConfigInteger(default = 30, limits = (15,9999))
+config.plugins.remotecontrolcode.rcuType = ConfigSelection(default = getRcuDefaultType(), choices = 
+	[ ("legacy", "Legacy Vu+ Universal RCU"), ("new", "New Vu+ Bluetooth RCU") ] )
 
 class RemoteControlCodeInit:
 	def __init__(self):
@@ -26,17 +43,13 @@ class RemoteControlCodeInit:
 		f.close()
 		return 0
 
-	def getModel(self):
-		if fileExists("/proc/stb/info/vumodel"):
-			vumodel = open("/proc/stb/info/vumodel")
-			info=vumodel.read().strip()
-			vumodel.close()
-			if info not in ["duo", "solo"]:
-				return True
-			else:
-				return False
-		else:
-			return False
+	def checkModelSupport(self):
+		ret = None
+		model = getModel()
+		if model not in ["duo", "solo"]:
+			ret = True
+
+		return ret
 
 class RemoteControlCode(Screen,ConfigListScreen,RemoteControlCodeInit):
 	skin = 	"""
@@ -70,13 +83,19 @@ class RemoteControlCode(Screen,ConfigListScreen,RemoteControlCodeInit):
 		self.replytext_2 +="\n1. Press Digit 2 and Digit 7 simultaneously for 3 seconds. After 3 seconds LED turns on. "
 		self.replytext_2 +="\n2. Press the <HELP> key. LED is blinked and turns on."
 		self.replytext_2 +="\n3. Enter a 4 digit code(ex. code 2 is '0002')"
+
+		self.replytext_newrcu_2 ="\n\n<Code set manual>"
+		self.replytext_newrcu_2 +="\n1. Press <OK> and <STB> simultaneously for 3 seconds. After 3 seconds LED turns on. "
+		self.replytext_newrcu_2 +="\n2. Enter a 5 digit code(ex. code 2 is '00002')"
+		self.replytext_newrcu_2 +="\n3. Press the <OK> key. LED is blinked and turns on."
+
 		self.createSetup()
 		self.onLayoutFinish.append(self.checkModel)
 		self.checkModelTimer = eTimer()
 		self.checkModelTimer.callback.append(self.invalidmodel)
 
 	def checkModel(self):
-		if not self.getModel():
+		if not self.checkModelSupport():
 			self.checkModelTimer.start(1000,True)
 
 	def invalidmodel(self):
@@ -84,8 +103,10 @@ class RemoteControlCode(Screen,ConfigListScreen,RemoteControlCodeInit):
 
 	def createSetup(self):
 		self.list = []
+		self.rcuTypeEntry = getConfigListEntry(_("Remote Control Type"), config.plugins.remotecontrolcode.rcuType)
 		self.rcsctype = getConfigListEntry(_("Remote Control System Code"), config.plugins.remotecontrolcode.systemcode)
 		self.replytimeout = getConfigListEntry(_("Reply timeout"), config.plugins.remotecontrolcode.replytimeout)
+		self.list.append( self.rcuTypeEntry )
 		self.list.append( self.rcsctype )
 		self.list.append( self.replytimeout )
 		self["config"].list = self.list
@@ -99,7 +120,12 @@ class RemoteControlCode(Screen,ConfigListScreen,RemoteControlCodeInit):
 			self.session.openWithCallback(self.close, MessageBox, _("FILE NOT EXIST : /proc/stb/fp/remote_code"), MessageBox.TYPE_ERROR)
 		else:
 			timeout = config.plugins.remotecontrolcode.replytimeout.value
-			self.session.openWithCallback(self.MessageBoxConfirmCodeCallback, MessageBoxConfirmCode, self.replytext_1,self.replytext_2 ,MessageBox.TYPE_YESNO, timeout = timeout, default = False)
+			text1 = self.replytext_1
+			text2 = self.replytext_2
+			if config.plugins.remotecontrolcode.rcuType.value == "new":
+				text2 = self.replytext_newrcu_2
+
+			self.session.openWithCallback(self.MessageBoxConfirmCodeCallback, MessageBoxConfirmCode, text1, text2, MessageBox.TYPE_YESNO, timeout = timeout, default = False)
 
 	def restoreCode(self):
 		for x in self["config"].list:
