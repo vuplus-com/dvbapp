@@ -62,6 +62,7 @@ int getType(int code)
 	case 358: // epg
 	case 370: // _subtitle selection
 	case 377: // tv
+	case 384: // tape
 	case 385: // radio
 	case 388: // =text
 	case 392: // audio
