@@ -495,10 +495,9 @@ void eDVBCIInterfaces::recheckPMTHandlers()
 						data_source tuner_source = TUNER_A;
 						switch (tunernum)
 						{
-							case 0: tuner_source = TUNER_A; break;
-							case 1: tuner_source = TUNER_B; break;
-							case 2: tuner_source = TUNER_C; break;
-							case 3: tuner_source = TUNER_D; break;
+							case 0 ... 18:
+								tuner_source = (data_source)tunernum;
+								break;
 							default:
 								eDebug("try to get source for tuner %d!!\n", tunernum);
 								break;
@@ -646,6 +645,8 @@ int eDVBCIInterfaces::getMMIState(int slotid)
 	return slot->getMMIState();
 }
 
+static const char *tuner_source[] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "CI0", "CI1", "CI2", "CI3"};
+
 int eDVBCIInterfaces::setInputSource(int tuner_no, data_source source)
 {
 //	eDebug("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
@@ -666,29 +667,8 @@ int eDVBCIInterfaces::setInputSource(int tuner_no, data_source source)
 
 		switch(source)
 		{
-			case CI_A:
-				fprintf(input, "CI0");
-				break;
-			case CI_B:
-				fprintf(input, "CI1");
-				break;
-			case CI_C:
-				fprintf(input, "CI2");
-			break;
-			case CI_D:
-				fprintf(input, "CI3");
-				break;
-			case TUNER_A:
-				fprintf(input, "A");
-				break;
-			case TUNER_B:
-				fprintf(input, "B");
-				break;
-			case TUNER_C:
-				fprintf(input, "C");
-				break;
-			case TUNER_D:
-				fprintf(input, "D");
+			case TUNER_A ... CI_D:
+				fprintf(input, tuner_source[(int)source]);
 				break;
 			default:
 				eDebug("setInputSource for input %d failed!!!\n", (int)source);
@@ -1281,29 +1261,8 @@ int eDVBCISlot::setSource(data_source source)
 		FILE *ci = fopen(buf, "wb");
 		switch(source)
 		{
-			case CI_A:
-				fprintf(ci, "CI0");
-				break;
-			case CI_B:
-				fprintf(ci, "CI1");
-				break;
-			case CI_C:
-				fprintf(ci, "CI2");
-				break;
-			case CI_D:
-				fprintf(ci, "CI3");
-				break;
-			case TUNER_A:
-				fprintf(ci, "A");
-				break;
-			case TUNER_B:
-				fprintf(ci, "B");
-				break;
-			case TUNER_C:
-				fprintf(ci, "C");
-				break;
-				case TUNER_D:
-				fprintf(ci, "D");
+			case TUNER_A ... CI_D:
+				fprintf(ci, tuner_source[(int)source]);
 				break;
 			default:
 				eDebug("CI Slot %d: setSource %d failed!!!\n", getSlotID(), (int)source);
