@@ -36,7 +36,7 @@ struct queueData
 
 enum data_source
 {
-	TUNER_A=0, TUNER_B, TUNER_C, TUNER_D, TUNER_E, TUNER_F, TUNER_G, TUNER_H, TUNER_I, TUNER_J, TUNER_K, TUNER_L, TUNER_M, TUNER_N, TUNER_O, TUNER_P, TUNER_Q, TUNER_R, TUNER_S, TUNER_T, TUNER_U, TUNER_V, CI_A, CI_B, CI_C, CI_D
+	TUNER_A=0, TUNER_B, TUNER_C, TUNER_D, TUNER_E, TUNER_F, TUNER_G, TUNER_H, TUNER_I, TUNER_J, TUNER_K, TUNER_L, TUNER_M, TUNER_N, TUNER_O, TUNER_P, TUNER_Q, TUNER_R, TUNER_S, TUNER_T, TUNER_U, TUNER_V, CI_A, CI_B, CI_C, CI_D, PVR, PVR_NONE
 };
 
 typedef std::pair<std::string, uint32_t> providerPair;
@@ -141,6 +141,7 @@ public:
 	void removePMTHandler(eDVBServicePMTHandler *pmthandler);
 	void recheckPMTHandlers();
 	void gotPMT(eDVBServicePMTHandler *pmthandler);
+	bool isCiConnected(eDVBServicePMTHandler *pmthandler);
 	void ciRemoved(eDVBCISlot *slot);
 	int getSlotState(int slot);
 

@@ -310,6 +310,8 @@ lib/python/Plugins/SystemPlugins/FastChannelChange/Makefile
 lib/python/Plugins/SystemPlugins/FastChannelChange/meta/Makefile
 lib/python/Plugins/SystemPlugins/Ultimo4kMiscControl/Makefile
 lib/python/Plugins/SystemPlugins/Ultimo4kMiscControl/meta/Makefile
+lib/python/Plugins/SystemPlugins/PvrDescrambleConvert/Makefile
+lib/python/Plugins/SystemPlugins/PvrDescrambleConvert/meta/Makefile
 lib/python/Tools/Makefile
 lib/service/Makefile
 lib/components/Makefile

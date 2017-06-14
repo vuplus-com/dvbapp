@@ -12,3 +12,5 @@ def InitRecordingConfig():
 		("standard", _("standard")),
 		("short", _("Short filenames")),
 		("long", _("Long filenames")) ] )
+	config.recording.always_ecm = ConfigYesNo(default = False)
+	config.recording.never_decrypt = ConfigYesNo(default = False)

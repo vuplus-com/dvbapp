@@ -90,7 +90,7 @@ class eServiceHDMIRecord: public eDVBServiceBase, public iRecordableService, pub
 public:
 	eServiceHDMIRecord(const eServiceReference &ref, ePtr<eNavigation> &nav_instance);
 	RESULT connectEvent(const Slot2<void,iRecordableService*,int> &event, ePtr<eConnection> &connection);
-	RESULT prepare(const char *filename, time_t begTime, time_t endTime, int eit_event_id, const char *name, const char *descr, const char *tags);
+	RESULT prepare(const char *filename, time_t begTime, time_t endTime, int eit_event_id, const char *name, const char *descr, const char *tags, bool descramble, bool recordecm);
 	RESULT prepareStreaming();
 	RESULT start(bool simulate=false);
 	RESULT stop();
@@ -98,6 +98,7 @@ public:
 	RESULT frontendInfo(ePtr<iFrontendInformation> &ptr);
 	RESULT stream(ePtr<iStreamableService> &ptr);
 	RESULT subServices(ePtr<iSubserviceList> &ptr);
+	RESULT getServiceType(int &serviceType) { serviceType = -1; return -1; };
 
 private:
 	enum { stateIdle, statePrepared, stateRecording };

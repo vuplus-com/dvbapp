@@ -535,6 +535,12 @@ int eMPEGStreamParserTS::processPacket(const unsigned char *pkt, off_t offset)
 	if (!(pkt[3] & 0x10)) /* no payload? */
 		return 0;
 
+	if (pkt[3] & 0xc0)
+	{
+		/* scrambled stream, we cannot parse pts */
+		return 0;
+	}
+
 	if (pkt[3] & 0x20) // adaptation field present?
 		pkt += pkt[4] + 4 + 1;  /* skip adaptation field and header */
 	else

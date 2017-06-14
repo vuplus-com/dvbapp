@@ -90,7 +90,7 @@ class RecordTimerEntry(timer.TimerEntry, object):
 			Notifications.AddNotification(Screens.Standby.TryQuitMainloop, 1, onSessionOpenCallback=RecordTimerEntry.stopTryQuitMainloop, default_yes = default_yes)
 #################################################################
 
-	def __init__(self, serviceref, begin, end, name, description, eit, disabled = False, justplay = False, afterEvent = AFTEREVENT.AUTO, checkOldTimers = False, dirname = None, tags = None):
+	def __init__(self, serviceref, begin, end, name, description, eit, disabled = False, justplay = False, afterEvent = AFTEREVENT.AUTO, checkOldTimers = False, dirname = None, tags = None, descramble = True, record_ecm = False, filename = None):
 		timer.TimerEntry.__init__(self, int(begin), int(end))
 
 		if checkOldTimers == True:
@@ -122,14 +122,24 @@ class RecordTimerEntry(timer.TimerEntry, object):
 		self.autoincreasetime = 3600 * 24 # 1 day
 		self.tags = tags or []
 
+		self.descramble = descramble
+		self.record_ecm = record_ecm
+
 		self.log_entries = []
 		self.resetState()
-	
+
+		self.Filename = filename
+		self.pvrConvert = False
+
 	def log(self, code, msg):
 		self.log_entries.append((int(time()), code, msg))
 		print "[TIMER]", msg
 
 	def calculateFilename(self):
+		if self.Filename:
+			self.log(0, "Filename calculated as: '%s'" % self.Filename)
+			return
+
 		service_name = self.service_ref.getServiceName()
 		begin_date = strftime("%Y%m%d %H%M", localtime(self.begin))
 		begin_shortdate = strftime("%Y%m%d", localtime(self.begin))
@@ -196,7 +206,7 @@ class RecordTimerEntry(timer.TimerEntry, object):
 				if event_id is None:
 					event_id = -1
 
-			prep_res=self.record_service.prepare(self.Filename + ".ts", self.begin, self.end, event_id, self.name.replace("\n", ""), self.description.replace("\n", ""), ' '.join(self.tags))
+			prep_res=self.record_service.prepare(self.Filename + ".ts", self.begin, self.end, event_id, self.name.replace("\n", ""), self.description.replace("\n", ""), ' '.join(self.tags), bool(self.descramble), bool(self.record_ecm))
 			if prep_res:
 				if prep_res == -255:
 					self.log(4, "failed to write meta information")
@@ -376,6 +386,9 @@ class RecordTimerEntry(timer.TimerEntry, object):
 			# that in our state, with also keeping the possibility to re-try.
 			# TODO: this has to be done.
 		elif event == iRecordableService.evStart:
+			if self.pvrConvert:
+				return
+
 			text = _("A record has been started:\n%s") % self.name
 			if self.dirnameHadToFallback:
 				text = '\n'.join((text, _("Please note that the previously selected media could not be accessed and therefore the default directory is being used instead.")))

@@ -8,6 +8,7 @@ eDVBMetaParser::eDVBMetaParser()
 	m_data_ok = 0;
 	m_length = 0;
 	m_filesize = 0;
+	m_scrambled = 0;
 }
 
 int eDVBMetaParser::parseFile(const std::string &basename)
@@ -94,6 +95,9 @@ int eDVBMetaParser::parseMeta(const std::string &tsname)
 		case 7:
 			m_service_data = line;
 			break;
+		case 8:
+			m_scrambled = atoi(line);
+			break;
 		default:
 			break;
 		}
@@ -149,8 +153,8 @@ int eDVBMetaParser::parseRecordings(const std::string &filename)
 			m_time_create = 0;
 			m_length = 0;
 			m_filesize = fileSize(filename);
-						
 			m_data_ok = 1;
+			m_scrambled = 0;
 			fclose(f);
 			updateMeta(filename.c_str());
 			return 0;
@@ -172,7 +176,7 @@ int eDVBMetaParser::updateMeta(const std::string &tsname)
 	FILE *f = fopen(filename.c_str(), "w");
 	if (!f)
 		return -ENOENT;
-	fprintf(f, "%s\n%s\n%s\n%d\n%s\n%d\n%lld\n%s\n", ref.toString().c_str(), m_name.c_str(), m_description.c_str(), m_time_create, m_tags.c_str(), m_length, m_filesize, m_service_data.c_str() );
+	fprintf(f, "%s\n%s\n%s\n%d\n%s\n%d\n%lld\n%s\n%d\n", ref.toString().c_str(), m_name.c_str(), m_description.c_str(), m_time_create, m_tags.c_str(), m_length, m_filesize, m_service_data.c_str(), m_scrambled);
 	fclose(f);
 	return 0;
 }

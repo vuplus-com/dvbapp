@@ -17,6 +17,7 @@ public:
 	off_t lseek(off_t offset, int whence);
 	ssize_t read(off_t offset, void *buf, size_t count);
 	off_t length();
+	off_t offset();
 	int valid();
 private:
 	int m_sync_offset;
@@ -307,6 +308,11 @@ int eM2TSFile::valid()
 off_t eM2TSFile::length()
 {
 	return m_length;
+}
+
+off_t eM2TSFile::offset()
+{
+	return m_current_offset;
 }
 
 eServiceFactoryM2TS::eServiceFactoryM2TS()

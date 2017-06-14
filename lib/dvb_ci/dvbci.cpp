@@ -226,7 +226,11 @@ void eDVBCIInterfaces::ciRemoved(eDVBCISlot *slot)
 			slot->linked_next->setSource(slot->current_source);
 		else // last CI in chain
 		{
-			setInputSource(slot->current_tuner, slot->current_source);
+			if(slot->current_tuner == 99)
+				slot->setSource(PVR_NONE);
+			else
+				setInputSource(slot->current_tuner, slot->current_source);
+
 			slot->removeVtunerPid();
 		}
 		slot->linked_next = 0;
@@ -244,6 +248,7 @@ static bool canDescrambleMultipleServices(int slotid)
 	snprintf(configStr, 255, "config.ci.%d.canDescrambleMultipleServices", slotid);
 	std::string str;
 	ePythonConfigQuery::getConfigValue(configStr, str);
+	eDebugCI("canDescrambleMultipleServices %s", str.c_str());	
 	if ( str == "auto" )
 	{
 		std::string appname = eDVBCI_UI::getInstance()->getAppName(slotid);
@@ -494,6 +499,8 @@ void eDVBCIInterfaces::recheckPMTHandlers()
 								eDVBFrontend *fe = (eDVBFrontend*) &(*frontend);
 								tunernum = fe->getSlotID();
 							}
+							else // no frontend, PVR
+								tunernum = 99;
 						}
 						ASSERT(tunernum != -1);
 						data_source tuner_source = TUNER_A;
@@ -502,12 +509,15 @@ void eDVBCIInterfaces::recheckPMTHandlers()
 							case 0 ... 22:
 								tuner_source = (data_source)tunernum;
 								break;
+							case 99: tuner_source = PVR;
+								break;
 							default:
 								eDebug("try to get source for tuner %d!!\n", tunernum);
 								break;
 						}
 						ci_it->current_tuner = tunernum;
-						setInputSource(tunernum, ci_source);
+						if (tunernum != 99)
+							setInputSource(tunernum, ci_source);
 						ci_it->setSource(tuner_source);
 					}
 					else
@@ -597,7 +607,11 @@ void eDVBCIInterfaces::removePMTHandler(eDVBServicePMTHandler *pmthandler)
 					slot->linked_next->setSource(slot->current_source);
 				else
 				{
-					setInputSource(slot->current_tuner, slot->current_source);
+					if(slot->current_tuner == 99)
+						slot->setSource(PVR_NONE);
+					else
+						setInputSource(slot->current_tuner, slot->current_source);
+
 					slot->removeVtunerPid();
 				}
 
@@ -640,6 +654,19 @@ void eDVBCIInterfaces::gotPMT(eDVBServicePMTHandler *pmthandler)
 			tmp = tmp->linked_next;
 		}
 	}
+
+}
+
+bool eDVBCIInterfaces::isCiConnected(eDVBServicePMTHandler *pmthandler)
+{
+	bool ret = false;
+	PMTHandlerList::iterator it=std::find(m_pmt_handlers.begin(), m_pmt_handlers.end(), pmthandler);
+	if (it != m_pmt_handlers.end() && it->cislot)
+	{
+		ret = true;
+	}
+
+	return ret;
 }
 
 int eDVBCIInterfaces::getMMIState(int slotid)
@@ -652,12 +679,11 @@ int eDVBCIInterfaces::getMMIState(int slotid)
 	return slot->getMMIState();
 }
 
-static const char *tuner_source[] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "CI0", "CI1", "CI2", "CI3"};
+static const char *g_tuner_source[] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "CI0", "CI1", "CI2", "CI3"};
 
 int eDVBCIInterfaces::setInputSource(int tuner_no, data_source source)
 {
-//	eDebug("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-//	eDebug("eDVBCIInterfaces::setInputSource(%d %d)", tuner_no, (int)source);
+	eDebugCI("[eDVBCIInterfaces] setInputSource(%d, %d)", tuner_no, (int)source);
 	if (getNumOfSlots() > 1) // FIXME .. we force DM8000 when more than one CI Slot is avail
 	{
 		char buf[64];
@@ -669,13 +695,10 @@ int eDVBCIInterfaces::setInputSource(int tuner_no, data_source source)
 			return 0;
 		}
 
-		if (tuner_no > 3)
-			eDebug("setInputSource(%d, %d) failed... dm8000 just have four inputs", tuner_no, (int)source);
-
 		switch(source)
 		{
-			case TUNER_A ... CI_D:
-				fprintf(input, tuner_source[(int)source]);
+           case TUNER_A ... CI_D:
+               fprintf(input, g_tuner_source[(int)source]);
 				break;
 			default:
 				eDebug("setInputSource for input %d failed!!!\n", (int)source);
@@ -1268,6 +1291,7 @@ void eDVBCISlot::removeService(uint16_t program_number)
 int eDVBCISlot::setSource(data_source source)
 {
 	current_source = source;
+	eDebugCI("[eDVBCISlot] setSource %d", (int)source);
 	if (eDVBCIInterfaces::getInstance()->getNumOfSlots() > 1) // FIXME .. we force DM8000 when more than one CI Slot is avail
 	{
 		char buf[64];
@@ -1276,7 +1300,13 @@ int eDVBCISlot::setSource(data_source source)
 		switch(source)
 		{
 			case TUNER_A ... CI_D:
-				fprintf(ci, tuner_source[(int)source]);
+				fprintf(ci, g_tuner_source[(int)source]);
+				break;
+			case PVR:
+				fprintf(ci, "PVR");
+				break;
+			case PVR_NONE:
+				fprintf(ci, "PVR_NONE");
 				break;
 			default:
 				eDebug("CI Slot %d: setSource %d failed!!!\n", getSlotID(), (int)source);
@@ -1299,7 +1329,7 @@ int eDVBCISlot::setSource(data_source source)
 			fprintf(ci, "%s", source==TUNER_A ? "A" : "B");  // configure CI data source (TunerA, TunerB)
 		fclose(ci);
 	}
-	eDebug("CI Slot %d setSource(%d)", getSlotID(), (int)source);
+	eDebugCI("[eDVBCISlot] CI Slot %d setSource(%d)", getSlotID(), (int)source);
 	return 0;
 }
 

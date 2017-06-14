@@ -3,6 +3,8 @@
 #include <lib/dvb/epgcache.h>
 #include <lib/dvb/metaparser.h>
 #include <lib/base/httpstream.h>
+#include <lib/base/nconfig.h>
+
 #include <fcntl.h>
 
 	/* for cutlist */
@@ -22,12 +24,16 @@ eDVBServiceRecord::eDVBServiceRecord(const eServiceReferenceDVB &ref, bool isstr
 	CONNECT(m_event_handler.m_eit_changed, eDVBServiceRecord::gotNewEvent);
 	m_state = stateIdle;
 	m_want_record = 0;
+	m_record_ecm = false;
+	m_descramble = true;
+	m_pvr_descramble = false;
 	m_tuned = 0;
 	m_target_fd = -1;
 	m_error = 0;
 	m_streaming = 0;
 	m_simulate = false;
 	m_last_event_id = -1;
+	m_serviceType = eDVBServicePMTHandler::recording;
 }
 
 void eDVBServiceRecord::serviceEvent(int event)
@@ -71,7 +77,12 @@ void eDVBServiceRecord::serviceEvent(int event)
 		if (m_state == stateIdle)
 			doPrepare();
 		else if (m_want_record) /* doRecord can be called from Prepared and Recording state */
-			doRecord();
+		{
+			if (m_pvr_descramble)
+				updateDecoder();
+			else
+				doRecord();
+		}
 		m_event((iRecordableService*)this, evNewProgramInfo);
 		break;
 	}
@@ -83,14 +94,34 @@ void eDVBServiceRecord::serviceEvent(int event)
 		m_error = errNoResources;
 		m_event((iRecordableService*)this, evTuneFailed);
 		break;
+	case eDVBServicePMTHandler::eventEOF:
+		m_event((iRecordableService*)this, evPvrEof);
+		break;
+	case eDVBServicePMTHandler::eventStartPvrDescramble:
+		if (m_want_record)
+		{
+			doRecord();
+		}
+		break;
 	}
 }
 
-RESULT eDVBServiceRecord::prepare(const char *filename, time_t begTime, time_t endTime, int eit_event_id, const char *name, const char *descr, const char *tags)
+RESULT eDVBServiceRecord::prepare(const char *filename, time_t begTime, time_t endTime, int eit_event_id, const char *name, const char *descr, const char *tags, bool descramble, bool recordecm)
 {
+	bool config_recording_always_ecm = ePythonConfigQuery::getConfigBoolValue("config.recording.always_ecm", false);
+	bool config_recording_never_decrypt = ePythonConfigQuery::getConfigBoolValue("config.recording.never_decrypt", false);
 	m_filename = filename;
 	m_streaming = 0;
-	
+	m_descramble = config_recording_never_decrypt ? false : descramble;
+	m_record_ecm = config_recording_always_ecm ? true : recordecm;
+
+	// force descramble for _pvrdesc.ts
+	if (strstr(filename, "_pvrdesc.ts"))
+	{
+		m_pvr_descramble = true;
+		m_descramble = true;
+	}
+
 	if (m_state == stateIdle)
 	{
 		int ret = doPrepare();
@@ -136,7 +167,8 @@ RESULT eDVBServiceRecord::prepare(const char *filename, time_t begTime, time_t e
 				meta.m_description = descr;
 			if (tags)
 				meta.m_tags = tags;
-			ret = meta.updateMeta(filename) ? -255 : 0;
+			meta.m_scrambled = !m_descramble;
+			ret = meta.updateMeta(m_filename) ? -255 : 0;
 			if (!ret)
 			{
 				const eit_event_struct *event = 0;
@@ -162,7 +194,7 @@ RESULT eDVBServiceRecord::prepare(const char *filename, time_t begTime, time_t e
 				if ( event )
 				{
 					eDebug("found event.. store to disc");
-					std::string fname = filename;
+					std::string fname = m_filename;
 					fname.erase(fname.length()-2, 2);
 					fname+="eit";
 					int fd = open(fname.c_str(), O_CREAT|O_WRONLY, 0777);
@@ -234,32 +266,62 @@ int eDVBServiceRecord::doPrepare()
 		/* allocate a ts recorder if we don't already have one. */
 	if (m_state == stateIdle)
 	{
-		bool isstreamclient = false;
+		int use_decode_demux = 0;
+
+		if (m_streaming)
+		{
+			m_serviceType = m_record_ecm ? eDVBServicePMTHandler::scrambled_streamserver : eDVBServicePMTHandler::streamserver;
+		}
+		else
+		{
+			m_serviceType = m_record_ecm ? eDVBServicePMTHandler::scrambled_recording : eDVBServicePMTHandler::recording;
+		}
+
 		m_pids_active.clear();
 		m_state = statePrepared;
 		ePtr<iTsSource> source;
-		if (!m_ref.path.empty())
+		if (!m_simulate && !m_ref.path.empty())
 		{
 			if (m_is_stream_client)
 			{
-				isstreamclient = true;
+				m_descramble = true; // assume stream is scrambled
+				m_record_ecm = false;
+				m_serviceType = eDVBServicePMTHandler::streamclient;
 				eHttpStream *f = new eHttpStream();
 				f->open(m_ref.path.c_str());
 				source = ePtr<iTsSource>(f);
 			}
 			else
 			{
+				use_decode_demux = 1;
+
 				/* re-record a recording */
+				eDVBMetaParser meta;
+				if (!meta.parseFile(m_ref.path))
+				{
+					m_descramble = meta.m_scrambled;
+				}
+
+				if(m_pvr_descramble)
+				{
+					m_serviceType = eDVBServicePMTHandler::pvrDescramble;
+				}
+				else
+				{
+					m_serviceType = eDVBServicePMTHandler::offline;
+				}
+
 				eRawFile *f = new eRawFile();
 				f->open(m_ref.path.c_str());
 				source = ePtr<iTsSource>(f);
 			}
+			m_event((iRecordableService*)this, evPvrTuneStart);
 		}
 		else
 		{
 			m_event((iRecordableService*)this, evTuneStart);
 		}
-		return m_service_handler.tuneExt(m_ref, 0, source, m_ref.path.c_str(), 0, m_simulate, 0, isstreamclient);
+		return m_service_handler.tuneExt(m_ref, use_decode_demux, source, m_ref.path.c_str(), 0, m_simulate, 0, m_serviceType, m_descramble);
 	}
 	return 0;
 }
@@ -279,6 +341,22 @@ int eDVBServiceRecord::doRecord()
 	
 	if (!m_record && m_tuned && !m_streaming && !m_simulate)
 	{
+		if (m_pvr_descramble)
+		{
+			if (m_service_handler.isPmtReady())
+			{
+				if (!m_service_handler.isCiConnected())
+				{
+					m_event((iRecordableService*)this, evRecordFailed);
+					return errNoCiConnected;
+				}
+			}
+			else
+			{
+				return 0;
+			}
+		}
+
 		eDebug("Recording to %s...", m_filename.c_str());
 		::remove(m_filename.c_str());
 		int fd = ::open(m_filename.c_str(), O_WRONLY|O_CREAT|O_LARGEFILE, 0644);
@@ -404,6 +482,41 @@ int eDVBServiceRecord::doRecord()
 			if (program.textPid != -1)
 				pids_to_record.insert(program.textPid); // Videotext
 
+			if (m_record_ecm)
+			{
+				for (std::list<eDVBServicePMTHandler::program::capid_pair>::const_iterator i(program.caids.begin());
+							i != program.caids.end(); ++i)
+				{
+					if (i->capid >= 0) pids_to_record.insert(i->capid);
+				}
+				pids_to_record.insert(EventInformationSection::PID);
+				pids_to_record.insert(TimeAndDateSection::PID);
+			}
+
+			{
+				int isCrypted = (int)program.isCrypted();
+				int scrambled = !m_descramble;
+				if (!m_descramble)
+				{
+					scrambled = isCrypted;
+				}
+				else if (!isCrypted)
+				{
+					scrambled = 0;
+				}
+				else // m_descramble && isCrypted
+				{
+					if (!m_service_handler.isCiConnected())
+						scrambled = 1;
+					else
+						scrambled = 0;
+				}
+				eDVBMetaParser dvbParser;
+				dvbParser.parseFile(m_filename);
+				dvbParser.m_scrambled = scrambled;
+				dvbParser.updateMeta(m_filename);
+			}
+
 				/* find out which pids are NEW and which pids are obsolete.. */
 			std::set<int> new_pids, obsolete_pids;
 
@@ -444,6 +557,77 @@ int eDVBServiceRecord::doRecord()
 	m_error = 0;
 	m_event((iRecordableService*)this, evRecordRunning);
 	return 0;
+}
+
+void eDVBServiceRecord::updateDecoder()
+{
+	int vpid = -1, vpidtype = -1, apid = -1, apidtype = -1, pcrpid = -1;
+
+	eDVBServicePMTHandler &h = m_service_handler;
+
+	eDVBServicePMTHandler::program program;
+	if (m_service_handler.getProgramInfo(program))
+		eDebug("getting program info failed.");
+	else
+	{
+		eDebugNoNewLine("have %zd video stream(s)", program.videoStreams.size());
+		if (!program.videoStreams.empty())
+		{
+			eDebugNoNewLine(" (");
+			for (std::vector<eDVBServicePMTHandler::videoStream>::const_iterator
+				i(program.videoStreams.begin());
+				i != program.videoStreams.end(); ++i)
+			{
+				if (vpid == -1)
+				{
+					vpid = i->pid;
+					vpidtype = i->type;
+				}
+				if (i != program.videoStreams.begin())
+					eDebugNoNewLine(", ");
+				eDebugNoNewLine("%04x", i->pid);
+			}
+			eDebugNoNewLine(")");
+		}
+
+		eDebugNoNewLine(", and %zd audio stream(s)", program.audioStreams.size());
+		if (!program.audioStreams.empty())
+		{
+			eDebugNoNewLine(" (");
+			for (std::vector<eDVBServicePMTHandler::audioStream>::const_iterator
+				i(program.audioStreams.begin());
+				i != program.audioStreams.end(); ++i)
+			{
+				if (i != program.audioStreams.begin())
+					eDebugNoNewLine(", ");
+				eDebugNoNewLine("%04x", i->pid);
+			}
+			eDebugNoNewLine(")");
+		}
+
+		apid = program.audioStreams[program.defaultAudioStream].pid;
+		apidtype = program.audioStreams[program.defaultAudioStream].type;
+
+		eDebugNoNewLine(", and the pcr pid is %04x", program.pcrPid);
+		pcrpid = program.pcrPid;
+	}
+
+	if (!m_decoder)
+	{
+		h.getDecodeDemux(m_decode_demux);
+		if (m_decode_demux)
+		{
+			m_decode_demux->getMPEGDecoder(m_decoder, 0);
+		}
+	}
+
+	if (m_decoder)
+	{
+		m_decoder->setVideoPID(vpid, vpidtype);
+		m_decoder->setAudioPID(apid, apidtype);
+		m_decoder->setSyncPCR(-1);
+		m_decoder->play();
+	}
 }
 
 RESULT eDVBServiceRecord::frontendInfo(ePtr<iFrontendInformation> &ptr)

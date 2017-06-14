@@ -31,4 +31,5 @@ SystemInfo["FrontpanelDisplayGrayscale"] = fileExists("/dev/dbox/oled0")
 SystemInfo["DeepstandbySupport"] = HardwareInfo().get_device_name() != "dm800"
 SystemInfo["HdmiInSupport"] = HardwareInfo().get_vu_device_name() == "ultimo4k"
 SystemInfo["WOWLSupport"] = HardwareInfo().get_vu_device_name() == "ultimo4k"
+SystemInfo["ScrambledPlayback"] = HardwareInfo().get_vu_device_name() in ("solo4k", "ultimo4k")
 

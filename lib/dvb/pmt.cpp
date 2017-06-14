@@ -32,7 +32,8 @@ eDVBServicePMTHandler::eDVBServicePMTHandler()
 	m_use_decode_demux = 0;
 	m_pmt_pid = -1;
 	m_dsmcc_pid = -1;
-	m_isstreamclient = false;
+	m_service_type = livetv;
+	m_descramble = true;
 	m_ca_disabled = false;
 	m_pmt_ready = false;
 	eDVBResourceManager::getInstance(m_resourceManager);
@@ -114,6 +115,19 @@ void eDVBServicePMTHandler::channelEvent(iDVBChannel *channel, int event)
 	}
 }
 
+void eDVBServicePMTHandler::registerCAService()
+{
+	int demuxes[2] = {0,0};
+	uint8_t demuxid;
+	m_demux->getCADemuxID(demuxid);
+	demuxes[0]=demuxid;
+	if (m_decode_demux_num != 0xFF)
+		demuxes[1]=m_decode_demux_num;
+	else
+		demuxes[1]=demuxes[0];
+	eDVBCAService::register_service(m_reference, demuxes, m_ca_servicePtr);
+}
+
 void eDVBServicePMTHandler::PMTready(int error)
 {
 	if (error)
@@ -123,26 +137,24 @@ void eDVBServicePMTHandler::PMTready(int error)
 		m_pmt_ready = true;
 		m_have_cached_program = false;
 		serviceEvent(eventNewProgramInfo);
+
 		mDemuxId = m_decode_demux_num;
-		if (!m_pvr_channel) // don't send campmt to camd.socket for playbacked services
+		if (!m_pvr_channel)
 		{
 			eEPGCache::getInstance()->PMTready(this);
-			if(!m_ca_servicePtr && !m_isstreamclient)
+		}
+
+		if (m_descramble)
+		{
+			if(!m_ca_servicePtr)
 			{
-				int demuxes[2] = {0,0};
-				uint8_t tmp;
-				m_demux->getCADemuxID(tmp);
-				demuxes[0]=tmp;
-				if (m_decode_demux_num != 0xFF)
-					demuxes[1]=m_decode_demux_num;
-				else
-					demuxes[1]=demuxes[0];
-				eDVBCAService::register_service(m_reference, demuxes, m_ca_servicePtr);
-				if (!m_ca_disabled)
-					eDVBCIInterfaces::getInstance()->recheckPMTHandlers();
+				registerCAService();
 			}
 			if (!m_ca_disabled)
+			{
+				eDVBCIInterfaces::getInstance()->recheckPMTHandlers();
 				eDVBCIInterfaces::getInstance()->gotPMT(this);
+			}
 		}
 		if (m_ca_servicePtr)
 		{
@@ -152,6 +164,9 @@ void eDVBServicePMTHandler::PMTready(int error)
 			else
 				eDebug("eDVBServicePMTHandler cannot call buildCAPMT");
 		}
+
+		if (m_service_type == pvrDescramble)
+			serviceEvent(eventStartPvrDescramble);
 	}
 }
 
@@ -1123,19 +1138,20 @@ void eDVBServicePMTHandler::SDTScanEvent(int event)
 	}
 }
 
-int eDVBServicePMTHandler::tune(eServiceReferenceDVB &ref, int use_decode_demux, eCueSheet *cue, bool simulate, eDVBService *service)
+int eDVBServicePMTHandler::tune(eServiceReferenceDVB &ref, int use_decode_demux, eCueSheet *cue, bool simulate, eDVBService *service, serviceType type, bool descramble)
 {
 	ePtr<iTsSource> s;
-	return tuneExt(ref, use_decode_demux, s, NULL, cue, simulate, service);
+	return tuneExt(ref, use_decode_demux, s, NULL, cue, simulate, service, type, descramble);
 }
 
-int eDVBServicePMTHandler::tuneExt(eServiceReferenceDVB &ref, int use_decode_demux, ePtr<iTsSource> &source, const char *streaminfo_file, eCueSheet *cue, bool simulate, eDVBService *service, bool isstreamclient)
+int eDVBServicePMTHandler::tuneExt(eServiceReferenceDVB &ref, int use_decode_demux, ePtr<iTsSource> &source, const char *streaminfo_file, eCueSheet *cue, bool simulate, eDVBService *service, serviceType type, bool descramble)
 {
 	RESULT res=0;
 	m_reference = ref;
 	m_use_decode_demux = use_decode_demux;
 	m_no_pat_entry_delay->stop();
-	m_isstreamclient = isstreamclient;
+	m_service_type = type;
+	m_descramble = descramble;
 
 		/* use given service as backup. This is used for timeshift where we want to clone the live stream using the cache, but in fact have a PVR channel */
 	m_service = service;
@@ -1153,7 +1169,7 @@ int eDVBServicePMTHandler::tuneExt(eServiceReferenceDVB &ref, int use_decode_dem
 		if (!m_resourceManager->getChannelList(db))
 			db->getService((eServiceReferenceDVB&)m_reference, m_service);
 
-		if (!res && !simulate && !m_ca_disabled)
+		if (!res && !simulate && m_descramble && !m_ca_disabled)
 			eDVBCIInterfaces::getInstance()->addPMTHandler(this);
 	} else if (!simulate) // no simulation of playback services
 	{
@@ -1180,10 +1196,16 @@ int eDVBServicePMTHandler::tuneExt(eServiceReferenceDVB &ref, int use_decode_dem
 		eDebug("alloc PVR");
 			/* allocate PVR */
 		eDVBChannelID chid;
-		if (m_isstreamclient) ref.getChannelID(chid);
+		if (m_service_type == streamclient) ref.getChannelID(chid);
 		res = m_resourceManager->allocatePVRChannel(chid, m_pvr_channel);
 		if (res)
+		{
 			eDebug("allocatePVRChannel failed!\n");
+		}
+		else if (descramble)
+		{
+			eDVBCIInterfaces::getInstance()->addPMTHandler(this);
+		}
 		m_channel = m_pvr_channel;
 	}
 
@@ -1221,15 +1243,7 @@ int eDVBServicePMTHandler::tuneExt(eServiceReferenceDVB &ref, int use_decode_dem
 			m_pvr_channel->setCueSheet(cue);
 
 			if (m_pvr_channel->getDemux(m_pvr_demux_tmp, (!m_use_decode_demux) ? 0 : iDVBChannel::capDecode))
-			{
-				if (m_isstreamclient)
-				{
-					eDebug("Allocating %s-decoding a demux for http channel failed.", m_use_decode_demux ? "" : "non-");
-					return -2;
-				}
-				else
-					eDebug("Allocating %s-decoding a demux for PVR channel failed.", m_use_decode_demux ? "" : "non-");
-			}
+				eDebug("[eDVBServicePMTHandler] Allocating %s-decoding a demux for PVR channel failed.", m_use_decode_demux ? "" : "non-");
 			else if (source)
 				m_pvr_channel->playSource(source, streaminfo_file);
 			else
@@ -1301,6 +1315,10 @@ void eDVBServicePMTHandler::removeCaHandler()
 		eDVBCIInterfaces::getInstance()->removePMTHandler(this);
 }
 
+bool eDVBServicePMTHandler::isCiConnected()
+{
+	eDVBCIInterfaces::getInstance()->isCiConnected(this);
+}
 
 CAServiceMap eDVBCAService::exist;
 ChannelMap eDVBCAService::exist_channels;

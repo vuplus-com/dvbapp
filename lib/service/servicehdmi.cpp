@@ -205,7 +205,7 @@ eServiceHDMIRecord::eServiceHDMIRecord(const eServiceReference &ref, ePtr<eNavig
 	m_nav_instance = nav_instance;
 }
 
-RESULT eServiceHDMIRecord::prepare(const char *filename, time_t begTime, time_t endTime, int eit_event_id, const char *name, const char *descr, const char *tags)
+RESULT eServiceHDMIRecord::prepare(const char *filename, time_t begTime, time_t endTime, int eit_event_id, const char *name, const char *descr, const char *tags, bool descramble, bool recordecm)
 {
 	m_filename = filename;
 

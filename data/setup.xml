@@ -61,6 +61,8 @@
 			<item level="2" text="Preferred tuner">config.usage.frontend_priority</item>
 			<item level="2" text="Limited character set for recording filenames">config.recording.ascii_filenames</item>
 			<item level="2" text="Composition of the recording filenames">config.recording.filename_composition</item>
+			<item level="2" text="Always include ECM in recordings" requires="ScrambledPlayback" description="Always include ECM messages in recordings. This overrides the individual timer settings globally. It allows recordings to be always decrypted afterwards (sometimes called offline decoding), if supported by your receiver. Default: off.">config.recording.always_ecm</item>
+			<item level="2" text="Never decrypt while recording" requires="ScrambledPlayback" description="Never decrypt the content while recording. This overrides the individual timer settings globally. If enabled, recordings are stored in crypted presentation and must be decrypted afterwards (sometimes called offline decoding). Default: off.">config.recording.never_decrypt</item>
 		</setup>
 		<setup key="subtitlesetup" title="Subtitle settings">
 			<item level="2" text="Subtitle font color" description="Configure the color of the subtitles.">config.subtitles.subtitle_fontcolor</item>

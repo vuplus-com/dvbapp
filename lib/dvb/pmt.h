@@ -140,6 +140,7 @@ class eDVBServicePMTHandler: public Object
 	eAUTable<eTable<ApplicationInformationSection> > m_AIT;
 	eAUTable<eTable<OCSection> > m_OC;
 
+	void registerCAService();
 	void PMTready(int error);
 	void PATready(int error);
 	
@@ -190,6 +191,7 @@ public:
 		
 		eventMisconfiguration, // a channel was not found in any list, or no frontend was found which could provide this channel
 		eventNoDiskSpace,  // no disk space available
+		eventStartPvrDescramble,   // start PVR Descramble Convert
 	};
 #ifndef SWIG
 	Signal1<void,int> serviceEvent;
@@ -282,19 +284,38 @@ public:
 	void getDemuxID(int &id) { id = mDemuxId; }
 	void setCaDisable(bool disable) { m_ca_disabled = disable; }
 
+	enum serviceType
+	{
+		livetv = 0,
+		recording = 1,
+		scrambled_recording = 2,
+		playback = 3,
+		timeshift_recording = 4,
+		scrambled_timeshift_recording = 5,
+		timeshift_playback = 6,
+		streamserver = 7,
+		scrambled_streamserver = 8,
+		streamclient = 9,
+		offline = 10,
+		pvrDescramble = 11,
+	};
+
 	/* deprecated interface */
-	int tune(eServiceReferenceDVB &ref, int use_decode_demux, eCueSheet *sg=0, bool simulate=false, eDVBService *service = 0);
+	int tune(eServiceReferenceDVB &ref, int use_decode_demux, eCueSheet *sg=0, bool simulate=false, eDVBService *service = 0, serviceType type = livetv, bool descramble = true);
 
 	/* new interface */
-	int tuneExt(eServiceReferenceDVB &ref, int use_decode_demux, ePtr<iTsSource> &, const char *streaminfo_file, eCueSheet *sg=0, bool simulate=false, eDVBService *service = 0, bool isstreamclient=false);
+	int tuneExt(eServiceReferenceDVB &ref, int use_decode_demux, ePtr<iTsSource> &, const char *streaminfo_file, eCueSheet *sg=0, bool simulate=false, eDVBService *service = 0, serviceType type = livetv, bool descramble=true);
 
 	void free();
 	void addCaHandler();
 	void removeCaHandler();
+	bool isCiConnected();
+	bool isPmtReady() { return m_pmt_ready; }
 private:
 	bool m_have_cached_program;
 	program m_cached_program;
-	bool m_isstreamclient;
+	bool m_descramble;
+	serviceType m_service_type;
 #endif
 };
 

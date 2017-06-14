@@ -352,3 +352,9 @@ off_t eHttpStream::length()
 {
 	return (off_t)-1;
 }
+
+off_t eHttpStream::offset()
+{
+	return 0;
+}
+
