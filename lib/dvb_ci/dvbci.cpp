@@ -225,7 +225,10 @@ void eDVBCIInterfaces::ciRemoved(eDVBCISlot *slot)
 		if (slot->linked_next)
 			slot->linked_next->setSource(slot->current_source);
 		else // last CI in chain
+		{
 			setInputSource(slot->current_tuner, slot->current_source);
+			slot->removeVtunerPid();
+		}
 		slot->linked_next = 0;
 		slot->use_count=0;
 		slot->plugged=true;
@@ -389,6 +392,7 @@ void eDVBCIInterfaces::recheckPMTHandlers()
 							eDebug("The CI in Slot %d has said it can handle caid %04x... so use it", ci_it->getSlotID(), *z);
 							useThis = true;
 							user_mapped = false;
+							ci_it->addVtunerPid(pmthandler);
 							break;
 						}
 					}
@@ -495,7 +499,7 @@ void eDVBCIInterfaces::recheckPMTHandlers()
 						data_source tuner_source = TUNER_A;
 						switch (tunernum)
 						{
-							case 0 ... 18:
+							case 0 ... 22:
 								tuner_source = (data_source)tunernum;
 								break;
 							default:
@@ -592,7 +596,10 @@ void eDVBCIInterfaces::removePMTHandler(eDVBServicePMTHandler *pmthandler)
 				if (slot->linked_next)
 					slot->linked_next->setSource(slot->current_source);
 				else
+				{
 					setInputSource(slot->current_tuner, slot->current_source);
+					slot->removeVtunerPid();
+				}
 
 				if (base_slot != slot)
 				{
@@ -645,7 +652,7 @@ int eDVBCIInterfaces::getMMIState(int slotid)
 	return slot->getMMIState();
 }
 
-static const char *tuner_source[] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "CI0", "CI1", "CI2", "CI3"};
+static const char *tuner_source[] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "CI0", "CI1", "CI2", "CI3"};
 
 int eDVBCIInterfaces::setInputSource(int tuner_no, data_source source)
 {
@@ -1039,6 +1046,13 @@ eDVBCISlot::eDVBCISlot(eMainloop *context, int nr)
 	{
 		perror(filename);
 	}
+
+	for(int i = 0; i < NUM_OF_ECM ; i++)
+	{
+		m_ecm[i] = 0;
+	}
+	ecm_num = 0;
+	
 }
 
 eDVBCISlot::~eDVBCISlot()
@@ -1304,6 +1318,44 @@ int eDVBCISlot::setClockRate(int rate)
 		return 0;
 	}
 	return -1;
+}
+
+void eDVBCISlot::addVtunerPid(eDVBServicePMTHandler *pmthandler)
+{
+	ePtr<iDVBDemux> demux;
+	eDVBServicePMTHandler::program p;
+		
+	if (!pmthandler->getDataDemux(demux) && !ecm_num)
+	{
+	
+		if (!pmthandler->getProgramInfo(p))
+		{
+			for (std::list<eDVBServicePMTHandler::program::capid_pair>::const_iterator i(p.caids.begin());
+						i != p.caids.end(); ++i)
+			{
+				if (i->capid >= 0)
+				{
+					eDebug("PES Start ECM PID = %d Caid = %d ecm_num=%d", i->capid, i->caid, ecm_num);
+					m_ecm[ecm_num] = new eDVBECMParser(demux);
+					m_ecm[ecm_num++]->start(i->capid);
+				}
+			}
+		}
+	}
+
+}
+
+void eDVBCISlot::removeVtunerPid(void)
+{
+	for(int i = 0; i < ecm_num ; i++)
+	{
+		if(m_ecm[i])
+		{
+			m_ecm[i]->stop();
+			m_ecm[i] = 0;
+		}
+	}
+	ecm_num = 0;
 }
 
 eAutoInitP0<eDVBCIInterfaces> init_eDVBCIInterfaces(eAutoInitNumbers::dvb, "CI Slots");

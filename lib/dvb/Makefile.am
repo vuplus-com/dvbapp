@@ -29,6 +29,7 @@ libenigma_dvb_a_SOURCES = \
 	sec.cpp \
 	subtitle.cpp \
 	teletext.cpp \
+	ecm.cpp \
 	tstools.cpp \
 	volume.cpp \
 	fbc.cpp \
@@ -63,6 +64,7 @@ dvbinclude_HEADERS = \
 	specs.h \
 	subtitle.h \
 	teletext.h \
+	ecm.h \
 	tstools.h \
 	volume.h \
 	fbc.h \
