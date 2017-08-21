@@ -9,11 +9,13 @@ class eVideoWidget: public eLabel
 	int m_state;
 	eRect m_user_rect;
 	int m_decoder;
+	bool m_adjust_position;
 public:
 	eVideoWidget(eWidget *parent);
 	~eVideoWidget();
 	void setDecoder(int target);
 	void setFBSize(eSize size);
+	void setAdjustPosition(bool value);
 protected:
 	int event(int event, void *data=0, void *data2=0);
 	void updatePosition(int disable = 0);

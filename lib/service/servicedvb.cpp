@@ -959,6 +959,10 @@ eDVBServicePlay::eDVBServicePlay(const eServiceReference &ref, eDVBService *serv
 
 	m_current_video_pid_type = 0;
 
+	m_qpip_mode = false;
+
+	m_play_audio = true;
+
 	CONNECT(m_subtitle_sync_timer->timeout, eDVBServicePlay::checkSubtitleTiming);
 }
 
@@ -1963,7 +1967,7 @@ int eDVBServicePlay::selectAudioStream(int i)
 
 	m_current_audio_pid = apid;
 
-	if (m_is_primary && m_decoder->setAudioPID(apid, apidtype))
+	if ((m_is_primary || (m_qpip_mode && m_play_audio)) && m_decoder->setAudioPID(apid, apidtype))
 	{
 		eDebug("set audio pid failed");
 		return -4;
@@ -2665,7 +2669,9 @@ void eDVBServicePlay::updateDecoder(bool sendSeekableStateChanged)
 
 		m_decoder->setVideoPID(vpid, vpidtype);
 		m_current_video_pid_type = vpidtype;
-		selectAudioStream();
+
+		if (!m_qpip_mode || m_play_audio) // 1) no qpip mode, 2) qpip mode & play audio
+			selectAudioStream();
 
 		//if (!(m_is_pvr || m_is_stream || m_timeshift_active || !m_is_primary))
 		if (!(m_is_pvr || m_is_stream || m_timeshift_active))
@@ -3305,6 +3311,24 @@ PyObject *eDVBServicePlay::getStreamingData()
 	return r;
 }
 
+void eDVBServicePlay::setQpipMode(bool value, bool audio)
+{
+	m_qpip_mode = value;
+	m_play_audio = audio;
+
+	if(m_decoder)
+	{
+		if (m_play_audio)
+		{
+			selectAudioStream();
+		}
+		else
+		{
+			m_decoder->setAudioPID(-1, -1);
+		}
+		m_decoder->set();
+	}
+}
 
 DEFINE_REF(eDVBServicePlay)
 

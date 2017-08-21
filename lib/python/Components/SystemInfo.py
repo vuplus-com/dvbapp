@@ -32,4 +32,6 @@ SystemInfo["DeepstandbySupport"] = HardwareInfo().get_device_name() != "dm800"
 SystemInfo["HdmiInSupport"] = HardwareInfo().get_vu_device_name() == "ultimo4k"
 SystemInfo["WOWLSupport"] = HardwareInfo().get_vu_device_name() == "ultimo4k"
 SystemInfo["ScrambledPlayback"] = HardwareInfo().get_vu_device_name() in ("solo4k", "ultimo4k")
+SystemInfo["FastChannelChange"] =  fileExists("/proc/stb/frontend/fbc/fcc")
+SystemInfo["MiniTV"] = fileExists("/proc/stb/lcd/live_enable")
 

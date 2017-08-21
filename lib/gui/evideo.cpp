@@ -30,7 +30,7 @@ void setFullsize()
 }
 
 eVideoWidget::eVideoWidget(eWidget *parent)
-	:eLabel(parent), m_fb_size(720, 576), m_state(0), m_decoder(1)
+	:eLabel(parent), m_fb_size(720, 576), m_state(0), m_decoder(1), m_adjust_position(true)
 {
 	if (!fullsizeTimer)
 	{
@@ -118,14 +118,17 @@ void eVideoWidget::updatePosition(int disable)
 	int width = pos.width() * 720 / m_fb_size.width();
 	int height = pos.height() * 576 / m_fb_size.height();
 
-	int tmp = left - (width * 4) / 100;
-	left = tmp < 0 ? 0 : tmp;
-	tmp = top - (height * 4) / 100;
-	top = tmp < 0 ? 0 : tmp;
-	tmp = (width * 108) / 100;
-	width = left + tmp > 720 ? 720 - left : tmp;
-	tmp = (height * 108) / 100;
-	height = top + tmp > 576 ? 576 - top : tmp;
+	if (m_adjust_position)
+	{
+		int tmp = left - (width * 4) / 100;
+		left = tmp < 0 ? 0 : tmp;
+		tmp = top - (height * 4) / 100;
+		top = tmp < 0 ? 0 : tmp;
+		tmp = (width * 108) / 100;
+		width = left + tmp > 720 ? 720 - left : tmp;
+		tmp = (height * 108) / 100;
+		height = top + tmp > 576 ? 576 - top : tmp;
+	}
 
 //	eDebug("picture recalced %d %d -> %d %d", left, top, width, height);
 
@@ -172,3 +175,9 @@ void eVideoWidget::setDecoder(int decoder)
 {
 	m_decoder = decoder;
 }
+
+void eVideoWidget::setAdjustPosition(bool value)
+{
+	m_adjust_position = value;
+}
+

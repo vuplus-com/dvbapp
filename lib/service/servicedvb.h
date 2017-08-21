@@ -184,6 +184,7 @@ public:
 		// iStreamableService
 	RESULT stream(ePtr<iStreamableService> &ptr);
 	PyObject *getStreamingData();
+	void setQpipMode(bool value, bool audio);
 
 protected:
 	friend class eServiceFactoryDVB;
@@ -202,6 +203,9 @@ protected:
 	eDVBServiceEITHandler m_event_handler;
 	int m_current_audio_pid;
 	int m_current_video_pid_type;
+
+	bool m_qpip_mode;
+	bool m_play_audio;
 	
 	eDVBServicePlay(const eServiceReference &ref, eDVBService *service, bool connect_event=true);
 	

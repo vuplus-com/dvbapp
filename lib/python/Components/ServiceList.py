@@ -265,3 +265,7 @@ class ServiceList(HTMLComponent, GUIComponent):
 			self.l.setElementPosition(self.l.celServiceName, eRect(60, 0, self.instance.size().width()-60, self.ItemHeight))
 			self.l.setElementFont(self.l.celServiceInfo, self.ServiceInfoFont)
 
+	def selectionEnabled(self, enabled):
+		if self.instance is not None:
+			self.instance.setSelectionEnable(enabled)
+
