@@ -1165,6 +1165,9 @@ int eDVBServicePMTHandler::tuneExt(eServiceReferenceDVB &ref, int use_decode_dem
 		if (!simulate)
 			eDebug("allocate Channel: res %d", res);
 
+		if (!res)
+			serviceEvent(eventChannelAllocated);
+
 		ePtr<iDVBChannelList> db;
 		if (!m_resourceManager->getChannelList(db))
 			db->getService((eServiceReferenceDVB&)m_reference, m_service);

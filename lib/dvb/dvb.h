@@ -144,6 +144,7 @@ class eDVBResourceManager: public iObject, public Object
 	eSmartPtrList<eDVBRegisteredDemux> m_demux;
 	eSmartPtrList<eDVBRegisteredFrontend> m_frontend, m_simulate_frontend;
 	void addAdapter(iDVBAdapter *adapter);
+	void setUsbTuner();
 
 	struct active_channel
 	{

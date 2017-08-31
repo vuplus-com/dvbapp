@@ -192,6 +192,7 @@ public:
 		eventMisconfiguration, // a channel was not found in any list, or no frontend was found which could provide this channel
 		eventNoDiskSpace,  // no disk space available
 		eventStartPvrDescramble,   // start PVR Descramble Convert
+		eventChannelAllocated,
 	};
 #ifndef SWIG
 	Signal1<void,int> serviceEvent;

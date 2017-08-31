@@ -24,6 +24,7 @@ typedef struct _tagFccElem
 	eServiceReference m_service_reference;
 	ePtr<eConnection> m_service_event_conn;
 	int m_state;
+	bool m_useNormalDecode;
 }FCCServiceElem;
 
 class eFCCServiceManager: public iObject, public Object
@@ -62,6 +63,8 @@ public:
 	static bool checkAvailable(const eServiceReference &ref);
 	void setFCCEnable(int enable) { m_fcc_enable = (enable != 0); }
 	bool isEnable() { return m_fcc_enable; }
+	bool isStateDecoding(iPlayableService* service);
+	void setNormalDecoding(iPlayableService* service);
 };
 
 #endif /* __dvb_fcc_h */

@@ -81,7 +81,7 @@ RESULT eFCCServiceManager::playFCCService(const eServiceReference &ref, ePtr<iPl
 		ePtr<eConnection> conn;
 		service->connectEvent(slot(*this, &eFCCServiceManager::FCCEvent), conn);
 
-		FCCServiceElem elem = {ref, conn, fcc_state_preparing};
+		FCCServiceElem elem = {ref, conn, fcc_state_preparing, false};
 		m_FCCServices[service] = elem;
 
 		res = service->start();
@@ -116,7 +116,7 @@ void eFCCServiceManager::FCCEvent(iPlayableService* service, int event)
 		case iPlayableService::evTuneFailed:
 		case iPlayableService::evFccFailed:
 		{
-			eDebug("[eFCCServiceManager][%s] set service to state failed.", it->second.m_service_reference.toString().c_str());
+			eDebug("[eFCCServiceManager::FCCEvent][%s] set service to state failed.", it->second.m_service_reference.toString().c_str());
 			it->second.m_state = fcc_state_failed;
 			break;
 		}
@@ -189,6 +189,9 @@ RESULT eFCCServiceManager::stopFCCService()
 
 RESULT eFCCServiceManager::tryFCCService(const eServiceReference &sref, ePtr<iPlayableService> &service)
 {
+	if (!isEnable())
+		return -1;
+
 	ePtr<iPlayableService> new_service = 0;
 
 	printFCCServices();
@@ -211,17 +214,27 @@ RESULT eFCCServiceManager::tryFCCService(const eServiceReference &sref, ePtr<iPl
 			m_core->m_service_event_conn = 0;
 			m_core->m_runningService = 0;
 
-			/* connect to fcc event */
-			ePtr<eConnection> conn;
-			it->first->connectEvent(slot(*this, &eFCCServiceManager::FCCEvent), conn);
-			it->second.m_service_event_conn = conn;
-			it->second.m_state = fcc_state_preparing;
+			if (it->second.m_useNormalDecode)
+			{
+				/* stop service */
+				it->first->stop();
+				m_FCCServices.erase(it++);
+			}
+			else
+			{
+				/* connect to fcc event */
+				ePtr<eConnection> conn;
+				it->first->connectEvent(slot(*this, &eFCCServiceManager::FCCEvent), conn);
+				it->second.m_service_event_conn = conn;
+				it->second.m_state = fcc_state_preparing;
 
-			/* switch to FCC prepare state */
-			it->first->start();
+				/* switch to FCC prepare state */
+				it->first->start();
 
-			/* update FCCServiceChannels */
-			m_fccServiceChannels.addFCCService(it->second.m_service_reference);
+				/* update FCCServiceChannels */
+				m_fccServiceChannels.addFCCService(it->second.m_service_reference);
+			}
+			break;
 		}
 	}
 
@@ -255,7 +268,7 @@ RESULT eFCCServiceManager::tryFCCService(const eServiceReference &sref, ePtr<iPl
 
 			if (service)
 			{
-				FCCServiceElem elem = {sref, 0, fcc_state_decoding};
+				FCCServiceElem elem = {sref, 0, fcc_state_decoding, false};
 				m_FCCServices[service] = elem;
 				service->start(); // do FCC preparing
 			}
@@ -307,7 +320,7 @@ void eFCCServiceManager::printFCCServices()
 	std::map< ePtr<iPlayableService>, FCCServiceElem >::iterator it = m_FCCServices.begin();
 	for (;it != m_FCCServices.end();++it)
 	{
-		eDebug("						[eFCCServiceManager::printFCCServices][*] sref : %s, state : %d, tune : %d", it->second.m_service_reference.toString().c_str(), it->second.m_state, isLocked(it->first));
+		eDebug("						[eFCCServiceManager::printFCCServices][*] sref : %s, state : %d, tune : %d, useNormalDecode : %d", it->second.m_service_reference.toString().c_str(), it->second.m_state, isLocked(it->first), it->second.m_useNormalDecode);
 	}
 #else
 	;
@@ -329,6 +342,35 @@ bool eFCCServiceManager::checkAvailable(const eServiceReference &ref)
 	if ((ref.type == 1) && ref.path.empty() && (serviceType != 2) && (serviceType != 10) && fcc_mng) // no PVR, streaming, radio channel..
 		return fcc_mng->isEnable();
 	return false;
+}
+
+bool eFCCServiceManager::isStateDecoding(iPlayableService* service)
+{
+	std::map<ePtr<iPlayableService>, FCCServiceElem >::iterator it = m_FCCServices.find(service);
+	if (it != m_FCCServices.end())
+	{
+		return (it->second.m_state == fcc_state_decoding);
+	}
+	else
+	{
+		eDebug("[eFCCServiceManager] non registered FCC service");
+	}
+
+	return false;
+}
+
+void eFCCServiceManager::setNormalDecoding(iPlayableService* service)
+{
+	std::map<ePtr<iPlayableService>, FCCServiceElem >::iterator it = m_FCCServices.find(service);
+	if (it != m_FCCServices.end())
+	{
+		eDebug("[eFCCServiceManager::setNormalDecoding][%s] set to use normal decoding.", it->second.m_service_reference.toString().c_str());
+		it->second.m_useNormalDecode = true;
+	}
+	else
+	{
+		eDebug("[eFCCServiceManager] non registered FCC service");
+	}
 }
 
 DEFINE_REF(eFCCServiceManager);

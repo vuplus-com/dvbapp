@@ -4,6 +4,8 @@
 #include <lib/service/servicedvb.h>
 #include <list>
 
+#include <lib/dvb/fcc.h>
+
 class eDVBServiceFCCPlay: public eDVBServicePlay
 {
 	DECLARE_REF(eDVBServiceFCCPlay);
@@ -20,6 +22,9 @@ protected:
 	void updateFCCDecoder(bool sendSeekableStateChanged=false);
 	void FCCDecoderStop();
 	void switchToLive();
+	bool checkUsbTuner();
+	bool getFCCStateDecoding();
+	void setNormalDecoding();
 
 	bool m_fcc_enable;
 
@@ -42,6 +47,7 @@ protected:
 	bool m_fcc_mustplay;
 	std::list<int> m_fcc_events;
 	int m_pmtVersion;
+	bool m_normal_decoding;
 };
 
 #endif /* __servicedvbfcc_h */

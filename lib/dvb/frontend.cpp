@@ -502,7 +502,7 @@ int eDVBFrontend::PreferredFrontendIndex=-1;
 eDVBFrontend::eDVBFrontend(int adap, int fe, int &ok, bool simulate, eDVBFrontend *simulate_fe)
 	:m_simulate(simulate), m_enabled(false), m_simulate_fe(simulate_fe), m_dvbid(fe), m_slotid(fe)
 	,m_fd(-1), m_rotor_mode(false), m_need_rotor_workaround(false)
-	,m_state(stateClosed), m_timeout(0), m_tuneTimer(0), m_fbc(false)
+	,m_state(stateClosed), m_timeout(0), m_tuneTimer(0), m_fbc(false), m_is_usbtuner(false)
 #if HAVE_DVB_API_VERSION < 3
 	,m_secfd(-1)
 #endif
@@ -1053,6 +1053,8 @@ int eDVBFrontend::readFrontendData(int type)
 		}
 		case frontendNumber:
 			return m_slotid;
+		case isUsbTuner:
+			return m_is_usbtuner;
 	}
 	return 0;
 }

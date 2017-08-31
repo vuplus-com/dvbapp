@@ -5,7 +5,7 @@
 
 eDVBServiceFCCPlay::eDVBServiceFCCPlay(const eServiceReference &ref, eDVBService *service)
 	:eDVBServicePlay(ref, service, false), m_fcc_flag(0), m_fcc_mode(fcc_mode_preparing), m_fcc_mustplay(false),
-		m_pmtVersion(-1)
+		m_pmtVersion(-1), m_normal_decoding(false)
 {
 	CONNECT(m_service_handler.serviceEvent, eDVBServiceFCCPlay::serviceEvent);
 }
@@ -43,19 +43,50 @@ void eDVBServiceFCCPlay::serviceEvent(int event)
 			pushbackFCCEvents(evTuneFailed);
 			break;
 		}
+		case eDVBServicePMTHandler::eventChannelAllocated:
+		{
+			bool is_usb_tuner = checkUsbTuner();
+			bool fcc_state_decoding = getFCCStateDecoding();
+			int slotId = getFrontendInfo(iDVBFrontend_ENUMS::frontendNumber);
+
+			if (is_usb_tuner)
+			{
+				if (fcc_state_decoding)
+				{
+					m_normal_decoding = true;
+					setNormalDecoding();
+				}
+				else
+				{
+					eDVBServicePlay::serviceEvent(eDVBServicePMTHandler::eventTuneFailed);
+					pushbackFCCEvents(evTuneFailed);
+				}
+			}
+			break;
+		}
 		case eDVBServicePMTHandler::eventNewProgramInfo:
 		{
-			eDebug("eventNewProgramInfo %d %d", m_timeshift_enabled, m_timeshift_active);
-			if (m_timeshift_enabled)
+			if (m_fcc_flag & fcc_tune_failed)
+				return;
+
+			eDebug("eventNewProgramInfo %d %d %d", m_timeshift_enabled, m_timeshift_active, m_normal_decoding);
+			if (m_normal_decoding)
+			{
+				eDVBServicePlay::serviceEvent(event);
+			}
+			else
+			{
+				if (m_timeshift_enabled)
 				updateTimeshiftPids();
 
-			if (!m_timeshift_active)
-				processNewProgramInfo();
+				if (!m_timeshift_active)
+					processNewProgramInfo();
 
-			if (!m_timeshift_active)
-			{
-				m_event((iPlayableService*)this, evUpdatedInfo);
-				pushbackFCCEvents(evUpdatedInfo);
+				if (!m_timeshift_active)
+				{
+					m_event((iPlayableService*)this, evUpdatedInfo);
+					pushbackFCCEvents(evUpdatedInfo);
+				}
 			}
 			break;
 		}
@@ -125,7 +156,6 @@ void eDVBServiceFCCPlay::popFCCEvents()
 	for (std::list<int>::iterator it = m_fcc_events.begin(); it != m_fcc_events.end(); ++it)
 	{
 		int event = *it;
-//		eDebug("[eDVBServiceFCCPlay::popFCCEvents][%s] send event : %s", m_reference.toString().c_str(), eventDesc[event]);
 		m_event((iPlayableService*)this, event);
 	}
 }
@@ -447,10 +477,26 @@ void eDVBServiceFCCPlay::switchToLive()
 	/* free the timeshift service handler, we need the resources */
 	m_service_handler_timeshift.free();
 
-	//updateDecoder(true);
 	m_fcc_flag &=~fcc_ready;
 	m_fcc_flag &=~fcc_decoding;
 	processNewProgramInfo(true);
+}
+
+bool eDVBServiceFCCPlay::checkUsbTuner()
+{
+	return (bool)getFrontendInfo(iDVBFrontend_ENUMS::isUsbTuner);
+}
+
+bool eDVBServiceFCCPlay::getFCCStateDecoding()
+{
+	eFCCServiceManager *fcc_service_mgr = eFCCServiceManager::getInstance();
+	return fcc_service_mgr->isStateDecoding((iPlayableService*)this);
+}
+
+void eDVBServiceFCCPlay::setNormalDecoding()
+{
+	eFCCServiceManager *fcc_service_mgr = eFCCServiceManager::getInstance();
+	return fcc_service_mgr->setNormalDecoding((iPlayableService*)this);
 }
 
 DEFINE_REF(eDVBServiceFCCPlay)

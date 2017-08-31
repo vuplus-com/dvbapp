@@ -77,6 +77,7 @@ private:
 	bool m_simulate;
 	bool m_enabled;
 	bool m_fbc;
+	bool m_is_usbtuner;
 	eDVBFrontend *m_simulate_fe; // only used to set frontend type in dvb.cpp
 	int m_dvbid;
 	int m_slotid;
@@ -165,6 +166,7 @@ public:
 	void setEnabled(bool enable) { m_enabled = enable; }
 	bool isLoopTimerActive() { return m_tuneTimer->isActive(); }
 	bool isScheduledSendDiseqc();
+	void setUSBTuner(bool yesno) { m_is_usbtuner = yesno; }
 };
 
 #endif // SWIG
