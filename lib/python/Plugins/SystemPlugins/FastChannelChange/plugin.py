@@ -567,8 +567,14 @@ def FCCSupportInit(reason, **kwargs):
 		global FccInstance
 		FccInstance = FCCSupport(kwargs["session"])
 
+def showFCCExtentionMenu():
+	currentScreenName = None
+	if FccInstance:
+		currentScreenName = FccInstance.session.current_dialog.__class__.__name__
+	return (currentScreenName == "InfoBar")
+
 def addExtentions(infobarExtensions):
-	infobarExtensions.addExtension((getExtensionName, ToggleUpdate, lambda: True), None)
+	infobarExtensions.addExtension((getExtensionName, ToggleUpdate, showFCCExtentionMenu), None)
 
 def main(session, **kwargs):
 	session.open(FCCSetup)
