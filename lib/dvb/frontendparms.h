@@ -3,9 +3,9 @@
 
 #include <lib/python/swig.h>
 
-class SatelliteDeliverySystemDescriptor;
-class CableDeliverySystemDescriptor;
-class TerrestrialDeliverySystemDescriptor;
+#include <dvbsi++/satellite_delivery_system_descriptor.h>
+#include <dvbsi++/cable_delivery_system_descriptor.h>
+#include <dvbsi++/terrestrial_delivery_system_descriptor.h>
 
 struct eDVBFrontendParametersSatellite
 {
@@ -120,4 +120,4 @@ struct eDVBFrontendParametersTerrestrial
 };
 SWIG_ALLOW_OUTPUT_SIMPLE(eDVBFrontendParametersTerrestrial);
 
-#endif
+#endif /* __lib_dvb_frontendparms_h */

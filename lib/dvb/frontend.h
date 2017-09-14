@@ -87,10 +87,6 @@ private:
 	std::map<fe_delivery_system_t, bool> m_delsys, m_delsys_whitelist;
 	char m_filename[128];
 	char m_description[128];
-#if HAVE_DVB_API_VERSION < 3
-	int m_secfd;
-	char m_sec_filename[128];
-#endif
 	FRONTENDPARAMETERS parm;
 	eDVBFrontendParameters oparm;
 

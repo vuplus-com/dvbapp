@@ -154,11 +154,7 @@ eDVBAdapterLinux::eDVBAdapterLinux(int nr): m_nr(nr)
 	{
 		struct stat s;
 		char filename[128];
-#if HAVE_DVB_API_VERSION < 3
-		sprintf(filename, "/dev/dvb/card%d/frontend%d", m_nr, num_fe);
-#else
 		sprintf(filename, "/dev/dvb/adapter%d/frontend%d", m_nr, num_fe);
-#endif
 		if (stat(filename, &s))
 			break;
 		eDVBFrontend *fe;
@@ -185,11 +181,7 @@ eDVBAdapterLinux::eDVBAdapterLinux(int nr): m_nr(nr)
 	{
 		struct stat s;
 		char filename[128];
-#if HAVE_DVB_API_VERSION < 3
-		sprintf(filename, "/dev/dvb/card%d/demux%d", m_nr, num_demux);
-#else
 		sprintf(filename, "/dev/dvb/adapter%d/demux%d", m_nr, num_demux);
-#endif
 		if (stat(filename, &s))
 			break;
 		ePtr<eDVBDemux> demux;
@@ -249,11 +241,7 @@ int eDVBAdapterLinux::exist(int nr)
 {
 	struct stat s;
 	char filename[128];
-#if HAVE_DVB_API_VERSION < 3
-	sprintf(filename, "/dev/dvb/card%d", nr);
-#else
 	sprintf(filename, "/dev/dvb/adapter%d", nr);
-#endif
 	if (!stat(filename, &s))
 		return 1;
 	return 0;
@@ -444,7 +432,7 @@ bool eDVBResourceManager::frontendIsCompatible(int index, const char *type)
 			}
 			else if (!strcmp(type, "DVB-C"))
 			{
-#if DVB_API_VERSION > 5 || DVB_API_VERSION == 5 && DVB_API_VERSION_MINOR >= 6
+#if defined SYS_DVBC_ANNEX_A
 				return i->m_frontend->supportsDeliverySystem(SYS_DVBC_ANNEX_A, false);
 #else
 				return i->m_frontend->supportsDeliverySystem(SYS_DVBC_ANNEX_AC, false);
@@ -476,7 +464,7 @@ void eDVBResourceManager::setFrontendType(int index, const char *type)
 			}
 			else if (!strcmp(type, "DVB-C"))
 			{
-#if DVB_API_VERSION > 5 || DVB_API_VERSION == 5 && DVB_API_VERSION_MINOR >= 6
+#if defined SYS_DVBC_ANNEX_A
 				whitelist.push_back(SYS_DVBC_ANNEX_A);
 #else
 				whitelist.push_back(SYS_DVBC_ANNEX_AC);
@@ -2100,14 +2088,6 @@ RESULT eDVBChannel::playSource(ePtr<iTsSource> &source, const char *streaminfo_f
 	if (m_pvr_fd_dst < 0)
 	{
 		/* (this codepath needs to be improved anyway.) */
-#if HAVE_DVB_API_VERSION < 3
-		m_pvr_fd_dst = open("/dev/pvr", O_WRONLY);
-		if (m_pvr_fd_dst < 0)
-		{
-			eDebug("can't open /dev/pvr - you need to buy the new(!) $$$ box! (%m)"); // or wait for the driver to be improved.
-			return -ENODEV;
-		}
-#else
 		ePtr<eDVBAllocatedDemux> &demux = m_demux ? m_demux : m_decoder_demux;
 		if (demux)
 		{
@@ -2123,7 +2103,6 @@ RESULT eDVBChannel::playSource(ePtr<iTsSource> &source, const char *streaminfo_f
 			eDebug("no demux allocated yet.. so its not possible to open the dvr device!!");
 			return -ENODEV;
 		}
-#endif
 	}
 
 	m_pvr_thread = new eDVBChannelFilePush();

@@ -2,15 +2,8 @@
 #include <lib/dvb/sec.h>
 #include <lib/dvb/rotor_calc.h>
 #include <lib/dvb/dvbtime.h>
-
-#include <set>
-
-#if HAVE_DVB_API_VERSION < 3
-#define FREQUENCY Frequency
-#else
-#define FREQUENCY frequency
-#endif
 #include <lib/base/eerror.h>
+#include <set>
 
 //#define SEC_DEBUG
 
@@ -373,8 +366,8 @@ RESULT eDVBSatelliteEquipmentControl::prepare(iDVBFrontend &frontend, FRONTENDPA
 				// calc Frequency
 				int local= abs(sat.frequency
 					- lof);
-				parm.FREQUENCY = ((((local * 2) / 125) + 1) / 2) * 125;
-				frontend.setData(eDVBFrontend::FREQ_OFFSET, sat.frequency - parm.FREQUENCY);
+				parm.frequency = ((((local * 2) / 125) + 1) / 2) * 125;
+				frontend.setData(eDVBFrontend::FREQ_OFFSET, sat.frequency - parm.frequency);
 
 				if ( voltage_mode == eDVBSatelliteSwitchParameters::_14V
 					|| ( sat.polarisation & eDVBFrontendParametersSatellite::Polarisation_Vertical
@@ -403,8 +396,8 @@ RESULT eDVBSatelliteEquipmentControl::prepare(iDVBFrontend &frontend, FRONTENDPA
 								-lof)
 								- 100000;
 							volatile unsigned int tmp2 = (1000 + 2 * tmp1) / (2 *1000); //round to multiple of 1000
-							parm.FREQUENCY = lnb_param.SatCRvco - (tmp1 - (1000 * tmp2));
-							frontend.setData(eDVBFrontend::FREQ_OFFSET, sat.frequency - lof -(lnb_param.SatCRvco - parm.FREQUENCY));
+							parm.frequency = lnb_param.SatCRvco - (tmp1 - (1000 * tmp2));
+							frontend.setData(eDVBFrontend::FREQ_OFFSET, sat.frequency - lof -(lnb_param.SatCRvco - parm.frequency));
 
 							lnb_param.UnicableTuningWord =
 								  (band & 0x3)						//Bit0:HighLow  Bit1:VertHor
@@ -426,7 +419,7 @@ RESULT eDVBSatelliteEquipmentControl::prepare(iDVBFrontend &frontend, FRONTENDPA
 								+ lnb_param.guard_offset;
 							volatile unsigned int tmp2 = (4000 + 2 * tmp1) / (2 *4000); //round to multiple of 4000
 
-							parm.FREQUENCY = lnb_param.SatCRvco - (tmp1 - (4000 * tmp2)) + lnb_param.guard_offset;
+							parm.frequency = lnb_param.SatCRvco - (tmp1 - (4000 * tmp2)) + lnb_param.guard_offset;
 							lnb_param.UnicableTuningWord = tmp2
 								| ((band & 1) ? 0x400 : 0)			//HighLow
 								| ((band & 2) ? 0x800 : 0)			//VertHor
