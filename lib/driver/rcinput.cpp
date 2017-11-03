@@ -57,6 +57,7 @@ int getType(int code)
 	case 168: // RW
 	case 167: // record
 	case 174: // exit
+	case 176: // timer edit
 	case 207: // play
 	case 352: // ok
 	case 358: // epg

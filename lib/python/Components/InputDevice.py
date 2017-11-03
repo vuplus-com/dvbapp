@@ -49,9 +49,9 @@ class inputDevices:
 			if self.name:
 				if self.name == 'dreambox front panel':
 					continue
-				if self.name == "dreambox advanced remote control (native)" and config.misc.rcused.value != 0:
+				if self.name == "dreambox advanced remote control (native)" and config.misc.rcused.value == 1:
 					continue
-				if self.name == "dreambox remote control (native)" and config.misc.rcused.value == 0:
+				if self.name == "dreambox remote control (native)" and config.misc.rcused.value != 1:
 					continue
 				self.Devices[evdev] = {'name': self.name, 'type': self.getInputDeviceType(self.name),'enabled': False, 'configuredName': None }
 	
@@ -77,7 +77,7 @@ class inputDevices:
 		return sorted(self.Devices.iterkeys())
 
 	def getDefaultRCdeviceName(self):
-		if config.misc.rcused.value == 0:
+		if config.misc.rcused.value != 1:
 			for device in self.Devices.iterkeys():
 				if self.Devices[device]["name"] == "dreambox advanced remote control (native)":
 					return device

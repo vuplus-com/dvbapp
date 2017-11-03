@@ -29,7 +29,7 @@ SystemInfo["NumFrontpanelLEDs"] = countFrontpanelLEDs()
 SystemInfo["FrontpanelDisplay"] = fileExists("/dev/dbox/oled0") or fileExists("/dev/dbox/lcd0")
 SystemInfo["FrontpanelDisplayGrayscale"] = fileExists("/dev/dbox/oled0")
 SystemInfo["DeepstandbySupport"] = HardwareInfo().get_device_name() != "dm800"
-SystemInfo["HdmiInSupport"] = HardwareInfo().get_vu_device_name() == "ultimo4k"
+SystemInfo["HdmiInSupport"] = HardwareInfo().get_vu_device_name() in ("ultimo4k", "uno4kse")
 SystemInfo["WOWLSupport"] = HardwareInfo().get_vu_device_name() == "ultimo4k"
 SystemInfo["ScrambledPlayback"] = HardwareInfo().get_vu_device_name() in ("solo4k", "ultimo4k")
 SystemInfo["FastChannelChange"] =  fileExists("/proc/stb/frontend/fbc/fcc")

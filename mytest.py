@@ -405,6 +405,34 @@ class PowerKey:
 		if not Screens.Standby.inStandby and self.session.current_dialog and self.session.current_dialog.ALLOW_SUSPEND and self.session.in_exec:
 			self.session.open(Screens.Standby.Standby)
 
+class TimerKey:
+	def __init__(self, session):
+		self.session = session
+		globalActionMap.actions["timer_down"]=self.timerDown
+		globalActionMap.actions["timer_up"]=self.timerUp
+		self.timerblocked = 1
+
+	def MenuClosed(self, *val):
+		self.session.infobar = None
+
+	def doAction(self):
+		self.timerblocked = 1
+
+		if self.session.current_dialog and not self.session.current_dialog.ALLOW_SUSPEND:
+			return
+
+		self.session.infobar = self
+		from Screens.TimerEdit import TimerEditList
+		menu_screen = self.session.openWithCallback(self.MenuClosed, TimerEditList)
+		return
+
+	def timerDown(self):
+		self.timerblocked = 0
+
+	def timerUp(self):
+		if self.timerblocked == 0:
+			self.doAction()
+
 profile("Scart")
 from Screens.Scart import Scart
 
@@ -488,6 +516,9 @@ def runScreenTest():
 	vol = VolumeControl(session)
 	profile("Init:PowerKey")
 	power = PowerKey(session)
+
+	profile("Init:TimerKey")
+	timer = TimerKey(session)
 
 	# we need session.scart to access it from within menu.xml
 	session.scart = AutoScartControl(session)

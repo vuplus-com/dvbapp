@@ -13,10 +13,26 @@ eMPEGStreamInformation::eMPEGStreamInformation()
 
 eMPEGStreamInformation::~eMPEGStreamInformation()
 {
+	readClose();
+	writeClose();
+}
+
+void eMPEGStreamInformation::readClose()
+{
 	if (m_structure_read)
+	{
 		fclose(m_structure_read);
+		m_structure_read = 0;
+	}
+}
+
+void eMPEGStreamInformation::writeClose()
+{
 	if (m_structure_write)
+	{
 		fclose(m_structure_write);
+		m_structure_write = 0;
+	}
 }
 
 int eMPEGStreamInformation::startSave(const char *filename)
@@ -63,8 +79,7 @@ int eMPEGStreamInformation::stopSave(void)
 int eMPEGStreamInformation::load(const char *filename)
 {
 	m_filename = filename;
-	if (m_structure_read)
-		fclose(m_structure_read);
+	readClose();
 	m_structure_read = fopen((std::string(m_filename) + ".sc").c_str(), "rb");
 	m_access_points.clear();
 	m_pts_to_offset.clear();

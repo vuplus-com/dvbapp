@@ -62,10 +62,10 @@ class VideoHardware:
 	}
 
 	widescreen_modes = set(["720p", "1080i", "1080p", "2160p"])
-	hdmi_hw_types = set(["dm500", "dm800se", "dm7020hd", "bm750", "solo", "uno", "ultimo", "solo2", "duo2", "solose", "zero", "solo4k", "ultimo4k", "uno4k"])
-	hdmi_pc_hw_types = set(["dm500", "dm800se", "dm7020hd", "bm750", "solo", "uno", "ultimo", "solo2", "duo2", "solose", "zero", "solo4k", "ultimo4k", "uno4k"])
-	noscart_hw_types = set(["zero", "solo4k", "ultimo4k", "uno4k"])
-	noypbpr_hw_types = set(["solose", "zero", "solo4k", "ultimo4k", "uno4k"])
+	hdmi_hw_types = set(["dm500", "dm800se", "dm7020hd", "bm750", "solo", "uno", "ultimo", "solo2", "duo2", "solose", "zero", "solo4k", "ultimo4k", "uno4k", "uno4kse", "zero4k"])
+	hdmi_pc_hw_types = set(["dm500", "dm800se", "dm7020hd", "bm750", "solo", "uno", "ultimo", "solo2", "duo2", "solose", "zero", "solo4k", "ultimo4k", "uno4k", "uno4kse", "zero4k"])
+	noscart_hw_types = set(["zero", "solo4k", "ultimo4k", "uno4k", "uno4kse", "zero4k"])
+	noypbpr_hw_types = set(["solose", "zero", "solo4k", "ultimo4k", "uno4k", "uno4kse", "zero4k"])
 
 	def getDeviceName(self):
 		device_name = "unknown"
@@ -80,10 +80,10 @@ class VideoHardware:
 		return device_name
 
 	def isVumodel(self, hw_type):
-		return hw_type in set(["bm750", "solo", "uno", "ultimo", "solo2", "duo2", "solose", "zero", "solo4k", "ultimo4k", "uno4k"])
+		return hw_type in set(["bm750", "solo", "uno", "ultimo", "solo2", "duo2", "solose", "zero", "solo4k", "ultimo4k", "uno4k", "uno4kse", "zero4k"])
 
 	def isVumodel4K(self, hw_type):
-		return hw_type in set(["solo4k", "ultimo4k", "uno4k"])
+		return hw_type in set(["solo4k", "ultimo4k", "uno4k", "uno4kse", "zero4k"])
 
 	# re-define AVSwitch.getOutputAspect
 	def getOutputAspect(self):

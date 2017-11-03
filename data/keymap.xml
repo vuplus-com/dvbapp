@@ -245,6 +245,8 @@
 		<key id="KEY_POWER" mapto="power_long" flags="l" />
 		<key id="KEY_POWER" mapto="power_down" flags="m" />
 		<key id="KEY_POWER" mapto="power_up" flags="b" />
+		<key id="KEY_EDIT" mapto="timer_down" flags="m" />
+		<key id="KEY_EDIT" mapto="timer_up" flags="b" />
 		<device name="dreambox front panel">
 			<key id="KEY_POWER" mapto="deepstandby" flags="l" />
 		</device>

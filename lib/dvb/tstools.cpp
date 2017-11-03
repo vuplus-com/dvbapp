@@ -72,6 +72,8 @@ void eDVBTSTools::closeFile()
 {
 	if (m_source)
 		closeSource();
+
+	m_streaminfo.readClose();
 }
 
 void eDVBTSTools::setSyncPID(int pid)

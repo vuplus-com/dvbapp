@@ -174,6 +174,11 @@ def collectAttributes(skinAttributes, node, context, skin_path_prefix=None, igno
 	if size is not None:
 		skinAttributes.append(('size', size))
 
+def morphRcImagePath(value):
+	if value.startswith('/usr/share/enigma2') and path.basename(value) in ('rc.png', 'rcold.png'):
+		value = resolveFilename(SCOPE_SKIN, 'rc/' + 'rc_%d.png' % config.misc.rcused.value)
+	return value
+
 def loadPixmap(path, desktop):
 	cached = False
 	option = path.find("#")
@@ -181,7 +186,7 @@ def loadPixmap(path, desktop):
 		options = path[option+1:].split(',')
 		path = path[:option]
 		cached = "cached" in options
-	ptr = LoadPixmap(path, desktop, cached)
+	ptr = LoadPixmap(morphRcImagePath(path), desktop, cached)
 	if ptr is None:
 		raise SkinError("pixmap file %s not found!" % (path))
 	return ptr

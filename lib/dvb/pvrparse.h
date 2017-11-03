@@ -14,6 +14,9 @@ class eMPEGStreamInformation
 public:
 	eMPEGStreamInformation();
 	~eMPEGStreamInformation();
+
+	void writeClose();
+	void readClose();
 		/* we order by off_t here, since the timestamp may */
 		/* wrap around. */
 		/* we only record sequence start's pts values here. */

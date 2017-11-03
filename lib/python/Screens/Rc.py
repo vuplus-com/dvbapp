@@ -2,6 +2,8 @@ from Components.Pixmap import MovingPixmap, MultiPixmap
 from Tools.Directories import resolveFilename, SCOPE_SKIN
 from xml.etree.ElementTree import ElementTree
 from Components.config import config, ConfigInteger
+from Tools.HardwareInfo import HardwareInfo
+import skin
 
 config.misc.rcused = ConfigInteger(default = 1)
 
@@ -12,19 +14,33 @@ class Rc:
 		self["arrowdown2"] = MovingPixmap()
 		self["arrowup"] = MovingPixmap()
 		self["arrowup2"] = MovingPixmap()
-		
-		config.misc.rcused = ConfigInteger(default = 1)
-		
-		self.rcheight = 500
-		self.rcheighthalf = 250
+
+		(rcArrowDownW, rcArrowDownH, rcArrowUpW, rcArrowUpH, rcheight, rcheighthalf) = skin.parameters.get("RcArrow", (18, 70, 18, 0, 500, 250))
+
+		self.rcheight = rcheight
+		self.rcheighthalf = rcheighthalf
 		
 		self.selectpics = []
-		self.selectpics.append((self.rcheighthalf, ["arrowdown", "arrowdown2"], (-18,-70)))
-		self.selectpics.append((self.rcheight, ["arrowup", "arrowup2"], (-18,0)))
+		self.selectpics.append((self.rcheighthalf, ["arrowdown", "arrowdown2"], (-rcArrowDownW, -rcArrowDownH)))
+		self.selectpics.append((self.rcheight, ["arrowup", "arrowup2"], (-rcArrowUpW, rcArrowUpH)))
+
+		self.initRcused()
 		
 		self.readPositions()
 		self.clearSelectedKeys()
 		self.onShown.append(self.initRc)
+
+	def initRcused(self):
+		if config.misc.firstrun.value:
+			boxType = HardwareInfo().get_vu_device_name()
+
+			if boxType == 'solo':
+				config.misc.rcused.value = 0
+			elif boxType in ('duo', 'uno', 'ultimo', 'solo2', 'duo2', 'solose', 'zero', 'solo4k', 'uno4k', 'ultimo4k'):
+				config.misc.rcused.value = 1
+			else:
+				config.misc.rcused.value = 2
+			config.misc.rcused.save()
 
 	def initRc(self):
 		self["rc"].setPixmapNum(config.misc.rcused.value)		

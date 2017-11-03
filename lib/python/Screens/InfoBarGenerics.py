@@ -1906,8 +1906,8 @@ class InfoBarAdditionalInfo:
 
 		self["RecordingPossible"] = Boolean(fixed=harddiskmanager.HDDCount() > 0 and config.misc.rcused.value == 1)
 		self["TimeshiftPossible"] = self["RecordingPossible"]
-		self["ShowTimeshiftOnYellow"] = Boolean(fixed=(not config.misc.rcused.value == 0))
-		self["ShowAudioOnYellow"] = Boolean(fixed=config.misc.rcused.value == 0)
+		self["ShowTimeshiftOnYellow"] = Boolean(fixed=(config.misc.rcused.value == 1))
+		self["ShowAudioOnYellow"] = Boolean(fixed=config.misc.rcused.value != 1)
 		self["ShowRecordOnRed"] = Boolean(fixed=config.misc.rcused.value == 1)
 		self["ExtensionsAvailable"] = Boolean(fixed=1)
 
