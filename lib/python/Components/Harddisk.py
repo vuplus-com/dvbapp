@@ -6,6 +6,8 @@ from Tools.CList import CList
 from SystemInfo import SystemInfo
 import time
 from Components.Console import Console
+import os
+import glob
 
 def MajorMinor(path):
 	rdev = stat(path).st_rdev
@@ -629,7 +631,10 @@ class HarddiskManager:
 					("/", _("Internal Flash"))
 				]
 
-		self.partitions.extend([ Partition(mountpoint = x[0], description = x[1]) for x in p ])
+		known = set([os.path.normpath(a.mountpoint) for a in self.partitions if a.mountpoint])
+		for m,d in p:
+			if m not in known:
+				self.partitions.append(Partition(mountpoint=m, description=d))
 
 	def getBlockDevInfo(self, blockdev):
 		devpath = "/sys/block/" + blockdev
@@ -693,6 +698,16 @@ class HarddiskManager:
 				return True
 		return False
 
+	def getMountpoint(self, device):
+		if not self.is_hard_mounted(device):
+			return self.getAutofsMountpoint(device)
+
+		dev = "/dev/%s" % device
+		for item in getProcMounts():
+			if item[0] == dev:
+				return item[1]
+		return None
+
 	def addHotplugPartition(self, device, physdev = None):
 		if not physdev:
 			dev, part = self.splitDeviceName(device)
@@ -723,11 +738,14 @@ class HarddiskManager:
 					self.hdd.sort()
 					SystemInfo["Harddisk"] = len(self.hdd) > 0
 
-				if (not removable or medium_found) and not self.is_hard_mounted(device):
+				if not removable or medium_found:
 					# device is the device name, without /dev
 					# physdev is the physical device path, which we (might) use to determine the userfriendly name
 					description = self.getUserfriendlyDeviceName(device, physdev)
-					p = Partition(mountpoint = self.getAutofsMountpoint(device), description = description, force_mounted = True, device = device)
+					mountpoint = self.getMountpoint(device)
+					if mountpoint == "/media/hdd":
+						description = "Harddisk"
+					p = Partition(mountpoint = mountpoint, description = description, force_mounted = True, device = device)
 					self.partitions.append(p)
 					self.on_partition_list_change("add", p)
 
@@ -779,6 +797,13 @@ class HarddiskManager:
 		# return all devices which are not removed due to being a wholedisk when a partition exists
 		return [x for x in parts if not x.device or x.device in devs]
 
+	def getLabelFromDevName(self, dev):
+		for label in glob.glob("/dev/disk/by-label/*"):
+			realPath = os.path.realpath(label)
+			if realPath == dev:
+				return os.path.basename(label)
+		return None
+
 	def splitDeviceName(self, devname):
 		# this works for: sdaX, hdaX, sr0 (which is in fact dev="sr0", part=""). It doesn't work for other names like mtdblock3, but they are blacklisted anyway.
 		dev = devname[:3]
@@ -789,14 +814,20 @@ class HarddiskManager:
 		return dev, part and int(part) or 0
 
 	def getUserfriendlyDeviceName(self, dev, phys):
+		label = self.getLabelFromDevName("/dev/" + dev)
 		dev, part = self.splitDeviceName(dev)
 		description = "External Storage %s" % dev
 		have_model_descr = False
-		try:
-			description = readFile("/sys" + phys + "/model")
+
+		if label:
+			description = label
 			have_model_descr = True
-		except IOError, s:
-			print "couldn't read model: ", s
+		else:
+			try:
+				description = readFile("/sys" + phys + "/model")
+				have_model_descr = True
+			except IOError, s:
+				print "couldn't read model: ", s
 		from Tools.HardwareInfo import HardwareInfo
 		if dev.find('sr') == 0 and dev[2].isdigit():
 			devicedb = DEVICEDB_SR
