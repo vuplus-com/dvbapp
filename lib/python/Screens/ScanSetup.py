@@ -214,7 +214,7 @@ class CableTransponderSearchSupport:
 				nim_name = nimmanager.getNimName(nim_idx)
 				if nim_name is not None and nim_name != "":
 					device_id = ""
-					nim_name = nim_name.split(' ')[-1][4:-1]
+					nim_name = nim_name.strip(':VTUNER').split(' ')[-1][4:-1]
 					if nim_name == 'TT3L10':
 						try:
 							device_id = GetDeviceId('TT3L10', nim_idx)
@@ -445,7 +445,7 @@ class TerrestrialTransponderSearchSupport:
 			nim_name = nimmanager.getNimName(nim_idx)
 			if nim_name is not None and nim_name != "":
 				device_id = ""
-				nim_name = nim_name.split(' ')[-1][4:-1]
+				nim_name = nim_name.strip(':VTUNER').split(' ')[-1][4:-1]
 				if nim_name == 'TT3L10':
 					try:
 						device_id = GetDeviceId('TT3L10', nim_idx)
