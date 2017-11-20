@@ -631,10 +631,7 @@ class HarddiskManager:
 					("/", _("Internal Flash"))
 				]
 
-		known = set([os.path.normpath(a.mountpoint) for a in self.partitions if a.mountpoint])
-		for m,d in p:
-			if m not in known:
-				self.partitions.append(Partition(mountpoint=m, description=d))
+		self.partitions.extend([ Partition(mountpoint = x[0], description = x[1]) for x in p ])
 
 	def getBlockDevInfo(self, blockdev):
 		devpath = "/sys/block/" + blockdev
@@ -699,12 +696,9 @@ class HarddiskManager:
 		return False
 
 	def getMountpoint(self, device):
-		if not self.is_hard_mounted(device):
-			return self.getAutofsMountpoint(device)
-
 		dev = "/dev/%s" % device
 		for item in getProcMounts():
-			if item[0] == dev:
+			if item[0] == dev and item[1].find('/autofs') == -1:
 				return item[1]
 		return None
 
@@ -742,21 +736,18 @@ class HarddiskManager:
 					# device is the device name, without /dev
 					# physdev is the physical device path, which we (might) use to determine the userfriendly name
 					description = self.getUserfriendlyDeviceName(device, physdev)
-					mountpoint = self.getMountpoint(device)
-					if mountpoint == "/media/hdd":
-						description = "Harddisk"
-					p = Partition(mountpoint = mountpoint, description = description, force_mounted = True, device = device)
+					p = Partition(mountpoint = self.getAutofsMountpoint(device), description = description, force_mounted = True, device = device)
 					self.partitions.append(p)
 					self.on_partition_list_change("add", p)
 
 		return error, blacklisted, removable, is_cdrom, partitions, medium_found
 
 	def removeHotplugPartition(self, device):
-		mountpoint = self.getAutofsMountpoint(device)
 		for x in self.partitions[:]:
-			if x.mountpoint == mountpoint:
+			if x.device == device:
 				self.partitions.remove(x)
-				self.on_partition_list_change("remove", x)
+				if x.mountpoint:
+					self.on_partition_list_change("remove", x)
 		l = len(device)
 		if l and not device[l-1].isdigit():
 			for hdd in self.hdd:
@@ -785,7 +776,7 @@ class HarddiskManager:
 		return self.cd
 
 	def getMountedPartitions(self, onlyhotplug = False):
-		parts = [x for x in self.partitions if (x.is_hotplug or not onlyhotplug) and x.mounted()]
+		parts = [x for x in self.partitions if (x.is_hotplug or not onlyhotplug) and x.mounted() and x.mountpoint]
 		devs = set([x.device for x in parts])
 		for devname in devs.copy():
 			if not devname:
@@ -794,15 +785,27 @@ class HarddiskManager:
 			if part and dev in devs: # if this is a partition and we still have the wholedisk, remove wholedisk
 				devs.remove(dev)
 
+		# remove duplicate device
+		no_force_mounted_list = [x.mountpoint for x in self.partitions if not x.force_mounted]
+		for x in parts:
+			if x.force_mounted:
+				mp = self.getMountpoint(x.device)
+				if mp and mp in no_force_mounted_list:
+					devs.remove(x.device)
+
 		# return all devices which are not removed due to being a wholedisk when a partition exists
 		return [x for x in parts if not x.device or x.device in devs]
 
 	def getLabelFromDevName(self, dev):
-		for label in glob.glob("/dev/disk/by-label/*"):
-			realPath = os.path.realpath(label)
-			if realPath == dev:
-				return os.path.basename(label)
-		return None
+		data = None
+		try:
+			data = os.popen("e2label %s" % dev).read().strip()
+			if not data:
+				data = None
+		except:
+			data = None
+
+		return data
 
 	def splitDeviceName(self, devname):
 		# this works for: sdaX, hdaX, sr0 (which is in fact dev="sr0", part=""). It doesn't work for other names like mtdblock3, but they are blacklisted anyway.
