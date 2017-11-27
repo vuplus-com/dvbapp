@@ -15,7 +15,11 @@ class Rc:
 		self["arrowup"] = MovingPixmap()
 		self["arrowup2"] = MovingPixmap()
 
-		(rcArrowDownW, rcArrowDownH, rcArrowUpW, rcArrowUpH, rcheight, rcheighthalf) = skin.parameters.get("RcArrow", (18, 70, 18, 0, 500, 250))
+		self.initRcused()
+
+		(rcArrowDownW, rcArrowDownH, rcArrowUpW, rcArrowUpH, rcheight, rcheighthalf) = (18, 70, 18, 0, 500, 250)
+		if config.misc.rcused == 2:
+			(rcArrowDownW, rcArrowDownH, rcArrowUpW, rcArrowUpH, rcheight, rcheighthalf) = skin.parameters.get("RcArrow", (18, 70, 18, 0, 500, 250))
 
 		self.rcheight = rcheight
 		self.rcheighthalf = rcheighthalf
@@ -23,8 +27,6 @@ class Rc:
 		self.selectpics = []
 		self.selectpics.append((self.rcheighthalf, ["arrowdown", "arrowdown2"], (-rcArrowDownW, -rcArrowDownH)))
 		self.selectpics.append((self.rcheight, ["arrowup", "arrowup2"], (-rcArrowUpW, rcArrowUpH)))
-
-		self.initRcused()
 		
 		self.readPositions()
 		self.clearSelectedKeys()
