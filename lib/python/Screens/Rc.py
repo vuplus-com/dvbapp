@@ -34,7 +34,7 @@ class Rc:
 		if config.misc.firstrun.value:
 			boxType = HardwareInfo().get_vu_device_name()
 
-			if boxType in ('duo', 'uno', 'ultimo', 'solo2', 'duo2', 'solose', 'zero', 'solo4k', 'uno4k', 'ultimo4k'):
+			if boxType in ('bm750', 'uno', 'ultimo', 'solo2', 'duo2', 'solose', 'zero', 'solo4k', 'uno4k', 'ultimo4k'):
 				config.misc.rcused.value = 0
 			elif boxType == 'solo':
 				config.misc.rcused.value = 1
