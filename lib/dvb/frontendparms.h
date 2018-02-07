@@ -6,6 +6,7 @@
 #include <dvbsi++/satellite_delivery_system_descriptor.h>
 #include <dvbsi++/cable_delivery_system_descriptor.h>
 #include <dvbsi++/terrestrial_delivery_system_descriptor.h>
+#include <dvbsi++/t2_delivery_system_descriptor.h>
 
 struct eDVBFrontendParametersSatellite
 {
@@ -73,6 +74,7 @@ struct eDVBFrontendParametersTerrestrial
 {
 #ifndef SWIG
 	void set(const TerrestrialDeliverySystemDescriptor  &);
+	void set(const T2DeliverySystemDescriptor &);
 #endif
 
 	enum {

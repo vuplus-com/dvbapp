@@ -3,9 +3,12 @@
 #include <dvbsi++/service_descriptor.h>
 #include <dvbsi++/satellite_delivery_system_descriptor.h>
 #include <dvbsi++/terrestrial_delivery_system_descriptor.h>
+#include <dvbsi++/t2_delivery_system_descriptor.h>
 #include <dvbsi++/cable_delivery_system_descriptor.h>
 #include <dvbsi++/ca_identifier_descriptor.h>
 #include <dvbsi++/registration_descriptor.h>
+#include <dvbsi++/extension_descriptor.h>
+#include <dvbsi++/frequency_list_descriptor.h>
 #include <lib/dvb/specs.h>
 #include <lib/dvb/esection.h>
 #include <lib/dvb/scan.h>
@@ -502,7 +505,7 @@ void eDVBScan::addKnownGoodChannel(const eDVBChannelID &chid, iDVBFrontendParame
 		m_new_channels.insert(std::pair<eDVBChannelID,ePtr<iDVBFrontendParameters> >(chid, feparm));
 }
 
-void eDVBScan::addChannelToScan(const eDVBChannelID &chid, iDVBFrontendParameters *feparm)
+void eDVBScan::addChannelToScan(iDVBFrontendParameters *feparm)
 {
 		/* check if we don't already have that channel ... */
 
@@ -645,9 +648,9 @@ void eDVBScan::channelDone()
 			{
 				SCAN_eDebug("TSID: %04x ONID: %04x", (*tsinfo)->getTransportStreamId(),
 					(*tsinfo)->getOriginalNetworkId());
-				
-				eOriginalNetworkID onid = (*tsinfo)->getOriginalNetworkId();
-				eTransportStreamID tsid = (*tsinfo)->getTransportStreamId();
+
+				bool T2 = false;
+				eDVBFrontendParametersTerrestrial t2transponder;
 				
 				for (DescriptorConstIterator desc = (*tsinfo)->getDescriptors()->begin();
 						desc != (*tsinfo)->getDescriptors()->end(); ++desc)
@@ -664,13 +667,7 @@ void eDVBScan::channelDone()
 						cable.set(d);
 						feparm->setDVBC(cable);
 
-						unsigned long hash=0;
-						feparm->getHash(hash);
-						eDVBNamespace ns = buildNamespace(onid, tsid, hash);
-
-						addChannelToScan(
-							eDVBChannelID(ns, tsid, onid),
-							feparm);
+						addChannelToScan(feparm);
 						break;
 					}
 					case TERRESTRIAL_DELIVERY_SYSTEM_DESCRIPTOR:
@@ -683,13 +680,7 @@ void eDVBScan::channelDone()
 						terr.set(d);
 						feparm->setDVBT(terr);
 
-						unsigned long hash=0;
-						feparm->getHash(hash);
-						eDVBNamespace ns = buildNamespace(onid, tsid, hash);
-
-						addChannelToScan(
-							eDVBChannelID(ns, tsid, onid),
-							feparm);
+						addChannelToScan(feparm);
 						break;
 					}
 					case SATELLITE_DELIVERY_SYSTEM_DESCRIPTOR:
@@ -723,11 +714,56 @@ void eDVBScan::channelDone()
 							SCAN_eDebug("dropping this transponder, it's on another satellite.");
 						else
 						{
-							unsigned long hash=0;
-							feparm->getHash(hash);
-							addChannelToScan(
-									eDVBChannelID(buildNamespace(onid, tsid, hash), tsid, onid),
-									feparm);
+							addChannelToScan(feparm);
+						}
+						break;
+					}
+					case EXTENSION_DESCRIPTOR:
+					{
+						if (system != iDVBFrontend::feTerrestrial)
+							break; // when current locked transponder is no terrestrial transponder ignore this descriptor
+
+						ExtensionDescriptor &d = (ExtensionDescriptor&)**desc;
+						switch (d.getExtensionTag())
+						{
+						case T2_DELIVERY_SYSTEM_DESCRIPTOR:
+							T2 = true;
+							T2DeliverySystemDescriptor &d = (T2DeliverySystemDescriptor&)**desc;
+							t2transponder.set(d);
+
+							for (T2CellConstIterator cell = d.getCells()->begin();
+								cell != d.getCells()->end(); ++cell)
+							{
+								for (T2FrequencyConstIterator freq = (*cell)->getCentreFrequencies()->begin();
+									freq != (*cell)->getCentreFrequencies()->end(); ++freq)
+								{
+									t2transponder.frequency = (*freq) * 10;
+									ePtr<eDVBFrontendParameters> feparm = new eDVBFrontendParameters;
+									feparm->setDVBT(t2transponder);
+									addChannelToScan(feparm);
+								}
+							}
+						}
+						break;
+					}
+					case FREQUENCY_LIST_DESCRIPTOR:
+					{
+						if (system != iDVBFrontend::feTerrestrial)
+							break; // when current locked transponder is no terrestrial transponder ignore this descriptor
+						if (!T2)
+							break;
+
+						FrequencyListDescriptor &d = (FrequencyListDescriptor&)**desc;
+						if (d.getCodingType() != 0x03)
+							break;
+
+						for (CentreFrequencyConstIterator it = d.getCentreFrequencies()->begin();
+								it != d.getCentreFrequencies()->end(); ++it)
+						{
+							t2transponder.frequency = (*it) * 10;
+							ePtr<eDVBFrontendParameters> feparm = new eDVBFrontendParameters;
+							feparm->setDVBT(t2transponder);
+							addChannelToScan(feparm);
 						}
 						break;
 					}
