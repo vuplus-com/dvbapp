@@ -1,6 +1,7 @@
 from Components.Harddisk import harddiskmanager
 from Components.NimManager import nimmanager
 from config import ConfigSubsection, ConfigYesNo, config, ConfigSelection, ConfigText, ConfigNumber, ConfigSet, ConfigLocations
+from Tools.Directories import defaultRecordingLocation
 from Tools.Directories import resolveFilename, SCOPE_HDD
 from enigma import Misc_Options, eEnv
 from enigma import setTunerTypePriorityOrder, setPreferredTuner
@@ -35,7 +36,7 @@ def InitUsageConfig():
 		("standard", _("standard")), ("swap", _("swap PiP and main picture")),
 		("swapstop", _("move PiP to main picture")), ("stop", _("stop PiP")) ])
 
-	config.usage.default_path = ConfigText(default = resolveFilename(SCOPE_HDD))
+	config.usage.default_path = ConfigText(default = "")
 	config.usage.timer_path = ConfigText(default = "<default>")
 	config.usage.instantrec_path = ConfigText(default = "<default>")
 	config.usage.timeshift_path = ConfigText(default = "/media/hdd/")
@@ -226,7 +227,7 @@ def updateChoices(sel, choices):
 		sel.setChoices(map(str, choices), defval)
 
 def preferredPath(path):
-	if config.usage.setup_level.index < 2 or path == "<default>":
+	if config.usage.setup_level.index < 2 or path == "<default>" or not path:
 		return None  # config.usage.default_path.value, but delay lookup until usage
 	elif path == "<current>":
 		return config.movielist.last_videodir.value
@@ -242,5 +243,5 @@ def preferredInstantRecordPath():
 	return preferredPath(config.usage.instantrec_path.value)
 
 def defaultMoviePath():
-	return config.usage.default_path.value
+	return defaultRecordingLocation(config.usage.default_path.value)
 

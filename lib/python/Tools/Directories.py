@@ -17,6 +17,8 @@ try:
 except:
 	have_utime = False
 
+import os
+
 SCOPE_TRANSPONDERDATA = 0
 SCOPE_SYSETC = 1
 SCOPE_FONTS = 2
@@ -151,11 +153,64 @@ def resolveFilename(scope, base = "", path_prefix = None):
 	return path + base
 	# this is only the BASE - an extension must be added later.
 
-def pathExists(path):
-	return os_path.exists(path)
+pathExists = os.path.exists
+isMount = os.path.ismount
 
-def isMount(path):
-	return os_path.ismount(path)
+def bestRecordingLocation(candidates):
+	path = ''
+
+	from Components import Harddisk
+	ata_devices = [candidate for candidate in candidates if Harddisk.getDeviceInterface(candidate[1]) == "ata"]
+
+	if len(ata_devices) == 1:
+		path = ata_devices[0][1]
+
+	elif len(ata_devices):
+		best = ""
+		for device in ata_devices:
+			dev = os.path.basename(device[0])
+			if not best or (best > dev):
+				best = dev
+				path = device[1]
+	else: # Find the largest usb disk
+		biggest = 0
+		for candidate in candidates:
+			try:
+				stat = os.statvfs(candidate[1])
+				# must have some free space (i.e. not read-only)
+				if stat.f_bavail:
+					# Free space counts double
+					size = (stat.f_blocks + stat.f_bavail) * stat.f_bsize
+					if size > biggest:
+						path = candidate[1]
+						biggest = size
+			except Exception, e:
+				print "[DRL]", e
+
+	return path
+
+def defaultRecordingLocation(candidate=None):
+	if candidate and os.path.exists(candidate):
+		return candidate
+	# First, try whatever /hdd points to, or /media/hdd
+	try:
+		path = os.path.realpath('/hdd')
+	except:
+		path = '/media/hdd'
+	if not os.path.exists(path) or not os.path.ismount(path):
+		path = ''
+		from Components import Harddisk
+		mounts = [m for m in Harddisk.getProcMounts() if m[1].startswith('/media/')]
+		path = bestRecordingLocation([m for m in mounts if m[0].startswith('/dev/')])
+	if path:
+		# If there's a movie subdir, we'd probably want to use that.
+		movie = os.path.join(path, 'movie')
+		if os.path.isdir(movie):
+			path = movie
+		if not path.endswith('/'):
+			path += '/' # Bad habits die hard, old code relies on this
+
+	return path
 
 def createDir(path, makeParents = False):
 	try:
@@ -188,6 +243,9 @@ def fileExists(f, mode='r'):
 	return access(f, acc_mode)
 
 def getRecordingFilename(basename, dirname = None):
+	if not dirname.endswith('/'):
+		dirname += '/'
+
 	# filter out non-allowed characters
 	non_allowed_characters = "/.\\:*?<>|\""
 	filename = ""

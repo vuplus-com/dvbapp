@@ -18,6 +18,8 @@ from ServiceReference import ServiceReference
 from time import localtime, strftime, ctime, time
 from bisect import insort
 
+import os
+
 # ok, for descriptions etc we have:
 # service reference  (to get the service name)
 # name               (title)
@@ -46,6 +48,25 @@ class AFTEREVENT:
 	STANDBY = 1
 	DEEPSTANDBY = 2
 	AUTO = 3
+
+def findSafeRecordPath(dirname):
+	if not dirname:
+		return None
+
+	from Components import Harddisk
+	dirname = os.path.realpath(dirname)
+	mountpoint = Harddisk.findMountPoint(dirname)
+	if mountpoint in ('/', '/media'):
+		print '[RecordTimer] media is not mounted:', dirname
+		return None
+	if not os.path.isdir(dirname):
+		try:
+			os.makedirs(dirname)
+		except Exception, ex:
+			print '[RecordTimer] Failed to create dir "%s":' % dirname, ex
+			return None
+
+	return dirname
 
 # please do not translate log messages
 class RecordTimerEntry(timer.TimerEntry, object):
@@ -164,21 +185,31 @@ class RecordTimerEntry(timer.TimerEntry, object):
 		if config.recording.ascii_filenames.value:
 			filename = ASCIItranslit.legacyEncode(filename)
 
-		if not self.dirname or not Directories.fileExists(self.dirname, 'w'):
-			if self.dirname:
-				self.dirnameHadToFallback = True
-			dirname = defaultMoviePath()
+		if not self.dirname:
+			dirname = findSafeRecordPath(defaultMoviePath())
 		else:
-			dirname = self.dirname
+			dirname = findSafeRecordPath(self.dirname)
+			if dirname is None:
+				dirname = findSafeRecordPath(defaultMoviePath())
+				self.dirnameHadToFallback = True
+
+		if not dirname:
+			return None
+
 		self.Filename = Directories.getRecordingFilename(filename, dirname)
 		self.log(0, "Filename calculated as: '%s'" % self.Filename)
 		#begin_date + " - " + service_name + description)
+		return self.Filename
 
 	def tryPrepare(self):
 		if self.justplay:
 			return True
 		else:
-			self.calculateFilename()
+			if not self.calculateFilename():
+				self.do_backoff()
+				self.start_prepare = time() + self.backoff
+				return False
+
 			rec_ref = self.service_ref and self.service_ref.ref
 			if rec_ref and rec_ref.flags & eServiceReference.isGroup:
 				rec_ref = getBestPlayableServiceReference(rec_ref, eServiceReference())
@@ -410,6 +441,18 @@ class RecordTimerEntry(timer.TimerEntry, object):
 
 	record_service = property(lambda self: self.__record_service, setRecordService)
 
+	def isUsbRecordingPath(self):
+		dirname = None
+
+		if self.dirname:
+			dirname = findSafeRecordPath(self.dirname)
+
+		if dirname is None:
+			dirname = findSafeRecordPath(defaultMoviePath())
+
+		from Components import Harddisk
+		return Harddisk.isUsbStorage(dirname)
+
 def createTimer(xml):
 	begin = int(xml.get("begin"))
 	end = int(xml.get("end"))
@@ -466,6 +509,18 @@ class RecordTimer(timer.Timer):
 			print "unable to load timers from file!"
 
 	def doActivate(self, w):
+		if w.state == RecordTimerEntry.StateWaiting:
+			from Components.SystemInfo import SystemInfo
+			if SystemInfo.get("DisableUsbRecord", True) and w.isUsbRecordingPath():
+				service_name = w.service_ref.getServiceName()
+				self.timer_list.remove(w)
+				if w.dontSave is False:
+					w.resetState()
+					w.disable()
+					self.addTimerEntry(w)
+				Notifications.AddNotification(MessageBox, _("Can not recording on a USB storage.\nService name : %s"% service_name), MessageBox.TYPE_ERROR)
+				return
+
 		# when activating a timer which has already passed,
 		# simply abort the timer. don't run trough all the stages.
 		if w.shouldSkip():

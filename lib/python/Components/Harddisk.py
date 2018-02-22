@@ -58,6 +58,56 @@ def enableUdevEvent(enable = True):
 	print "CMD : ", cmd
 	system(cmd)
 
+def findMountPoint(path):
+	'Example: findMountPoint("/media/hdd/some/file") returns "/media/hdd"'
+	path = os.path.abspath(path)
+	while not os.path.ismount(path):
+		path = os.path.dirname(path)
+	return path
+
+def getDeviceFile(dev_path):
+	for parts in getProcMounts():
+		if os.path.realpath(parts[1]).startswith(dev_path):
+			return parts[0]
+
+def getMountPath(mountPath):
+	mountPath = os.path.realpath(mountPath)
+	while not os.path.ismount(mountPath):
+		mountPath = os.path.dirname(mountPath)
+
+	return mountPath
+
+def getDeviceInterface(mountPath):
+	mountPath = getMountPath(mountPath)
+
+	if mountPath == '/':
+		return None
+
+	from Components.Harddisk import getDeviceFile
+	dev = getDeviceFile(mountPath)
+
+	if dev and dev.startswith("/dev/sd"):
+		dev = os.path.basename(dev)
+		phyPath = os.path.realpath('/sys/block/' + dev[:3])
+
+		# check usb
+		for x in glob.glob("/sys/bus/usb/devices/usb*"):
+			if phyPath.find(os.path.realpath(x)) != -1:
+				from Tools.HardwareInfo import HardwareInfo
+				if (HardwareInfo().get_vu_device_name() == "zero4k") and (phyPath.find("f0b00500.ehci_v2/usb2/2-1") != -1):
+					return "ata"
+				else:
+					return "usb"
+
+		# check ata
+		if phyPath.find("/ata") != -1:
+			return "ata"
+
+	return None
+
+def isUsbStorage(dirname):
+	return getDeviceInterface(dirname) in (None, "usb")
+
 DEVTYPE_UDEV = 0
 DEVTYPE_DEVFS = 1
 

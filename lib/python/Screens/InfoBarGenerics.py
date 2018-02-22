@@ -39,7 +39,7 @@ from time import time, localtime, strftime
 from os import stat as os_stat, system as os_system
 from bisect import insort
 
-from RecordTimer import RecordTimerEntry, RecordTimer
+from RecordTimer import RecordTimerEntry, RecordTimer, findSafeRecordPath
 
 # hack alert!
 from Menu import MainMenu, mdom
@@ -1223,6 +1223,13 @@ class InfoBarTimeshift:
 		if self.timeshift_enabled:
 			print "hu, timeshift already enabled?"
 		else:
+			from Components import Harddisk
+			if Harddisk.getMountPath(config.usage.timeshift_path.value) != '/' and \
+				SystemInfo.get("DisableUsbRecord", True) and \
+				Harddisk.isUsbStorage(config.usage.timeshift_path.value):
+				self.session.open(MessageBox, _("Timeshift not possible on a USB storage."), MessageBox.TYPE_ERROR)
+				return 0
+
 			if not ts.startTimeshift():
 				self.timeshift_enabled = 1
 
@@ -1663,18 +1670,14 @@ class InfoBarInstantRecord:
 			self.session.nav.RecordTimer.timeChanged(entry)
 
 	def instantRecord(self):
-		dir = preferredInstantRecordPath()
-		if not dir or not fileExists(dir, 'w'):
-			dir = defaultMoviePath()
-
 		if not fileExists("/hdd", 0):
 			print "not found /hdd"
 			os_system("ln -s /media/hdd /hdd")
-#
-		try:
-			stat = os_stat(dir)
-		except:
-			# XXX: this message is a little odd as we might be recording to a remote device
+
+		recPath = preferredInstantRecordPath()
+		if not findSafeRecordPath(recPath) and not findSafeRecordPath(defaultMoviePath()):
+			if not recPath:
+				recPath = ""
 			self.session.open(MessageBox, _("No HDD found or HDD not initialized!"), MessageBox.TYPE_ERROR)
 			return
 

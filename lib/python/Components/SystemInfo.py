@@ -34,4 +34,5 @@ SystemInfo["WOWLSupport"] = HardwareInfo().get_vu_device_name() == "ultimo4k"
 SystemInfo["ScrambledPlayback"] = HardwareInfo().get_vu_device_name() in ("solo4k", "ultimo4k", "uno4kse", "zero4k")
 SystemInfo["FastChannelChange"] =  fileExists("/proc/stb/frontend/fbc/fcc")
 SystemInfo["MiniTV"] = fileExists("/proc/stb/lcd/live_enable")
+SystemInfo["DisableUsbRecord"] = HardwareInfo().get_vu_device_name() in ("solo4k", "uno4kse", "zero4k")
 

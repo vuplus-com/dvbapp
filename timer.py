@@ -232,6 +232,10 @@ class Timer:
 		self.setNextActivation(min)
 	
 	def timeChanged(self, timer):
+		if timer not in (self.processed_timers + self.timer_list):
+			print "timer not found"
+			return
+
 		print "time changed"
 		timer.timeChanged()
 		if timer.state == TimerEntry.StateEnded:
