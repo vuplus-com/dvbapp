@@ -19,7 +19,7 @@ from Tools.Directories import resolveFilename, SCOPE_DEFAULTPARTITIONMOUNTDIR, S
 from enigma import eTimer, eDVBFrontendParametersSatellite, eComponentScan, eDVBSatelliteEquipmentControl, eDVBFrontendParametersTerrestrial, eDVBFrontendParametersCable, eConsoleAppContainer, eDVBResourceManager, getDesktop
 
 _modelName = file('/proc/stb/info/vumodel').read().strip()
-_supportNimType = { 'AVL1208':'', 'AVL6222':'6222_', 'AVL6211':'6211_', 'BCM7356':'bcm7346_'}
+_supportNimType = { 'AVL1208':'', 'AVL6222':'6222_', 'AVL6211':'6211_', 'BCM7356':'bcm7346_', 'SI2166':'si2166_'}
 
 class Blindscan(ConfigListScreen, Screen):
 	skin = 	"""
@@ -502,56 +502,67 @@ class Blindscan(ConfigListScreen, Screen):
 		for line in lines:
 			data = line.split()
 			print "cnt :", len(data), ", data :", data
-			if len(data) >= 10:
-				if data[0] == 'OK':
-					parm = eDVBFrontendParametersSatellite()
-					sys = { "DVB-S" : eDVBFrontendParametersSatellite.System_DVB_S,
-						"DVB-S2" : eDVBFrontendParametersSatellite.System_DVB_S2,
-						"DVB-S2X" : eDVBFrontendParametersSatellite.System_DVB_S2X}
-					qam = { "QPSK" : parm.Modulation_QPSK,
-						"8PSK" : parm.Modulation_8PSK}
-					inv = { "INVERSION_OFF" : parm.Inversion_Off,
-						"INVERSION_ON" : parm.Inversion_On,
-						"INVERSION_AUTO" : parm.Inversion_Unknown}
-					fec = { "FEC_AUTO" : parm.FEC_Auto,
-						"FEC_1_2" : parm.FEC_1_2,
-						"FEC_2_3" : parm.FEC_2_3,
-						"FEC_3_4" : parm.FEC_3_4,
-						"FEC_5_6": parm.FEC_5_6,
-						"FEC_7_8" : parm.FEC_7_8,
-						"FEC_8_9" : parm.FEC_8_9,
-						"FEC_3_5" : parm.FEC_3_5,
-						"FEC_9_10" : parm.FEC_9_10,
-						"FEC_NONE" : parm.FEC_None, 
-						"FEC_13_45" : parm.FEC_13_45, "FEC_9_20" : parm.FEC_9_20, "FEC_11_20" : parm.FEC_11_20, "FEC_23_36" : parm.FEC_23_36, "FEC_25_36" : parm.FEC_25_36,
-						"FEC_13_18" : parm.FEC_13_18, "FEC_26_45" : parm.FEC_26_45, "FEC_28_45" : parm.FEC_28_45, "FEC_7_9" : parm.FEC_7_9, "FEC_77_90" : parm.FEC_77_90,
-						"FEC_32_45" : parm.FEC_32_45, "FEC_11_15" : parm.FEC_11_15, "FEC_1_2_L" : parm.FEC_1_2_L, "FEC_8_15_L" : parm.FEC_8_15_L, "FEC_3_5_L" : parm.FEC_3_5_L,
-						"FEC_2_3_L" : parm.FEC_2_3_L, "FEC_5_9_L" : parm.FEC_5_9_L, "FEC_26_45_L" : parm.FEC_26_45_L}
-					roll ={ "ROLLOFF_20" : parm.RollOff_alpha_0_20,
-						"ROLLOFF_25" : parm.RollOff_alpha_0_25,
-						"ROLLOFF_35" : parm.RollOff_alpha_0_35}
-					pilot={ "PILOT_ON" : parm.Pilot_On,
-						"PILOT_OFF" : parm.Pilot_Off,
-						"PILOT_AUTO" : parm.Pilot_Unknown}
-					pol = {	"HORIZONTAL" : parm.Polarisation_Horizontal,
-						"VERTICAL" : parm.Polarisation_Vertical}
-					try :
-						parm.orbital_position = self.orb_position
-						parm.polarisation = pol[data[1]]
-						parm.frequency = int(data[2])
-						parm.symbol_rate = int(data[3])
-						parm.system = sys[data[4]]
-						parm.inversion = inv[data[5]]
-						parm.pilot = pilot[data[6]]
-						parm.fec = fec[data[7]]
-						parm.modulation = qam[data[8]]
-						parm.rolloff = roll[data[9]]
-						parm.is_id = -1
-						parm.pls_mode = eDVBFrontendParametersSatellite.PLS_Unknown
-						parm.pls_code = 0
-						self.tmp_tplist.append(parm)
-					except:	pass
+			if len(data) >= 12: # multi stream channel
+				is_id_list = data[11:]
+				for is_id in is_id_list:
+					self.appendFrontendParams(data[:10] + [is_id])
+			elif len(data) >= 10:
+				self.appendFrontendParams(data + ["-1"])
+
 		self.blindscan_session.close(True)
+
+	def appendFrontendParams(self, data):
+		if data[0] == 'OK':
+			parm = eDVBFrontendParametersSatellite()
+			sys = { "DVB-S" : eDVBFrontendParametersSatellite.System_DVB_S,
+				"DVB-S2" : eDVBFrontendParametersSatellite.System_DVB_S2,
+				"DVB-S2X" : eDVBFrontendParametersSatellite.System_DVB_S2X}
+			qam = { "QPSK" : parm.Modulation_QPSK,
+				"8PSK" : parm.Modulation_8PSK,
+				"16APSK" : parm.Modulation_16APSK,
+				"32APSK" : parm.Modulation_32APSK,
+				"8APSK" : parm.Modulation_8APSK}
+			inv = { "INVERSION_OFF" : parm.Inversion_Off,
+				"INVERSION_ON" : parm.Inversion_On,
+				"INVERSION_AUTO" : parm.Inversion_Unknown}
+			fec = { "FEC_AUTO" : parm.FEC_Auto,
+				"FEC_1_2" : parm.FEC_1_2,
+				"FEC_2_3" : parm.FEC_2_3,
+				"FEC_3_4" : parm.FEC_3_4,
+				"FEC_5_6": parm.FEC_5_6,
+				"FEC_7_8" : parm.FEC_7_8,
+				"FEC_8_9" : parm.FEC_8_9,
+				"FEC_3_5" : parm.FEC_3_5,
+				"FEC_9_10" : parm.FEC_9_10,
+				"FEC_NONE" : parm.FEC_None,
+				"FEC_13_45" : parm.FEC_13_45, "FEC_9_20" : parm.FEC_9_20, "FEC_11_20" : parm.FEC_11_20, "FEC_23_36" : parm.FEC_23_36, "FEC_25_36" : parm.FEC_25_36,
+				"FEC_13_18" : parm.FEC_13_18, "FEC_26_45" : parm.FEC_26_45, "FEC_28_45" : parm.FEC_28_45, "FEC_7_9" : parm.FEC_7_9, "FEC_77_90" : parm.FEC_77_90,
+				"FEC_32_45" : parm.FEC_32_45, "FEC_11_15" : parm.FEC_11_15, "FEC_1_2_L" : parm.FEC_1_2_L, "FEC_8_15_L" : parm.FEC_8_15_L, "FEC_3_5_L" : parm.FEC_3_5_L,
+				"FEC_2_3_L" : parm.FEC_2_3_L, "FEC_5_9_L" : parm.FEC_5_9_L, "FEC_26_45_L" : parm.FEC_26_45_L}
+			roll ={ "ROLLOFF_20" : parm.RollOff_alpha_0_20,
+				"ROLLOFF_25" : parm.RollOff_alpha_0_25,
+				"ROLLOFF_35" : parm.RollOff_alpha_0_35}
+			pilot={ "PILOT_ON" : parm.Pilot_On,
+				"PILOT_OFF" : parm.Pilot_Off,
+				"PILOT_AUTO" : parm.Pilot_Unknown}
+			pol = {	"HORIZONTAL" : parm.Polarisation_Horizontal,
+				"VERTICAL" : parm.Polarisation_Vertical}
+			try :
+				parm.orbital_position = self.orb_position
+				parm.polarisation = pol[data[1]]
+				parm.frequency = int(data[2])
+				parm.symbol_rate = int(data[3])
+				parm.system = sys[data[4]]
+				parm.inversion = inv[data[5]]
+				parm.pilot = pilot[data[6]]
+				parm.fec = fec[data[7]]
+				parm.modulation = qam[data[8]]
+				parm.rolloff = roll[data[9]]
+				parm.is_id = int(data[10])
+				parm.pls_mode = eDVBFrontendParametersSatellite.PLS_Unknown
+				parm.pls_code = 0
+				self.tmp_tplist.append(parm)
+			except:	pass
 
 	def blindscanContainerAvail(self, str):
 		print str
@@ -579,7 +590,7 @@ class Blindscan(ConfigListScreen, Screen):
 
 		if self.tmp_tplist != None and self.tmp_tplist != []:
 			for p in self.tmp_tplist:
-				print "data : [%d][%d][%d][%d][%d][%d][%d][%d][%d][%d]" % (p.orbital_position, p.polarisation, p.frequency, p.symbol_rate, p.system, p.inversion, p.pilot, p.fec, p.modulation, p.modulation)
+				print "data : [%d][%d][%d][%d][%d][%d][%d][%d][%d][%d][%d]" % (p.orbital_position, p.polarisation, p.frequency, p.symbol_rate, p.system, p.inversion, p.pilot, p.fec, p.modulation, p.modulation, p.is_id)
 
 			self.startScan(self.tmp_tplist, self.feid)
 		else:
