@@ -8,11 +8,12 @@ from Components.config import config, ConfigNumber, ConfigSelection, ConfigSelec
 from Plugins.Plugin import PluginDescriptor
 
 from enigma import setAnimation_current, setAnimation_speed, setAnimation_current_listbox
+from Components.SystemInfo import SystemInfo
 
 # default = slide to left
 g_default = {
 	"current": 6,
-	"speed"  : 20,
+	"speed"  : SystemInfo.get("DefaultAniSpeed", 20),
 	"listbox": "0",
 }
 g_max_speed = 30
