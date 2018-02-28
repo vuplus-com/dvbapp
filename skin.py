@@ -56,8 +56,11 @@ def loadSkin(name, scope = SCOPE_SKIN):
 # so the first screen found will be used.
 
 # example: loadSkin("nemesis_greenline/skin.xml")
+from Components.SystemInfo import SystemInfo
+DEFAULT_SKIN = SystemInfo.get("DefaultFullHDSkin", False) and "Vu_HD_1080P/skin.xml" or "Vu_HD/skin.xml"
+
 config.skin = ConfigSubsection()
-config.skin.primary_skin = ConfigText(default = "skin.xml")
+config.skin.primary_skin = ConfigText(default = DEFAULT_SKIN)
 
 profile("LoadSkin")
 try:

@@ -36,3 +36,4 @@ SystemInfo["FastChannelChange"] =  fileExists("/proc/stb/frontend/fbc/fcc")
 SystemInfo["MiniTV"] = fileExists("/proc/stb/lcd/live_enable")
 SystemInfo["DisableUsbRecord"] = HardwareInfo().get_vu_device_name() in ("solo4k", "uno4kse", "zero4k")
 SystemInfo["DefaultAniSpeed"] = HardwareInfo().get_vu_device_name() in ("uno4k", "uno4kse", "zero4k") and 25 or 20
+SystemInfo["DefaultFullHDSkin"] = HardwareInfo().get_vu_device_name() in ("solo4k","ultimo4k","uno4k","uno4kse","zero4k")
