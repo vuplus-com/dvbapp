@@ -54,9 +54,11 @@ class ServiceScan:
 						else:
 							network = ("%s %d.%d %s") % (sat_name, orb_pos / 10, orb_pos % 10, h)
 						tp_text = ("%s %s %d%c / %d / %s") %( { tp.System_DVB_S : "DVB-S",
-							tp.System_DVB_S2 : "DVB-S2" }.get(tp.system, tp.System_DVB_S),
+							tp.System_DVB_S2 : "DVB-S2" , tp.System_DVB_S2X : "DVB-S2X"}.get(tp.system, tp.System_DVB_S),
 							{ tp.Modulation_Auto : "Auto", tp.Modulation_QPSK : "QPSK",
-								tp.Modulation_8PSK : "8PSK", tp.Modulation_QAM16 : "QAM16" }.get(tp.modulation, tp.Modulation_QPSK),
+								tp.Modulation_8PSK : "8PSK", tp.Modulation_QAM16 : "QAM16",
+								tp.Modulation_8APSK : "8APSK", tp.Modulation_16APSK : "16APSK",
+								tp.Modulation_32APSK : "32APSK"}.get(tp.modulation, tp.Modulation_QPSK),
 							tp.frequency/1000,
 							{ tp.Polarisation_Horizontal : 'H', tp.Polarisation_Vertical : 'V', tp.Polarisation_CircularLeft : 'L',
 								tp.Polarisation_CircularRight : 'R' }.get(tp.polarisation, tp.Polarisation_Horizontal),
@@ -64,7 +66,13 @@ class ServiceScan:
 							{ tp.FEC_Auto : "AUTO", tp.FEC_1_2 : "1/2", tp.FEC_2_3 : "2/3",
 								tp.FEC_3_4 : "3/4", tp.FEC_5_6 : "5/6", tp.FEC_7_8 : "7/8",
 								tp.FEC_8_9 : "8/9", tp.FEC_3_5 : "3/5", tp.FEC_4_5 : "4/5",
-								tp.FEC_9_10 : "9/10", tp.FEC_None : "NONE" }.get(tp.fec, tp.FEC_Auto))
+								tp.FEC_9_10 : "9/10", tp.FEC_None : "NONE",
+								tp.FEC_13_45 : "13/45", tp.FEC_9_20 : "9/20", tp.FEC_11_20 : "11/20", tp.FEC_23_36 : "23/36", tp.FEC_25_36 : "25/36",
+								tp.FEC_13_18 : "13/18", tp.FEC_26_45 : "26/45", tp.FEC_28_45 : "28/45", tp.FEC_7_9 : "7/9", tp.FEC_77_90 : "77/90",
+								tp.FEC_32_45 : "32/45", tp.FEC_11_15 : "11/15", tp.FEC_1_2_L : "1/2-L", tp.FEC_8_15_L : "8/15-L", tp.FEC_3_5_L : "3/5-L",
+								tp.FEC_2_3_L : "2/3-L", tp.FEC_5_9_L : "5/9-L", tp.FEC_26_45_L : "26/45-L"}.get(tp.fec, tp.FEC_Auto))
+						if tp.is_id > -1 and tp.system in (tp.System_DVB_S2, tp.System_DVB_S2X):
+							tp_text = ("%s IS %d") % (tp_text, tp.is_id)
 					elif tp_type == iDVBFrontend.feCable:
 						network = _("Cable")
 						tp = transponder.getDVBC()

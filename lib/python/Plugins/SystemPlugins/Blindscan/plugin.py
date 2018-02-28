@@ -199,7 +199,7 @@ class Blindscan(ConfigListScreen, Screen):
 				defaultSat["inversion"] = frontendData.get("inversion", eDVBFrontendParametersSatellite.Inversion_Unknown)
 				defaultSat["symbolrate"] = frontendData.get("symbol_rate", 0) / 1000
 				defaultSat["polarization"] = frontendData.get("polarization", eDVBFrontendParametersSatellite.Polarisation_Horizontal)
-				if defaultSat["system"] == eDVBFrontendParametersSatellite.System_DVB_S2:
+				if defaultSat["system"] in (eDVBFrontendParametersSatellite.System_DVB_S2, eDVBFrontendParametersSatellite.System_DVB_S2X):
 					defaultSat["fec_s2"] = frontendData.get("fec_inner", eDVBFrontendParametersSatellite.FEC_Auto)
 					defaultSat["rolloff"] = frontendData.get("rolloff", eDVBFrontendParametersSatellite.RollOff_alpha_0_35)
 					defaultSat["pilot"] = frontendData.get("pilot", eDVBFrontendParametersSatellite.Pilot_Unknown)
@@ -305,7 +305,7 @@ class Blindscan(ConfigListScreen, Screen):
 		print "cur is", cur
 		if cur == self.tunerEntry or \
 			cur == self.systemEntry or \
-			(self.modulationEntry and self.systemEntry[1].value == eDVBFrontendParametersSatellite.System_DVB_S2 and cur == self.modulationEntry):
+			(self.modulationEntry and (self.systemEntry[1].value in (eDVBFrontendParametersSatellite.System_DVB_S2, eDVBFrontendParametersSatellite.System_DVB_S2X)) and cur == self.modulationEntry):
 			self.createSetup()
 
 	def checkSettings(self):
@@ -506,7 +506,8 @@ class Blindscan(ConfigListScreen, Screen):
 				if data[0] == 'OK':
 					parm = eDVBFrontendParametersSatellite()
 					sys = { "DVB-S" : eDVBFrontendParametersSatellite.System_DVB_S,
-						"DVB-S2" : eDVBFrontendParametersSatellite.System_DVB_S2}
+						"DVB-S2" : eDVBFrontendParametersSatellite.System_DVB_S2,
+						"DVB-S2X" : eDVBFrontendParametersSatellite.System_DVB_S2X}
 					qam = { "QPSK" : parm.Modulation_QPSK,
 						"8PSK" : parm.Modulation_8PSK}
 					inv = { "INVERSION_OFF" : parm.Inversion_Off,
@@ -521,7 +522,11 @@ class Blindscan(ConfigListScreen, Screen):
 						"FEC_8_9" : parm.FEC_8_9,
 						"FEC_3_5" : parm.FEC_3_5,
 						"FEC_9_10" : parm.FEC_9_10,
-						"FEC_NONE" : parm.FEC_None}
+						"FEC_NONE" : parm.FEC_None, 
+						"FEC_13_45" : parm.FEC_13_45, "FEC_9_20" : parm.FEC_9_20, "FEC_11_20" : parm.FEC_11_20, "FEC_23_36" : parm.FEC_23_36, "FEC_25_36" : parm.FEC_25_36,
+						"FEC_13_18" : parm.FEC_13_18, "FEC_26_45" : parm.FEC_26_45, "FEC_28_45" : parm.FEC_28_45, "FEC_7_9" : parm.FEC_7_9, "FEC_77_90" : parm.FEC_77_90,
+						"FEC_32_45" : parm.FEC_32_45, "FEC_11_15" : parm.FEC_11_15, "FEC_1_2_L" : parm.FEC_1_2_L, "FEC_8_15_L" : parm.FEC_8_15_L, "FEC_3_5_L" : parm.FEC_3_5_L,
+						"FEC_2_3_L" : parm.FEC_2_3_L, "FEC_5_9_L" : parm.FEC_5_9_L, "FEC_26_45_L" : parm.FEC_26_45_L}
 					roll ={ "ROLLOFF_20" : parm.RollOff_alpha_0_20,
 						"ROLLOFF_25" : parm.RollOff_alpha_0_25,
 						"ROLLOFF_35" : parm.RollOff_alpha_0_35}
@@ -541,6 +546,9 @@ class Blindscan(ConfigListScreen, Screen):
 						parm.fec = fec[data[7]]
 						parm.modulation = qam[data[8]]
 						parm.rolloff = roll[data[9]]
+						parm.is_id = -1
+						parm.pls_mode = eDVBFrontendParametersSatellite.PLS_Unknown
+						parm.pls_code = 0
 						self.tmp_tplist.append(parm)
 					except:	pass
 		self.blindscan_session.close(True)

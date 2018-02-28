@@ -153,7 +153,7 @@ class SecConfigure:
 
 		for slot in nim_slots:
 			if slot.type is not None:
-				used_nim_slots.append((slot.slot, slot.description, slot.config.configMode.value != "nothing" and True or False, slot.isCompatible("DVB-S2"), slot.isCompatible("DVB-T2"), slot.frontend_id is None and -1 or slot.frontend_id))
+				used_nim_slots.append((slot.slot, slot.description, slot.config.configMode.value != "nothing" and True or False, slot.isCompatible("DVB-S2"), slot.isCompatible("DVB-T2"), slot.isCompatible("DVB-S2X"), slot.frontend_id is None and -1 or slot.frontend_id))
 		eDVBResourceManager.getInstance().setFrontendSlotInformations(used_nim_slots)
 
 		for slot in nim_slots:
@@ -510,7 +510,7 @@ class NIM(object):
 	def __init__(self, slot, type, description, has_outputs = True, internally_connectable = None, multi_type = {}, frontend_id = None, i2c = None, is_empty = False):
 		self.slot = slot
 
-		if type not in ("DVB-S", "DVB-C", "DVB-T", "DVB-S2", "DVB-T2", None):
+		if type not in ("DVB-S", "DVB-C", "DVB-T", "DVB-S2", "DVB-T2", "DVB-S2X", None):
 			print "warning: unknown NIM type %s, not using." % type
 			type = None
 
@@ -528,7 +528,8 @@ class NIM(object):
 				"DVB-C": ("DVB-C", None),
 				"DVB-T": ("DVB-T", None),
 				"DVB-S2": ("DVB-S", "DVB-S2", None),
-				"DVB-T2": ("DVB-T", "DVB-T2", None)
+				"DVB-T2": ("DVB-T", "DVB-T2", None),
+				"DVB-S2X": ("DVB-S", "DVB-S2", "DVB-S2X", None),
 			}
 
 	def getType(self):
@@ -558,7 +559,8 @@ class NIM(object):
 				"DVB-C": ("DVB-C",),
 				"DVB-T": ("DVB-T",),
 				"DVB-S2": ("DVB-S", "DVB-S2"),
-				"DVB-T2": ("DVB-T", "DVB-T2",)
+				"DVB-T2": ("DVB-T", "DVB-T2",),
+				"DVB-S2X": ("DVB-S", "DVB-S2", "DVB-S2X"),
 			}
 		return connectable[self.getType()]
 
@@ -601,7 +603,16 @@ class NIM(object):
 	# empty tuners are supported!
 	def isSupported(self):
 		return (self.frontend_id is not None) or self.__is_empty
-	
+
+	def isMultistream(self):
+		multistream = self.frontend_id is not None and eDVBResourceManager.getInstance().frontendIsMultistream(self.frontend_id) or False
+		# HACK due to poor support for VTUNER_SET_FE_INFO
+		# When vtuner does not accept fe_info we have to fallback to detection using tuner name
+		# More tuner names will be added when confirmed as multistream (FE_CAN_MULTISTREAM)
+		if not multistream and "TBS" in self.description:
+			multistream = True
+		return multistream
+
 	# returns dict {<slotid>: <type>}
 	def getMultiTypeList(self):
 		return self.multi_type
@@ -615,6 +626,7 @@ class NIM(object):
 			"DVB-C": "DVB-C",
 			"DVB-S2": "DVB-S2",
 			"DVB-T2": "DVB-T2",
+			"DVB-S2X": "DVB-S2X",
 			None: _("empty")
 			}[self.getType()]
 
@@ -798,13 +810,20 @@ class NimManager:
 
 			# get MultiType from DTV_ENUM_DELSYS
 			if entry["frontend_device"] is not None:
-				types = [type for type in ["DVB-C", "DVB-T2", "DVB-T", "DVB-S2", "DVB-S", "ATSC"] if eDVBResourceManager.getInstance().frontendIsCompatible(entry["frontend_device"], type)]
+				types = [type for type in ["DVB-C", "DVB-T2", "DVB-T", "DVB-S2", "DVB-S", "ATSC", "DVB-S2X"] if eDVBResourceManager.getInstance().frontendIsCompatible(entry["frontend_device"], type)]
 				if "DVB-T2" in types and "DVB-T" in types:
 					# DVB-T2 implies DVB-T support
 					types.remove("DVB-T")
 				if "DVB-S2" in types and "DVB-S" in types:
 					# DVB-S2 implies DVB-S support
 					types.remove("DVB-S")
+				if "DVB-S2X" in types:
+					if "DVB-S" in types:
+						# DVB-S2X implies DVB-S support
+						types.remove("DVB-S")
+					if "DVB-S2" in types:
+						# DVB-S2X implies DVB-S2 support
+						types.remove("DVB-S2")
 				if len(types) > 1:
 					entry["multi_type"] = {}
 					for type in types:
@@ -840,6 +859,9 @@ class NimManager:
 			if x.isCompatible(type) and x.slot != exception:
 				list.append(x.slot)
 		return list
+
+	def isSupportMultistream(self, slotid):
+		return self.getNim(slotid).isMultistream()
 
 	def __init__(self):
 		self.satList = [ ]
@@ -908,6 +930,8 @@ class NimManager:
 			type = "DVB-S"
 		elif type == "DVB-T2":
 			type = "DVB-T"
+		elif type == "DVB-S2X":
+			type = "DVB-S"
 		nimList = self.getNimListOfType(type, slotid)
 		for nim in nimList[:]:
 			mode = self.getNimConfig(nim)
@@ -921,6 +945,8 @@ class NimManager:
 			type = "DVB-S"
 		elif type == "DVB-T2":
 			type = "DVB-T"
+		elif type == "DVB-S2X":
+			type = "DVB-S"
 		nimList = self.getNimListOfType(type, slotid)
 		positionerList = []
 		for nim in nimList[:]:

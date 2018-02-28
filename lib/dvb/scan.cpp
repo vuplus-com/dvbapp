@@ -868,15 +868,41 @@ void eDVBScan::channelDone()
 			{
 				case iDVBFrontend::feSatellite:
 				{
+					char system_name[255];
+					char modulation_name[255];
+					memset(system_name, 0, sizeof(system_name));
+					memset(modulation_name, 0, sizeof(modulation_name));
+
 					eDVBFrontendParametersSatellite parm;
 					m_ch_current->getDVBS(parm);
+
+					if (parm.system == eDVBFrontendParametersSatellite::System_DVB_S2)
+						strcpy(system_name, "DVB-S2");
+					else if (parm.system == eDVBFrontendParametersSatellite::System_DVB_S2X)
+						strcpy(system_name, "DVB-S2X");
+					else
+						strcpy(system_name, "DVB-S");
+
+					if (parm.modulation == eDVBFrontendParametersSatellite::Modulation_QPSK)
+						strcpy(modulation_name, "QPSK");
+					else if (parm.modulation == eDVBFrontendParametersSatellite::Modulation_8PSK)
+						strcpy(modulation_name, "8PSK");
+					else if (parm.modulation == eDVBFrontendParametersSatellite::Modulation_8APSK)
+						strcpy(modulation_name, "8APSK");
+					else if (parm.modulation == eDVBFrontendParametersSatellite::Modulation_16APSK)
+						strcpy(modulation_name, "16APSK");
+					else if (parm.modulation == eDVBFrontendParametersSatellite::Modulation_32APSK)
+						strcpy(modulation_name, "32APSK");
+					else
+						strcpy(modulation_name, "8PSK");
+
 					snprintf(sname, 255, "%d%c SID 0x%02x",
 							parm.frequency/1000,
 							parm.polarisation ? 'V' : 'H',
 							m_pmt_in_progress->first);
 					snprintf(pname, 255, "%s %s %d%c %d.%d°%c",
-						parm.system ? "DVB-S2" : "DVB-S",
-						parm.modulation == 1 ? "QPSK" : "8PSK",
+						system_name,
+						modulation_name,
 						parm.frequency/1000,
 						parm.polarisation ? 'V' : 'H',
 						parm.orbital_position/10,

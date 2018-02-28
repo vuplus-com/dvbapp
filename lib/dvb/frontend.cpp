@@ -38,6 +38,9 @@
 #define FEC_S2_QPSK_4_5 (fe_code_rate_t)(FEC_4_5)
 #define FEC_S2_QPSK_9_10 (fe_code_rate_t)(FEC_9_10)
 
+/* DVB-S2X */
+#define FEC_S2_QPSK_13_45 (fe_code_rate_t)(FEC_13_45)
+
 #include <dvbsi++/satellite_delivery_system_descriptor.h>
 #include <dvbsi++/cable_delivery_system_descriptor.h>
 #include <dvbsi++/terrestrial_delivery_system_descriptor.h>
@@ -126,29 +129,35 @@ void eDVBFrontendParametersSatellite::set(const SatelliteDeliverySystemDescripto
 		orbital_position = 3600 - orbital_position;
 	system = descriptor.getModulationSystem();
 	modulation = descriptor.getModulation();
-	if (system == eDVBFrontendParametersSatellite::System_DVB_S && modulation == eDVBFrontendParametersSatellite::Modulation_8PSK)
+	if (system == eDVBFrontendParametersSatellite::System_DVB_S && modulation != eDVBFrontendParametersSatellite::Modulation_QPSK)
 	{
 		eDebug("satellite_delivery_descriptor non valid modulation type.. force QPSK");
 		modulation=eDVBFrontendParametersSatellite::Modulation_QPSK;
 	}
 	rolloff = descriptor.getRollOff();
-	if (system == eDVBFrontendParametersSatellite::System_DVB_S2)
-	{
-		eDebug("SAT DVB-S2 freq %d, %s, pos %d, sr %d, fec %d, modulation %d, rolloff %d",
-			frequency,
-			polarisation ? "hor" : "vert",
-			orbital_position,
-			symbol_rate, fec,
-			modulation,
-			rolloff);
-	}
-	else
+	is_id = NO_STREAM_ID_FILTER;
+	pls_mode = eDVBFrontendParametersSatellite::PLS_Unknown;
+	pls_code = 0;
+	if (system == eDVBFrontendParametersSatellite::System_DVB_S)
 	{
 		eDebug("SAT DVB-S freq %d, %s, pos %d, sr %d, fec %d",
 			frequency,
 			polarisation ? "hor" : "vert",
 			orbital_position,
 			symbol_rate, fec);
+	}
+	else // System_DVB_S2 or System_DVB_S2X
+	{
+		eDebug("SAT DVB-S2 freq %d, %s, pos %d, sr %d, fec %d, modulation %d, rolloff %d, is_id %d, pls_mode %d, pls_code %d",
+			frequency,
+			polarisation ? "hor" : "vert",
+			orbital_position,
+			symbol_rate, fec,
+			modulation,
+			rolloff,
+			is_id,
+			pls_mode,
+			pls_code);
 	}
 }
 
@@ -356,6 +365,12 @@ RESULT eDVBFrontendParameters::calculateDifference(const iDVBFrontendParameters 
 			diff = 1<<29;
 		else if (sat.polarisation != osat.polarisation)
 			diff = 1<<28;
+		else if (sat.is_id != osat.is_id)
+			diff = 1<<27;
+		else if (sat.pls_mode != osat.pls_mode)
+			diff = 1<<27;
+		else if (sat.pls_code != osat.pls_code)
+			diff = 1<<27;
 		else if (exact && sat.fec != osat.fec && sat.fec != eDVBFrontendParametersSatellite::FEC_Auto && osat.fec != eDVBFrontendParametersSatellite::FEC_Auto)
 			diff = 1<<27;
 		else if (exact && sat.modulation != osat.modulation && sat.modulation != eDVBFrontendParametersSatellite::Modulation_Auto && osat.modulation != eDVBFrontendParametersSatellite::Modulation_Auto)
@@ -527,7 +542,6 @@ int eDVBFrontend::openFrontend()
 	m_state=stateIdle;
 	m_tuning=0;
 
-	dvb_frontend_info fe_info;
 	if (!m_simulate)
 	{
 		eDebug("opening frontend %d", m_dvbid);
@@ -545,6 +559,13 @@ int eDVBFrontend::openFrontend()
 
 		if (m_delsys.empty())
 		{
+			if (::ioctl(m_fd, FE_GET_INFO, &fe_info) < 0)
+			{
+				eWarning("ioctl FE_GET_INFO failed");
+				::close(m_fd);
+				m_fd = -1;
+				return -1;
+			}
 #ifdef DTV_ENUM_DELSYS
 			struct dtv_property p[1];
 			p[0].cmd = DTV_ENUM_DELSYS;
@@ -561,48 +582,46 @@ int eDVBFrontend::openFrontend()
 					m_delsys[delsys] = true;
 				}
 			}
+			else
 #else
-			if (::ioctl(m_fd, FE_GET_INFO, &fe_info) < 0)
+			/* no DTV_ENUM_DELSYS support */
+			if (1)
+#endif
 			{
-				eWarning("ioctl FE_GET_INFO failed");
-				::close(m_fd);
-				m_fd = -1;
-				return -1;
-			}
 			/* old DVB API, fill delsys map with some defaults */
-			switch (fe_info.type)
-			{
-				case FE_QPSK:
+				switch (fe_info.type)
 				{
-					m_delsys[SYS_DVBS] = true;
+					case FE_QPSK:
+					{
+						m_delsys[SYS_DVBS] = true;
 #if DVB_API_VERSION >= 5
-					if (fe_info.caps & FE_CAN_2G_MODULATION) m_delsys[SYS_DVBS2] = true;
+						if (fe_info.caps & FE_CAN_2G_MODULATION) m_delsys[SYS_DVBS2] = true;
 #endif
-					break;
-				}
-				case FE_QAM:
-				{
+						break;
+					}
+					case FE_QAM:
+					{
 #if defined SYS_DVBC_ANNEX_A
-					m_delsys[SYS_DVBC_ANNEX_A] = true;
+						m_delsys[SYS_DVBC_ANNEX_A] = true;
 #else
-					m_delsys[SYS_DVBC_ANNEX_AC] = true;
+						m_delsys[SYS_DVBC_ANNEX_AC] = true;
 #endif
-					break;
-				}
-				case FE_OFDM:
-				{
-					m_delsys[SYS_DVBT] = true;
+						break;
+					}
+					case FE_OFDM:
+					{
+						m_delsys[SYS_DVBT] = true;
 #if DVB_API_VERSION > 5 || DVB_API_VERSION == 5 && DVB_API_VERSION_MINOR >= 3
-					if (fe_info.caps & FE_CAN_2G_MODULATION) m_delsys[SYS_DVBT2] = true;
+						if (fe_info.caps & FE_CAN_2G_MODULATION) m_delsys[SYS_DVBT2] = true;
 #endif
-					break;
-				}
-				case FE_ATSC:	// placeholder to prevent warning
-				{
-					break;
+						break;
+					}
+					case FE_ATSC:	// placeholder to prevent warning
+					{
+						break;
+					}
 				}
 			}
-#endif
 		}
 
 		if (m_simulate_fe)
@@ -612,6 +631,26 @@ int eDVBFrontend::openFrontend()
 
 		m_sn = eSocketNotifier::create(eApp, m_fd, eSocketNotifier::Read, false);
 		CONNECT(m_sn->activated, eDVBFrontend::feEvent);
+	}
+	else
+	{
+		fe_info.frequency_min = 900000;
+		fe_info.frequency_max = 2200000;
+
+		eDebug("[eDVBFrontend] opening frontend %d", m_dvbid);
+		int tmp_fd = ::open(m_filename, O_RDONLY | O_NONBLOCK);
+		if (tmp_fd < 0)
+		{
+			eWarning("[eDVBFrontend] opening %s failed: %m", m_filename);
+		}
+		else
+		{
+			if (::ioctl(tmp_fd, FE_GET_INFO, &fe_info) < 0)
+			{
+				eWarning("[eDVBFrontend] ioctl FE_GET_INFO on frontend %s failed: %m", m_filename);
+			}
+			::close(tmp_fd);
+		}
 	}
 
 	setTone(iDVBFrontend::toneOff);
@@ -1054,10 +1093,13 @@ void PutSatelliteDataToDict(ePyObject &dict, eDVBFrontendParametersSatellite &fe
 	PutToDict(dict, "fec_inner", feparm.fec);
 	PutToDict(dict, "modulation", feparm.modulation);
 	PutToDict(dict, "polarization", feparm.polarisation);
-	if (feparm.system == eDVBFrontendParametersSatellite::System_DVB_S2)
+	if ((feparm.system == eDVBFrontendParametersSatellite::System_DVB_S2) || (feparm.system == eDVBFrontendParametersSatellite::System_DVB_S2X))
 	{
 		PutToDict(dict, "rolloff", feparm.rolloff);
 		PutToDict(dict, "pilot", feparm.pilot);
+		PutToDict(dict, "is_id", feparm.is_id);
+		PutToDict(dict, "pls_mode", feparm.pls_mode);
+		PutToDict(dict, "pls_code", feparm.pls_code);
 	}
 	PutToDict(dict, "system", feparm.system);
 }
@@ -1091,7 +1133,7 @@ void PutCableDataToDict(ePyObject &dict, eDVBFrontendParametersCable &feparm)
 	PutToDict(dict, "fec_inner", feparm.fec_inner);
 }
 
-static void fillDictWithSatelliteData(ePyObject dict, struct dtv_property *p, long freq_offset, int orbital_position, int polarization)
+static void fillDictWithSatelliteData(ePyObject dict, struct dtv_property *p, long freq_offset, eDVBFrontendParametersSatellite &feparm)
 {
 	long tmp=0;
 	int p_system = p[0].u.data;
@@ -1102,12 +1144,13 @@ static void fillDictWithSatelliteData(ePyObject dict, struct dtv_property *p, lo
 	int p_inner_fec = p[5].u.data;
 	int p_rolloff = p[6].u.data;
 	int p_pilot = p[7].u.data;
+	int p_stream_id = p[8].u.data;
 
 	int frequency = p_frequency + freq_offset;
 	PutToDict(dict, "frequency", frequency);
 	PutToDict(dict, "symbol_rate", p_symbolrate);
-	PutToDict(dict, "orbital_position", orbital_position);
-	PutToDict(dict, "polarization", polarization);
+	PutToDict(dict, "orbital_position", feparm.orbital_position);
+	PutToDict(dict, "polarization", feparm.polarisation);
 
 	switch(p_inner_fec)
 	{
@@ -1120,6 +1163,7 @@ static void fillDictWithSatelliteData(ePyObject dict, struct dtv_property *p, lo
 	case FEC_7_8: tmp = eDVBFrontendParametersSatellite::FEC_7_8; break;
 	case FEC_8_9: tmp = eDVBFrontendParametersSatellite::FEC_8_9; break;
 	case FEC_9_10: tmp = eDVBFrontendParametersSatellite::FEC_9_10; break;
+	case FEC_13_45 ... FEC_26_45_L: tmp = eDVBFrontendParametersSatellite::FEC_13_45 + (long)(p_inner_fec - FEC_13_45); break;
 	case FEC_NONE: tmp = eDVBFrontendParametersSatellite::FEC_None; break;
 	case FEC_AUTO: tmp = eDVBFrontendParametersSatellite::FEC_Auto; break;
 	default: eDebug("got unsupported FEC from frontend! report as FEC_AUTO!\n");
@@ -1130,7 +1174,12 @@ static void fillDictWithSatelliteData(ePyObject dict, struct dtv_property *p, lo
 	{
 	default: eDebug("got unsupported system from frontend! report as DVBS!");
 	case SYS_DVBS: tmp = eDVBFrontendParametersSatellite::System_DVB_S; break;
-	case SYS_DVBS2:
+	case SYS_DVBS2: tmp = eDVBFrontendParametersSatellite::System_DVB_S2; break;
+	case SYS_DVBS2X: tmp = eDVBFrontendParametersSatellite::System_DVB_S2X; break;
+	}
+	PutToDict(dict, "system", tmp);
+
+	if ((p_system == SYS_DVBS2) || (p_system == SYS_DVBS2X))
 	{
 		switch (p_rolloff)
 		{
@@ -1149,16 +1198,19 @@ static void fillDictWithSatelliteData(ePyObject dict, struct dtv_property *p, lo
 		}
 		PutToDict(dict, "pilot", tmp);
 
-		tmp = eDVBFrontendParametersSatellite::System_DVB_S2; break;
+		PutToDict(dict, "is_id", ((unsigned int)p_stream_id == NO_STREAM_ID_FILTER) ? feparm.is_id : (p_stream_id & 0xFF));
+		PutToDict(dict, "pls_mode", ((unsigned int)p_stream_id == NO_STREAM_ID_FILTER) ? feparm.pls_mode : ((p_stream_id >> 26) & 0x3));
+		PutToDict(dict, "pls_code", ((unsigned int)p_stream_id == NO_STREAM_ID_FILTER) ? feparm.pls_code : ((p_stream_id >> 8) & 0x3FFFF));
 	}
-	}
-	PutToDict(dict, "system", tmp);
 
 	switch (p_modulation)
 	{
 	default: eDebug("got unsupported modulation from frontend! report as QPSK!");
 	case QPSK: tmp = eDVBFrontendParametersSatellite::Modulation_QPSK; break;
 	case PSK_8: tmp = eDVBFrontendParametersSatellite::Modulation_8PSK; break;
+	case APSK_8: tmp = eDVBFrontendParametersSatellite::Modulation_8APSK; break;
+	case APSK_16: tmp = eDVBFrontendParametersSatellite::Modulation_16APSK; break;
+	case APSK_32: tmp = eDVBFrontendParametersSatellite::Modulation_32APSK; break;
 	}
 	PutToDict(dict, "modulation", tmp);
 
@@ -1426,6 +1478,7 @@ void eDVBFrontend::getTransponderData(ePyObject dest, bool original)
 			p[cmdseq.num++].cmd = DTV_INNER_FEC;
 			p[cmdseq.num++].cmd = DTV_ROLLOFF;
 			p[cmdseq.num++].cmd = DTV_PILOT;
+			p[cmdseq.num++].cmd = DTV_STREAM_ID;
 		}
 		else if(type == feCable)
 		{
@@ -1485,13 +1538,12 @@ void eDVBFrontend::getTransponderData(ePyObject dest, bool original)
 		}
 		else
 		{
-			FRONTENDPARAMETERS &parm = front;
 			switch(type)
 			{
 				case feSatellite:
 					eDVBFrontendParametersSatellite sparm;
 					oparm.getDVBS(sparm);
-					fillDictWithSatelliteData(dest, p, m_data[FREQ_OFFSET], sparm.orbital_position, sparm.polarisation);
+					fillDictWithSatelliteData(dest, p, m_data[FREQ_OFFSET], sparm);
 					break;
 				case feCable:
 					fillDictWithCableData(dest, p);
@@ -1511,7 +1563,7 @@ void eDVBFrontend::getFrontendData(ePyObject dest)
 		const char *tmp=0;
 		PutToDict(dest, "tuner_number", m_slotid);
 
-		if (supportsDeliverySystem(SYS_DVBS, true) || supportsDeliverySystem(SYS_DVBS2, true))
+		if (supportsDeliverySystem(SYS_DVBS, true) || supportsDeliverySystem(SYS_DVBS2, true) || supportsDeliverySystem(SYS_DVBS2X, true))
 		{
 			tmp = "DVB-S";
 		}
@@ -2009,12 +2061,16 @@ void eDVBFrontend::setFrontend(bool recvEvents)
 			{
 			case eDVBFrontendParametersSatellite::System_DVB_S: system = SYS_DVBS; break;
 			case eDVBFrontendParametersSatellite::System_DVB_S2: system = SYS_DVBS2; break;
+			case eDVBFrontendParametersSatellite::System_DVB_S2X: system = SYS_DVBS2X; break;
 			};
 			switch(sparm.modulation)
 			{
 			case eDVBFrontendParametersSatellite::Modulation_QPSK: modulation = QPSK; break;
 			case eDVBFrontendParametersSatellite::Modulation_8PSK: modulation = PSK_8; break;
 			case eDVBFrontendParametersSatellite::Modulation_QAM16: modulation = QAM_16; break;
+			case eDVBFrontendParametersSatellite::Modulation_8APSK: modulation = APSK_8; break;
+			case eDVBFrontendParametersSatellite::Modulation_16APSK: modulation = APSK_16; break;
+			case eDVBFrontendParametersSatellite::Modulation_32APSK: modulation = APSK_32; break;
 			};
 			switch(sparm.pilot)
 			{
@@ -2028,7 +2084,7 @@ void eDVBFrontend::setFrontend(bool recvEvents)
 			case eDVBFrontendParametersSatellite::RollOff_alpha_0_25: rolloff = ROLLOFF_25; break;
 			case eDVBFrontendParametersSatellite::RollOff_alpha_0_35: rolloff = ROLLOFF_35; break;
 			};
-			struct dtv_property p[10];
+			struct dtv_property p[11];
 			struct dtv_properties cmdseq;
 			cmdseq.props = p;
 			p[0].cmd = DTV_CLEAR;
@@ -2038,12 +2094,13 @@ void eDVBFrontend::setFrontend(bool recvEvents)
 			p[4].cmd = DTV_SYMBOL_RATE,	p[4].u.data = parm_u_qpsk_symbol_rate;
 			p[5].cmd = DTV_INNER_FEC,	p[5].u.data = parm_u_qpsk_fec_inner;
 			p[6].cmd = DTV_INVERSION,	p[6].u.data = parm_inversion;
-			if (system == SYS_DVBS2)
+			if ((system == SYS_DVBS2) || (system == SYS_DVBS2X))
 			{
 				p[7].cmd = DTV_ROLLOFF,		p[7].u.data = rolloff;
 				p[8].cmd = DTV_PILOT,		p[8].u.data = pilot;
-				p[9].cmd = DTV_TUNE;
-				cmdseq.num = 10;
+				p[9].cmd = DTV_STREAM_ID,	p[9].u.data = sparm.is_id | (sparm.pls_code << 8) | (sparm.pls_mode << 26);
+				p[10].cmd = DTV_TUNE;
+				cmdseq.num = 11;
 			}
 			else
 			{
@@ -2152,8 +2209,7 @@ RESULT eDVBFrontend::prepare_sat(const eDVBFrontendParametersSatellite &feparm, 
 	res = m_sec->prepare(*this, parm, feparm, 1 << m_slotid, tunetimeout);
 	if (!res)
 	{
-		eDebugNoSimulate("prepare_sat System %d Freq %d Pol %d SR %d INV %d FEC %d orbpos %d system %d modulation %d pilot %d, rolloff %d",
-			feparm.system,
+		eDebugNoSimulate("prepare_sat Freq %d Pol %d SR %d INV %d FEC %d orbpos %d system %d modulation %d pilot %d, rolloff %d, is_id %d, pls_mode %d, pls_code %d",
 			feparm.frequency,
 			feparm.polarisation,
 			feparm.symbol_rate,
@@ -2163,7 +2219,10 @@ RESULT eDVBFrontend::prepare_sat(const eDVBFrontendParametersSatellite &feparm, 
 			feparm.system,
 			feparm.modulation,
 			feparm.pilot,
-			feparm.rolloff);
+			feparm.rolloff,
+			feparm.is_id,
+			feparm.pls_mode,
+			feparm.pls_code);
 		parm_u_qpsk_symbol_rate = feparm.symbol_rate;
 		switch (feparm.inversion)
 		{
@@ -2207,7 +2266,7 @@ RESULT eDVBFrontend::prepare_sat(const eDVBFrontendParametersSatellite &feparm, 
 					break;
 			}
 		}
-		else // DVB_S2
+		else if (feparm.system == eDVBFrontendParametersSatellite::System_DVB_S2)
 		{
 			switch (feparm.fec)
 			{
@@ -2240,6 +2299,45 @@ RESULT eDVBFrontend::prepare_sat(const eDVBFrontendParametersSatellite &feparm, 
 					break;
 				default:
 					eDebugNoSimulate("no valid fec for DVB-S2 set.. abort !!");
+					return -EINVAL;
+			}
+		}
+		else // DVB_S2X
+		{
+			switch (feparm.fec)
+			{
+				case eDVBFrontendParametersSatellite::FEC_1_2:
+					parm_u_qpsk_fec_inner = FEC_S2_QPSK_1_2;
+					break;
+				case eDVBFrontendParametersSatellite::FEC_2_3:
+					parm_u_qpsk_fec_inner = FEC_S2_QPSK_2_3;
+					break;
+				case eDVBFrontendParametersSatellite::FEC_3_4:
+					parm_u_qpsk_fec_inner = FEC_S2_QPSK_3_4;
+					break;
+				case eDVBFrontendParametersSatellite::FEC_3_5:
+					parm_u_qpsk_fec_inner = FEC_S2_QPSK_3_5;
+					break;
+				case eDVBFrontendParametersSatellite::FEC_4_5:
+					parm_u_qpsk_fec_inner = FEC_S2_QPSK_4_5;
+					break;
+				case eDVBFrontendParametersSatellite::FEC_5_6:
+					parm_u_qpsk_fec_inner = FEC_S2_QPSK_5_6;
+					break;
+				case eDVBFrontendParametersSatellite::FEC_7_8:
+					parm_u_qpsk_fec_inner = FEC_S2_QPSK_7_8;
+					break;
+				case eDVBFrontendParametersSatellite::FEC_8_9:
+					parm_u_qpsk_fec_inner = FEC_S2_QPSK_8_9;
+					break;
+				case eDVBFrontendParametersSatellite::FEC_9_10:
+					parm_u_qpsk_fec_inner = FEC_S2_QPSK_9_10;
+					break;
+				case eDVBFrontendParametersSatellite::FEC_13_45 ... eDVBFrontendParametersSatellite::FEC_26_45_L:
+					parm_u_qpsk_fec_inner = (fe_code_rate_t)((int)FEC_S2_QPSK_13_45 + (feparm.fec-eDVBFrontendParametersSatellite::FEC_13_45));
+					break;
+				default:
+					eDebugNoSimulate("no valid fec for DVB-S2X set.. abort !!");
 					return -EINVAL;
 			}
 		}
@@ -2827,10 +2925,15 @@ int eDVBFrontend::isCompatibleWith(ePtr<iDVBFrontendParameters> &feparm)
 	if (type == eDVBFrontend::feSatellite)
 	{
 		eDVBFrontendParametersSatellite sat_parm;
-		bool can_handle_dvbs, can_handle_dvbs2;
+		bool can_handle_dvbs, can_handle_dvbs2, can_handle_dvbs2x;
 		can_handle_dvbs = supportsDeliverySystem(SYS_DVBS, true);
 		can_handle_dvbs2 = supportsDeliverySystem(SYS_DVBS2, true);
+		can_handle_dvbs2x = supportsDeliverySystem(SYS_DVBS2X, true);
 		if (feparm->getDVBS(sat_parm) < 0)
+		{
+			return 0;
+		}
+		if (sat_parm.system == eDVBFrontendParametersSatellite::System_DVB_S2X && !can_handle_dvbs2x)
 		{
 			return 0;
 		}
@@ -2842,10 +2945,27 @@ int eDVBFrontend::isCompatibleWith(ePtr<iDVBFrontendParameters> &feparm)
 		{
 			return 0;
 		}
+		bool multistream = (static_cast<unsigned int>(sat_parm.is_id) != NO_STREAM_ID_FILTER || (sat_parm.pls_code & 0x3FFFF) != 0 ||
+					(sat_parm.pls_mode & 3) != eDVBFrontendParametersSatellite::PLS_Unknown);
+
+		if (((sat_parm.system == eDVBFrontendParametersSatellite::System_DVB_S2)||(sat_parm.system == eDVBFrontendParametersSatellite::System_DVB_S2X)) && multistream && !is_multistream())
+		{
+			return 0;
+		}
 		score = m_sec ? m_sec->canTune(sat_parm, this, 1 << m_slotid) : 0;
 		if (score > 1 && sat_parm.system == eDVBFrontendParametersSatellite::System_DVB_S && can_handle_dvbs2)
 		{
 			/* prefer to use a S tuner, try to keep S2 free for S2 transponders */
+			score--;
+		}
+		if (score > 1 && sat_parm.system == eDVBFrontendParametersSatellite::System_DVB_S2 && can_handle_dvbs2x)
+		{
+			/* prefer to use a S2 tuner, try to keep S2X free for S2X transponders */
+			score--;
+		}
+		if (score > 1 && is_multistream() && !multistream)
+		{
+			/* prefer to use a non multistream tuner, try to keep multistream tuners free for multistream transponders */
 			score--;
 		}
 	}
@@ -2933,17 +3053,18 @@ void eDVBFrontend::setDeliverySystemWhitelist(const std::vector<fe_delivery_syst
 
 bool eDVBFrontend::setSlotInfo(ePyObject obj)
 {
-	ePyObject Id, Descr, Enabled, IsDVBS2, IsDVBT2, frontendId;
-	if (!PyTuple_Check(obj) || PyTuple_Size(obj) != 6)
+	ePyObject Id, Descr, Enabled, IsDVBS2, IsDVBT2, IsDVBS2X, frontendId;
+	if (!PyTuple_Check(obj) || PyTuple_Size(obj) != 7)
 		goto arg_error;
 	Id = PyTuple_GET_ITEM(obj, 0);
 	Descr = PyTuple_GET_ITEM(obj, 1);
 	Enabled = PyTuple_GET_ITEM(obj, 2);
 	IsDVBS2 = PyTuple_GET_ITEM(obj, 3);
 	IsDVBT2 = PyTuple_GET_ITEM(obj, 4);
-	frontendId = PyTuple_GET_ITEM(obj, 5);
+	IsDVBS2X = PyTuple_GET_ITEM(obj, 5);
+	frontendId = PyTuple_GET_ITEM(obj, 6);
 	m_slotid = PyInt_AsLong(Id);
-	if (!PyInt_Check(Id) || !PyString_Check(Descr) || !PyBool_Check(Enabled) || !PyBool_Check(IsDVBS2) || !PyBool_Check(IsDVBT2) || !PyInt_Check(frontendId))
+	if (!PyInt_Check(Id) || !PyString_Check(Descr) || !PyBool_Check(Enabled) || !PyBool_Check(IsDVBS2) || !PyBool_Check(IsDVBT2) || !PyBool_Check(IsDVBS2X) || !PyInt_Check(frontendId))
 		goto arg_error;
 	strcpy(m_description, PyString_AS_STRING(Descr));
 	if (PyInt_AsLong(frontendId) == -1 || PyInt_AsLong(frontendId) != m_dvbid) {
@@ -2967,12 +3088,23 @@ bool eDVBFrontend::setSlotInfo(ePyObject obj)
 		/* HACK for legacy dvb api without DELSYS support */
 		m_delsys[SYS_DVBT2] = true;
 	}
+	if (IsDVBS2X == Py_True)
+	{
+		/* HACK for legacy dvb api without DELSYS support */
+		m_delsys[SYS_DVBS2X] = true;
+	}
 
-	eDebugNoSimulate("setSlotInfo for dvb frontend %d to slotid %d, descr %s, need rotorworkaround %s, enabled %s, DVB-S2 %s, DVB-T2 %s",
-		m_dvbid, m_slotid, m_description, m_need_rotor_workaround ? "Yes" : "No", Enabled == Py_True ? "Yes" : "No", IsDVBS2 == Py_True ? "Yes" : "No", IsDVBT2 == Py_True ? "Yes" : "No" );
+	eDebugNoSimulate("setSlotInfo for dvb frontend %d to slotid %d, descr %s, need rotorworkaround %s, enabled %s, DVB-S2 %s, DVB-T2 %s, DVB-S2X %s",
+		m_dvbid, m_slotid, m_description, m_need_rotor_workaround ? "Yes" : "No", Enabled == Py_True ? "Yes" : "No", IsDVBS2 == Py_True ? "Yes" : "No", IsDVBT2 == Py_True ? "Yes" : "No", IsDVBS2X == Py_True ? "Yes" : "No");
 	return true;
 arg_error:
 	PyErr_SetString(PyExc_StandardError,
 		"eDVBFrontend::setSlotInfo must get a tuple with first param slotid, second param slot description and third param enabled boolean");
 	return false;
 }
+
+bool eDVBFrontend::is_multistream()
+{
+	return fe_info.caps & FE_CAN_MULTISTREAM;
+}
+

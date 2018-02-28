@@ -22,15 +22,19 @@ struct eDVBFrontendParametersSatellite
 	};
 
 	enum {
-		FEC_Auto, FEC_1_2, FEC_2_3, FEC_3_4, FEC_5_6, FEC_7_8, FEC_8_9, FEC_3_5, FEC_4_5, FEC_9_10, FEC_None=15
+		FEC_Auto=0, FEC_1_2=1, FEC_2_3=2, FEC_3_4=3, FEC_5_6=4, FEC_7_8=5, FEC_8_9=6, FEC_3_5=7, FEC_4_5=8, FEC_9_10=9, FEC_None=15,
+		FEC_13_45=16, FEC_9_20=17, FEC_11_20=18, FEC_23_36=19, FEC_25_36=20,
+		FEC_13_18=21, FEC_26_45=22, FEC_28_45=23, FEC_7_9=24, FEC_77_90=25,
+		FEC_32_45=26, FEC_11_15=27, FEC_1_2_L=28, FEC_8_15_L=29, FEC_3_5_L=30,
+		FEC_2_3_L=31, FEC_5_9_L=32, FEC_26_45_L=33
 	};
 
 	enum {
-		System_DVB_S, System_DVB_S2
+		System_DVB_S, System_DVB_S2, System_DVB_S2X
 	};
 
 	enum {
-		Modulation_Auto, Modulation_QPSK, Modulation_8PSK, Modulation_QAM16
+		Modulation_Auto, Modulation_QPSK, Modulation_8PSK, Modulation_QAM16, Modulation_16APSK, Modulation_32APSK, Modulation_8APSK
 	};
 
 	// dvb-s2
@@ -42,9 +46,13 @@ struct eDVBFrontendParametersSatellite
 		Pilot_Off, Pilot_On, Pilot_Unknown
 	};
 
+	enum {
+		PLS_Root, PLS_Gold, PLS_Combo, PLS_Unknown
+	};
+
 	bool no_rotor_command_on_tune;
 	unsigned int frequency, symbol_rate;
-	int polarisation, fec, inversion, orbital_position, system, modulation, rolloff, pilot;
+	int polarisation, fec, inversion, orbital_position, system, modulation, rolloff, pilot, is_id, pls_mode, pls_code;
 };
 SWIG_ALLOW_OUTPUT_SIMPLE(eDVBFrontendParametersSatellite);
 

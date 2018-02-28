@@ -414,6 +414,10 @@ bool eDVBResourceManager::frontendIsCompatible(int index, const char *type)
 	{
 		if (i->m_frontend->getSlotID() == index)
 		{
+			if (!strcmp(type, "DVB-S2X"))
+			{
+				return i->m_frontend->supportsDeliverySystem(SYS_DVBS2X, false);
+			}
 			if (!strcmp(type, "DVB-S2"))
 			{
 				return i->m_frontend->supportsDeliverySystem(SYS_DVBS2, false);
@@ -443,6 +447,18 @@ bool eDVBResourceManager::frontendIsCompatible(int index, const char *type)
 	return false;
 }
 
+bool eDVBResourceManager::frontendIsMultistream(int index)
+{
+	for (eSmartPtrList<eDVBRegisteredFrontend>::iterator i(m_frontend.begin()); i != m_frontend.end(); ++i)
+	{
+		if (i->m_frontend->getSlotID() == index)
+		{
+			return i->m_frontend->is_multistream();
+		}
+	}
+	return false;
+}
+
 void eDVBResourceManager::setFrontendType(int index, const char *type)
 {
 	eDebug("[eDVBResourceManager::setFrontendType] index : %d, type : %s", index, type);
@@ -456,6 +472,8 @@ void eDVBResourceManager::setFrontendType(int index, const char *type)
 			{
 				whitelist.push_back(SYS_DVBS);
 				whitelist.push_back(SYS_DVBS2);
+				if (!strcmp(type, "DVB-S2X"))
+					whitelist.push_back(SYS_DVBS2X);
 			}
 			else if (!strcmp(type, "DVB-T2") || !strcmp(type, "DVB-T"))
 			{

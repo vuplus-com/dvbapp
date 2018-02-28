@@ -22,12 +22,34 @@ def ConvertToHumanReadable(tp, type = None):
 			eDVBFrontendParametersSatellite.FEC_3_5 : "3/5",
 			eDVBFrontendParametersSatellite.FEC_4_5 : "4/5",
 			eDVBFrontendParametersSatellite.FEC_8_9 : "8/9",
-			eDVBFrontendParametersSatellite.FEC_9_10 : "9/10"}[tp["fec_inner"]]
+			eDVBFrontendParametersSatellite.FEC_9_10 : "9/10",
+			eDVBFrontendParametersSatellite.FEC_13_45 : "13/45",
+			eDVBFrontendParametersSatellite.FEC_9_20 : "9/20",
+			eDVBFrontendParametersSatellite.FEC_11_20 : "11/20",
+			eDVBFrontendParametersSatellite.FEC_23_36 : "23/36",
+			eDVBFrontendParametersSatellite.FEC_25_36 : "25/36",
+			eDVBFrontendParametersSatellite.FEC_13_18 : "13/18",
+			eDVBFrontendParametersSatellite.FEC_26_45 : "26/45",
+			eDVBFrontendParametersSatellite.FEC_28_45 : "28/45",
+			eDVBFrontendParametersSatellite.FEC_7_9 : "7/9",
+			eDVBFrontendParametersSatellite.FEC_77_90 : "77/90",
+			eDVBFrontendParametersSatellite.FEC_32_45 : "32/45",
+			eDVBFrontendParametersSatellite.FEC_11_15 : "11/15",
+			eDVBFrontendParametersSatellite.FEC_1_2_L : "1/2-L",
+			eDVBFrontendParametersSatellite.FEC_8_15_L : "8/15-L",
+			eDVBFrontendParametersSatellite.FEC_3_5_L : "3/5-L",
+			eDVBFrontendParametersSatellite.FEC_2_3_L : "2/3-L",
+			eDVBFrontendParametersSatellite.FEC_5_9_L : "5/9-L",
+			eDVBFrontendParametersSatellite.FEC_26_45_L : "26/45-L"}[tp["fec_inner"]]
 		ret["modulation"] = {
 			eDVBFrontendParametersSatellite.Modulation_Auto : _("Auto"),
 			eDVBFrontendParametersSatellite.Modulation_QPSK : "QPSK",
 			eDVBFrontendParametersSatellite.Modulation_QAM16 : "QAM16",
-			eDVBFrontendParametersSatellite.Modulation_8PSK : "8PSK"}[tp["modulation"]]
+			eDVBFrontendParametersSatellite.Modulation_8PSK : "8PSK",
+			eDVBFrontendParametersSatellite.Modulation_16APSK : "16APSK",
+			eDVBFrontendParametersSatellite.Modulation_32APSK : "32APSK",
+			eDVBFrontendParametersSatellite.Modulation_8APSK : "8APSK",
+			}[tp["modulation"]]
 		ret["orbital_position"] = nimmanager.getSatName(int(tp["orbital_position"]))
 		ret["polarization"] = {
 			eDVBFrontendParametersSatellite.Polarisation_Horizontal : _("Horizontal"),
@@ -36,8 +58,9 @@ def ConvertToHumanReadable(tp, type = None):
 			eDVBFrontendParametersSatellite.Polarisation_CircularRight : _("Circular right")}[tp["polarization"]]
 		ret["system"] = {
 			eDVBFrontendParametersSatellite.System_DVB_S : "DVB-S",
-			eDVBFrontendParametersSatellite.System_DVB_S2 : "DVB-S2"}[tp["system"]]
-		if ret["system"] == "DVB-S2":
+			eDVBFrontendParametersSatellite.System_DVB_S2 : "DVB-S2",
+			eDVBFrontendParametersSatellite.System_DVB_S2X : "DVB-S2X"}[tp["system"]]
+		if ret["system"] in ("DVB-S2", "DVB-S2X"):
 			ret["rolloff"] = {
 				eDVBFrontendParametersSatellite.RollOff_alpha_0_35 : "0.35",
 				eDVBFrontendParametersSatellite.RollOff_alpha_0_25 : "0.25",
@@ -46,6 +69,17 @@ def ConvertToHumanReadable(tp, type = None):
 				eDVBFrontendParametersSatellite.Pilot_Unknown : _("Auto"),
 				eDVBFrontendParametersSatellite.Pilot_On : _("On"),
 				eDVBFrontendParametersSatellite.Pilot_Off : _("Off")}[tp["pilot"]]
+			ret["pls_mode"] = {
+				eDVBFrontendParametersSatellite.PLS_Root : _("Root"),
+				eDVBFrontendParametersSatellite.PLS_Gold : _("Gold"),
+				eDVBFrontendParametersSatellite.PLS_Combo : _("Combo"),
+				eDVBFrontendParametersSatellite.PLS_Unknown : _("Auto")}.get(tp.get("pls_mode"))
+			#ret["is_id"] = tp.get("is_id")
+			#ret["pls_code"] = tp.get("pls_code")
+		else:
+			ret["pls_mode"] = None
+			ret["is_id"] = None
+			ret["pls_code"] = None
 	elif type == "DVB-C":
 		ret["tuner_type"] = _("Cable")
 		ret["modulation"] = {
@@ -83,6 +117,7 @@ def ConvertToHumanReadable(tp, type = None):
 			eDVBFrontendParametersTerrestrial.FEC_1_2 : "1/2",
 			eDVBFrontendParametersTerrestrial.FEC_2_3 : "2/3",
 			eDVBFrontendParametersTerrestrial.FEC_3_4 : "3/4",
+			eDVBFrontendParametersTerrestrial.FEC_4_5 : "4/5",
 			eDVBFrontendParametersTerrestrial.FEC_5_6 : "5/6",
 			eDVBFrontendParametersTerrestrial.FEC_6_7 : "6/7",
 			eDVBFrontendParametersTerrestrial.FEC_7_8 : "7/8",
@@ -92,6 +127,7 @@ def ConvertToHumanReadable(tp, type = None):
 			eDVBFrontendParametersTerrestrial.FEC_1_2 : "1/2",
 			eDVBFrontendParametersTerrestrial.FEC_2_3 : "2/3",
 			eDVBFrontendParametersTerrestrial.FEC_3_4 : "3/4",
+			eDVBFrontendParametersTerrestrial.FEC_4_5 : "4/5",
 			eDVBFrontendParametersTerrestrial.FEC_5_6 : "5/6",
 			eDVBFrontendParametersTerrestrial.FEC_6_7 : "6/7",
 			eDVBFrontendParametersTerrestrial.FEC_7_8 : "7/8",

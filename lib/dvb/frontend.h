@@ -87,6 +87,7 @@ private:
 	std::map<fe_delivery_system_t, bool> m_delsys, m_delsys_whitelist;
 	char m_filename[128];
 	char m_description[128];
+	dvb_frontend_info fe_info;
 	FRONTENDPARAMETERS parm;
 	eDVBFrontendParameters oparm;
 
@@ -163,6 +164,7 @@ public:
 	bool isLoopTimerActive() { return m_tuneTimer->isActive(); }
 	bool isScheduledSendDiseqc();
 	void setUSBTuner(bool yesno) { m_is_usbtuner = yesno; }
+	bool is_multistream();
 };
 
 #endif // SWIG
