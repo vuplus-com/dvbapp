@@ -4,6 +4,7 @@ from enigma import eEPGCache, getBestPlayableServiceReference, \
 from Components.config import config
 from Components.UsageConfig import defaultMoviePath
 from Components.TimerSanityCheck import TimerSanityCheck
+from Components.SystemInfo import SystemInfo
 
 from Screens.MessageBox import MessageBox
 import Screens.Standby
@@ -135,7 +136,10 @@ class RecordTimerEntry(timer.TimerEntry, object):
 		self.timer = None
 		self.__record_service = None
 		self.start_prepare = 0
-		self.justplay = justplay
+		if SystemInfo["PVRSupport"]:
+			self.justplay = justplay
+		else:
+			self.justplay = True
 		self.afterEvent = afterEvent
 		self.dirname = dirname
 		self.dirnameHadToFallback = False
@@ -460,7 +464,10 @@ def createTimer(xml):
 	description = xml.get("description").encode("utf-8")
 	repeated = xml.get("repeated").encode("utf-8")
 	disabled = long(xml.get("disabled") or "0")
-	justplay = long(xml.get("justplay") or "0")
+	if SystemInfo["PVRSupport"]:
+		justplay = long(xml.get("justplay") or "0")
+	else:
+		justplay = long("1")
 	afterevent = str(xml.get("afterevent") or "nothing")
 	afterevent = {
 		"nothing": AFTEREVENT.NONE,
@@ -658,7 +665,10 @@ class RecordTimer(timer.Timer):
 			if timer.tags is not None:
 				list.append(' tags="' + str(stringToXML(' '.join(timer.tags))) + '"')
 			list.append(' disabled="' + str(int(timer.disabled)) + '"')
-			list.append(' justplay="' + str(int(timer.justplay)) + '"')
+			if SystemInfo["PVRSupport"]:
+				list.append(' justplay="' + str(int(timer.justplay)) + '"')
+			else:
+				list.append(' justplay="1"')
 			list.append('>\n')
 			
 			if config.recording.debug.value:

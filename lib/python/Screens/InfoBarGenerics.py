@@ -235,7 +235,7 @@ class InfoBarNumberZap:
 			else:
 				self.servicelist.recallPrevService()
 		else:
-			if self.has_key("TimeshiftActions") and not self.timeshift_enabled:
+			if not (self.has_key("TimeshiftActions") and self.timeshift_enabled):
 				self.session.openWithCallback(self.numberEntered, NumberZap, number)
 
 	def numberEntered(self, retval):
@@ -1185,11 +1185,12 @@ class InfoBarShowMovies:
 
 class InfoBarTimeshift:
 	def __init__(self):
-		self["TimeshiftActions"] = HelpableActionMap(self, "InfobarTimeshiftActions",
-			{
-				"timeshiftStart": (self.startTimeshift, _("start timeshift")),  # the "yellow key"
-				"timeshiftStop": (self.stopTimeshift, _("stop timeshift"))      # currently undefined :), probably 'TV'
-			}, prio=1)
+		if SystemInfo["PVRSupport"]:
+			self["TimeshiftActions"] = HelpableActionMap(self, "InfobarTimeshiftActions",
+				{
+					"timeshiftStart": (self.startTimeshift, _("start timeshift")),  # the "yellow key"
+					"timeshiftStop": (self.stopTimeshift, _("stop timeshift"))      # currently undefined :), probably 'TV'
+				}, prio=1)
 		self["TimeshiftActivateActions"] = ActionMap(["InfobarTimeshiftActivateActions"],
 			{
 				"timeshiftActivateEnd": self.activateTimeshiftEnd, # something like "rewind key"
@@ -1520,10 +1521,11 @@ class InfoBarInstantRecord:
 	"""Instant Record - handles the instantRecord action in order to
 	start/stop instant records"""
 	def __init__(self):
-		self["InstantRecordActions"] = HelpableActionMap(self, "InfobarInstantRecord",
-			{
-				"instantRecord": (self.instantRecord, _("Instant Record...")),
-			})
+		if SystemInfo["PVRSupport"]:
+			self["InstantRecordActions"] = HelpableActionMap(self, "InfobarInstantRecord",
+				{
+					"instantRecord": (self.instantRecord, _("Instant Record...")),
+				})
 		self.recording = []
 
 	def stopCurrentRecording(self, entry = -1):
