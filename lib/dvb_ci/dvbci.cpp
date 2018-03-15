@@ -298,6 +298,7 @@ void eDVBCIInterfaces::recheckPMTHandlers()
 			if (tmp) // we dont like to change tsmux for running services
 			{
 				eDebugCI("already assigned and running CI!\n");
+				tmp->addVtunerPid(pmthandler);
 				continue;
 			}
 		}
@@ -1069,13 +1070,6 @@ eDVBCISlot::eDVBCISlot(eMainloop *context, int nr)
 	{
 		perror(filename);
 	}
-
-	for(int i = 0; i < NUM_OF_ECM ; i++)
-	{
-		m_ecm[i] = 0;
-	}
-	ecm_num = 0;
-	
 }
 
 eDVBCISlot::~eDVBCISlot()
@@ -1355,7 +1349,8 @@ void eDVBCISlot::addVtunerPid(eDVBServicePMTHandler *pmthandler)
 	ePtr<iDVBDemux> demux;
 	eDVBServicePMTHandler::program p;
 		
-	if (!pmthandler->getDataDemux(demux) && !ecm_num)
+	bool ignore = 0;
+	if (!pmthandler->getDataDemux(demux))
 	{
 	
 		if (!pmthandler->getProgramInfo(p))
@@ -1363,11 +1358,23 @@ void eDVBCISlot::addVtunerPid(eDVBServicePMTHandler *pmthandler)
 			for (std::list<eDVBServicePMTHandler::program::capid_pair>::const_iterator i(p.caids.begin());
 						i != p.caids.end(); ++i)
 			{
-				if (i->capid >= 0)
+				ignore = 0;
+				for (eSmartPtrList<eDVBECMParser>::iterator it(m_ecms.begin()); it != m_ecms.end(); ++it)
 				{
-					eDebug("PES Start ECM PID = %d Caid = %d ecm_num=%d", i->capid, i->caid, ecm_num);
-					m_ecm[ecm_num] = new eDVBECMParser(demux);
-					m_ecm[ecm_num++]->start(i->capid);
+					if(it->getPid() == i->capid)
+					{
+						ignore = 1;
+						break;
+					}
+				}
+
+				if (i->capid >= 0 && !ignore)
+				{
+					ePtr<eDVBECMParser> ecm;
+					eDebug("PES Start CAPID = %d Caid = %d", i->capid, i->caid);
+					ecm = new eDVBECMParser(demux);
+					m_ecms.push_back(ecm);
+					ecm->start(i->capid);
 				}
 			}
 		}
@@ -1377,15 +1384,12 @@ void eDVBCISlot::addVtunerPid(eDVBServicePMTHandler *pmthandler)
 
 void eDVBCISlot::removeVtunerPid(void)
 {
-	for(int i = 0; i < ecm_num ; i++)
+	eDebugCI("eDVBCISlot::removeVtunerPid...");
+	for (eSmartPtrList<eDVBECMParser>::iterator it(m_ecms.begin()); it != m_ecms.end(); ++it)
 	{
-		if(m_ecm[i])
-		{
-			m_ecm[i]->stop();
-			m_ecm[i] = 0;
-		}
+		it->stop();
 	}
-	ecm_num = 0;
+	m_ecms.clear();
 }
 
 eAutoInitP0<eDVBCIInterfaces> init_eDVBCIInterfaces(eAutoInitNumbers::dvb, "CI Slots");

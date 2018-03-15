@@ -67,10 +67,7 @@ class eDVBCISlot: public iObject, public Object
 	bool user_mapped;
 	void data(int);
 	bool plugged;
-
-#define NUM_OF_ECM             32
-	ePtr<eDVBECMParser> m_ecm[NUM_OF_ECM];
-	int ecm_num;
+	eSmartPtrList<eDVBECMParser> m_ecms;
 public:
 	enum {stateRemoved, stateInserted, stateInvalid, stateResetted};
 	eDVBCISlot(eMainloop *context, int nr);

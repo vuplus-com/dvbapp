@@ -18,6 +18,7 @@ public:
 	int start(int pid);
 	int stop();	
 	void processData(const __u8 *p, int len);
+	int getPid(){return m_pid;}
 private:
 	void processPESPacket(__u8 *pkt, int len);	
 	int m_pid;
