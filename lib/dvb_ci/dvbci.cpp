@@ -398,7 +398,6 @@ void eDVBCIInterfaces::recheckPMTHandlers()
 							eDebug("The CI in Slot %d has said it can handle caid %04x... so use it", ci_it->getSlotID(), *z);
 							useThis = true;
 							user_mapped = false;
-							ci_it->addVtunerPid(pmthandler);
 							break;
 						}
 					}
@@ -407,6 +406,7 @@ void eDVBCIInterfaces::recheckPMTHandlers()
 
 			if (useThis)
 			{
+				ci_it->addVtunerPid(pmthandler);
 				// check if this CI is already assigned to this pmthandler
 				eDVBCISlot *tmp = it->cislot;
 				while(tmp)
