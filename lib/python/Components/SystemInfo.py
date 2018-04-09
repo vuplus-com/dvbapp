@@ -1,5 +1,5 @@
-from enigma import eDVBResourceManager
-from Tools.Directories import fileExists
+from enigma import eDVBResourceManager, eDVBCIInterfaces
+from Tools.Directories import fileExists, fileCheck
 from Tools.HardwareInfo import HardwareInfo
 
 SystemInfo = { }
@@ -38,3 +38,9 @@ SystemInfo["DisableUsbRecord"] = HardwareInfo().get_vu_device_name() in ("solo4k
 SystemInfo["DefaultAniSpeed"] = HardwareInfo().get_vu_device_name() in ("uno4k", "uno4kse", "zero4k") and 25 or 20
 SystemInfo["DefaultFullHDSkin"] = HardwareInfo().get_vu_device_name() in ("solo4k","ultimo4k","uno4k","uno4kse","zero4k")
 SystemInfo["PVRSupport"] = HardwareInfo().get_vu_device_name() not in ["solose", "zero", "uno4k"]
+
+SystemInfo["CommonInterface"] = eDVBCIInterfaces.getInstance().getNumOfSlots()
+SystemInfo["CommonInterfaceCIDelay"] = fileCheck("/proc/stb/tsmux/rmx_delay")
+for cislot in range (0, SystemInfo["CommonInterface"]):
+	SystemInfo["CI%dSupportsHighBitrates" % cislot] = fileCheck("/proc/stb/tsmux/ci%d_tsclk"  % cislot)
+	SystemInfo["CI%dRelevantPidsRoutingSupport" % cislot] = fileCheck("/proc/stb/tsmux/ci%d_relevant_pids_routing"  % cislot)

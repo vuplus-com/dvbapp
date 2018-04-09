@@ -3,7 +3,7 @@ from Components.ActionMap import ActionMap
 from Components.ActionMap import NumberActionMap
 from Components.Label import Label
 
-from Components.config import config, ConfigSubsection, ConfigSelection, ConfigSubList, getConfigListEntry, KEY_LEFT, KEY_RIGHT, KEY_0, ConfigNothing, ConfigPIN
+from Components.config import config, ConfigSubsection, ConfigSelection, ConfigSubList, getConfigListEntry, KEY_LEFT, KEY_RIGHT, KEY_0, ConfigNothing, ConfigPIN, ConfigYesNo
 from Components.ConfigList import ConfigList
 
 from Components.SystemInfo import SystemInfo
@@ -11,56 +11,37 @@ from Tools.Directories import fileExists
 
 from enigma import eTimer, eDVBCI_UI, eDVBCIInterfaces
 
-MAX_NUM_CI = 4
-
 def setCIBitrate(configElement):
-	if configElement.value == "no":
-		eDVBCI_UI.getInstance().setClockRate(configElement.slotid, eDVBCI_UI.rateNormal)
-	else:
-		eDVBCI_UI.getInstance().setClockRate(configElement.slotid, eDVBCI_UI.rateHigh)
+	eDVBCI_UI.getInstance().setClockRate(configElement.slotid, eDVBCI_UI.rateHigh if configElement.value else eDVBCI_UI.rateNormal)
 
 def setRelevantPidsRouting(configElement):
-	fileName = "/proc/stb/tsmux/ci%d_relevant_pids_routing" % (configElement.slotid)
-	if not fileExists(fileName, 'r'):
-		print "[CI] file not found : ", fileName
-	else:
-		data = configElement.value
-		if data in ("yes", "no"):
-			fd = open(fileName, 'w')
-			fd.write("%s" % data)
-			fd.close()
+	open(SystemInfo["CI%dRelevantPidsRoutingSupport" % configElement.slotid], "w").write("yes" if configElement.value else "no")
 
-relevantPidsRoutingChoices = None
+def setdvbCiDelay(configElement):
+	open(SystemInfo["CommonInterfaceCIDelay"], "w").write(configElement.value)
+	configElement.save()
+
 def InitCiConfig():
 	config.ci = ConfigSubList()
-	for slot in range(MAX_NUM_CI):
-		config.ci.append(ConfigSubsection())
-		config.ci[slot].canDescrambleMultipleServices = ConfigSelection(choices = [("auto", _("Auto")), ("no", _("No")), ("yes", _("Yes"))], default = "auto")
-		if SystemInfo["CommonInterfaceSupportsHighBitrates"]:
-			config.ci[slot].canHandleHighBitrates = ConfigSelection(choices = [("no", _("No")), ("yes", _("Yes"))], default = "no")
-			config.ci[slot].canHandleHighBitrates.slotid = slot
-			config.ci[slot].canHandleHighBitrates.addNotifier(setCIBitrate)
+	config.cimisc = ConfigSubsection()
+	if SystemInfo["CommonInterface"]:
+		for slot in range(SystemInfo["CommonInterface"]):
+			config.ci.append(ConfigSubsection())
+			config.ci[slot].canDescrambleMultipleServices = ConfigSelection(choices = [("auto", _("Auto")), ("no", _("No")), ("yes", _("Yes"))], default = "auto")
+			if SystemInfo["CI%dSupportsHighBitrates" % slot]:
+				config.ci[slot].canHandleHighBitrates = ConfigYesNo(default = False)
+				config.ci[slot].canHandleHighBitrates.slotid = slot
+				config.ci[slot].canHandleHighBitrates.addNotifier(setCIBitrate)
 
-		if SystemInfo["RelevantPidsRoutingSupport"]:
-			global relevantPidsRoutingChoices
-			if not relevantPidsRoutingChoices:
-				relevantPidsRoutingChoices = [("no", _("No")), ("yes", _("Yes"))]
-				default = "no"
-				fileName = "/proc/stb/tsmux/ci%d_relevant_pids_routing_choices"
-				if fileExists(fileName, 'r'):
-					relevantPidsRoutingChoices = []
-					fd = open(fileName, 'r')
-					data = fd.read()
-					data = data.split()
-					for x in data:
-						relevantPidsRoutingChoices.append((x, _(x)))
-					if default not in data:
-						default = data[0]
+			if SystemInfo["CI%dRelevantPidsRoutingSupport" % slot]:
+				config.ci[slot].relevantPidsRouting = ConfigYesNo(default = False)
+				config.ci[slot].relevantPidsRouting.slotid = slot
+				config.ci[slot].relevantPidsRouting.addNotifier(setRelevantPidsRouting)
 
-			config.ci[slot].relevantPidsRouting = ConfigSelection(choices = relevantPidsRoutingChoices, default = default)
-			config.ci[slot].relevantPidsRouting.slotid = slot
-			config.ci[slot].relevantPidsRouting.addNotifier(setRelevantPidsRouting)
-
+		if SystemInfo["CommonInterfaceCIDelay"]:
+			config.cimisc.dvbCiDelay = ConfigSelection(default = "256", choices = [("16"), ("32"), ("64"), ("128"), ("256")])
+			config.cimisc.dvbCiDelay.addNotifier(setdvbCiDelay)
+			
 class MMIDialog(Screen):
 	def __init__(self, session, slotid, action, handler = eDVBCI_UI.getInstance(), wait_text = _("wait for ci...") ):
 		Screen.__init__(self, session)
@@ -269,20 +250,6 @@ class CiMessageHandler:
 		self.ci = { }
 		self.dlgs = { }
 		eDVBCI_UI.getInstance().ciStateChanged.get().append(self.ciStateChanged)
-		SystemInfo["CommonInterface"] = eDVBCIInterfaces.getInstance().getNumOfSlots() > 0
-		try:
-			file = open("/proc/stb/tsmux/ci0_tsclk", "r")
-			file.close()
-			SystemInfo["CommonInterfaceSupportsHighBitrates"] = True
-		except:
-			SystemInfo["CommonInterfaceSupportsHighBitrates"] = False
-
-		try:
-			file = open("/proc/stb/tsmux/ci0_relevant_pids_routing", "r")
-			file.close()
-			SystemInfo["RelevantPidsRoutingSupport"] = True
-		except:
-			SystemInfo["RelevantPidsRoutingSupport"] = False
 
 	def setSession(self, session):
 		self.session = session
@@ -329,6 +296,7 @@ class CiSelection(Screen):
 		self.RelevantPidsRoutingEntry = {}
 
 		self.entryData = []
+		self.DVBCiDelayEntry = None
 
 		self.list = [ ]
 		self["entries"] = ConfigList(self.list)
@@ -338,7 +306,7 @@ class CiSelection(Screen):
 		self.onLayoutFinish.append(self.initialUpdate)
 
 	def initialUpdate(self):
-		for slot in range(MAX_NUM_CI):
+		for slot in range(SystemInfo["CommonInterface"]):
 			state = eDVBCI_UI.getInstance().getState(slot)
 			if state != -1:
 				self.slots.append(slot)
@@ -346,7 +314,10 @@ class CiSelection(Screen):
 				self.createEntries(slot)
 				CiHandler.registerCIMessageHandler(slot, self.ciStateChanged)
 
+		self.slots.sort()
 		self.updateEntries()
+		if self.slots:
+			self["text"].setText(_("Slot %d")% (int(self.slots[0])+1))
 
 	def selectionChanged(self):
 		entryData = self.entryData[self["entries"].getCurrentIndex()]
@@ -367,10 +338,12 @@ class CiSelection(Screen):
 		self.keyConfigEntry(KEY_RIGHT)
 
 	def createEntries(self, slot):
-		if SystemInfo["CommonInterfaceSupportsHighBitrates"]:
+		if SystemInfo["CI%dSupportsHighBitrates" % slot]:
 			self.HighBitrateEntry[slot] = getConfigListEntry(_("High bitrate support"), config.ci[slot].canHandleHighBitrates)
-		if SystemInfo["RelevantPidsRoutingSupport"]:
+		if SystemInfo["CI%dRelevantPidsRoutingSupport" % slot]:
 			self.RelevantPidsRoutingEntry[slot] = getConfigListEntry(_("Relevant PIDs Routing"), config.ci[slot].relevantPidsRouting)
+		if SystemInfo["CommonInterfaceCIDelay"] and self.DVBCiDelayEntry is None:
+			self.DVBCiDelayEntry = getConfigListEntry(_("DVB CI Delay"), config.cimisc.dvbCiDelay)
 
 	def addToList(self, data, action, slotid):
 		self.list.append(data)
@@ -379,6 +352,7 @@ class CiSelection(Screen):
 	def updateEntries(self):
 		self.list = []
 		self.entryData = []
+
 		for slot in self.slots:
 			self.addToList((_("Reset"), ConfigNothing()), 0, slot)
 			self.addToList((_("Init"), ConfigNothing()), 1, slot)
@@ -394,10 +368,12 @@ class CiSelection(Screen):
 
 			self.addToList(getConfigListEntry(_("Multiple service support"), config.ci[slot].canDescrambleMultipleServices), -1, slot)
 
-			if SystemInfo["CommonInterfaceSupportsHighBitrates"]:
+			if SystemInfo["CI%dSupportsHighBitrates" % slot]:
 				self.addToList(self.HighBitrateEntry[slot], -1, slot)
-			if SystemInfo["RelevantPidsRoutingSupport"]:
+			if SystemInfo["CI%dRelevantPidsRoutingSupport" % slot]:
 				self.addToList(self.RelevantPidsRoutingEntry[slot], -1, slot)
+			if SystemInfo["CommonInterfaceCIDelay"]:
+				self.addToList(self.DVBCiDelayEntry, -1, slot)
 
 		self["entries"].list = self.list
 		self["entries"].l.setList(self.list)
@@ -432,7 +408,7 @@ class CiSelection(Screen):
 				self.dlg = self.session.openWithCallback(self.dlgClosed, MMIDialog, slot, action)
 
 	def cancel(self):
-		for slot in range(MAX_NUM_CI):
+		for slot in range(SystemInfo["CommonInterface"]):
 			state = eDVBCI_UI.getInstance().getState(slot)
 			if state != -1:
 				CiHandler.unregisterCIMessageHandler(slot)

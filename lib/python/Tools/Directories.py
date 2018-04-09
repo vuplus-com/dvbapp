@@ -242,6 +242,9 @@ def fileExists(f, mode='r'):
 		acc_mode = F_OK
 	return access(f, acc_mode)
 
+def fileCheck(f, mode='r'):
+	return fileExists(f, mode) and f
+
 def getRecordingFilename(basename, dirname = None):
 	if not dirname.endswith('/'):
 		dirname += '/'

@@ -305,12 +305,8 @@ lib/python/Plugins/SystemPlugins/AnimationSetup/Makefile
 lib/python/Plugins/SystemPlugins/AnimationSetup/meta/Makefile
 lib/python/Plugins/SystemPlugins/BoxModeConfig/Makefile
 lib/python/Plugins/SystemPlugins/BoxModeConfig/meta/Makefile
-lib/python/Plugins/SystemPlugins/Solo4kMiscControl/Makefile
-lib/python/Plugins/SystemPlugins/Solo4kMiscControl/meta/Makefile
 lib/python/Plugins/SystemPlugins/FastChannelChange/Makefile
 lib/python/Plugins/SystemPlugins/FastChannelChange/meta/Makefile
-lib/python/Plugins/SystemPlugins/Ultimo4kMiscControl/Makefile
-lib/python/Plugins/SystemPlugins/Ultimo4kMiscControl/meta/Makefile
 lib/python/Plugins/SystemPlugins/PvrDescrambleConvert/Makefile
 lib/python/Plugins/SystemPlugins/PvrDescrambleConvert/meta/Makefile
 lib/python/Plugins/Extensions/QuadPiP/Makefile
