@@ -19,7 +19,7 @@ def getModel():
 	return ret
 
 def getRcuDefaultType():
-	if getModel() in ["ultimo4k"]:
+	if getModel() in ["uno4kse", "zero4k"]:
 		return "new"
 	return "legacy"
 
@@ -28,7 +28,7 @@ config.plugins.remotecontrolcode.systemcode = ConfigSelection(default = "2", cho
 	[ ("1", "1 "), ("2", "2 "), ("3", "3 "), ("4", "4 ") ] )
 config.plugins.remotecontrolcode.replytimeout = ConfigInteger(default = 30, limits = (15,9999))
 config.plugins.remotecontrolcode.rcuType = ConfigSelection(default = getRcuDefaultType(), choices = 
-	[ ("legacy", "Legacy Vu+ Universal RCU"), ("new", "New Vu+ Bluetooth RCU") ] )
+	[ ("legacy", "Legacy Vu+ Universal RCU"), ("new", "New Vu+ DarkBrown/Bluetooth RCU") ] )
 
 class RemoteControlCodeInit:
 	def __init__(self):
