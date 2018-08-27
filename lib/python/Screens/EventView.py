@@ -113,7 +113,7 @@ class EventViewBase:
 
 	def setService(self, service):
 		self.currentService=service
-		if self.isRecording:
+		if self.isRecording and (self.currentService.ref.type == eServiceReference.idDVB):
 			self["channel"].setText(_("Recording"))
 		else:
 			name = self.currentService.getServiceName()

@@ -226,7 +226,7 @@ class EPGSelection(Screen):
 		cur = self["list"].getCurrent()
 		event = cur[0]
 		serviceref = cur[1]
-		if event is None:
+		if event is None or serviceref.getType() != eServiceReference.idDVB:
 			return
 		eventid = event.getEventId()
 		refstr = serviceref.ref.toString()
@@ -352,13 +352,13 @@ class EPGSelection(Screen):
 				self["key_red"].setText("Zap")
 				self.key_red_choice = self.ZAP
 
-		if event is None:
+		serviceref = cur[1]
+		if event is None or serviceref.getType() != eServiceReference.idDVB:
 			if self.key_green_choice != self.EMPTY:
 				self["key_green"].setText("")
 				self.key_green_choice = self.EMPTY
 			return
 
-		serviceref = cur[1]
 		eventid = event.getEventId()
 		refstr = serviceref.ref.toString()
 		isRecordEvent = False
@@ -366,6 +366,7 @@ class EPGSelection(Screen):
 			if timer.eit == eventid and timer.service_ref.ref.toString() == refstr:
 				isRecordEvent = True
 				break
+
 		if isRecordEvent and self.key_green_choice != self.REMOVE_TIMER:
 			self["key_green"].setText(_("Remove timer"))
 			self.key_green_choice = self.REMOVE_TIMER

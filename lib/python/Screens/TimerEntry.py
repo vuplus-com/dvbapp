@@ -138,6 +138,8 @@ class TimerEntry(Screen, ConfigListScreen):
 				servicename = str(self.timer.service_ref.getServiceName())
 			except:
 				pass
+			if not servicename:
+				servicename = "N/A"
 			self.timerentry_service_ref = self.timer.service_ref
 			self.timerentry_service = ConfigSelection([servicename])
 
