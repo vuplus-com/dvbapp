@@ -5,15 +5,16 @@
 #include <lib/base/eenv.h>
 
 eDVBTextEncodingHandler encodingHandler;  // the one and only instance
+int defaultEncodingTable = 1; // ISO8859-1 / Latin1
 
 inline char toupper(char c)
 {
-	switch (c)
-	{
-		case 'a' ... 'z':
-			return c-32;
-	}
-	return c;
+	return (c >= 'a' && c <= 'z') ? c - ('a' - 'A') : c;
+}
+
+inline char tolower(char c)
+{
+	return (c >= 'A' && c <= 'Z') ? c + ('a' - 'A') : c;
 }
 
 eDVBTextEncodingHandler::eDVBTextEncodingHandler()
@@ -41,10 +42,10 @@ eDVBTextEncodingHandler::eDVBTextEncodingHandler()
 				countrycode[2]=toupper(countrycode[2]);
 				m_CountryCodeDefaultMapping[countrycode]=encoding;
 			}
-			else if ( (sscanf( line, "0x%x 0x%x ISO%d", &tsid, &onid, &encoding ) == 3 && encoding == 6397 )
-					||(sscanf( line, "%d %d ISO%d", &tsid, &onid, &encoding ) == 3 && encoding == 6397 ) )
+			else if ( (sscanf( line, "0x%x 0x%x ISO%d", &tsid, &onid, &encoding ) == 3 && encoding == 6937 )
+					||(sscanf( line, "%d %d ISO%d", &tsid, &onid, &encoding ) == 3 && encoding == 6937 ) )
 				m_TransponderDefaultMapping[(tsid<<16)|onid]=0;
-			else if ( sscanf( line, "%s ISO%d", countrycode, &encoding ) == 2 && encoding == 6397 )
+			else if ( sscanf( line, "%s ISO%d", countrycode, &encoding ) == 2 && encoding == 6937 )
 			{
 				m_CountryCodeDefaultMapping[countrycode]=0;
 				countrycode[0]=toupper(countrycode[0]);
@@ -67,7 +68,7 @@ eDVBTextEncodingHandler::eDVBTextEncodingHandler()
 
 void eDVBTextEncodingHandler::getTransponderDefaultMapping(int tsidonid, int &table)
 {
-	std::map<int, int>::iterator it =
+	std::map<unsigned int, int>::iterator it =
 		m_TransponderDefaultMapping.find(tsidonid);
 	if ( it != m_TransponderDefaultMapping.end() )
 		table = it->second;
@@ -84,5 +85,5 @@ int eDVBTextEncodingHandler::getCountryCodeDefaultMapping( const std::string &co
 		m_CountryCodeDefaultMapping.find(country_code);
 	if ( it != m_CountryCodeDefaultMapping.end() )
 		return it->second;
-	return 1;  // ISO8859-1 / Latin1
+	return defaultEncodingTable;
 }

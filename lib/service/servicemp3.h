@@ -41,6 +41,8 @@ public:
 	RESULT getName(const eServiceReference &ref, std::string &name);
 	int getLength(const eServiceReference &ref);
 	int getInfo(const eServiceReference &ref, int w);
+	int isPlayable(const eServiceReference &ref, const eServiceReference &ignore, bool simulate) { return 1; }
+	RESULT getEvent(const eServiceReference &ref, ePtr<eServiceEvent> &ptr, time_t start_time);
 };
 
 typedef struct _GstElement GstElement;
@@ -101,6 +103,7 @@ public:
 
 		// iServiceInformation
 	RESULT getName(std::string &name);
+	RESULT getEvent(ePtr<eServiceEvent> &evt, int nownext);
 	int getInfo(int w);
 	std::string getInfoString(int w);
 	PyObject *getInfoObject(int w);
@@ -181,6 +184,10 @@ public:
 		std::string missing_codec;
 	};
 
+protected:
+	ePtr<eTimer> m_nownext_timer;
+	ePtr<eServiceEvent> m_event_now, m_event_next;
+	void updateEpgCacheNowNext();
 private:
 	static int pcm_delay;
 	static int ac3_delay;

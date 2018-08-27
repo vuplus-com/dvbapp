@@ -64,6 +64,17 @@
 			<item level="2" text="Always include ECM in recordings" requires="ScrambledPlayback" description="Always include ECM messages in recordings. This overrides the individual timer settings globally. It allows recordings to be always decrypted afterwards (sometimes called offline decoding), if supported by your receiver. Default: off.">config.recording.always_ecm</item>
 			<item level="2" text="Never decrypt while recording" requires="ScrambledPlayback" description="Never decrypt the content while recording. This overrides the individual timer settings globally. If enabled, recordings are stored in crypted presentation and must be decrypted afterwards (sometimes called offline decoding). Default: off.">config.recording.never_decrypt</item>
 		</setup>
+		<setup key="epgsettings" title="EPG settings">
+			<item level="1" text="EPG language selection 1" description="Configure the primary EPG language.">config.autolanguage.epglanguage</item>
+			<item level="1" text="EPG language selection 2" description="Configure the secondary EPG language.">config.autolanguage.epglanguage_alternative</item>
+			<item level="0" text="Enable EIT EPG" description="Use EIT EPG information when it is available.">config.epg.eit</item>
+			<item level="2" text="Enable MHW EPG" description="Use MHW EPG information when it is available.">config.epg.mhw</item>
+			<item level="1" text="Enable freesat EPG" description="Use FreeSat EPG information when it is available.">config.epg.freesat</item>
+			<item level="1" text="Enable ViaSat EPG" description="Use ViaSat EPG information when it is available.">config.epg.viasat</item>
+			<item level="1" text="Enable Netmed EPG" description="Use Netmed EPG information when it is available.">config.epg.netmed</item>
+			<item level="1" text="Enable Virgin EPG" description="Use Virgin EPG information when it is available.">config.epg.virgin</item>
+			<item level="2" text="Maintain old EPG data for (min)" description="Configure for how many minutes finished events should remain visible in the EPG. Useful when you need information about an event which has just finished, or has been delayed.">config.epg.histminutes</item>
+		</setup>
 		<setup key="subtitlesetup" title="Subtitle settings">
 			<item level="2" text="Subtitle font color" description="Configure the color of the subtitles.">config.subtitles.subtitle_fontcolor</item>
 			<item level="2" text="Subtitle font size" description="Configure the font size of the subtitles.">config.subtitles.subtitle_fontsize</item>

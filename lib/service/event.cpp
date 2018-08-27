@@ -8,70 +8,30 @@
 #include <dvbsi++/extended_event_descriptor.h>
 #include <dvbsi++/linkage_descriptor.h>
 #include <dvbsi++/component_descriptor.h>
+#include <dvbsi++/content_descriptor.h>
+#include <dvbsi++/parental_rating_descriptor.h>
 #include <dvbsi++/descriptor_tag.h>
+#include <dvbsi++/pdc_descriptor.h>
 
 #include <sys/types.h>
 #include <fcntl.h>
 
 // static members / methods
-std::string eServiceEvent::m_language = "de_DE";
+std::string eServiceEvent::m_language = "---";
+std::string eServiceEvent::m_language_alternative = "---";
 
-void eServiceEvent::setEPGLanguage( const std::string language )
-{
-	m_language = language;
-}
 ///////////////////////////
 
 DEFINE_REF(eServiceEvent);
 DEFINE_REF(eComponentData);
-
-const char MAX_LANG = 37;
-/* OSD language (see /share/locales/locales) to iso639 conversion table */
-std::string ISOtbl[MAX_LANG][2] =
-{
-	{"ar_AE","ara"},
-	{"C","eng"},
-	{"cs_CZ","ces"},     /* or 'cze' */
-	{"cs_CZ","cze"},
-	{"da_DK","dan"},
-	{"de_DE","deu"},     /* also 'ger' is valid iso639 code!! */
-	{"de_DE","ger"},
-	{"el_GR","gre"},     /* also 'ell' is valid */
-	{"el_GR","ell"},
-	{"es_ES","esl"},     /* also 'spa' is ok */
-	{"es_ES","spa"},
-	{"et_EE","est"},
-	{"fi_FI","fin"},
-	{"fr_FR","fra"},
-	{"hr_HR","hrv"},     /* or 'scr' */
-	{"hr_HR","scr"},
-	{"hu_HU","hun"},
-	{"is_IS","isl"},     /* or 'ice' */
-	{"is_IS","ice"},
-	{"it_IT","ita"},
-	{"lt_LT","lit"},
-	{"nl_NL","nld"},     /* or 'dut' */
-	{"nl_NL","dut"},
-	{"no_NO","nor"},
-	{"pl_PL","pol"},
-	{"pt_PT","por"},
-	{"ro_RO","ron"},     /* or 'rum' */
-	{"ro_RO","rum"},
-	{"ru_RU","rus"},
-	{"sk_SK","slk"},     /* or 'slo' */
-	{"sk_SK","slo"},
-	{"sl_SI","slv"},
-	{"sr_YU","srp"},     /* or 'scc' */
-	{"sr_YU","scc"},
-	{"sv_SE","swe"},
-	{"tr_TR","tur"},
-	{"ur_IN","urd"}
-};
+DEFINE_REF(eGenreData);
+DEFINE_REF(eParentalData);
 
 /* search for the presence of language from given EIT event descriptors*/
-bool eServiceEvent::loadLanguage(Event *evt, std::string lang, int tsidonid)
+bool eServiceEvent::loadLanguage(Event *evt, const std::string &lang, int tsidonid)
 {
 	bool retval=0;
+	std::string language = lang;
 	for (DescriptorConstIterator desc = evt->getDescriptors()->begin(); desc != evt->getDescriptors()->end(); ++desc)
 	{
 		switch ((*desc)->getTag())
@@ -82,14 +42,15 @@ bool eServiceEvent::loadLanguage(Event *evt, std::string lang, int tsidonid)
 			case SHORT_EVENT_DESCRIPTOR:
 			{
 				const ShortEventDescriptor *sed = (ShortEventDescriptor*)*desc;
-				const std::string &cc = sed->getIso639LanguageCode();
+				std::string cc = sed->getIso639LanguageCode();
+				std::transform(cc.begin(), cc.end(), cc.begin(), tolower);
 				int table=encodingHandler.getCountryCodeDefaultMapping(cc);
-				if (lang.empty())
-					lang = cc;  // use first found language
-				if (!strncasecmp(lang.c_str(), cc.c_str(), 3))
+				if (language == "---" || language.find(cc) != std::string::npos)
 				{
-					m_event_name = convertDVBUTF8(replace_all(replace_all(sed->getEventName(), "\n", " "), "\t", " "), table, tsidonid);
-					m_short_description = convertDVBUTF8(sed->getText(), table, tsidonid);
+					/* stick to this language, avoid merging or mixing descriptors of different languages */
+					language = cc;
+					m_event_name += replace_all(replace_all(convertDVBUTF8(sed->getEventName(), table, tsidonid), "\n", " ",table), "\t", " ",table);
+					m_short_description += convertDVBUTF8(sed->getText(), table, tsidonid);
 					retval=1;
 				}
 				break;
@@ -97,13 +58,37 @@ bool eServiceEvent::loadLanguage(Event *evt, std::string lang, int tsidonid)
 			case EXTENDED_EVENT_DESCRIPTOR:
 			{
 				const ExtendedEventDescriptor *eed = (ExtendedEventDescriptor*)*desc;
-				const std::string &cc = eed->getIso639LanguageCode();
+				std::string cc = eed->getIso639LanguageCode();
+				std::transform(cc.begin(), cc.end(), cc.begin(), tolower);
 				int table=encodingHandler.getCountryCodeDefaultMapping(cc);
-				if (lang.empty())
-					lang = cc;  // use first found language
-				if (!strncasecmp(lang.c_str(), cc.c_str(), 3))
+				if (language == "---" || language.find(cc) != std::string::npos)
 				{
-					m_extended_description += convertDVBUTF8(eed->getText(), table, tsidonid);
+					/* stick to this language, avoid merging or mixing descriptors of different languages */
+					language = cc;
+					/*
+					 * Bit of a hack, some providers put the event description partly in the short descriptor,
+					 * and the remainder in extended event descriptors.
+					 * In that case, we cannot really treat short/extended description as separate descriptions.
+					 * Unfortunately we cannot recognise this, but we'll use the length of the short description
+					 * to guess whether we should concatenate both descriptions (without any spaces)
+					 */
+					if (eed->getText().empty() && m_short_description.size() >= 180)
+					{
+						m_extended_description = m_short_description;
+						m_short_description = "";
+					}
+					if (table == 0) // Two Char Mapping EED must be processed in one pass
+					{
+						m_tmp_extended_description += eed->getText();
+						if (eed->getDescriptorNumber() == eed->getLastDescriptorNumber())
+						{
+							m_extended_description += convertDVBUTF8(m_tmp_extended_description, table, tsidonid);
+						}
+					}
+					else
+					{
+						m_extended_description += convertDVBUTF8(eed->getText(), table, tsidonid);
+					}
 					retval=1;
 				}
 #if 0
@@ -136,6 +121,7 @@ bool eServiceEvent::loadLanguage(Event *evt, std::string lang, int tsidonid)
 					data.m_componentType = cp->getComponentType();
 					data.m_componentTag = cp->getComponentTag();
 					data.m_iso639LanguageCode = cp->getIso639LanguageCode();
+					std::transform(data.m_iso639LanguageCode.begin(), data.m_iso639LanguageCode.end(), data.m_iso639LanguageCode.begin(), tolower);
 					int table=encodingHandler.getCountryCodeDefaultMapping(data.m_iso639LanguageCode);
 					data.m_text = convertDVBUTF8(cp->getText(),table,tsidonid);
 					m_component_data.push_back(data);
@@ -146,17 +132,51 @@ bool eServiceEvent::loadLanguage(Event *evt, std::string lang, int tsidonid)
 					const LinkageDescriptor  *ld = (LinkageDescriptor*)*desc;
 					if ( ld->getLinkageType() == 0xB0 )
 					{
-						eServiceReference ref;
-						ref.type = eServiceReference::idDVB;
-						eServiceReferenceDVB &dvb_ref = (eServiceReferenceDVB&) ref;
+						eServiceReferenceDVB dvb_ref;
+						dvb_ref.type = eServiceReference::idDVB;
 						dvb_ref.setServiceType(1);
 						dvb_ref.setTransportStreamID(ld->getTransportStreamId());
 						dvb_ref.setOriginalNetworkID(ld->getOriginalNetworkId());
 						dvb_ref.setServiceID(ld->getServiceId());
 						const PrivateDataByteVector *privateData = ld->getPrivateDataBytes();
 						dvb_ref.name = convertDVBUTF8((const unsigned char*)&((*privateData)[0]), privateData->size(), 1, tsidonid);
-						m_linkage_services.push_back(ref);
+						m_linkage_services.push_back(dvb_ref);
 					}
+					break;
+				}
+				case CONTENT_DESCRIPTOR:
+				{
+					const ContentDescriptor *cd = (ContentDescriptor *)*desc;
+					const ContentClassificationList *con = cd->getClassifications();
+					for (ContentClassificationConstIterator it = con->begin(); it != con->end(); ++it)
+					{
+						eGenreData data;
+						data.m_level1 = (*it)->getContentNibbleLevel1();
+						data.m_level2 = (*it)->getContentNibbleLevel2();
+						data.m_user1  = (*it)->getUserNibble1();
+						data.m_user2  = (*it)->getUserNibble2();
+						m_genres.push_back(data);
+					}
+					break;
+				}
+				case PARENTAL_RATING_DESCRIPTOR:
+				{
+					const ParentalRatingDescriptor *prd = (ParentalRatingDescriptor *)*desc;
+					const ParentalRatingList *par = prd->getParentalRatings();
+					for (ParentalRatingConstIterator it = par->begin(); it != par->end(); ++it)
+					{
+						eParentalData data;
+
+						data.m_country_code = (*it)->getCountryCode();
+						data.m_rating = (*it)->getRating();
+						m_ratings.push_back(data);
+					}
+					break;
+				}
+				case PDC_DESCRIPTOR:
+				{
+					const PdcDescriptor *pdcd = (PdcDescriptor *)*desc;
+					m_pdc_pil = pdcd->getProgrammeIdentificationLabel();
 					break;
 				}
 			}
@@ -169,37 +189,29 @@ bool eServiceEvent::loadLanguage(Event *evt, std::string lang, int tsidonid)
 
 RESULT eServiceEvent::parseFrom(Event *evt, int tsidonid)
 {
-	uint16_t stime_mjd = evt->getStartTimeMjd();
-	uint32_t stime_bcd = evt->getStartTimeBcd();
-	uint32_t duration = evt->getDuration();
-	m_begin = parseDVBtime(
-		stime_mjd >> 8,
-		stime_mjd&0xFF,
-		stime_bcd >> 16,
-		(stime_bcd >> 8)&0xFF,
-		stime_bcd & 0xFF
-	);
+	m_begin = parseDVBtime(evt->getStartTimeMjd(), evt->getStartTimeBcd());
 	m_event_id = evt->getEventId();
+	uint32_t duration = evt->getDuration();
 	m_duration = fromBCD(duration>>16)*3600+fromBCD(duration>>8)*60+fromBCD(duration);
-	for (int i=0; i < MAX_LANG; i++)
-		if (m_language==ISOtbl[i][0])
-			if (loadLanguage(evt, ISOtbl[i][1], tsidonid))
-				return 0;
-	if (loadLanguage(evt, "eng", tsidonid))
+	uint8_t running_status = evt->getRunningStatus();
+	m_running_status = running_status;
+	if (m_language != "---" && loadLanguage(evt, m_language, tsidonid))
 		return 0;
-	if (loadLanguage(evt, std::string(), tsidonid))
+	if (m_language_alternative != "---" && loadLanguage(evt, m_language_alternative, tsidonid))
+		return 0;
+	if (loadLanguage(evt, "---", tsidonid))
 		return 0;
 	return 0;
 }
 
-RESULT eServiceEvent::parseFrom(const std::string filename, int tsidonid)
+RESULT eServiceEvent::parseFrom(const std::string &filename, int tsidonid)
 {
 	if (!filename.empty())
 	{
 		int fd = ::open( filename.c_str(), O_RDONLY );
 		if ( fd > -1 )
 		{
-			__u8 buf[4096];
+			uint8_t buf[4096];
 			int rd = ::read(fd, buf, 4096);
 			::close(fd);
 			if ( rd > 12 /*EIT_LOOP_SIZE*/ )
@@ -224,6 +236,60 @@ std::string eServiceEvent::getBeginTimeString() const
 	return std::string(tmp, 12);
 }
 
+RESULT eServiceEvent::getGenreData(ePtr<eGenreData> &dest) const
+{
+	std::list<eGenreData>::const_iterator it = m_genres.begin();
+	for(;it != m_genres.end(); ++it) {
+		dest = new eGenreData(*it);
+		//  for now just return the first item on the list
+		return 0;
+	}
+	dest = 0;
+	return -1;
+}
+
+PyObject *eServiceEvent::getGenreData() const
+{
+	ePyObject ret = PyList_New(m_genres.size());
+	int cnt=0;
+	for (std::list<eGenreData>::const_iterator it(m_genres.begin()); it != m_genres.end(); ++it)
+	{
+		ePyObject tuple = PyTuple_New(4);
+		PyTuple_SET_ITEM(tuple, 0, PyInt_FromLong(it->getLevel1()));
+		PyTuple_SET_ITEM(tuple, 1, PyInt_FromLong(it->getLevel2()));
+		PyTuple_SET_ITEM(tuple, 2, PyInt_FromLong(it->getUser1()));
+		PyTuple_SET_ITEM(tuple, 3, PyInt_FromLong(it->getUser2()));
+		PyList_SET_ITEM(ret, cnt++, tuple);
+	}
+	return ret;
+}
+
+RESULT eServiceEvent::getParentalData(ePtr<eParentalData> &dest) const
+{
+	std::list<eParentalData>::const_iterator it = m_ratings.begin();
+	for(;it != m_ratings.end(); ++it) {
+		dest = new eParentalData(*it);
+		//  for now just return the first item on the list
+		return 0;
+	}
+	dest = 0;
+	return -1;
+}
+
+PyObject *eServiceEvent::getParentalData() const
+{
+	ePyObject ret = PyList_New(m_ratings.size());
+	int cnt = 0;
+	for (std::list<eParentalData>::const_iterator it(m_ratings.begin()); it != m_ratings.end(); ++it)
+	{
+		ePyObject tuple = PyTuple_New(2);
+		PyTuple_SET_ITEM(tuple, 0, PyString_FromString(it->getCountryCode().c_str()));
+		PyTuple_SET_ITEM(tuple, 1, PyInt_FromLong(it->getRating()));
+		PyList_SET_ITEM(ret, cnt++, tuple);
+	}
+	return ret;
+}
+
 RESULT eServiceEvent::getComponentData(ePtr<eComponentData> &dest, int tagnum) const
 {
 	std::list<eComponentData>::const_iterator it =
@@ -236,14 +302,14 @@ RESULT eServiceEvent::getComponentData(ePtr<eComponentData> &dest, int tagnum) c
 			return 0;
 		}
 	}
-	dest=0;
+	dest = 0;
 	return -1;
 }
 
 PyObject *eServiceEvent::getComponentData() const
 {
 	ePyObject ret = PyList_New(m_component_data.size());
-	int cnt=0;
+	int cnt = 0;
 	for (std::list<eComponentData>::const_iterator it(m_component_data.begin()); it != m_component_data.end(); ++it)
 	{
 		ePyObject tuple = PyTuple_New(5);
@@ -289,11 +355,6 @@ RESULT eServiceEvent::getLinkageService(eServiceReference &service, eServiceRefe
 	}
 	service.type = eServiceReference::idInvalid;
 	return -1;
-}
-
-void setServiceEventLanguage(const std::string language)
-{
-	eServiceEvent::setEPGLanguage(language);
 }
 
 DEFINE_REF(eDebugClass);

@@ -1,10 +1,9 @@
 from Components.Harddisk import harddiskmanager
 from Components.NimManager import nimmanager
-from config import ConfigSubsection, ConfigYesNo, config, ConfigSelection, ConfigText, ConfigNumber, ConfigSet, ConfigLocations
+from config import ConfigSubsection, ConfigYesNo, config, ConfigSelection, ConfigText, ConfigNumber, ConfigSet, ConfigLocations, ConfigSelectionNumber
 from Tools.Directories import defaultRecordingLocation
 from Tools.Directories import resolveFilename, SCOPE_HDD
-from enigma import Misc_Options, eEnv
-from enigma import setTunerTypePriorityOrder, setPreferredTuner
+from enigma import Misc_Options, eEnv, setTunerTypePriorityOrder, setPreferredTuner, eServiceEvent
 from SystemInfo import SystemInfo
 import os
 
@@ -93,6 +92,42 @@ def InitUsageConfig():
 	def PreferredTunerChanged(configElement):
 		setPreferredTuner(int(configElement.value))
 	config.usage.frontend_priority.addNotifier(PreferredTunerChanged)
+
+	config.epg = ConfigSubsection()
+	config.epg.eit = ConfigYesNo(default = True)
+	config.epg.mhw = ConfigYesNo(default = False)
+	config.epg.freesat = ConfigYesNo(default = True)
+	config.epg.viasat = ConfigYesNo(default = True)
+	config.epg.netmed = ConfigYesNo(default = True)
+	config.epg.virgin = ConfigYesNo(default = False)
+	def EpgSettingsChanged(configElement):
+		from enigma import eEPGCache
+		mask = 0xffffffff
+		if not config.epg.eit.value:
+			mask &= ~(eEPGCache.NOWNEXT | eEPGCache.SCHEDULE | eEPGCache.SCHEDULE_OTHER)
+		if not config.epg.mhw.value:
+			mask &= ~eEPGCache.MHW
+		if not config.epg.freesat.value:
+			mask &= ~(eEPGCache.FREESAT_NOWNEXT | eEPGCache.FREESAT_SCHEDULE | eEPGCache.FREESAT_SCHEDULE_OTHER)
+		if not config.epg.viasat.value:
+			mask &= ~eEPGCache.VIASAT
+		#if not config.epg.netmed.value:
+		#	mask &= ~(eEPGCache.NETMED_SCHEDULE | eEPGCache.NETMED_SCHEDULE_OTHER)
+		#if not config.epg.virgin.value:
+		#	mask &= ~(eEPGCache.VIRGIN_NOWNEXT | eEPGCache.VIRGIN_SCHEDULE)
+		eEPGCache.getInstance().setEpgSources(mask)
+	config.epg.eit.addNotifier(EpgSettingsChanged)
+	config.epg.mhw.addNotifier(EpgSettingsChanged)
+	config.epg.freesat.addNotifier(EpgSettingsChanged)
+	config.epg.viasat.addNotifier(EpgSettingsChanged)
+	config.epg.netmed.addNotifier(EpgSettingsChanged)
+	config.epg.virgin.addNotifier(EpgSettingsChanged)
+
+	config.epg.histminutes = ConfigSelectionNumber(min = 0, max = 120, stepwidth = 15, default = 0, wraparound = True)
+	def EpgHistorySecondsChanged(configElement):
+		from enigma import eEPGCache
+		eEPGCache.getInstance().setEpgHistorySeconds(config.epg.histminutes.getValue()*60)
+	config.epg.histminutes.addNotifier(EpgHistorySecondsChanged)
 
 	def setHDDStandby(configElement):
 		for hdd in harddiskmanager.HDDList():
@@ -212,6 +247,53 @@ def InitUsageConfig():
 		("29970", _("29.97")),
 		("30000", _("30"))])
 	config.subtitles.pango_autoturnon = ConfigYesNo(default = True)
+
+	config.autolanguage = ConfigSubsection()
+	epg_language_choices=[
+		("---", _("None")),
+		("eng qaa", _("English")),
+		("deu ger", _("German")),
+		("ara", _("Arabic")),
+		("eus baq", _("Basque")),
+		("bul", _("Bulgarian")),
+		("hrv", _("Croatian")),
+		("ces cze", _("Czech")),
+		("dan", _("Danish")),
+		("dut ndl nld", _("Dutch")),
+		("est", _("Estonian")),
+		("fin", _("Finnish")),
+		("fra fre", _("French")),
+		("ell gre", _("Greek")),
+		("heb", _("Hebrew")),
+		("hun", _("Hungarian")),
+		("ita", _("Italian")),
+		("lav", _("Latvian")),
+		("lit", _("Lithuanian")),
+		("ltz", _("Luxembourgish")),
+		("nor", _("Norwegian")),
+		("fas per fa pes", _("Persian")),
+		("pol", _("Polish")),
+		("por dub Dub DUB ud1", _("Portuguese")),
+		("ron rum", _("Romanian")),
+		("rus", _("Russian")),
+		("srp", _("Serbian")),
+		("slk slo", _("Slovak")),
+		("slv", _("Slovenian")),
+		("spa", _("Spanish")),
+		("swe", _("Swedish")),
+		("tha", _("Thai")),
+		("tur Audio_TUR", _("Turkish")),
+		("ukr Ukr", _("Ukrainian"))]
+
+	def setEpgLanguage(configElement):
+		eServiceEvent.setEPGLanguage(configElement.value)
+	config.autolanguage.epglanguage = ConfigSelection(epg_language_choices, default="---")
+	config.autolanguage.epglanguage.addNotifier(setEpgLanguage)
+
+	def setEpgLanguageAlternative(configElement):
+		eServiceEvent.setEPGLanguageAlternative(configElement.value)
+	config.autolanguage.epglanguage_alternative = ConfigSelection(epg_language_choices, default="---")
+	config.autolanguage.epglanguage_alternative.addNotifier(setEpgLanguageAlternative)
 
 def updateChoices(sel, choices):
 	if choices:

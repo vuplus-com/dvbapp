@@ -8,16 +8,16 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- * 
+ *
  * The author may be reached as dent@cosy.sbg.ac.at, or
  * Thomas Mirlacher, Jakob-Haringerstr. 2, A-5020 Salzburg,
  * Austria
@@ -68,6 +68,16 @@ typedef struct {
 	u_char	original_network_id_lo		: 8;
 	u_char	segment_last_section_number	: 8;
 	u_char	segment_last_table_id		: 8;
+
+	int getSectionLength() const     { return section_length_hi << 8 | section_length_lo; };
+	int getServiceID() const         { return service_id_hi << 8 | service_id_lo; };
+	int getTransportStreamId() const { return transport_stream_id_hi << 8 | transport_stream_id_lo; };
+	int getOriginalNetworkId() const { return original_network_id_hi << 8 | original_network_id_lo; };
+
+	void setSectionLength(int length)  { section_length_hi = length >> 8; section_length_lo = length & 0xFF; };
+	void setServiceId(int serviceId)   { service_id_hi = serviceId >> 8; service_id_lo = serviceId & 0xFF; };
+	void setTransportStreamId(int tsi) { transport_stream_id_hi = tsi >> 8; transport_stream_id_lo = tsi & 0xFF; };
+	void setOriginalNetworkId(int oni) { original_network_id_hi = oni >> 8; original_network_id_lo = oni & 0xFF; };
 } eit_t;
 
 #define EIT_SIZE 14
@@ -103,20 +113,20 @@ struct eit_loop_struct1 {
 struct eit_short_event_descriptor_struct {
 	u_char	descriptor_tag			: 8;
 	u_char	descriptor_length		: 8;
-	
+
 	u_char	language_code_1			: 8;
 	u_char	language_code_2			: 8;
 	u_char	language_code_3			: 8;
 
 	u_char	event_name_length		: 8;
 };
-	
+
 #define EIT_EXTENDED_EVENT_DESCRIPOR 0x4e
 
 typedef struct eit_event_struct {
 	u_char	event_id_hi			: 8;
 	u_char	event_id_lo			: 8;
-	
+
 	u_char	start_time_1			: 8;
 	u_char	start_time_2			: 8;
 	u_char	start_time_3			: 8;
@@ -138,7 +148,13 @@ typedef struct eit_event_struct {
 #endif
 
 	u_char	descriptors_loop_length_lo	: 8;
-	
+
+	uint16_t getEventId() const          { return event_id_hi << 8 | event_id_lo; };
+	int getDescriptorsLoopLength() const { return descriptors_loop_length_hi << 8 | descriptors_loop_length_lo; };
+
+	void setEventId(uint16_t eventId)      { event_id_hi = eventId >> 8; event_id_lo = eventId & 0xFF; };
+	void setDescriptorsLoopLength(int dll) { descriptors_loop_length_hi = dll >> 8; descriptors_loop_length_lo = dll & 0xFF; };
+
 } eit_event_t;
 #define EIT_LOOP_SIZE 12
 
@@ -160,4 +176,4 @@ struct eit_extended_descriptor_struct {
 };
 
 
-#endif	
+#endif

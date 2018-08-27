@@ -44,6 +44,9 @@ from RecordTimer import RecordTimerEntry, RecordTimer, findSafeRecordPath
 # hack alert!
 from Menu import MainMenu, mdom
 
+def isStandardInfoBar(self):
+	return self.__class__.__name__ == "InfoBar"
+
 class InfoBarDish:
 	def __init__(self):
 		self.dishDialog = self.session.instantiateDialog(Dish)
@@ -852,7 +855,7 @@ class InfoBarSeek:
 		return seek
 
 	def isSeekable(self):
-		if self.getSeek() is None:
+		if self.getSeek() is None or (isStandardInfoBar(self) and not self.timeshift_enabled):
 			return False
 		return True
 
