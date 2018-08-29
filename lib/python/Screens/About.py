@@ -10,6 +10,8 @@ from Tools.DreamboxHardware import getFPVersion
 class About(Screen):
 	def __init__(self, session):
 		Screen.__init__(self, session)
+		self["NetworkHeader"] = StaticText(_("Network:"))
+		self["Network"] = StaticText(about.getNetworkInfo())
 
 		self["EnigmaVersion"] = StaticText("Version: " + about.getEnigmaVersionString())
 		self["ImageVersion"] = StaticText("Image: " + about.getImageVersionString())
