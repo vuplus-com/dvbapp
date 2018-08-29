@@ -678,12 +678,14 @@ class MediaPlayer(Screen, InfoBarBase, InfoBarSeek, InfoBarAudioSelection, InfoB
 		filelist = FileList(directory, useServiceRef = True, showMountpoints = False, isTop = True)
 
 		for x in filelist.getFileList():
-			if x[0][1] == True: #isDir
+			isDir = x[0][1]
+			data = x[0][0]
+			if isDir == True:
 				if recursive:
-					if x[0][0] != directory:
+					if data != directory:
 						self.copyDirectory(x[0][0])
-			elif filelist.getServiceRef() and filelist.getServiceRef().type == 4097:
-				self.playlist.addFile(x[0][0])
+			elif data and data.type in (2, 3, 4097):
+				self.playlist.addFile(data)
 		self.playlist.updateList()
 
 	def deleteFile(self):
