@@ -186,11 +186,6 @@ class DeviceManager(Screen):
 		if self.currList == "partitions":
 			currentPartition = self.getCurrentPartition()
 			if currentPartition is not None:
-				if currentPartition["mountpoint"] != "":
-					self["key_green"].setText(_("Umount"))
-				else:
-					self["key_green"].setText(_("Mount"))
-
 				if currentPartition["fstype"] == "":
 					self["key_blue"].setText("")
 				elif currentPartition["fstype"][:3] == "ext":
@@ -241,7 +236,7 @@ class DeviceManager(Screen):
 			partitionList.append(partitionEntry)
 		if len(partitionList) != 0:
 			self["key_red"].setText(_("Devices"))
-			self["key_green"].setText(_("Mount"))
+			self["key_green"].setText(_(" "))
 			self["key_yellow"].setText(_("Format"))
 			self["key_blue"].setText(_("Check"))
 			self.currList = "partitions"
@@ -250,34 +245,6 @@ class DeviceManager(Screen):
 			self.selectionChanged()
 		else:
 			self.session.open(MessageBox, _("No partition list found on device.\nPlease click BLUE key and do Initialize to use this device."), MessageBox.TYPE_ERROR, timeout = 10)
-
-	def showMountPointSetup(self):
-		if self.currDevice is None or self.currPartition is None:
-			return
-		partition =  self.currPartition["partition"]
-		if deviceinfo.isMountable(partition) is False:
-			self.session.open(MessageBox, _("This partition is not mountable.\nYou need to check or format this partition."), MessageBox.TYPE_ERROR, timeout = 10)
-			return
-		self["key_red"].setText(_("Partitions"))
-		self["key_green"].setText(_("Ok"))
-		self["key_yellow"].setText("")
-		self["key_blue"].setText("")
-		self.mountPointList = []
-		currentMountPoint = self.currPartition["mountpoint"]
-		if currentMountPoint == "":
-			currentMountPoint = "'not mounted'"
-		defaultMountPoint = self.getDefaultMountPoint()
-		autoMountPoint = self.getAutoMountPoint()
-		defaultMountPointEntry = (self.icon_button_green, _("Set up Default Mount Point"), _("Mount Point : %s ->%s")%(currentMountPoint, defaultMountPoint), "default", defaultMountPoint, self.divpng)
-		autoMountPointEntry = (self.icon_button_green, _("Automatically set up a Mount Point"), _("Mount Point : %s -> %s")%(currentMountPoint, autoMountPoint), "auto", autoMountPoint, self.divpng)
-		manuallyMountPointEntry = (self.icon_button_green, _("User manually Set up a Mount Point"), _("Mount Point : click ok button on here."), "manual", "", self.divpng)
-		if not path.ismount(defaultMountPoint):
-			self.mountPointList.append(defaultMountPointEntry)
-		self.mountPointList.append(autoMountPointEntry)
-		self.mountPointList.append(manuallyMountPointEntry)
-		self.currList = "mountpoint"
-		self["menu"].style = "mountpoint"
-		self["menu"].setList(self.mountPointList)
 
 	def getCurrentDevice(self):
 		try:
@@ -303,29 +270,7 @@ class DeviceManager(Screen):
 			else:
 				self.session.open(MessageBox, _("Device not found."), MessageBox.TYPE_ERROR, timeout = 10)
 		elif self.currList == "partitions":
-			currentPartition = self.getCurrentPartition()
-			if currentPartition is not None:
-				currMountPoint = currentPartition["mountpoint"]
-				currUuid = currentPartition["uuid"]
-				if currMountPoint == "":
-					self.currPartition = currentPartition
-					self.showMountPointSetup()
-				else:
-					self.doUmount(currMountPoint, self.showPartitionList)
-			else:
-				self.session.open(MessageBox, _("Partition info is not found."), MessageBox.TYPE_ERROR, timeout = 10)
-		elif self.currList == "mountpoint":
-# self["menu"].getCurrent() : (green_button, "menu description", "mount point description, "default", mountpoint, self.divpng)
-			currEntry = self["menu"].getCurrent()[3]
-			if currEntry == "default":
-#				print "Setup mountpoint default!"
-				self.doMount(self.currPartition, self["menu"].getCurrent()[4])
-			elif currEntry == "auto":
-#				print "Setup mountpoint automatically!"
-				self.doMount(self.currPartition, self["menu"].getCurrent()[4])
-			else:
-#				print "Setup mountpoint manually!"
-				self.session.openWithCallback(self.MountpointBrowserCB, MountpointBrowser)
+			pass
 		else:
 			pass
 
@@ -338,9 +283,6 @@ class DeviceManager(Screen):
 		if self.currList == "partitions":
 			self.currDevice = None
 			self.showDeviceList()
-		elif self.currList == "mountpoint":
-			self.currPartition = None
-			self.showPartitionList()
 		else: # currList = "default"
 			self.close()
 
@@ -391,113 +333,6 @@ class DeviceManager(Screen):
 				self.session.openWithCallback(self.deviceFormatCB, DeviceFormat, partition, choice[1])
 			else:
 				self.session.open(MessageBox, _("Partition info is not found."), MessageBox.TYPE_ERROR, timeout = 10)
-
-# about mount funcs..
-	def doUmount(self, mountpoint, callback):
-		cmd = "umount %s"%mountpoint
-		print "[DeviceManager] cmd : %s"%cmd
-		os.system(cmd)
-		if not path.ismount(mountpoint):
-			pass
-		else:
-			self.session.open(MessageBox, _("Can't umount %s. \nMaybe device or resource busy.")%mountpoint, MessageBox.TYPE_ERROR, timeout = 10)
-		callback()
-
-	def getDefaultMountPoint(self):
-		return self.defaultMountPoint
-
-	def getAutoMountPoint(self):
-		mountPoint = "/media/"+self.currDevice["model"]
-		mountPoint = mountPoint.replace(' ','-')
-		if path.ismount(mountPoint):
-			partnum = 2
-			while 1:
-				mountPoint_fix = mountPoint+str(partnum)
-				if not path.ismount(mountPoint_fix):
-					break
-				partnum +=1
-			mountPoint = mountPoint_fix
-		return mountPoint
-
-	def doMount(self, partition, mountpoint):
-		try:
-# check mountpoint is in partition list.
-			if mountpoint != self.getDefaultMountPoint():
-				for p in harddiskmanager.partitions:
-					if p.mountpoint == mountpoint:
-						self.session.open(MessageBox, _("Can not use this mount point.(%s) \nPlease select another mount point.")%mountpoint, MessageBox.TYPE_ERROR, timeout = 10)
-						return
-#
-			device = partition["partition"]
-			filesystem = partition["fstype"]
-			uuid = partition["uuid"]
-			if mountpoint.endswith("/"):
-				mountpoint = retval[:-1]
-			if mountpoint.find(' ') != -1:
-				mountpoint = mountpoint.replace(' ','-')
-			devpath = "/dev/"+device
-			if deviceinfo.isMounted(devpath, mountpoint):
-				print "[DeviceManager] '%s -> %s' is already mounted."%(devpath, mountpoint)
-				return
-
-# check current device mounted on another mountpoint.
-			mp_list = deviceinfo.checkMountDev(devpath)
-			for mp in mp_list:
-				if mp != mountpoint and path.ismount(mp):
-					deviceinfo.umountByMountpoint(mp)
-# check another device mounted on configmountpoint
-			devpath_list = deviceinfo.checkMountPoint(mountpoint)
-			for devpath_ in devpath_list:
-				if devpath_ != devpath:
-					self.session.open(MessageBox, _("Mount Failed!\nCurrent path is already mounted by \"%s\"")%devpath_list[0], MessageBox.TYPE_ERROR, timeout = 10)
-					return
-# do mount
-			print "[DeviceManagerHotplugDevice] doMount"
-			if not path.exists(mountpoint):
-				os.system("mkdir %s"%mountpoint)
-			if path.exists(mountpoint):
-				if not path.ismount(mountpoint):
-					if filesystem == "ntfs":
-						cmd = "ntfs-3g %s %s"%(devpath, mountpoint)
-					elif filesystem is None:
-						cmd = "mount %s %s"%(devpath, mountpoint)
-					else:
-						cmd = "mount -t %s %s %s"%(filesystem, devpath, mountpoint)
-					print "[DeviceManager] cmd : %s"%cmd
-					self.DeviceManagerConsole.ePopen(cmd, self.doMountFinished, (devpath, mountpoint) )
-		except:
-			self.session.open(MessageBox, _("Mount Failed!\n(%s -> %s)")%(device, mountpoint), MessageBox.TYPE_ERROR, timeout = 10)
-
-	def doMountFinished(self, result, retval, extra_args = None):
-		(devpath, mountpoint) = extra_args
-		if retval == 0:
-			if not deviceinfo.isMounted(devpath, mountpoint):
-#				print "[DeviceManager] %s doMount failed!"%devpath
-				self.session.open(MessageBox, _("Mount Failed!\n(%s -> %s)")%(devpath, mountpoint), MessageBox.TYPE_ERROR, timeout = 10)
-				return
-			else:
-# make movie directory
-				if mountpoint == "/media/hdd":
-					movieDir = mountpoint + "/movie"
-					if not pathExists(movieDir):
-						print "[DeviceManager] make dir %s"%movieDir
-						os.makedirs(movieDir)
-				self.showPartitionList()
-# update current mount state ,devicemanager.cfg
-				pass
-
-	def MountpointBrowserCB(self, retval = None):
-		if retval and retval is not None:
-			mountPoint = retval.strip().replace(' ','')
-			if retval.endswith("/"):
-				mountPoint = retval[:-1]
-			print "Mount point from MountpointBrowser : %s"%mountPoint
-			if not path.exists(mountPoint):
-				self.session.open(MessageBox, _("Mount Point is not writeable.\nPath : %s")%mountPoint, MessageBox.TYPE_ERROR, timeout = 10)
-
-			else:
-				self.doMount(self.currPartition, mountPoint)
-# mount funcs end..
 
 # Initializing Start...
 class DeviceInit(Screen):
@@ -1622,8 +1457,11 @@ class MessageBox_2(MessageBox):
 
 class MessageBox_2_Summary(Screen):
 	skin="""
-		<screen name="MessageBox_2_Summary" position="0,0" size="256,64" id="1">
-			<widget source="parent.Text" render="Label" position="0,0" size="256,64" font="Regular;13" halign="center" valign="center" />
+		<screen name="MessageBox_2_Summary" position="0,0" size="%d,%d" id="1">
+			<widget source="parent.Text" render="Label" position="0,0" size="%d,%d" font="Regular;%d" halign="center" valign="center" />
 		</screen>
 	"""
-
+	def __init__(self, session, parent):
+		w,h   = session.summary_desktop.size().width(), session.summary_desktop.size().height()
+		self.skin = self.skin % (w, h, w, h, h/7)
+		Screen.__init__(self, session, parent = parent)
