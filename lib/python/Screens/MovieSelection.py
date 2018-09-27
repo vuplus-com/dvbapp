@@ -189,8 +189,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo):
 		self["DescriptionBorder"].hide()
 
 		if not fileExists(config.movielist.last_videodir.value):
-			config.movielist.last_videodir.value = defaultMoviePath()
-			config.movielist.last_videodir.save()
+			self.getDefaultMoviePath()
 		self.current_ref = eServiceReference("2:0:1:0:0:0:0:0:0:0:" + config.movielist.last_videodir.value)
 
 		self["list"] = MovieList(None,
@@ -241,6 +240,17 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo):
 		self.onShown.append(self.go)
 		self.onLayoutFinish.append(self.saveListsize)
 		self.inited = False
+
+	def getDefaultMoviePath(self):
+		path = defaultMoviePath()
+		config.movielist.last_videodir.value = path
+		config.movielist.last_videodir.save()
+		tmp = config.movielist.videodirs.value[:]
+		if path not in tmp:
+			tmp.append(path)
+			tmp.sort()
+			config.movielist.videodirs.value = tmp
+			config.movielist.videodirs.save()
 
 	def updateDescription(self):
 		if config.movielist.description.value == MovieList.SHOW_DESCRIPTION:
@@ -346,13 +356,12 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo):
 
 	def reloadList(self, sel = None, home = False):
 		if not fileExists(config.movielist.last_videodir.value):
-			path = defaultMoviePath()
-			config.movielist.last_videodir.value = path
-			config.movielist.last_videodir.save()
+			self.getDefaultMoviePath()
 			self.current_ref = eServiceReference("2:0:1:0:0:0:0:0:0:0:" + path)
 			self["freeDiskSpace"].path = path
 		if sel is None:
 			sel = self.getCurrent()
+
 		self["list"].reload(self.current_ref, self.selected_tags)
 		title = _("Recorded files...")
 		if config.usage.setup_level.index >= 2: # expert+
