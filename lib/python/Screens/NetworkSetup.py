@@ -313,8 +313,6 @@ class AdapterSetup(Screen, ConfigListScreen, HelpableScreen):
 		self.oktext = _("Press OK on your remote control to continue.")
 		self.oldInterfaceState = iNetwork.getAdapterAttribute(self.iface, "up")
 
-		self.createConfig()
-
 		self["OkCancelActions"] = HelpableActionMap(self, "OkCancelActions",
 			{
 			"cancel": (self.keyCancel, _("exit network adapter configuration")),
@@ -333,7 +331,6 @@ class AdapterSetup(Screen, ConfigListScreen, HelpableScreen):
 
 		self.list = []
 		ConfigListScreen.__init__(self, self.list,session = self.session)
-		self.createSetup()
 		self.onLayoutFinish.append(self.layoutFinished)
 		self.onClose.append(self.cleanup)
 
@@ -361,7 +358,14 @@ class AdapterSetup(Screen, ConfigListScreen, HelpableScreen):
 		self["HelpWindow"] = Pixmap()
 		self["HelpWindow"].hide()
 		
-	def layoutFinished(self):
+	def updateInterfaces(self,callback = None):
+		iNetwork.config_ready = False
+		iNetwork.msgPlugins()
+		iNetwork.getInterfaces(callback)
+
+	def updateInterfaceCB(self, ret=None):
+		self.createConfig()
+		self.createSetup()
 		self["DNS1"].setText(self.primaryDNS.getText())
 		self["DNS2"].setText(self.secondaryDNS.getText())
 		if self.ipConfigEntry.getText() is not None:
@@ -389,6 +393,9 @@ class AdapterSetup(Screen, ConfigListScreen, HelpableScreen):
 			self["Gateway"].setText("")
 			self["Gatewaytext"].setText("")
 		self["Adapter"].setText(iNetwork.getFriendlyAdapterName(self.iface))
+
+	def layoutFinished(self):
+		self.updateInterfaces(self.updateInterfaceCB)
 
 	def createConfig(self):
 		self.InterfaceEntry = None
