@@ -331,6 +331,7 @@ class AdapterSetup(Screen, ConfigListScreen, HelpableScreen):
 
 		self.list = []
 		ConfigListScreen.__init__(self, self.list,session = self.session)
+		self.initConfig()
 		self.onLayoutFinish.append(self.layoutFinished)
 		self.onClose.append(self.cleanup)
 
@@ -397,7 +398,7 @@ class AdapterSetup(Screen, ConfigListScreen, HelpableScreen):
 	def layoutFinished(self):
 		self.updateInterfaces(self.updateInterfaceCB)
 
-	def createConfig(self):
+	def initConfig(self):
 		self.InterfaceEntry = None
 		self.dhcpEntry = None
 		self.gatewayEntry = None
@@ -412,6 +413,7 @@ class AdapterSetup(Screen, ConfigListScreen, HelpableScreen):
 		self.wsconfig = None
 		self.default = None
 
+	def createConfig(self):
 		if iNetwork.isWirelessInterface(self.iface):
 			from Plugins.SystemPlugins.WirelessLan.Wlan import wpaSupplicant
 			self.ws = wpaSupplicant()
@@ -419,7 +421,8 @@ class AdapterSetup(Screen, ConfigListScreen, HelpableScreen):
 			self.encryptionlist.append(("Unencrypted", _("Unencrypted")))
 			self.encryptionlist.append(("WEP", _("WEP")))
 			self.encryptionlist.append(("WPA", _("WPA")))
-			self.encryptionlist.append(("WPA/WPA2", _("WPA or WPA2")))
+			if not iNetwork.useWlCommand(self.iface):
+				self.encryptionlist.append(("WPA/WPA2", _("WPA or WPA2")))
 			self.encryptionlist.append(("WPA2", _("WPA2")))
 			self.weplist = []
 			self.weplist.append("ASCII")
@@ -669,10 +672,10 @@ class AdapterSetup(Screen, ConfigListScreen, HelpableScreen):
 		
 	def hideInputHelp(self):
 		current = self["config"].getCurrent()
-		if current == self.wlanSSID:
+		if self.wlanSSID is not None and current == self.wlanSSID:
 			if current[1].help_window.instance is not None:
 				current[1].help_window.instance.hide()
-		elif current == self.encryptionKey and config.plugins.wlan.encryption.value is not "Unencrypted":
+		elif self.encryptionKey is not None and current == self.encryptionKey and config.plugins.wlan.encryption.value is not "Unencrypted":
 			if current[1].help_window.instance is not None:
 				current[1].help_window.instance.hide()
 

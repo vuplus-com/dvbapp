@@ -46,7 +46,7 @@ class Network:
 		return self.remoteRootFS
 
 	def isBlacklisted(self, iface):
-		return iface in ('lo', 'wifi0', 'wmaster0')
+		return iface in ('lo', 'wifi0', 'wmaster0', 'sys0')
 
 	def getInterfaces(self, callback = None):
 		self.configuredInterfaces = []
@@ -90,7 +90,7 @@ class Network:
 		
 		for line in result.splitlines():
 			split = line.strip().split(' ',2)
-			if (split[1][:-1] == iface):
+			if (split[1][:-1] == iface) or (split[1][:-1] == (iface + '@sys0')):
 				up = self.regExpMatch(upPattern, split[2])
 				mac = self.regExpMatch(macPattern, self.regExpMatch(macLinePattern, split[2]))
 				if up is not None:
@@ -290,6 +290,9 @@ class Network:
 					name += " " + str(len(self.lan_interfaces)+1)
 				self.lan_interfaces.append(iface)
 		return name
+
+	def useWlCommand(self, iface):
+		return iface and os_path.exists("/tmp/bcm/%s" % iface)
 	
 	def getFriendlyAdapterDescription(self, iface):
 		if not self.isWirelessInterface(iface):
@@ -298,18 +301,40 @@ class Network:
 		moduledir = self.getWlanModuleDir(iface)
 		if moduledir:
 			name = os_path.basename(os_path.realpath(moduledir))
-			if name in ('ath_pci','ath5k'):
+			if name in ('ath_pci', 'ath5k'):
 				name = 'Atheros'
-			elif name in ('rt73','rt73usb','rt3070sta'):
+			elif name in ('rt73','rt73usb','rt3070sta', 'rt5370sta'):
 				name = 'Ralink'
 			elif name == 'zd1211b':
 				name = 'Zydas'
-			elif name == 'r871x_usb_drv':
+			elif name in ('r871x_usb_drv', 'rtw_usb_drv'):
 				name = 'Realtek'
+			elif self.isRalinkModule(iface):
+				name = 'Ralink'
+		elif self.useWlCommand(iface):
+			name = 'BroadCom'
 		else:
 			name = _('Unknown')
 
 		return name + ' ' + _('wireless network interface')
+
+	def isRalinkModule(self, iface):
+		import os
+# check vendor ID for lagacy driver
+		vendorID = "148f" # ralink vendor ID
+		idVendorPath = "/sys/class/net/%s/device/idVendor" % iface
+		if os.access(idVendorPath, os.R_OK):
+			if open(idVendorPath, "r").read().strip() == vendorID:
+				return True
+
+# check sys driver path for kernel driver
+		ralinkKmod = "rt2800usb" # ralink kernel driver name
+		driverPath = "/sys/class/net/%s/device/driver/" % iface
+		if os.path.exists(driverPath):
+			driverName = os.path.basename(os_path.realpath(driverPath))
+			if driverName == ralinkKmod:
+				return True
+		return False
 
 	def getAdapterName(self, iface):
 		return iface
@@ -636,6 +661,9 @@ class Network:
 
 	def getWlanModuleDir(self, iface = None):
 		devicedir = self.sysfsPath(iface) + '/device'
+		if not os_path.exists(devicedir):
+			return None
+
 		moduledir = devicedir + '/driver/module'
 		if os_path.isdir(moduledir):
 			return moduledir
