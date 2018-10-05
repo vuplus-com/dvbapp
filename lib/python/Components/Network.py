@@ -439,15 +439,10 @@ class Network:
 				callback(True,mode)
 
 	def checkNetworkState(self,statecallback):
-		# www.dream-multimedia-tv.de, www.heise.de, www.google.de
 		self.NetworkState = 0
-		cmd1 = "ping -c 1 82.149.226.170"
-		cmd2 = "ping -c 1 193.99.144.85"
-		cmd3 = "ping -c 1 209.85.135.103"
 		self.PingConsole = Console()
-		self.PingConsole.ePopen(cmd1, self.checkNetworkStateFinished,statecallback)
-		self.PingConsole.ePopen(cmd2, self.checkNetworkStateFinished,statecallback)
-		self.PingConsole.ePopen(cmd3, self.checkNetworkStateFinished,statecallback)
+		for testserver in ("www.heise.de", "www.google.de", "de.yahoo.com"):
+			self.PingConsole.ePopen("ping -c 1 %s" % testserver, self.checkNetworkStateFinished,statecallback)
 		
 	def checkNetworkStateFinished(self, result, retval,extra_args):
 		(statecallback) = extra_args
