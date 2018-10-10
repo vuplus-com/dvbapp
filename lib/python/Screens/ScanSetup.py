@@ -886,7 +886,11 @@ class ScanSetup(ConfigListScreen, Screen, CableTransponderSearchSupport, Terrest
 				(eDVBFrontendParametersSatellite.System_DVB_S2, _("DVB-S2")),
 				(eDVBFrontendParametersSatellite.System_DVB_S2X, _("DVB-S2X"))]
 
-			self.scan_sat.system = ConfigSelection(default = defaultSat["system"], choices = sat_choices)
+			default_sat_system = defaultSat["system"]
+			if default_sat_system not in sat_choices:
+				default_sat_system = eDVBFrontendParametersSatellite.System_DVB_S
+
+			self.scan_sat.system = ConfigSelection(default = default_sat_system, choices = sat_choices)
 			self.scan_sat.system_dvbs2x = ConfigSelection(default = defaultSat["system"], choices = sat_choices_dvbs2x)
 			self.scan_sat.frequency = ConfigInteger(default = defaultSat["frequency"], limits = (1, 99999))
 			self.scan_sat.inversion = ConfigSelection(default = defaultSat["inversion"], choices = [
