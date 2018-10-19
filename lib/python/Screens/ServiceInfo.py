@@ -154,7 +154,11 @@ class ServiceInfo(Screen):
 					 "constellation"		: _("Constellation"),
 					 "transmission_mode"		: _("Transmission mode"),
 					 "guard_interval" 		: _("Guard interval"),
-					 "hierarchy_information"	: _("Hierarchy info") }
+					 "hierarchy_information"	: _("Hierarchy info"),
+					 "plp_id"			: _("PLP ID"),
+					 "is_id"			: _("Input Stream ID"),
+					 "pls_mode"			: _("PLS Mode"),
+					 "pls_code"			: _("PLS Code")}
 				Labels = [(conv[i], tp_info[i], TYPE_VALUE_DEC) for i in tp_info.keys()]
 				self.fillList(Labels)
 
