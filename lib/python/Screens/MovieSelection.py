@@ -252,6 +252,8 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo):
 			config.movielist.videodirs.value = tmp
 			config.movielist.videodirs.save()
 
+		return path
+
 	def updateDescription(self):
 		if config.movielist.description.value == MovieList.SHOW_DESCRIPTION:
 			self["DescriptionBorder"].show()
@@ -356,7 +358,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo):
 
 	def reloadList(self, sel = None, home = False):
 		if not fileExists(config.movielist.last_videodir.value):
-			self.getDefaultMoviePath()
+			path = self.getDefaultMoviePath()
 			self.current_ref = eServiceReference("2:0:1:0:0:0:0:0:0:0:" + path)
 			self["freeDiskSpace"].path = path
 		if sel is None:
