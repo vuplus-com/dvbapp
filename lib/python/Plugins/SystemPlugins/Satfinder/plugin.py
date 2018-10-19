@@ -57,6 +57,7 @@ class Satfinder(ScanSetup):
 		self.session.nav.playService(self.oldref)
 
 	def createSetup(self):
+		self.modulationEntry = None
 		self.typeOfTuningEntry = None
 		self.satEntry = None
 		self.systemEntry = None
