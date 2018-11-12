@@ -107,7 +107,8 @@ cable_autoscan_nimtype = {
 'TT3L10' : 'tt3l10',
 'TURBO' : 'vuplus_turbo_c',
 'TT2L08' : 'tt2l08',
-'BCM3148' : 'bcm3148'
+'BCM3148' : 'bcm3148',
+'BCM3158' : 'bcm3148',
 }
 
 terrestrial_autoscan_nimtype = {
