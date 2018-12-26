@@ -341,7 +341,7 @@ class CiSelection(Screen):
 		if SystemInfo["CI%dSupportsHighBitrates" % slot]:
 			self.HighBitrateEntry[slot] = getConfigListEntry(_("High bitrate support"), config.ci[slot].canHandleHighBitrates)
 		if SystemInfo["CI%dRelevantPidsRoutingSupport" % slot]:
-			self.RelevantPidsRoutingEntry[slot] = getConfigListEntry(_("Relevant PIDs Routing"), config.ci[slot].relevantPidsRouting)
+			self.RelevantPidsRoutingEntry[slot] = getConfigListEntry(_("PID Filtering"), config.ci[slot].relevantPidsRouting)
 		if SystemInfo["CommonInterfaceCIDelay"] and self.DVBCiDelayEntry is None:
 			self.DVBCiDelayEntry = getConfigListEntry(_("DVB CI Delay"), config.cimisc.dvbCiDelay)
 
