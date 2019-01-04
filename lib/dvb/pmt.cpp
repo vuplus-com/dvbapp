@@ -1322,7 +1322,7 @@ void eDVBServicePMTHandler::removeCaHandler()
 
 bool eDVBServicePMTHandler::isCiConnected()
 {
-	eDVBCIInterfaces::getInstance()->isCiConnected(this);
+	return eDVBCIInterfaces::getInstance()->isCiConnected(this);
 }
 
 CAServiceMap eDVBCAService::exist;
