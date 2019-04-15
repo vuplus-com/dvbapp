@@ -161,7 +161,7 @@ class RecordTimerEntry(timer.TimerEntry, object):
 		print "[TIMER]", msg
 
 	def calculateFilename(self):
-		if self.Filename:
+		if self.pvrConvert and self.Filename:
 			self.log(0, "Filename calculated as: '%s'" % self.Filename)
 			return self.Filename
 
