@@ -19,7 +19,7 @@ def getModel():
 	return ret
 
 def getRcuDefaultType():
-	if getModel() in ["uno4kse", "zero4k", "duo4k"]:
+	if getModel() in ["uno4kse", "zero4k", "duo4k", "duo4kse"]:
 		return "new"
 	return "legacy"
 

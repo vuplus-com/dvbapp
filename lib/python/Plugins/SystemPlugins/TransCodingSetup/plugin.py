@@ -53,6 +53,14 @@ def getProcPath(encoder, configName):
 		"profile" 		: 	"profile",
 		"width" 		: 	"width",
 		"height" 		: 	"height",
+		"framerate_choices"		:	"framerate_choices",
+		"resolution_choices"	:	"resolution_choices",
+		"aspectratio_choices"	:	"aspectratio_choices",
+		"resolution_choices"	:	"display_format_choices",
+		"audiocodec_choices"	:	"audio_codec_choices",
+		"videocodec_choices"	:	"video_codec_choices",
+		"level_choices"		:	"level_choices",
+		"profile_choices"	:	"profile_choices",
 	}.get(configName)
 	return "/proc/stb/encoder/%s/%s" % (encoder, _configName)
 
@@ -60,6 +68,36 @@ def checkSupportAdvanced():
 	if fileExists( getProcPath(0, "aspectratio") ):
 		return True
 	return False
+
+def getChoices(configName):
+	choices = []
+	proc_path = getProcPath(encoder, configName)
+	if fileExists(proc_path):
+		data = getProcValue(proc_path)
+		if data is not None:
+			for choice in data.split(' '):
+				choices.append( (choice, _(choice)) )
+	return choices
+
+def getDefault(choices, value):
+	for choice in choices:
+		if choice[0] == value:
+			return value
+	return choices[0][0]
+
+def getAspectratioChoices():
+	choices = []
+	proc_path = getProcPath(encoder, "aspectratio_choices")
+	if fileExists(proc_path):
+		data = getProcValue(proc_path)
+		if data is not None:
+			for choice in data.split(' '):
+				try:
+					k,v = choice.split(':')
+					choices.append( (k, _(v)) )
+				except:
+					continue
+	return choices
 
 config.plugins.transcodingsetup = ConfigSubsection()
 config.plugins.transcodingsetup.transcoding = ConfigSelection(default = "enable", choices = [ ("enable", _("enable")), ("disable", _("disable"))] )
@@ -84,7 +122,10 @@ def createTransCodingConfig(encoder):
 		setAttr("bitrate", encoder, choice)
 
 	if fileExists( getProcPath(encoder ,"framerate") ):
-		choice = TconfigSelection(encoder, default = "30000", choices = [ ("23976", _("23976")), ("24000", _("24000")), ("25000", _("25000")), ("29970", _("29970")), ("30000", _("30000")), ("50000", _("50000")), ("59940", _("59940")), ("60000", _("60000"))] )
+		framerate_choices = getChoices("framerate_choices")
+		if (len(framerate_choices) == 0):
+			framerate_choices = [ ("23976", _("23976")), ("24000", _("24000")), ("25000", _("25000")), ("29970", _("29970")), ("30000", _("30000")), ("50000", _("50000")), ("59940", _("59940")), ("60000", _("60000"))]
+		choice = TconfigSelection(encoder, default = getDefault(framerate_choices, "30000"), choices = framerate_choices )
 		setAttr("framerate", encoder, choice)
 
 	if checkSupportAdvanced() and (hasAttr("bitrate", encoder) or hasAttr("framerate", encoder)):
@@ -92,23 +133,31 @@ def createTransCodingConfig(encoder):
 		setAttr("automode", encoder, choice)
 
 	if fileExists( getProcPath(encoder, "resolution") ):
-		resolutaion_choices = [ ("480p", _("480p")), ("576p", _("576p")), ("720p", _("720p")), ("320x240", _("320x240")), ("160x120", _("160x120")) ]
-		if vumodel in ("solo4k"):
-			resolutaion_choices.insert(3, ("1080p", _("1080p")))
-
-		choice = TconfigSelection(encoder, default = "480p", choices = resolutaion_choices )
+		resolutaion_choices = getChoices("resolution_choices")
+		if (len(resolutaion_choices) == 0):
+			resolutaion_choices = [ ("480p", _("480p")), ("576p", _("576p")), ("720p", _("720p")), ("320x240", _("320x240")), ("160x120", _("160x120")) ]
+		choice = TconfigSelection(encoder, default = getDefault(resolutaion_choices, "480p"), choices = resolutaion_choices )
 		setAttr("resolution", encoder, choice)
 
 	if fileExists( getProcPath(encoder, "aspectratio") ):
-		choice = TconfigSelection(encoder, default = "1", choices = [ ("0", _("auto")), ("1", _("4x3")), ("2", _("16x9")) ] )
+		aspectratio_choices = getAspectratioChoices()
+		if len(aspectratio_choices) == 0:
+			aspectratio_choices = [ ("0", _("auto")), ("1", _("4x3")), ("2", _("16x9")) ]
+		choice = TconfigSelection(encoder, default = "1", choices = aspectratio_choices )
 		setAttr("aspectratio", encoder, choice)
 
 	if fileExists( getProcPath(encoder, "audiocodec") ):
-		choice = TconfigSelection(encoder, default = "aac", choices = [("mpg", _("mpg")), ("mp3", _("mp3")), ("aac", _("aac")), ("aac+", _("aac+")), ("aac+loas", _("aac+loas")), ("aac+adts", _("aac+adts")), ("ac3", _("ac3"))] )
+		audiocodec_choices = getChoices("audiocodec_choices")
+		if len(audiocodec_choices) == 0:
+			audiocodec_choices = [("mpg", _("mpg")), ("mp3", _("mp3")), ("aac", _("aac")), ("aac+", _("aac+")), ("aac+loas", _("aac+loas")), ("aac+adts", _("aac+adts")), ("ac3", _("ac3"))]
+		choice = TconfigSelection(encoder, default = getDefault(audiocodec_choices, "aac"), choices = audiocodec_choices )
 		setAttr("audiocodec", encoder, choice)
 
 	if fileExists( getProcPath(encoder, "videocodec") ):
-		choice = TconfigSelection(encoder, default = "h264", choices = [ ("h264", _("h264")) ] )
+		videocodec_choices = getChoices("videocodec_choices")
+		if len(videocodec_choices) == 0:
+			_choices = [ ("h264", _("h264")) ]
+		choice = TconfigSelection(encoder, default = getDefault(videocodec_choices, "h264"), choices = videocodec_choices )
 		setAttr("videocodec", encoder, choice)
 
 	if fileExists( getProcPath(encoder, "gopframeb") ):
@@ -120,14 +169,20 @@ def createTransCodingConfig(encoder):
 		setAttr("gopframep", encoder, choice)
 
 	if fileExists( getProcPath(encoder, "level") ):
-		choice = TconfigSelection(encoder, default = "3.1", choices = [("1.0", _("1.0")), ("2.0", _("2.0")),
-			("2.1", _("2.1")), ("2.2", _("2.2")), ("3.0", _("3.0")), ("3.1", _("3.1")),
-			("3.2", _("3.2")), ("4.0", _("4.0")), ("4.1", _("4.1")), ("4.2", _("4.2")),
-			("5.0", _("5.0")), ("low", _("low")), ("main", _("main")), ("high", _("high"))] )
+		level_choices = getChoices("level_choices")
+		if (len(level_choices) == 0):
+			level_choices = [("1.0", _("1.0")), ("2.0", _("2.0")),
+				("2.1", _("2.1")), ("2.2", _("2.2")), ("3.0", _("3.0")), ("3.1", _("3.1")),
+				("3.2", _("3.2")), ("4.0", _("4.0")), ("4.1", _("4.1")), ("4.2", _("4.2")),
+				("5.0", _("5.0")), ("low", _("low")), ("main", _("main")), ("high", _("high"))]
+		choice = TconfigSelection(encoder, default = getDefault(level_choices, "3.1"), choices = level_choices )
 		setAttr("level", encoder, choice)
 
 	if fileExists( getProcPath(encoder, "profile") ):
-		choice = TconfigSelection(encoder, default = "baseline", choices = [("baseline", _("baseline")), ("simple", _("simple")), ("main", _("main")), ("high", _("high")), ("advanced simple", _("advancedsimple"))] )
+		profile_choices = getChoices("profile_choices")
+		if (len(profile_choices) == 0):
+			profile_choices = [("baseline", _("baseline")), ("simple", _("simple")), ("main", _("main")), ("high", _("high")), ("advanced simple", _("advancedsimple"))]
+		choice = TconfigSelection(encoder, default = getDefault(profile_choices, "baseline"), choices = profile_choices )
 		setAttr("profile", encoder, choice)
 
 # check encoders
